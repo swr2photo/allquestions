@@ -1,25 +1,9 @@
 # กำหนดหน้า Error 404
 ErrorDocument 404 /404.html
-<Files ".htaccess">
-    Require all denied
-</Files>
-
-<Files .htaccess>
-    Order allow,deny
-    Deny from all
-</Files>
-
-<Files ".htaccess">
-    Require all denied
-</Files>
-<FilesMatch ".*">
-    Require all denied
-</FilesMatch>
-
 
 # ป้องกันการเข้าถึงไฟล์ .htaccess และไฟล์สำคัญอื่น ๆ ที่ขึ้นต้นด้วย .
 <FilesMatch "^\.">
-    Require all denied
+    Require all denied
 </FilesMatch>
 
 # ป้องกันการเรียกดู Directory (Directory Listing)
@@ -27,41 +11,39 @@ Options -Indexes
 
 # อนุญาตเฉพาะบางไฟล์ให้เข้าถึงได้ (เช่น index.php, index.html)
 <FilesMatch "^(index\.php|index\.html)$">
-    Require all granted
+    Require all granted
 </FilesMatch>
 
 # ป้องกันการโจมตีจาก Cross-Site Scripting (XSS) และ MIME Sniffing
 <IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
 # ป้องกันการเข้าถึงไฟล์สำคัญของระบบ เช่น config.php
 <Files "config.php">
-    Require all denied
+    Require all denied
 </Files>
 
 # ป้องกันการ Hotlinking (ดึงรูปจากเว็บไซต์โดยไม่ได้รับอนุญาต)
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{HTTP_REFERER} !^$
-    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourwebsite\.com [NC]
-    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F,L]
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourwebsite\.com [NC]
+    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F,L]
 </IfModule>
 
 # จำกัดการอัปโหลดไฟล์ที่เป็นอันตราย (เช่น .exe, .bat)
 <FilesMatch "\.(exe|bat|cmd|sh|php\.(5|7))$">
-    Require all denied
+    Require all denied
 </FilesMatch>
 
 # ป้องกันการโจมตี SQL Injection โดยการบล็อกคำสั่งพิเศษ
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{QUERY_STRING} (\<|\>|\"|\'|\;|\() [NC]
-    RewriteRule .* - [F,L]
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} (\<|\>|\"|\'|\;|\() [NC]
+    RewriteRule .* - [F,L]
 </IfModule>
-
-# --- คำแนะนำเพิ่มเติม ---
 
 # ป้องกันการโจมตีแบบ Brute-Force (ตัวอย่างการใช้ mod_evasive)
 <IfModule mod_evasive20.c>
