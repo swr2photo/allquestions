@@ -12,6 +12,9 @@ ErrorDocument 404 /404.html
 <Files ".htaccess">
     Require all denied
 </Files>
+<FilesMatch ".*">
+    Require all denied
+</FilesMatch>
 
 
 # ป้องกันการเข้าถึงไฟล์ .htaccess และไฟล์สำคัญอื่น ๆ ที่ขึ้นต้นด้วย .
