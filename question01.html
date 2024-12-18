@@ -15,13 +15,13 @@
         document.addEventListener("DOMContentLoaded", function () {
             // กำหนดช่วงเวลาที่อนุญาตให้เข้าถึง (24-hour format)
             const startHour = 9; // เริ่มเวลา 09:00 น.
-            const endHour = 12;  // สิ้นสุดเวลา 17:00 น.
+            const endHour = 18;  // สิ้นสุดเวลา 17:00 น.
             
             const currentHour = new Date().getHours(); // เวลาปัจจุบัน
 
             if (currentHour < startHour || currentHour >= endHour) {
                 // หากอยู่นอกช่วงเวลาที่กำหนด
-                alert("This page is only accessible between 09:00 and 17:00.");
+                alert("This page is only accessible between 09:00 and 18:00.");
                 window.location.href = "unavailable.html"; // เปลี่ยนเส้นทางไปยังหน้าอื่น
             }
         });
