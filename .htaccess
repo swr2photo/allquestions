@@ -1,1 +1,45 @@
 ErrorDocument 404 /404.html
+
+# ป้องกันการเข้าถึงไฟล์ .htaccess และไฟล์สำคัญอื่น ๆ
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# ป้องกันการเรียกดู Directory (Directory Listing)
+Options -Indexes
+
+# อนุญาตเฉพาะบางไฟล์ให้เข้าถึงได้ (เช่น index.php, index.html)
+<FilesMatch "^(index\.php|index\.html)$">
+    Require all granted
+</FilesMatch>
+
+# ป้องกันการโจมตีจาก Cross-Site Scripting (XSS) และ MIME Sniffing
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# ป้องกันการเข้าถึงไฟล์สำคัญของระบบ เช่น config.php
+<Files "config.php">
+    Require all denied
+</Files>
+
+# ป้องกันการ Hotlinking (ดึงรูปจากเว็บไซต์โดยไม่ได้รับอนุญาต)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourwebsite\.com [NC]
+    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F,L]
+</IfModule>
+
+# จำกัดการอัปโหลดไฟล์ที่เป็นอันตราย (เช่น .exe, .bat)
+<FilesMatch "\.(exe|bat|cmd|sh|php\.(5|7))$">
+    Require all denied
+</FilesMatch>
+
+# ป้องกันการโจมตี SQL Injection โดยการบล็อกคำสั่งพิเศษ
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} (\<|\>|\"|\'|\;|\() [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
