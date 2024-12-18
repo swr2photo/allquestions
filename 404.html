@@ -5,41 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Page Not Found</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: #333;
+            text-align: center;
+            padding: 2rem;
         }
+
+        .container {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
         h1 {
-            font-size: 3rem;
+            font-size: 8vw;
+            font-weight: bold;
+            color: #e74c3c;
             margin-bottom: 1rem;
         }
+
         p {
             font-size: 1.2rem;
+            color: #555;
             margin-bottom: 2rem;
         }
+
         a {
             text-decoration: none;
-            background-color: #007bff;
+            background-color: #3498db;
             color: #fff;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            font-size: 1rem;
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
         }
+
         a:hover {
-            background-color: #0056b3;
+            background-color: #2980b9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 12vw;
+            }
+
+            p {
+                font-size: 1rem;
+            }
+
+            a {
+                font-size: 1rem;
+                padding: 0.7rem 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 14vw;
+            }
+
+            p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            a {
+                font-size: 1rem;
+                padding: 0.6rem 1.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>404</h1>
-    <p>Oops! The page you're looking for doesn't exist.</p>
-    <a href="/">Back to Home</a>
+    <div class="container">
+        <h1>404</h1>
+        <p>Oops! The page you're looking for doesn't exist.</p>
+        <a href="/">Back to Home</a>
+    </div>
 </body>
 </html>
