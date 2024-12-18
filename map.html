@@ -51,15 +51,29 @@
   <div class="modal-content">
     <h1>ตรวจสอบตำแหน่งของคุณ</h1>
     <p>เราจะตรวจสอบตำแหน่งของคุณเพื่อเข้าถึงหน้าที่ต้องการ</p>
-    <button class="btn" onclick="getLocationPermission()">ตรวจสอบตำแหน่ง</button>
+    <button class="btn" onclick="requestUserInteraction()">ตรวจสอบตำแหน่ง</button>
     <p id="status"></p>
   </div>
 
   <script>
-    // ฟังก์ชันตรวจสอบตำแหน่ง
+    let hasInteracted = false;
+
+    // ฟังก์ชันขอการโต้ตอบจากผู้ใช้
+    function requestUserInteraction() {
+      hasInteracted = true; // บันทึกว่าผู้ใช้โต้ตอบแล้ว
+      getLocationPermission(); // เรียกฟังก์ชันหาตำแหน่ง
+    }
+
+    // ฟังก์ชันตรวจจับตำแหน่ง
     function getLocationPermission() {
       const statusElement = document.getElementById('status');
       statusElement.textContent = "กำลังตรวจสอบตำแหน่งของคุณ...";
+
+      if (!hasInteracted) {
+        alert("กรุณาคลิกปุ่มเพื่ออนุญาตการใช้ตำแหน่ง");
+        statusElement.textContent = "";
+        return;
+      }
 
       if (!('geolocation' in navigator)) {
         alert("เบราว์เซอร์ของคุณไม่รองรับการใช้บริการตำแหน่ง กรุณาใช้เบราว์เซอร์ที่รองรับ");
@@ -75,7 +89,7 @@
           if (lat !== null && lon !== null) {
             if (isWithinAllowedAreas(lat, lon)) {
               alert("ตำแหน่งของคุณอยู่ในพื้นที่ที่อนุญาต");
-              window.location.href = "/allowed-page.html"; // เปลี่ยนเส้นทางไปยังหน้าที่อนุญาต
+              window.location.href = "/allowed-page.html";
             } else {
               alert("ตำแหน่งของคุณอยู่นอกพื้นที่ที่อนุญาต");
             }
