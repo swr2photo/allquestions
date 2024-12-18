@@ -1,8 +1,9 @@
+# กำหนดหน้า Error 404
 ErrorDocument 404 /404.html
 
-# ป้องกันการเข้าถึงไฟล์ .htaccess และไฟล์สำคัญอื่น ๆ
+# ป้องกันการเข้าถึงไฟล์ .htaccess และไฟล์สำคัญอื่น ๆ ที่ขึ้นต้นด้วย .
 <FilesMatch "^\.">
-    Require all denied
+    Require all denied
 </FilesMatch>
 
 # ป้องกันการเรียกดู Directory (Directory Listing)
@@ -10,36 +11,97 @@ Options -Indexes
 
 # อนุญาตเฉพาะบางไฟล์ให้เข้าถึงได้ (เช่น index.php, index.html)
 <FilesMatch "^(index\.php|index\.html)$">
-    Require all granted
+    Require all granted
 </FilesMatch>
 
 # ป้องกันการโจมตีจาก Cross-Site Scripting (XSS) และ MIME Sniffing
 <IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-XSS-Protection "1; mode=block"
 </IfModule>
 
 # ป้องกันการเข้าถึงไฟล์สำคัญของระบบ เช่น config.php
 <Files "config.php">
-    Require all denied
+    Require all denied
 </Files>
 
 # ป้องกันการ Hotlinking (ดึงรูปจากเว็บไซต์โดยไม่ได้รับอนุญาต)
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{HTTP_REFERER} !^$
-    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourwebsite\.com [NC]
-    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F,L]
+    RewriteEngine On
+    RewriteCond %{HTTP_REFERER} !^$
+    RewriteCond %{HTTP_REFERER} !^https?://(www\.)?yourwebsite\.com [NC]
+    RewriteRule \.(jpg|jpeg|png|gif|webp)$ - [F,L]
 </IfModule>
 
 # จำกัดการอัปโหลดไฟล์ที่เป็นอันตราย (เช่น .exe, .bat)
 <FilesMatch "\.(exe|bat|cmd|sh|php\.(5|7))$">
-    Require all denied
+    Require all denied
 </FilesMatch>
 
 # ป้องกันการโจมตี SQL Injection โดยการบล็อกคำสั่งพิเศษ
 <IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} (\<|\>|\"|\'|\;|\() [NC]
+    RewriteRule .* - [F,L]
+</IfModule>
+
+# --- คำแนะนำเพิ่มเติม ---
+
+# ป้องกันการโจมตีแบบ Brute-Force (ตัวอย่างการใช้ mod_evasive)
+<IfModule mod_evasive20.c>
+    DOSHashTableSize    3097
+    DOSPageCount        2
+    DOSSiteCount        50
+    DOSPageInterval     1
+    DOSSiteInterval     1
+    DOSBlockingPeriod   10
+</IfModule>
+
+# การจำกัดอัตราการเข้าถึง (Rate Limiting) (ตัวอย่างการใช้ mod_ratelimit)
+<IfModule mod_ratelimit.c>
+    <Location "/">
+        SetOutputFilter RATE_LIMIT
+        SetEnv rate-limit 400
+    </Location>
+</IfModule>
+
+# การบังคับใช้ HTTPS
+<IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteCond %{QUERY_STRING} (\<|\>|\"|\'|\;|\() [NC]
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# การป้องกัน Clickjacking
+<IfModule mod_headers.c>
+    Header always append X-Frame-Options "SAMEORIGIN"
+</IfModule>
+
+# Content Security Policy (CSP)
+<IfModule mod_headers.c>
+    Header set Content-Security-Policy "default-src 'self'; script-src 'self' https://cdn.example.com; img-src 'self' https://images.example.com; style-src 'self' 'unsafe-inline';"
+</IfModule>
+
+# HTTP Strict Transport Security (HSTS)
+<IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+</IfModule>
+
+# การซ่อนเวอร์ชันของ Apache และระบบปฏิบัติการ
+ServerSignature Off
+ServerTokens Prod
+
+# การป้องกันการอัปโหลดไฟล์ที่มีนามสกุลซ้อนกัน (Double Extensions)
+<FilesMatch "\.(php|pl|py|jsp|asp|htm|shtml|sh|cgi)\.\w+$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "\.\w+\.(php|pl|py|jsp|asp|htm|shtml|sh|cgi)$">
+    Require all denied
+</FilesMatch>
+
+# การบล็อก User-Agent ที่เป็น Bot หรือ Crawler ที่ไม่ต้องการ
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTP_USER_AGENT} ^.*(BadBot|Crawler).*$ [NC]
     RewriteRule .* - [F,L]
 </IfModule>
