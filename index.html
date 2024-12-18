@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@flaticon/font/flaticon.css">
   <title>เว็บไซต์ควิซ</title>
   <style>
 /* ตั้งต้นสำหรับการตั้งค่าเบื้องต้น */
@@ -372,11 +371,6 @@ footer p {
   font-weight: bold;
 }
 
-#notification-bell {
-  font-size: 24px;
-  position: relative;
-  color: #333;
-}
 
   </style>
 </head>
@@ -385,9 +379,13 @@ footer p {
 
 <div id="notification-bell-container">
   <span id="notification-bell" onclick="toggleNotificationList()">
-    <i class="flaticon-bell"></i>
+    🔔
     <span id="notification-count" style="display: none;">0</span>
   </span>
+  <div id="notification-list" style="display: none;">
+    <div id="no-notifications">ไม่มีการแจ้งเตือน</div>
+    <ul id="notifications"></ul>
+  </div>
 </div>
 
     <section id="subjects">
