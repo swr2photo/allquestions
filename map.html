@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ตรวจสอบการเข้าถึงตำแหน่งบนมือถือ</title>
+  <title>ตรวจสอบการเข้าถึงตำแหน่ง</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -40,13 +40,10 @@
       background-color: #45a049;
     }
 
-    .error-message {
-      background-color: #f44336;
-      color: white;
-      padding: 10px;
-      border-radius: 5px;
+    #status {
       margin-top: 20px;
-      display: none; /* ซ่อนข้อผิดพลาด */
+      font-size: 14px;
+      color: #555;
     }
   </style>
 </head>
@@ -55,20 +52,18 @@
     <h1>ตรวจสอบตำแหน่งของคุณ</h1>
     <p>เราจะตรวจสอบตำแหน่งของคุณเพื่อเข้าถึงหน้าที่ต้องการ</p>
     <button class="btn" onclick="getLocationPermission()">ตรวจสอบตำแหน่ง</button>
+    <p id="status"></p>
   </div>
 
-  <div class="error-message" id="error-message"></div>
-
   <script>
-    // ฟังก์ชันที่ใช้ตรวจสอบว่าเบราว์เซอร์รองรับ Geolocation หรือไม่
-    function isGeolocationAvailable() {
-      return 'geolocation' in navigator;
-    }
-
-    // ฟังก์ชันที่ดึงตำแหน่งผู้ใช้
+    // ฟังก์ชันตรวจสอบตำแหน่ง
     function getLocationPermission() {
-      if (!isGeolocationAvailable()) {
-        displayErrorMessage("ไม่รองรับ Geolocation", "เบราว์เซอร์ของคุณไม่รองรับการใช้บริการตำแหน่ง กรุณาใช้เบราว์เซอร์ที่รองรับ");
+      const statusElement = document.getElementById('status');
+      statusElement.textContent = "กำลังตรวจสอบตำแหน่งของคุณ...";
+
+      if (!('geolocation' in navigator)) {
+        alert("เบราว์เซอร์ของคุณไม่รองรับการใช้บริการตำแหน่ง กรุณาใช้เบราว์เซอร์ที่รองรับ");
+        statusElement.textContent = "";
         return;
       }
 
@@ -79,16 +74,19 @@
 
           if (lat !== null && lon !== null) {
             if (isWithinAllowedAreas(lat, lon)) {
+              alert("ตำแหน่งของคุณอยู่ในพื้นที่ที่อนุญาต");
               window.location.href = "/allowed-page.html"; // เปลี่ยนเส้นทางไปยังหน้าที่อนุญาต
             } else {
-              displayErrorMessage("ตำแหน่งไม่อนุญาต", "ตำแหน่งของคุณอยู่นอกพื้นที่ที่อนุญาต");
+              alert("ตำแหน่งของคุณอยู่นอกพื้นที่ที่อนุญาต");
             }
           } else {
-            displayErrorMessage("ไม่พบตำแหน่ง", "ไม่สามารถหาตำแหน่งของคุณได้");
+            alert("ไม่สามารถหาตำแหน่งของคุณได้");
           }
+          statusElement.textContent = "";
         },
         function (error) {
           handleLocationError(error);
+          statusElement.textContent = "";
         },
         {
           enableHighAccuracy: true,
@@ -98,7 +96,7 @@
       );
     }
 
-    // การตรวจสอบหลายพื้นที่
+    // ฟังก์ชันตรวจสอบพื้นที่ที่อนุญาต
     function isWithinAllowedAreas(lat, lon) {
       const allowedAreas = [
         { lat: 7.0114380, lon: 100.5026383, radius: 1 }, // พื้นที่ 1
@@ -111,7 +109,7 @@
       });
     }
 
-    // คำนวณระยะทางระหว่างตำแหน่ง
+    // คำนวณระยะทาง
     function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
       const R = 6371; // รัศมีโลกในกิโลเมตร
       const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -125,29 +123,22 @@
       return distance;
     }
 
-    // จัดการข้อผิดพลาดจาก Geolocation API
+    // จัดการข้อผิดพลาด
     function handleLocationError(error) {
       switch (error.code) {
         case error.PERMISSION_DENIED:
-          displayErrorMessage("การปฏิเสธการอนุญาต", "กรุณาอนุญาตการเข้าถึงตำแหน่งในเบราว์เซอร์ของคุณ");
+          alert("คุณปฏิเสธการเข้าถึงตำแหน่ง กรุณาเปิดการอนุญาตในเบราว์เซอร์ของคุณ");
           break;
         case error.POSITION_UNAVAILABLE:
-          displayErrorMessage("ไม่สามารถหาตำแหน่งได้", "กรุณาเปิด GPS หรือเปิดใช้งานตำแหน่งบนอุปกรณ์ของคุณ");
+          alert("ไม่สามารถหาตำแหน่งได้ กรุณาเปิด GPS หรือบริการตำแหน่งบนอุปกรณ์ของคุณ");
           break;
         case error.TIMEOUT:
-          displayErrorMessage("หมดเวลาการขอข้อมูลตำแหน่ง", "กรุณาลองอีกครั้ง");
+          alert("การขอข้อมูลตำแหน่งหมดเวลา กรุณาลองใหม่");
           break;
         default:
-          displayErrorMessage("ข้อผิดพลาดที่ไม่รู้จัก", "เกิดข้อผิดพลาดไม่รู้จักในการขอข้อมูลตำแหน่ง");
+          alert("เกิดข้อผิดพลาดไม่ทราบสาเหตุ");
           break;
       }
-    }
-
-    // แสดงข้อความข้อผิดพลาด
-    function displayErrorMessage(title, message) {
-      const errorMessageElement = document.getElementById('error-message');
-      errorMessageElement.innerHTML = `<h2>${title}</h2><p>${message}</p>`;
-      errorMessageElement.style.display = 'block';
     }
   </script>
 </body>
