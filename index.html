@@ -374,12 +374,60 @@ footer p {
   font-weight: bold;
 }
 
+/* Popup Container */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังโปร่งใส */
+  display: none; /* ซ่อน Popup เป็นค่าเริ่มต้น */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Popup Content */
+.popup-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Close Button */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-button:hover {
+  color: #FF0000;
+}
 
   </style>
 </head>
 <body>
   <main>
 
+<!-- Popup ประกาศสำคัญ -->
+<div id="important-announcement-popup" class="popup">
+  <div class="popup-content">
+    <span class="close-button" onclick="closePopup()">&times;</span>
+    <h2>ประกาศสำคัญ</h2>
+    <p id="announcement-message">นี่คือข้อความประกาศสำคัญ</p>
+  </div>
+</div>
 
 <div id="notification-bell-container">
   <span id="notification-bell" onclick="toggleNotificationList()">
@@ -708,6 +756,25 @@ document.getElementById('back-button').onclick = () => {
 setInterval(updateCountdowns, 1000);
 initializeSubjects();
 
+// ฟังก์ชันเปิด Popup
+function showPopup(message) {
+  const popup = document.getElementById('important-announcement-popup');
+  const messageElement = document.getElementById('announcement-message');
+  messageElement.innerText = message; // อัปเดตข้อความประกาศ
+  popup.style.display = 'flex'; // แสดง Popup
+}
+
+// ฟังก์ชันปิด Popup
+function closePopup() {
+  const popup = document.getElementById('important-announcement-popup');
+  popup.style.display = 'none'; // ซ่อน Popup
+}
+
+// เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
+document.addEventListener('DOMContentLoaded', () => {
+  const announcement = "ระบบจะปิดปรับปรุงในวันที่ 25 ธันวาคม 2024 เวลา 23:59 น.";
+  showPopup(announcement);
+});
 
   </script>
   
