@@ -414,7 +414,11 @@ footer p {
   </style>
 </head>
 <body>
-  <h2>ประกาศสำคัญ</h2>
+ <!-- Popup ประกาศสำคัญ -->
+<div id="important-announcement-popup" class="popup">
+  <div class="popup-content">
+    <span class="close-button" onclick="closePopup()">&times;</span>
+    <h2>ประกาศสำคัญ</h2>
     <!-- เพิ่มส่วนแสดงรูปภาพ -->
     <img id="announcement-image" src="" alt="ประกาศ" class="popup-image" style="display: none;">
     <p id="announcement-message">นี่คือข้อความประกาศสำคัญ</p>
