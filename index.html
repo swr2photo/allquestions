@@ -374,10 +374,52 @@ footer p {
   font-weight: bold;
 }
 
+/* Popup Content */
+.popup-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Close Button */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  color: #000;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.close-button:hover {
+  color: #FF0000;
+}
+
+/* สไตล์สำหรับรูปภาพใน Popup */
+.popup-image {
+  max-width: 100%;
+  height: auto;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
 
   </style>
 </head>
 <body>
+  <h2>ประกาศสำคัญ</h2>
+    <!-- เพิ่มส่วนแสดงรูปภาพ -->
+    <img id="announcement-image" src="" alt="ประกาศ" class="popup-image" style="display: none;">
+    <p id="announcement-message">นี่คือข้อความประกาศสำคัญ</p>
+  </div>
+</div>
   <main>
 
 
@@ -703,7 +745,39 @@ document.getElementById('back-button').onclick = () => {
   document.getElementById('quiz-list').style.display = 'none';
   document.getElementById('subjects').style.display = 'block';
 };
+// ฟังก์ชันเปิด Popup พร้อมข้อความและรูปภาพ
+function showPopup(message, imageUrl = null) {
+  const popup = document.getElementById('important-announcement-popup');
+  const messageElement = document.getElementById('announcement-message');
+  const imageElement = document.getElementById('announcement-image');
+  
+  // อัปเดตข้อความ
+  messageElement.innerText = message;
 
+  // อัปเดตรูปภาพ (ถ้ามี)
+  if (imageUrl) {
+    imageElement.src = imageUrl;
+    imageElement.style.display = 'block';
+  } else {
+    imageElement.style.display = 'none';
+  }
+
+  // แสดง Popup
+  popup.style.display = 'flex';
+}
+
+// ฟังก์ชันปิด Popup
+function closePopup() {
+  const popup = document.getElementById('important-announcement-popup');
+  popup.style.display = 'none';
+}
+
+// เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
+document.addEventListener('DOMContentLoaded', () => {
+  const announcementMessage = "จะปิดปรับปรุงเว็บไซต์ในวันที่ 25 ธันวาคม 2024 เวลา 23:59 น.";
+  const announcementImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMjS_gvuOu285suklwtW0nRfiRhcB1boSTlxkVrVdPQTzTUvp4SJ_feCuo&s=10"; // URL รูปภาพ
+  showPopup(announcementMessage, announcementImage);
+});
 // ตั้งค่าเริ่มต้น
 setInterval(updateCountdowns, 1000);
 initializeSubjects();
