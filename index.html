@@ -781,69 +781,55 @@ initializeSubjects();
     
   </script>
      <script>
-    // ฟังก์ชันแปลง Google Drive Link เป็น Direct Link
-    function convertGoogleDriveLink(originalLink) {
-      const regex = /\/file\/d\/(.*?)\/view/; // ดึง File ID
-      const match = originalLink.match(regex);
-      if (match && match[1]) {
-        return `https://drive.google.com/uc?id=${match[1]}`;
-      } else {
-        return null; // หากลิงก์ไม่ถูกต้อง
-      }
-    }
+  // ฟังก์ชันแปลง URL เป็น Base64
+function encodeUrlToBase64(url) {
+  return btoa(url); // ใช้ btoa() สำหรับการเข้ารหัส
+}
 
-    // ฟังก์ชันโหลดรูปภาพจาก Blob URL
-    async function loadImageAsBlob(imageUrl) {
-      try {
-        const response = await fetch(imageUrl);
-        const blob = await response.blob();
-        return URL.createObjectURL(blob); // สร้าง Blob URL
-      } catch (error) {
-        console.error("Error loading image:", error);
-        return null;
-      }
-    }
+// ฟังก์ชันแปลง Base64 กลับเป็น URL
+function decodeBase64ToUrl(base64) {
+  return atob(base64); // ใช้ atob() สำหรับการถอดรหัส
+}
 
-    // ฟังก์ชันแสดง Popup
-    async function showPopup(message, imageUrl) {
-      const popup = document.getElementById('important-announcement-popup');
-      const popupMessage = document.getElementById('announcement-message');
-      const popupImage = document.getElementById('announcement-image');
+// ฟังก์ชันแสดง Popup
+function showPopup(message, encodedImageUrl) {
+  const popup = document.getElementById('important-announcement-popup');
+  const popupMessage = document.getElementById('announcement-message');
+  const popupImage = document.getElementById('announcement-image');
 
-      // แสดงข้อความที่มีหลายบรรทัด
-      popupMessage.textContent = message;
+  // แสดงข้อความที่มีหลายบรรทัด
+  popupMessage.textContent = message;
 
-      // โหลดรูปภาพและแสดง
-      const blobUrl = await loadImageAsBlob(imageUrl);
-      if (blobUrl) {
-        popupImage.src = blobUrl;
-        popupImage.style.display = 'block'; // แสดงรูปภาพ
-      } else {
-        popupImage.style.display = 'none'; // หากโหลดรูปภาพไม่สำเร็จ ซ่อนรูป
-      }
+  // ถอดรหัส Base64 และแสดงรูปภาพ
+  const imageUrl = decodeBase64ToUrl(encodedImageUrl);
+  if (imageUrl) {
+    popupImage.src = imageUrl;
+    popupImage.style.display = 'block'; // แสดงรูปภาพ
+  } else {
+    popupImage.style.display = 'none'; // หากไม่มีรูปภาพ
+  }
 
-      popup.style.display = 'flex'; // แสดง Popup
-    }
+  popup.style.display = 'flex'; // แสดง Popup
+}
 
-    // ฟังก์ชันปิด Popup
-    function closePopup() {
-      const popup = document.getElementById('important-announcement-popup');
-      popup.style.display = 'none';
-    }
+// ฟังก์ชันปิด Popup
+function closePopup() {
+  const popup = document.getElementById('important-announcement-popup');
+  popup.style.display = 'none';
+}
 
-    // เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
-    document.addEventListener('DOMContentLoaded', () => {
-      const announcementMessage = `IDEA TO ENTREPRENEURSHIP กำหนด Quiz กิจกรรมที่ 3
+// เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
+document.addEventListener('DOMContentLoaded', () => {
+  const announcementMessage = `IDEA TO ENTREPRENEURSHIP กำหนด Quiz กิจกรรมที่ 3
 วันเสาร์ที่ 21 ธันวาคม 2567 เวลา 12.30 - 13.00 น.`;
-      const googleDriveLink = "https://drive.google.com/file/d/1PDvsxlhg6dC-xOV6B_Zty7OjcyXVNqVI/view?usp=drivesdk";
-      const announcementImage = convertGoogleDriveLink(googleDriveLink); // แปลงลิงก์
+  
+  // เข้ารหัสลิงก์ Google Drive เป็น Base64
+  const googleDriveLink = "https://drive.google.com/file/d/1PDvsxlhg6dC-xOV6B_Zty7OjcyXVNqVI/view?usp=drivesdk";
+  const encodedImageUrl = encodeUrlToBase64(googleDriveLink); // เข้ารหัสลิงก์
+  
+  showPopup(announcementMessage, encodedImageUrl);
+});
 
-      if (announcementImage) {
-        showPopup(announcementMessage, announcementImage);
-      } else {
-        console.error("Invalid Google Drive link.");
-      }
-    });
   </script>
   
       <!--=============== SNOW JS ===============-->
