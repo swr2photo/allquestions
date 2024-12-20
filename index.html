@@ -789,49 +789,54 @@ initializeSubjects();
     
   </script>
      <script>
-// ฟังก์ชันแปลงลิงก์ Google Drive ให้เป็นลิงก์สำหรับแสดงรูปภาพ
-function convertGoogleDriveLinkToImageUrl(driveLink) {
-  const fileId = driveLink.match(/\/d\/(.*)\/view/)[1]; // ดึง ID ของไฟล์จาก URL
-  return `https://drive.google.com/uc?export=view&id=${fileId}`; // สร้างลิงก์แสดงรูปภาพ
+// เข้ารหัส Base64 URL
+function encodeURL(url) {
+  return btoa(url); // แปลง URL เป็น Base64
 }
 
-// ฟังก์ชันแสดง Popup
+// ถอดรหัส Base64 URL
+function decodeURL(encodedURL) {
+  return atob(encodedURL); // แปลง Base64 กลับเป็น URL ปกติ
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const announcementMessage = `IDEA TO ENTREPRENEURSHIP กำหนด Quiz กิจกรรมที่ 3
+วันเสาร์ที่ 21 ธันวาคม 2567 เวลา 12.30 - 13.00 น.`;
+
+  // เข้ารหัส URL รูปภาพ
+  const encodedImage = encodeURL("https://cdn.discordapp.com/attachments/1058718167251288094/1319804401853927476/IMG_8472.png?ex=67674b22&is=6765f9a2&hm=ab280291886372cc0739bcd98086a2eb7083d161e084cfe5616d4836749a602c");
+
+  // ถอดรหัส URL รูปภาพก่อนแสดง
+  const announcementImage = decodeURL(encodedImage);
+
+  // เรียกใช้งาน Popup
+  showPopup(announcementMessage, announcementImage);
+});
+
 function showPopup(message, imageUrl) {
   const popup = document.getElementById('important-announcement-popup');
   const popupMessage = document.getElementById('announcement-message');
   const popupImage = document.getElementById('announcement-image');
 
-  // แสดงข้อความใน Popup
-  popupMessage.textContent = message;
+  // ตั้งค่าข้อความ
+  popupMessage.innerHTML = message.replace(/\n/g, '<br>');
 
-  // ตั้งค่ารูปภาพใน Popup
+  // ตั้งค่ารูปภาพ
   if (imageUrl) {
     popupImage.src = imageUrl;
-    popupImage.style.display = 'block'; // แสดงรูปภาพ
+    popupImage.style.display = 'block';
   } else {
-    popupImage.style.display = 'none'; // หากไม่มีรูปภาพ
+    popupImage.style.display = 'none';
+    console.error("Image URL is invalid.");
   }
 
   popup.style.display = 'flex'; // แสดง Popup
 }
 
-// ฟังก์ชันปิด Popup
 function closePopup() {
   const popup = document.getElementById('important-announcement-popup');
-  popup.style.display = 'none';
+  popup.style.display = 'none'; // ปิด Popup
 }
-
-// เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
-document.addEventListener('DOMContentLoaded', () => {
-  const announcementMessage = `IDEA TO ENTREPRENEURSHIP กำหนด Quiz กิจกรรมที่ 3
-วันเสาร์ที่ 21 ธันวาคม 2567 เวลา 12.30 - 13.00 น.`;
-  
-  // ลิงก์ Google Drive ที่เป็นลิงก์แสดงรูปภาพ
-  const googleDriveLink = "https://drive.google.com/file/d/1PDvsxlhg6dC-xOV6B_Zty7OjcyXVNqVI/view?usp=drivesdk";
-  const imageUrl = convertGoogleDriveLinkToImageUrl(googleDriveLink); // แปลงเป็น URL รูปภาพ
-  
-  showPopup(announcementMessage, imageUrl); // แสดง Popup พร้อมรูปภาพ
-});
 
   </script>
   
