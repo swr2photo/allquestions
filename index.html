@@ -780,8 +780,7 @@ initializeSubjects();
    
     
   </script>
-  <script>
-<script>
+     <script>
     // ฟังก์ชันแปลง Google Drive Link เป็น Direct Link
     function convertGoogleDriveLink(originalLink) {
       const regex = /\/file\/d\/(.*?)\/view/; // ดึง File ID
@@ -818,7 +817,7 @@ initializeSubjects();
       const blobUrl = await loadImageAsBlob(imageUrl);
       if (blobUrl) {
         popupImage.src = blobUrl;
-        popupImage.style.display = 'block';
+        popupImage.style.display = 'block'; // แสดงรูปภาพ
       } else {
         popupImage.style.display = 'none'; // หากโหลดรูปภาพไม่สำเร็จ ซ่อนรูป
       }
@@ -845,7 +844,6 @@ initializeSubjects();
         console.error("Invalid Google Drive link.");
       }
     });
-  </script>
   </script>
   
       <!--=============== SNOW JS ===============-->
