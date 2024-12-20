@@ -4,7 +4,7 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Allquize</title>
+  <title>เว็บไซต์ควิซ</title>
   <style>
 /* ตั้งต้นสำหรับการตั้งค่าเบื้องต้น */
 * {
@@ -374,63 +374,13 @@ footer p {
   font-weight: bold;
 }
 
-/* Popup Container */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังโปร่งใส */
-  display: none; /* ซ่อน Popup เป็นค่าเริ่มต้น */
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-/* Popup Content */
-.popup-content {
-  background-color: #fff;
-  border-radius: 10px;
-  padding: 20px;
-  width: 80%;
-  max-width: 500px;
-  text-align: center;
-  position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Close Button */
-.close-button {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 20px;
-  color: #000;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.close-button:hover {
-  color: #FF0000;
-}
 
   </style>
 </head>
 <body>
-
   <main>
 
- <!-- Popup ประกาศสำคัญ -->
-<div id="important-announcement-popup" class="popup">
-  <div class="popup-content">
-    <span class="close-button" onclick="closePopup()">&times;</span>
-    <h2>ประกาศสำคัญ</h2>
-    <!-- เพิ่มส่วนแสดงรูปภาพ -->
-    <img id="announcement-image" src="" alt="ประกาศ" class="popup-image" style="display: none;">
-    <p id="announcement-message">นี่คือข้อความประกาศสำคัญ</p>
-  </div>
-</div>
+
 <div id="notification-bell-container">
   <span id="notification-bell" onclick="toggleNotificationList()">
     <i class="fas fa-bell"></i>
@@ -753,57 +703,12 @@ document.getElementById('back-button').onclick = () => {
   document.getElementById('quiz-list').style.display = 'none';
   document.getElementById('subjects').style.display = 'block';
 };
-);
+
 // ตั้งค่าเริ่มต้น
 setInterval(updateCountdowns, 1000);
 initializeSubjects();
 
-// ฟังก์ชันเปิด Popup พร้อมอนิเมชั่น
-function showPopup(message, imageUrl = null) {
-  const popup = document.getElementById('important-announcement-popup');
-  const messageElement = document.getElementById('announcement-message');
-  const imageElement = document.getElementById('announcement-image');
 
-  // อัปเดตข้อความ
-  messageElement.innerText = message;
-
-  // อัปเดตรูปภาพ (ถ้ามี)
-  if (imageUrl) {
-    imageElement.src = imageUrl;
-    imageElement.style.display = 'block';
-  } else {
-    imageElement.style.display = 'none';
-  }
-
-  // แสดง Popup พร้อมอนิเมชั่น
-  popup.classList.remove('popup-hide');
-  popup.classList.add('popup-show');
-}
-
-// ฟังก์ชันปิด Popup พร้อมอนิเมชั่น
-function closePopup() {
-  const popup = document.getElementById('important-announcement-popup');
-
-  // เพิ่มคลาสสำหรับอนิเมชั่นปิด
-  popup.classList.remove('popup-show');
-  popup.classList.add('popup-hide');
-
-  // ซ่อน Popup หลังอนิเมชั่นจบ
-  setTimeout(() => {
-    popup.style.display = 'none';
-  }, 500); // เวลาเดียวกับ duration ของอนิเมชั่น
-}
-
-// เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
-document.addEventListener('DOMContentLoaded', () => {
-  const announcementMessage = "ระบบจะปิดปรับปรุงในวันที่ 25 ธันวาคม 2024 เวลา 23:59 น.";
-  const announcementImage = "https://example.com/your-image.jpg"; // URL รูปภาพ
-  showPopup(announcementMessage, announcementImage);
-
-  // เพิ่ม Event ปิด Popup เมื่อคลิกปุ่ม
-  const closeButton = document.querySelector('.close-button');
-  closeButton.addEventListener('click', closePopup);
-});
   </script>
   
       <!--=============== SNOW JS ===============-->
