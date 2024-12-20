@@ -1,9 +1,15 @@
 # กำหนดหน้า Error 404
 ErrorDocument 404 /404.html
 
-Options +Includes
-AddType text/html .shtml
-AddOutputFilter INCLUDES .shtml
+# ปิดการเข้าถึงเว็บไซต์ชั่วคราว
+RewriteEngine On
+
+# ยกเว้น IP ของผู้ดูแล (ใส่ IP ของคุณเองที่นี่)
+RewriteCond %{REMOTE_ADDR} !^123\.456\.789\.123$
+
+# Redirect ทุกคนไปที่หน้า maintenance.html
+RewriteCond %{REQUEST_URI} !/maintenance.html$
+RewriteRule ^(.*)$ /maintenance.html [R=302,L]
 
 
 # ป้องกันการเข้าถึงไฟล์ .htaccess และไฟล์สำคัญอื่น ๆ ที่ขึ้นต้นด้วย .
