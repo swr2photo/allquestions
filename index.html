@@ -745,12 +745,17 @@ document.getElementById('back-button').onclick = () => {
   document.getElementById('quiz-list').style.display = 'none';
   document.getElementById('subjects').style.display = 'block';
 };
-// ฟังก์ชันเปิด Popup พร้อมข้อความและรูปภาพ
+);
+// ตั้งค่าเริ่มต้น
+setInterval(updateCountdowns, 1000);
+initializeSubjects();
+
+// ฟังก์ชันเปิด Popup พร้อมอนิเมชั่น
 function showPopup(message, imageUrl = null) {
   const popup = document.getElementById('important-announcement-popup');
   const messageElement = document.getElementById('announcement-message');
   const imageElement = document.getElementById('announcement-image');
-  
+
   // อัปเดตข้อความ
   messageElement.innerText = message;
 
@@ -762,27 +767,35 @@ function showPopup(message, imageUrl = null) {
     imageElement.style.display = 'none';
   }
 
-  // แสดง Popup
-  popup.style.display = 'flex';
+  // แสดง Popup พร้อมอนิเมชั่น
+  popup.classList.remove('popup-hide');
+  popup.classList.add('popup-show');
 }
 
-// ฟังก์ชันปิด Popup
+// ฟังก์ชันปิด Popup พร้อมอนิเมชั่น
 function closePopup() {
   const popup = document.getElementById('important-announcement-popup');
-  popup.style.display = 'none';
+
+  // เพิ่มคลาสสำหรับอนิเมชั่นปิด
+  popup.classList.remove('popup-show');
+  popup.classList.add('popup-hide');
+
+  // ซ่อน Popup หลังอนิเมชั่นจบ
+  setTimeout(() => {
+    popup.style.display = 'none';
+  }, 500); // เวลาเดียวกับ duration ของอนิเมชั่น
 }
 
 // เรียกใช้งาน Popup เมื่อโหลดหน้าเว็บ
 document.addEventListener('DOMContentLoaded', () => {
-  const announcementMessage = "จะปิดปรับปรุงเว็บไซต์ในวันที่ 25 ธันวาคม 2024 เวลา 23:59 น.";
-  const announcementImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSMjS_gvuOu285suklwtW0nRfiRhcB1boSTlxkVrVdPQTzTUvp4SJ_feCuo&s=10"; // URL รูปภาพ
+  const announcementMessage = "ระบบจะปิดปรับปรุงในวันที่ 25 ธันวาคม 2024 เวลา 23:59 น.";
+  const announcementImage = "https://example.com/your-image.jpg"; // URL รูปภาพ
   showPopup(announcementMessage, announcementImage);
+
+  // เพิ่ม Event ปิด Popup เมื่อคลิกปุ่ม
+  const closeButton = document.querySelector('.close-button');
+  closeButton.addEventListener('click', closePopup);
 });
-// ตั้งค่าเริ่มต้น
-setInterval(updateCountdowns, 1000);
-initializeSubjects();
-
-
   </script>
   
       <!--=============== SNOW JS ===============-->
