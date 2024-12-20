@@ -781,27 +781,22 @@ initializeSubjects();
     
   </script>
      <script>
-  // ฟังก์ชันแปลง URL เป็น Base64
-function encodeUrlToBase64(url) {
-  return btoa(url); // ใช้ btoa() สำหรับการเข้ารหัส
-}
-
-// ฟังก์ชันแปลง Base64 กลับเป็น URL
-function decodeBase64ToUrl(base64) {
-  return atob(base64); // ใช้ atob() สำหรับการถอดรหัส
+// ฟังก์ชันแปลงลิงก์ Google Drive ให้เป็นลิงก์สำหรับแสดงรูปภาพ
+function convertGoogleDriveLinkToImageUrl(driveLink) {
+  const fileId = driveLink.match(/\/d\/(.*)\/view/)[1]; // ดึง ID ของไฟล์จาก URL
+  return `https://drive.google.com/uc?export=view&id=${fileId}`; // สร้างลิงก์แสดงรูปภาพ
 }
 
 // ฟังก์ชันแสดง Popup
-function showPopup(message, encodedImageUrl) {
+function showPopup(message, imageUrl) {
   const popup = document.getElementById('important-announcement-popup');
   const popupMessage = document.getElementById('announcement-message');
   const popupImage = document.getElementById('announcement-image');
 
-  // แสดงข้อความที่มีหลายบรรทัด
+  // แสดงข้อความใน Popup
   popupMessage.textContent = message;
 
-  // ถอดรหัส Base64 และแสดงรูปภาพ
-  const imageUrl = decodeBase64ToUrl(encodedImageUrl);
+  // ตั้งค่ารูปภาพใน Popup
   if (imageUrl) {
     popupImage.src = imageUrl;
     popupImage.style.display = 'block'; // แสดงรูปภาพ
@@ -823,11 +818,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const announcementMessage = `IDEA TO ENTREPRENEURSHIP กำหนด Quiz กิจกรรมที่ 3
 วันเสาร์ที่ 21 ธันวาคม 2567 เวลา 12.30 - 13.00 น.`;
   
-  // เข้ารหัสลิงก์ Google Drive เป็น Base64
+  // ลิงก์ Google Drive ที่เป็นลิงก์แสดงรูปภาพ
   const googleDriveLink = "https://drive.google.com/file/d/1PDvsxlhg6dC-xOV6B_Zty7OjcyXVNqVI/view?usp=drivesdk";
-  const encodedImageUrl = encodeUrlToBase64(googleDriveLink); // เข้ารหัสลิงก์
+  const imageUrl = convertGoogleDriveLinkToImageUrl(googleDriveLink); // แปลงเป็น URL รูปภาพ
   
-  showPopup(announcementMessage, encodedImageUrl);
+  showPopup(announcementMessage, imageUrl); // แสดง Popup พร้อมรูปภาพ
 });
 
   </script>
