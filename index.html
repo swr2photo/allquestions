@@ -799,6 +799,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const announcementImage = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTFpyWfgsKD9NnFIF9lBqGwL2qXU183rLrdgQ&usqp=CAU"; // URL รูปภาพ
   showPopup(announcementMessage, announcementImage);
 });
+    
+  </script>
+  <script>
+    // ดึง header.html มาแสดง
+    fetch('header.html')
+      .then(response => response.text())
+      .then(data => {
+        document.getElementById('header-container').innerHTML = data;
+      })
+      .catch(error => console.error('ไม่สามารถโหลด header ได้:', error));
   </script>
   
       <!--=============== SNOW JS ===============-->
