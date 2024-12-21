@@ -698,13 +698,15 @@ if (closeToExpiry.length > 0) {
       timeLeftText = `<strong>${timeLeftInHours} ชั่วโมง</strong>`;
     }
 
-    li.innerHTML = `
-      ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-      เหลือเวลา ${timeLeftText}!
-      <br>
-      <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-    `;
-    notificationList.appendChild(li);
+    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftText }) => {
+  const li = document.createElement('li');
+  li.innerHTML = `
+    ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+    เหลือเวลา <strong>${timeLeftText}</strong>!
+    <br>
+    <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+  `;
+  notificationList.appendChild(li);
   });
 }
 
