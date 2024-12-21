@@ -688,17 +688,37 @@ if (closeToExpiry.length > 0) {
 
   closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
     const li = document.createElement('li');
+// ตรวจสอบควิซที่เหลือเวลาน้อยกว่า 1 วัน
+if (expiryDate) {
+  const now = new Date().getTime();
+  const [datePart, timePart] = expiryDate.split(", "); // แยกวันและเวลา
+  const [day, month, year] = datePart.split("/"); // แยก dd/MM/yyyy
+  const formattedDate = `${year}-${month}-${day}T${timePart || "00:00:00"}+07:00`;
+  const endDate = new Date(formattedDate).getTime();
 
-    // คำนวณเวลาเหลือในนาที ถ้าต่ำกว่า 1 ชั่วโมง
+  const timeLeftInMilliseconds = endDate - now;
+  const timeLeftInHours = timeLeftInMilliseconds / (1000 * 60 * 60);
+
+  if (timeLeftInMilliseconds > 0 && timeLeftInMilliseconds <= 24 * 60 * 60 * 1000) {
     let timeLeftText;
     if (timeLeftInHours < 1) {
       const timeLeftInMinutes = Math.ceil(timeLeftInHours * 60);
-      timeLeftText = `<strong>${timeLeftInMinutes} นาที</strong>`;
+      timeLeftText = `${timeLeftInMinutes} นาที`;
     } else {
-      timeLeftText = `<strong>${timeLeftInHours} ชั่วโมง</strong>`;
+      timeLeftText = `${Math.floor(timeLeftInHours)} ชั่วโมง`;
     }
 
-    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftText }) => {
+    closeToExpiry.push({
+      subject,
+      quizName,
+      quizLink,
+      timeLeftText, // เพิ่มข้อความเวลาในข้อมูล
+    });
+  }
+}
+
+// แสดงรายการควิซที่ใกล้หมดอายุ
+closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftText }) => {
   const li = document.createElement('li');
   li.innerHTML = `
     ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
@@ -707,8 +727,7 @@ if (closeToExpiry.length > 0) {
     <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
   `;
   notificationList.appendChild(li);
-  });
-}
+});
 
 
   // เพิ่มหัวข้อสำหรับ "ควิซที่เพิ่งอัพเดต"
