@@ -580,25 +580,37 @@ async function initializeSubjects() {
 
       subjectMap[subject].push({ quizName, quizLink, quizDescription, expiryDate, status });
 
-      // ตรวจสอบควิซที่เหลือเวลาน้อยกว่า 1 วัน
-      if (expiryDate) {
-        const now = new Date().getTime();
-        const [datePart, timePart] = expiryDate.split(", "); // แยกวันและเวลา
-        const [day, month, year] = datePart.split("/"); // แยก dd/MM/yyyy
-        const formattedDate = `${year}-${month}-${day}T${timePart || "00:00:00"}+07:00`;
-        const endDate = new Date(formattedDate).getTime();
+// ตรวจสอบควิซที่เหลือเวลาน้อยกว่า 1 วัน
+if (expiryDate) {
+  const now = new Date().getTime();
+  const [datePart, timePart] = expiryDate.split(", "); // แยกวันและเวลา
+  const [day, month, year] = datePart.split("/"); // แยก dd/MM/yyyy
+  const formattedDate = `${year}-${month}-${day}T${timePart || "00:00:00"}+07:00`;
+  const endDate = new Date(formattedDate).getTime();
 
-        const timeLeftInHours = (endDate - now) / (1000 * 60 * 60);
+  const timeLeftInMilliseconds = endDate - now;
+  const timeLeftInMinutes = timeLeftInMilliseconds / (1000 * 60);
+  const timeLeftInHours = timeLeftInMinutes / 60;
+  const timeLeftInDays = timeLeftInHours / 24;
 
-        if (timeLeftInHours > 0 && timeLeftInHours <= 24) {
-          closeToExpiry.push({
-            subject,
-            quizName,
-            quizLink,
-            timeLeftInHours: Math.ceil(timeLeftInHours),
-          });
-        }
-      }
+  // ตรวจสอบเวลาที่เหลือและเพิ่มในรายการ closeToExpiry
+  if (timeLeftInMilliseconds > 0 && timeLeftInMilliseconds <= 24 * 60 * 60 * 1000) {
+    let timeLeftText;
+    if (timeLeftInHours >= 1) {
+      timeLeftText = `${Math.floor(timeLeftInHours)} ชั่วโมง`;
+    } else {
+      timeLeftText = `${Math.ceil(timeLeftInMinutes)} นาที`;
+    }
+
+    closeToExpiry.push({
+      subject,
+      quizName,
+      quizLink,
+      timeLeftText, // เก็บข้อความที่ปรับรูปแบบแล้ว
+    });
+  }
+}
+
 
       // ตรวจสอบสถานะ "อัพเดตล่าสุด"
       if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
