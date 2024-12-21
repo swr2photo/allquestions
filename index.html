@@ -588,29 +588,17 @@ async function initializeSubjects() {
         const formattedDate = `${year}-${month}-${day}T${timePart || "00:00:00"}+07:00`;
         const endDate = new Date(formattedDate).getTime();
 
-        const timeLeftInMilliseconds = endDate - now;
+        const timeLeftInHours = (endDate - now) / (1000 * 60 * 60);
 
-        if (timeLeftInMilliseconds > 0) {
-          const timeLeftInMinutes = Math.floor(timeLeftInMilliseconds / (1000 * 60));
-          const days = Math.floor(timeLeftInMinutes / (60 * 24));
-          const hours = Math.floor((timeLeftInMinutes % (60 * 24)) / 60);
-          const minutes = timeLeftInMinutes % 60;
-
+        if (timeLeftInHours > 0 && timeLeftInHours <= 24) {
           closeToExpiry.push({
             subject,
             quizName,
             quizLink,
-            timeLeft: {
-              days,
-              hours,
-              minutes,
-            },
+            timeLeftInHours: Math.ceil(timeLeftInHours),
           });
         }
       }
-    }
-  });
-
 
       // ตรวจสอบสถานะ "อัพเดตล่าสุด"
       if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
