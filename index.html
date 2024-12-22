@@ -472,19 +472,8 @@ footer p {
 </style>
 
 <script>
-// ฟังก์ชันสร้าง Blob URL
-function createBlobURL(imageUrl) {
-  return fetch(imageUrl)
-    .then((response) => response.blob())
-    .then((blob) => URL.createObjectURL(blob))
-    .catch((error) => {
-      console.error('Error creating Blob URL:', error);
-      return null;
-    });
-}
-
 // เรียกใช้ Popup
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
   const announcementMessage = `ข้อสอบหน่วยที่ 2 (40 ข้อ 20 คะแนน) 23 ธ.ค. เวลา 00.00 น.- 26 ธ.ค.2567 ก่อนเวลา 23.59 น. เท่านั้น !!! ไม่มีการเปิดระบบนอกรอบ
 ข้อสอบมีจำนวน 40 ข้อ 20 คะเเนน
 
@@ -493,14 +482,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 ทำข้อสอบได้ 1 ครั้ง
 
 ทำเสร็จเเล้วอย่าลืม !!! กด Save เเละส่งเพื่อยืนยัน`;
-  const imageUrl = "https://cdn.discordapp.com/attachments/1058718167251288094/1320407004358901790/IMG_8511.jpg?ex=67697c59&is=67682ad9&hm=3bb50b39e03a60b9509a2d7834d26427a6f86f6582ffc894d3fbbac8a6c702cf&";
+  const imageUrl = "https://cdn.discordapp.com/attachments/1058718167251288094/1320407004358901790/IMG_8511.jpg";
 
-  // สร้าง Blob URL
-  const blobUrl = await createBlobURL(imageUrl);
-
-  if (blobUrl) {
-    showPopup(announcementMessage, blobUrl);
-  }
+  // เรียกใช้ Popup
+  showPopup(announcementMessage, imageUrl);
 });
 
 function showPopup(message, imageUrl) {
@@ -519,7 +504,7 @@ function showPopup(message, imageUrl) {
 
   // ตั้งค่ารูปภาพ
   if (imageUrl) {
-    popupImage.src = imageUrl;
+    popupImage.src = imageUrl; // ใช้ URL โดยตรง
     popupImage.style.display = 'block';
   } else {
     popupImage.style.display = 'none';
@@ -542,6 +527,7 @@ function closePopup() {
   popup.style.display = 'none'; // ปิด Popup
 }
 </script>
+
 
   <main>
 
