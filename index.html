@@ -656,82 +656,6 @@ function updateCountdowns() {
   });
 }
 
-function getStatusColor(status) {
-  if (status && status.toLowerCase().includes("รอการแก้ไข")) {
-    return "#FFEB3B"; // สีเหลืองสำหรับ "รอการแก้ไข"
-  } else if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
-    return "#4CAF50"; // สีเขียวสำหรับ "อัพเดตล่าสุด"
-  }
-  return "#000"; // สีดำสำหรับสถานะอื่นๆ
-}
-
-async function initializeSubjects() {
-  const subjects = await fetchSubjects();
-  const subjectList = document.getElementById('subject-list');
-  const subjectMap = {};
-  const closeToExpiry = []; // เก็บควิซที่เหลือเวลาน้อยกว่า 1 วัน
-  const latestUpdates = []; // เก็บควิซที่มีสถานะ "อัพเดตล่าสุด"
-
-  subjects.forEach((row, index) => {
-    if (index === 0) return; // ข้ามหัวตาราง
-
-    const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row;
-
-    if (subject && subject.trim() !== "") {
-      if (!subjectMap[subject]) {
-        subjectMap[subject] = [];
-      }
-
-      subjectMap[subject].push({ quizName, quizLink, quizDescription, expiryDate, status });
-
-      // ตรวจสอบควิซที่เหลือเวลาน้อยกว่า 1 วัน
-      if (expiryDate) {
-        const now = new Date().getTime();
-        const [datePart, timePart] = expiryDate.split(", "); // แยกวันและเวลา
-        const [day, month, year] = datePart.split("/"); // แยก dd/MM/yyyy
-        const formattedDate = `${year}-${month}-${day}T${timePart || "00:00:00"}+07:00`;
-        const endDate = new Date(formattedDate).getTime();
-
-        const timeLeftInHours = (endDate - now) / (1000 * 60 * 60);
-
-        if (timeLeftInHours > 0 && timeLeftInHours <= 24) {
-          closeToExpiry.push({
-            subject,
-            quizName,
-            quizLink,
-            timeLeftInHours: Math.ceil(timeLeftInHours),
-          });
-        }
-      }
-
-      // ตรวจสอบสถานะ "อัพเดตล่าสุด"
-      if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
-        latestUpdates.push({ subject, quizName, quizLink });
-      }
-    }
-  });
-
-  // อัปเดตรายการแจ้งเตือนในไอคอนกระดิ่ง
-  updateNotificationBell(closeToExpiry, latestUpdates);
-
-  subjectList.innerHTML = "";
-  Object.keys(subjectMap).forEach(subject => {
-    const quizzes = subjectMap[subject];
-
-    const subjectCard = document.createElement('div');
-    subjectCard.className = 'subject-card';
-    subjectCard.innerHTML = `<strong>${subject}</strong>`;
-
-    if (quizzes.every(quiz => !quiz.quizName)) {
-      subjectCard.innerHTML += `<div class="waiting-for-update">รออัพเดต</div>`;
-    } else {
-      subjectCard.onclick = () => showQuizzes(subject, quizzes);
-    }
-
-    subjectList.appendChild(subjectCard);
-  });
-}
-
 // ฟังก์ชันเน้นควิซ "อัพเดตล่าสุด"
 function highlightLatestUpdates(subjectMap) {
   const quizContainer = document.getElementById('quiz-container');
@@ -816,111 +740,145 @@ function toggleNotificationList() {
   notificationList.style.display = notificationList.style.display === "block" ? "none" : "block";
 }
 
+// ฟังก์ชันแสดงควิซ
 function showQuizzes(subject, quizzes) {
   // ซ่อนส่วนของรายวิชา
   document.getElementById('subjects').style.display = 'none';
   document.getElementById('quiz-list').style.display = 'block';
   document.getElementById('subject-title').innerText = `ควิซในวิชา ${subject}`;
 
-// คอนเทนเนอร์สำหรับควิซ
-const quizContainer = document.getElementById('quiz-container');
-quizContainer.innerHTML = '';
+  // คอนเทนเนอร์สำหรับควิซ
+  const quizContainer = document.getElementById('quiz-container');
+  quizContainer.innerHTML = '';
 
-quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status, buttonLabel, isButtonDisabled }) => {
-  const quizCard = document.createElement('div');
-  quizCard.className = 'quiz-card';
+  quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status, buttonLabel, isButtonDisabled }) => {
+    const quizCard = document.createElement('div');
+    quizCard.className = 'quiz-card';
 
-  if (quizName) {
-    // ชื่อควิซ
-    const quizTitle = document.createElement('strong');
-    quizTitle.innerText = quizName;
-    quizCard.appendChild(quizTitle);
+    if (quizName) {
+      // ชื่อควิซ
+      const quizTitle = document.createElement('strong');
+      quizTitle.innerText = quizName;
+      quizCard.appendChild(quizTitle);
 
-    // คำอธิบายควิซ (รองรับการเว้นบรรทัด)
-    if (quizDescription) {
-      const description = document.createElement('div');
-      description.className = 'quiz-description';
-      description.innerHTML = `<strong>คำอธิบาย:</strong><br>${quizDescription.replace(/\n/g, '<br>')}`;
-      quizCard.appendChild(description);
+      // คำอธิบายควิซ (รองรับการเว้นบรรทัด)
+      if (quizDescription) {
+        const description = document.createElement('div');
+        description.className = 'quiz-description';
+        description.innerHTML = `<strong>คำอธิบาย:</strong><br>${quizDescription.replace(/\n/g, '<br>')}`;
+        quizCard.appendChild(description);
+      }
+
+      // สถานะหรือวันหมดอายุ
+      if (status) {
+        const statusElement = document.createElement('div');
+        statusElement.className = 'status';
+        statusElement.innerText = status;
+        statusElement.style.backgroundColor = getStatusColor(status);
+        quizCard.appendChild(statusElement);
+      } else if (expiryDate) {
+        const countdown = document.createElement('div');
+        countdown.className = 'countdown';
+        countdown.setAttribute('data-expiry', expiryDate);
+        quizCard.appendChild(countdown);
+      }
+
+      // ปุ่มดูเฉลยหรือข้อความ "ไม่สามารถดูได้" เมื่อไม่มีลิงก์หรือปิดการใช้งาน
+      if (quizLink && !isButtonDisabled) {
+        // สร้างปุ่มเมื่อมีลิงก์
+        const answerButton = document.createElement('button');
+        answerButton.className = 'answer-button';
+        answerButton.innerText = buttonLabel || 'ดูเฉลย'; // ตั้งชื่อปุ่ม
+        answerButton.disabled = false; // ปุ่มไม่ถูกปิดใช้งาน
+        answerButton.style.backgroundColor = '#007BFF';
+        answerButton.style.color = '#fff';
+        answerButton.style.cursor = 'pointer';
+
+        // เพิ่ม Event Listener สำหรับการเปิดลิงก์
+        answerButton.addEventListener('click', () => {
+          window.open(quizLink, '_blank');
+        });
+
+        quizCard.appendChild(answerButton);
+      } else {
+        // เมื่อปุ่มไม่สามารถใช้งานได้
+        const noLinkMessage = document.createElement('p');
+        noLinkMessage.innerText = 'ไม่สามารถดูเฉลยได้';
+        quizCard.appendChild(noLinkMessage);
+      }
+
+      // เพิ่มการ์ดควิซในคอนเทนเนอร์
+      quizContainer.appendChild(quizCard);
     }
+  });
 
-    // สถานะหรือวันหมดอายุ
-    if (status) {
-      const statusElement = document.createElement('div');
-      statusElement.className = 'status';
-      statusElement.innerText = status;
-      statusElement.style.backgroundColor = getStatusColor(status);
-      quizCard.appendChild(statusElement);
-    } else if (expiryDate) {
-      const countdown = document.createElement('div');
-      countdown.className = 'countdown';
-      countdown.setAttribute('data-expiry', expiryDate);
-      quizCard.appendChild(countdown);
-    }
+  updateCountdowns();
+}
 
-    // ปุ่มดูเฉลยหรือข้อความ "ไม่สามารถดูได้" เมื่อไม่มีลิงก์หรือปิดการใช้งาน
-    if (quizLink && !isButtonDisabled) {
-      // สร้างปุ่มเมื่อมีลิงก์
-      const answerButton = document.createElement('button');
-      answerButton.className = 'answer-button';
-      answerButton.innerText = buttonLabel || 'ดูเฉลย'; // ตั้งชื่อปุ่ม
-      answerButton.disabled = false; // ปุ่มไม่ถูกปิดใช้งาน
-      answerButton.style.backgroundColor = '#007BFF';
-      answerButton.style.color = '#fff';
-      answerButton.style.cursor = 'pointer';
-
-      // เพิ่ม Event Listener สำหรับการเปิดลิงก์
-      answerButton.addEventListener('click', () => {
-        window.open(quizLink, '_blank');
-      });
-
-      quizCard.appendChild(answerButton);
-    } else {
-      // กรณีไม่มีลิงก์ หรือปิดการใช้งาน
-      const noAccessMessage = document.createElement('div');
-      noAccessMessage.className = 'no-access-message';
-      noAccessMessage.innerText = 'ไม่สามารถดูได้'; // ข้อความเมื่อปุ่มไม่สามารถใช้งานได้
-      quizCard.appendChild(noAccessMessage);
-    }
-  } else {
-    // กรณีไม่มีข้อมูลควิซ
-    const waitingUpdate = document.createElement('div');
-    waitingUpdate.className = 'waiting-for-update';
-    waitingUpdate.innerText = 'รออัพเดต';
-    quizCard.appendChild(waitingUpdate);
-  }
-
-  // เพิ่มคาร์ดของควิซในคอนเทนเนอร์
-  quizContainer.appendChild(quizCard);
-});
-
-// อัปเดตเวลานับถอยหลัง
-updateCountdowns();
-setInterval(updateCountdowns, 1000);
-
-// ฟังก์ชันกำหนดสีพื้นหลังตามสถานะ
+// ฟังก์ชันที่ใช้ในการแสดงผลสีของสถานะ
 function getStatusColor(status) {
-  switch (status) {
-    case 'เปิดทำควิซ':
-      return '#28a745'; // สีเขียว
-    case 'รออัพเดต':
-      return '#ffc107'; // สีเหลือง
-    case 'หมดอายุ':
-      return '#dc3545'; // สีแดง
-    default:
-      return '#6c757d'; // สีเทา
+  if (status.includes('หมดเขต')) {
+    return 'red';
+  } else if (status.includes('กำลังจะหมด')) {
+    return 'yellow';
+  } else if (status.includes('อัพเดตล่าสุด')) {
+    return 'green';
+  } else {
+    return 'blue';
   }
 }
 
-// กลับไปยังหน้าหลัก
-document.getElementById('back-button').onclick = () => {
-  document.getElementById('quiz-list').style.display = 'none';
-  document.getElementById('subjects').style.display = 'block';
-};
+// ฟังก์ชันเริ่มต้นการโหลดควิซ
+async function loadQuizzes() {
+  const subjectData = await fetchSubjects();
+  const subjectMap = {};
 
-// ตั้งค่าเริ่มต้น
-setInterval(updateCountdowns, 1000);
-initializeSubjects();
+  subjectData.forEach(([subject, quizName, quizLink, quizDescription, expiryDate, status, buttonLabel, isButtonDisabled]) => {
+    if (!subjectMap[subject]) subjectMap[subject] = [];
+    subjectMap[subject].push({
+      quizName,
+      quizLink,
+      quizDescription,
+      expiryDate,
+      status,
+      buttonLabel,
+      isButtonDisabled
+    });
+  });
+
+  // แสดงวิชาทั้งหมด
+  const subjectList = document.getElementById('subjects');
+  Object.keys(subjectMap).forEach(subject => {
+    const subjectItem = document.createElement('li');
+    subjectItem.innerText = subject;
+    subjectItem.addEventListener('click', () => showQuizzes(subject, subjectMap[subject]));
+    subjectList.appendChild(subjectItem);
+  });
+
+  // สร้างรายการแจ้งเตือน
+  const closeToExpiry = [];
+  const latestUpdates = [];
+  Object.keys(subjectMap).forEach(subject => {
+    subjectMap[subject].forEach(({ quizName, quizLink, expiryDate, status }) => {
+      const countdown = calculateCountdown(expiryDate);
+      if (countdown && countdown.includes('ชั่วโมง')) {
+        const timeLeftInHours = parseInt(countdown.split(" ")[0], 10);
+        if (timeLeftInHours <= 24) {
+          closeToExpiry.push({ subject, quizName, quizLink, timeLeftInHours });
+        }
+      }
+      if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
+        latestUpdates.push({ subject, quizName, quizLink });
+      }
+    });
+  });
+
+  highlightLatestUpdates(subjectMap);
+  updateNotificationBell(closeToExpiry, latestUpdates);
+}
+
+// เรียกใช้งานฟังก์ชันเริ่มต้น
+loadQuizzes();
 
    
     
