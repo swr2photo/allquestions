@@ -817,7 +817,6 @@ function toggleNotificationList() {
   notificationList.style.display = notificationList.style.display === "block" ? "none" : "block";
 }
 
-// ฟังก์ชันแสดงควิซในรายวิชา
 function showQuizzes(subject, quizzes) {
   document.getElementById('subjects').style.display = 'none';
   document.getElementById('quiz-list').style.display = 'block';
@@ -826,20 +825,23 @@ function showQuizzes(subject, quizzes) {
   const quizContainer = document.getElementById('quiz-container');
   quizContainer.innerHTML = '';
 
-  quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status }) => {
+  quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status, buttonLabel, isButtonDisabled }) => {
     const quizCard = document.createElement('div');
     quizCard.className = 'quiz-card';
 
     if (quizName) {
+      // ชื่อควิซ
       quizCard.innerHTML = `<strong>${quizName}</strong>`;
 
+      // คำอธิบายควิซ รองรับการเว้นบรรทัด
       if (quizDescription) {
         const description = document.createElement('div');
         description.className = 'quiz-description';
-        description.innerHTML = `<strong>คำอธิบาย:</strong> ${quizDescription}`;
+        description.innerHTML = `<strong>คำอธิบาย:</strong><br>${quizDescription.replace(/\n/g, '<br>')}`;
         quizCard.appendChild(description);
       }
 
+      // แสดงสถานะหรือวันหมดอายุ
       if (status) {
         const statusElement = document.createElement('div');
         statusElement.className = 'status';
@@ -853,20 +855,23 @@ function showQuizzes(subject, quizzes) {
         quizCard.appendChild(countdown);
       }
 
-      if (quizLink) {
-        const answerButton = document.createElement('a');
-        answerButton.className = 'answer-button';
-        answerButton.href = quizLink;
-        answerButton.target = '_blank';
-        answerButton.innerText = 'ดูเฉลย';
-        quizCard.appendChild(answerButton);
-      } else {
-        const waitingUpdate = document.createElement('div');
-        waitingUpdate.className = 'waiting-for-update';
-        waitingUpdate.innerText = 'รออัพเดต';
-        quizCard.appendChild(waitingUpdate);
+      // ปุ่มดูเฉลย
+      const answerButton = document.createElement('button');
+      answerButton.className = 'answer-button';
+      answerButton.innerText = buttonLabel || 'ดูเฉลย'; // ตั้งชื่อปุ่ม
+      answerButton.disabled = isButtonDisabled || false; // ปิดใช้งานปุ่มถ้าระบุ
+      answerButton.style.backgroundColor = isButtonDisabled ? '#ccc' : '#007BFF';
+      answerButton.style.cursor = isButtonDisabled ? 'not-allowed' : 'pointer';
+
+      if (quizLink && !isButtonDisabled) {
+        answerButton.addEventListener('click', () => {
+          window.open(quizLink, '_blank');
+        });
       }
+
+      quizCard.appendChild(answerButton);
     } else {
+      // กรณีไม่มีข้อมูลควิซ
       const waitingUpdate = document.createElement('div');
       waitingUpdate.className = 'waiting-for-update';
       waitingUpdate.innerText = 'รออัพเดต';
