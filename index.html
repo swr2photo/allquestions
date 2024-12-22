@@ -898,7 +898,7 @@ function showQuizzes(subject, quizzes) {
       const answerButton = document.createElement('button');
       answerButton.className = 'answer-button';
       answerButton.innerText = buttonLabel || 'ดูเฉลย'; // ชื่อปุ่ม
-      answerButton.disabled = isButtonDisabled || false; // ปิดการใช้งานปุ่มตามค่าที่ระบุ
+      answerButton.disabled = isButtonDisabled || FALSE; // ปิดการใช้งานปุ่มตามค่าที่ระบุ
       answerButton.style.backgroundColor = isButtonDisabled ? '#ccc' : '#007BFF';
       answerButton.style.color = isButtonDisabled ? '#666' : '#fff';
       answerButton.style.cursor = isButtonDisabled ? 'not-allowed' : 'pointer';
