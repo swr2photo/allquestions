@@ -818,10 +818,12 @@ function toggleNotificationList() {
 }
 
 function showQuizzes(subject, quizzes) {
+  // ซ่อนส่วนของรายวิชา
   document.getElementById('subjects').style.display = 'none';
   document.getElementById('quiz-list').style.display = 'block';
   document.getElementById('subject-title').innerText = `ควิซในวิชา ${subject}`;
 
+  // คอนเทนเนอร์สำหรับควิซ
   const quizContainer = document.getElementById('quiz-container');
   quizContainer.innerHTML = '';
 
@@ -831,9 +833,11 @@ function showQuizzes(subject, quizzes) {
 
     if (quizName) {
       // ชื่อควิซ
-      quizCard.innerHTML = `<strong>${quizName}</strong>`;
+      const quizTitle = document.createElement('strong');
+      quizTitle.innerText = quizName;
+      quizCard.appendChild(quizTitle);
 
-      // คำอธิบายควิซ รองรับการเว้นบรรทัด
+      // คำอธิบายควิซ (รองรับการเว้นบรรทัด)
       if (quizDescription) {
         const description = document.createElement('div');
         description.className = 'quiz-description';
@@ -841,7 +845,7 @@ function showQuizzes(subject, quizzes) {
         quizCard.appendChild(description);
       }
 
-      // แสดงสถานะหรือวันหมดอายุ
+      // สถานะหรือวันหมดอายุ
       if (status) {
         const statusElement = document.createElement('div');
         statusElement.className = 'status';
@@ -858,9 +862,10 @@ function showQuizzes(subject, quizzes) {
       // ปุ่มดูเฉลย
       const answerButton = document.createElement('button');
       answerButton.className = 'answer-button';
-      answerButton.innerText = buttonLabel || 'ดูเฉลย'; // ตั้งชื่อปุ่ม
-      answerButton.disabled = isButtonDisabled || false; // ปิดใช้งานปุ่มถ้าระบุ
+      answerButton.innerText = buttonLabel || 'ดูเฉลย'; // ชื่อปุ่ม
+      answerButton.disabled = isButtonDisabled || false; // ปิดการใช้งานปุ่มตามค่าที่ระบุ
       answerButton.style.backgroundColor = isButtonDisabled ? '#ccc' : '#007BFF';
+      answerButton.style.color = isButtonDisabled ? '#666' : '#fff';
       answerButton.style.cursor = isButtonDisabled ? 'not-allowed' : 'pointer';
 
       if (quizLink && !isButtonDisabled) {
@@ -878,12 +883,29 @@ function showQuizzes(subject, quizzes) {
       quizCard.appendChild(waitingUpdate);
     }
 
+    // เพิ่มคาร์ดของควิซในคอนเทนเนอร์
     quizContainer.appendChild(quizCard);
   });
 
+  // อัปเดตเวลานับถอยหลัง
   updateCountdowns();
   setInterval(updateCountdowns, 1000);
 }
+
+// ฟังก์ชันกำหนดสีพื้นหลังตามสถานะ
+function getStatusColor(status) {
+  switch (status) {
+    case 'เปิดทำควิซ':
+      return '#28a745'; // สีเขียว
+    case 'รออัพเดต':
+      return '#ffc107'; // สีเหลือง
+    case 'หมดอายุ':
+      return '#dc3545'; // สีแดง
+    default:
+      return '#6c757d'; // สีเทา
+  }
+}
+
 
 // กลับไปยังหน้าหลัก
 document.getElementById('back-button').onclick = () => {
