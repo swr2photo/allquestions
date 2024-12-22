@@ -375,21 +375,42 @@ footer p {
   font-weight: bold;
 }
 
-/* Popup Container */
+
+  </style>
+</head>
+<body>
+  <main>
+
+ <!-- Popup Container -->
+<div id="important-announcement-popup" class="popup">
+  <div class="popup-content">
+    <span class="close-button" onclick="closePopup()">&times;</span>
+    <h2>ประกาศสำคัญ</h2>
+    <!-- แสดงรูปภาพ -->
+    <img id="announcement-image" src="" alt="ประกาศ" class="popup-image" style="display: none;" draggable="false">
+    <!-- แสดงข้อความประกาศ -->
+    <p id="announcement-message" class="truncate-text">
+      นี่คือข้อความประกาศสำคัญ
+    </p>
+    <button id="expand-text-button" style="display: none;" onclick="expandText()">แสดงเพิ่มเติม</button>
+  </div>
+</div>
+
+<style>
+/* Popup Styles */
 .popup {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.6); /* พื้นหลังโปร่งใส */
-  display: none; /* ซ่อน Popup เป็นค่าเริ่มต้น */
+  background-color: rgba(0, 0, 0, 0.6);
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 1000;
 }
 
-/* Popup Content */
 .popup-content {
   background-color: #fff;
   border-radius: 10px;
@@ -401,7 +422,6 @@ footer p {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Close Button */
 .close-button {
   position: absolute;
   top: 10px;
@@ -416,47 +436,114 @@ footer p {
   color: #FF0000;
 }
 
-/* สไตล์สำหรับรูปภาพใน Popup */
 .popup-image {
   max-width: 100%;
   height: auto;
   margin: 10px 0;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-}
-    /* สไตล์สำหรับข้อความ */
-    #announcement-message {
-      color: #333;
-      font-size: 16px;
-      line-height: 1.5; /* เพิ่มระยะระหว่างบรรทัด */
-      white-space: pre-wrap; /* รองรับการขึ้นบรรทัดใหม่ */
-      word-wrap: break-word; /* หากข้อความยาวเกินก็จะแบ่งบรรทัด */
-      text-align: center;
-    }
-
-    #announcement-image {
-  max-width: 100%;
-  height: auto;
-  display: block; /* ให้แน่ใจว่ารูปภาพแสดง */
-  margin: 10px auto;
+  pointer-events: none; /* ป้องกันการกดรูปภาพ */
 }
 
-  </style>
-</head>
-<body>
-  <main>
+#announcement-message {
+  color: #333;
+  font-size: 16px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  text-align: center;
+  overflow: hidden;
+  max-height: 4.5em; /* แสดง 3 บรรทัด */
+}
 
-  <!-- Popup Container 
-  <div id="important-announcement-popup" class="popup">
-    <div class="popup-content">
-      <span class="close-button" onclick="closePopup()">&times;</span>
-      <h2>ประกาศสำคัญ</h2>
-      <!-- แสดงรูปภาพ -->
-      <img id="announcement-image" src="" alt="ประกาศ" class="popup-image" style="display: none;">
-      <!-- แสดงข้อความประกาศ -->
-      <p id="announcement-message">นี่คือข้อความประกาศสำคัญ</p>
-    </div>
-  </div> -->
+#expand-text-button {
+  margin-top: 10px;
+  background-color: #007BFF;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#expand-text-button:hover {
+  background-color: #0056b3;
+}
+</style>
+
+<script>
+// ฟังก์ชันสร้าง Blob URL
+function createBlobURL(imageUrl) {
+  return fetch(imageUrl)
+    .then((response) => response.blob())
+    .then((blob) => URL.createObjectURL(blob))
+    .catch((error) => {
+      console.error('Error creating Blob URL:', error);
+      return null;
+    });
+}
+
+// เรียกใช้ Popup
+document.addEventListener('DOMContentLoaded', async () => {
+  const announcementMessage = `ข้อสอบหน่วยที่ 2 (40 ข้อ 20 คะแนน) 23 ธ.ค. เวลา 00.00 น.- 26 ธ.ค.2567 ก่อนเวลา 23.59 น. เท่านั้น !!! ไม่มีการเปิดระบบนอกรอบ
+ข้อสอบมีจำนวน 40 ข้อ 20 คะเเนน
+
+นักศึกษามีเวลาทำข้อสอบ 2 ชั่วโมง
+
+ทำข้อสอบได้ 1 ครั้ง
+
+ทำเสร็จเเล้วอย่าลืม !!! กด Save เเละส่งเพื่อยืนยัน`;
+  const imageUrl = "https://cdn.discordapp.com/attachments/1058718167251288094/1320407004358901790/IMG_8511.jpg?ex=67697c59&is=67682ad9&hm=3bb50b39e03a60b9509a2d7834d26427a6f86f6582ffc894d3fbbac8a6c702cf&";
+
+  // สร้าง Blob URL
+  const blobUrl = await createBlobURL(imageUrl);
+
+  if (blobUrl) {
+    showPopup(announcementMessage, blobUrl);
+  }
+});
+
+function showPopup(message, imageUrl) {
+  const popup = document.getElementById('important-announcement-popup');
+  const popupMessage = document.getElementById('announcement-message');
+  const popupImage = document.getElementById('announcement-image');
+  const expandButton = document.getElementById('expand-text-button');
+
+  // ตั้งค่าข้อความ
+  popupMessage.innerHTML = message.replace(/\n/g, '<br>');
+
+  // ตรวจสอบความยาวข้อความ
+  if (popupMessage.scrollHeight > popupMessage.offsetHeight) {
+    expandButton.style.display = 'block'; // แสดงปุ่ม "แสดงเพิ่มเติม"
+  }
+
+  // ตั้งค่ารูปภาพ
+  if (imageUrl) {
+    popupImage.src = imageUrl;
+    popupImage.style.display = 'block';
+  } else {
+    popupImage.style.display = 'none';
+    console.error("Image URL is invalid.");
+  }
+
+  popup.style.display = 'flex'; // แสดง Popup
+}
+
+function expandText() {
+  const popupMessage = document.getElementById('announcement-message');
+  const expandButton = document.getElementById('expand-text-button');
+
+  popupMessage.style.maxHeight = 'none'; // ยกเลิกข้อจำกัดความสูง
+  expandButton.style.display = 'none'; // ซ่อนปุ่ม "แสดงเพิ่มเติม"
+}
+
+function closePopup() {
+  const popup = document.getElementById('important-announcement-popup');
+  popup.style.display = 'none'; // ปิด Popup
+}
+</script>
+
     
 <div id="notification-bell-container">
   <span id="notification-bell" onclick="toggleNotificationList()">
@@ -788,57 +875,7 @@ initializeSubjects();
    
     
   </script>
-     <script>
-// เข้ารหัส Base64 URL
-function encodeURL(url) {
-  return btoa(url); // แปลง URL เป็น Base64
-}
 
-// ถอดรหัส Base64 URL
-function decodeURL(encodedURL) {
-  return atob(encodedURL); // แปลง Base64 กลับเป็น URL ปกติ
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const announcementMessage = `IDEA TO ENTREPRENEURSHIP กำหนด Quiz กิจกรรมที่ 3
-วันเสาร์ที่ 21 ธันวาคม 2567 เวลา 12.30 - 13.00 น.`;
-
-  // เข้ารหัส URL รูปภาพ
-  const encodedImage = encodeURL("https://cdn.discordapp.com/attachments/1058718167251288094/1319804401853927476/IMG_8472.png?ex=67674b22&is=6765f9a2&hm=ab280291886372cc0739bcd98086a2eb7083d161e084cfe5616d4836749a602c");
-
-  // ถอดรหัส URL รูปภาพก่อนแสดง
-  const announcementImage = decodeURL(encodedImage);
-
-  // เรียกใช้งาน Popup
-  showPopup(announcementMessage, announcementImage);
-});
-
-function showPopup(message, imageUrl) {
-  const popup = document.getElementById('important-announcement-popup');
-  const popupMessage = document.getElementById('announcement-message');
-  const popupImage = document.getElementById('announcement-image');
-
-  // ตั้งค่าข้อความ
-  popupMessage.innerHTML = message.replace(/\n/g, '<br>');
-
-  // ตั้งค่ารูปภาพ
-  if (imageUrl) {
-    popupImage.src = imageUrl;
-    popupImage.style.display = 'block';
-  } else {
-    popupImage.style.display = 'none';
-    console.error("Image URL is invalid.");
-  }
-
-  popup.style.display = 'flex'; // แสดง Popup
-}
-
-function closePopup() {
-  const popup = document.getElementById('important-announcement-popup');
-  popup.style.display = 'none'; // ปิด Popup
-}
-
-  </script>
   
       <!--=============== SNOW JS ===============-->
       <script src="https://app.embed.im/snow.js" defer></script>
