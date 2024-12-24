@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Practice</title>
+    <!-- Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fc;
+            color: #333;
+            position: relative;
+            user-select: none; /* Prevent text selection on the whole page */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h3 {
+            font-size: 1.8rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4a4a4a;
+        }
+
+        /* Search Box Styles */
+        .search-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .search-box {
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 300px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 25px;
+            transition: border-color 0.3s ease;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: #0078d4;
+        }
+
+        .search-box::placeholder {
+            color: #888;
+        }
+
+        .search-button {
+            background-color: #0078d4;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #005bb5;
+        }
+
+        .search-button i {
+            margin-right: 8px;
+        }
+
+        /* Notification Popup */
+        .notification {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #f44336; /* Red background */
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            display: none;
+            font-size: 0.9rem;
+            z-index: 9999;
+            font-weight: bold;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            max-width: 300px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification.success {
+            background-color: #4CAF50; /* Green background for success */
+        }
+
+        .notification i {
+            font-size: 1.3rem;
+        }
+
+        .notification .message {
+            flex-grow: 1;
+        }
+
+        /* Question and Answer Styles */
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .question {
+            background: #f4f7fc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #0078d4;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #0078d4;
+        }
+
+        .question-text {
+            margin: 0;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .answer-container {
+            font-weight: bold;
+            color: #0078d4;
+            cursor: pointer;
+            text-decoration: underline;
+            position: relative;
+        }
+
+        .answer-container:hover {
+            color: #005bb5;
+        }
+
+        .copy-icon {
+            margin-left: 8px;
+            font-size: 1rem;
+            color: #888;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
+        .copy-icon:hover {
+            color: #555;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        ul li {
+            margin-bottom: 5px;
+        }
+
+        /* No results found message */
+        .no-results {
+            color: #f44336;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 1.3rem;
+            }
+
+            .question-text {
+                font-size: 0.8rem;
+            }
+        }
+
+/* Update for the .question */
+.question {
+    background: #f4f7fc;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-left: 4px solid #0078d4;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;  /* Use row direction for horizontal alignment */
+    align-items: center;  /* Align items in the center vertically */
+}
+
+/* Update for the .question-number */
+.question-number {
+    font-weight: bold;
+    color: #0078d4;
+    margin-right: 10px;  /* Add some space between the number and text */
+    flex-shrink: 0;  /* Prevent shrinking of the number */
+}
+
+/* Updated styling for Section C */
+.section-title {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    font-weight: bold;
+    color: #333;
+    text-align: left;
+}
+
+.question-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #555;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.question-text strong {
+    color: #0078d4; /* Make the speakers' names stand out */
+}
+
+.answer-container {
+    font-weight: bold;
+    color: #0078d4;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.answer-container:hover {
+    color: #005bb5;
+}
+
+/* Additional margin and padding adjustments for better readability */
+.question {
+    padding: 15px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+    border-left: 4px solid #0078d4;
+    border-radius: 8px;
+}
+
+.question p {
+    margin: 0;
+}
+
+    </style>
+    <script>
+        // Function to copy text to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Text copied successfully!', 'success'); // Show success notification
+            }).catch(err => {
+                console.error('Failed to copy text!', err);
+            });
+        }
+
+        // Prevent copying the entire page
+        document.addEventListener('copy', function (event) {
+            const selection = window.getSelection();
+            // Allow copying only if the selection contains an answer
+            if (!selection.isCollapsed && !selection.toString().startsWith('are going to get') && 
+                !selection.toString().startsWith('will not tell') &&
+                !selection.toString().startsWith('will tidy') &&
+                !selection.toString().startsWith('will take') && 
+                !selection.toString().startsWith('will go out')) {
+                event.preventDefault(); // Block copy for non-answer text
+                showNotification('You can only copy the answers.');
+            }
+        });
+
+        // Function to show a popup notification
+        function showNotification(message, type = 'error') {
+            const notification = document.createElement('div');
+            notification.classList.add('notification');
+            notification.classList.add(type); // Add success or error class
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-ban'}"></i>
+                <span class="message">${message}</span>
+            `;
+
+            document.body.appendChild(notification);
+            notification.style.display = 'flex';
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+                notification.remove();
+            }, 2000); // Hide after 2 seconds
+        }
+
+        // Function to search for questions and answers
+        function searchFunction() {
+            const searchQuery = document.getElementById('search').value.toLowerCase();
+            const questions = document.querySelectorAll('.question');
+            let found = false;  // Flag to check if any result is found
+
+            questions.forEach(question => {
+                const questionText = question.querySelector('.question-text').textContent.toLowerCase();
+                const answerText = question.querySelector('.answer-container').textContent.toLowerCase();
+                
+                if (questionText.includes(searchQuery) || answerText.includes(searchQuery)) {
+                    question.style.display = 'flex'; // Show question if it matches search query
+                    found = true;
+                } else {
+                    question.style.display = 'none'; // Hide question if it doesn't match
+                }
+            });
+
+            // Show no results message if no matches found
+            const noResultsMessage = document.querySelector('.no-results');
+            if (!found) {
+                noResultsMessage.style.display = 'block';
+            } else {
+                noResultsMessage.style.display = 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h3>Part 3: Grammar</h3>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="search" class="search-box" placeholder="Search for a question or answer..." oninput="searchFunction()">
+            <button class="search-button">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
+
+        <!-- No results found message -->
+        <div class="no-results">No matching questions or answers found.</div>
+
+        <!-- Section A -->
+        <div class="section">
+            <div class="section-title">A. Complete these sentences using the correct verb form of 'will' or 'be going to'.</div>
+
+            <div class="question">
+                <span class="question-number">1.</span>
+                <p class="question-text">
+                    We <span class="answer-container" onclick="copyToClipboard('are going to get')">are going to get<i class="fas fa-copy copy-icon"></i></span> married in July. We're already sending out invitations!
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">2.</span>
+                <p class="question-text">
+                    I <span class="answer-container" onclick="copyToClipboard('will not tell')">will not tell<i class="fas fa-copy copy-icon"></i></span> anyone your secret.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">3.</span>
+                <p class="question-text">
+                    I promise that I <span class="answer-container" onclick="copyToClipboard('will tidy')">will tidy<i class="fas fa-copy copy-icon"></i></span> my room today.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">4.</span>
+                <p class="question-text">
+                    I want to learn how to play the piano! Maybe I <span class="answer-container" onclick="copyToClipboard('am going to take')">am going to take<i class="fas fa-copy copy-icon"></i></span> some music lessons.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">5.</span>
+                <p class="question-text">
+                    I'm sure It’ll be an okay date, but I don't think I <span class="answer-container" onclick="copyToClipboard('will go out')">will go out<i class="fas fa-copy copy-icon"></i></span> with him again.
+                </p>
+            </div>
+        </div>
+
+        <!-- Section B -->
+        <div class="section">
+            <div class="section-title">B. Complete the sentences using the following phrases given below.</div>
+            <ul>
+                <li>could find</li>
+                <li>hopes to stay</li>
+                <li>could call</li>
+                <li>might go for walks</li>
+                <li>needs to bring</li>
+                <li>should not use</li>
+                <li>should not go out</li>
+            </ul>
+            <div class="question">
+                <span class="question-number">1.</span>
+                <p class="question-text">
+                    You look inactive these days. You <span class="answer-container" onclick="copyToClipboard('might go for walks')">might go for walks<i class="fas fa-copy copy-icon"></i></span> more often if you have time.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">2.</span>
+                <p class="question-text">
+                    You <span class="answer-container" onclick="copyToClipboard('should not go out')">should not go out<i class="fas fa-copy copy-icon"></i></span> all night when you have a meeting tomorrow morning.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">3.</span>
+                <p class="question-text">
+                    Everyone <span class="answer-container" onclick="copyToClipboard('needs to bring')">needs to bring<i class="fas fa-copy copy-icon"></i></span> something to eat.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">4.</span>
+                <p class="question-text">
+                    Children <span class="answer-container" onclick="copyToClipboard('should not use')">should not use<i class="fas fa-copy copy-icon"></i></span> internet too much.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">5.</span>
+                <p class="question-text">
+                    The service at this restaurant is so bad. We <span class="answer-container" onclick="copyToClipboard('could find')">could find<i class="fas fa-copy copy-icon"></i></span> a different one next time.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">6.</span>
+                <p class="question-text">
+                    Anny goes to the gym 4 days a week because she <span class="answer-container" onclick="copyToClipboard('hopes to stay')">hopes to stay<i class="fas fa-copy copy-icon"></i></span> in a good shape.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">7.</span>
+                <p class="question-text">
+                    If you’re not convenient to see him in person. You <span class="answer-container" onclick="copyToClipboard('could call')">could call<i class="fas fa-copy copy-icon"></i></span> him instead.
+                </p>
+            </div>
+        </div>
+
+        <div class="section">
+    <div class="section-title">C. Complete the dialogue using the first conditional.</div>
+    <div class="question">
+        <p class="question-text">
+            <strong>Phillip:</strong> Do you fancy going to the party later?<br>
+            <strong>Tom:</strong> No thanks. If I <span class="answer-container" onclick="copyToClipboard('go')">go<i class="fas fa-copy copy-icon"></i></span> to the party, I will fail the coming exam on Monday.<br><br>
+            <strong>Phillip:</strong> Really? What do you mean?<br>
+            <strong>Tom:</strong> If I go to the party, I <span class="answer-container" onclick="copyToClipboard('will see')">will see<i class="fas fa-copy copy-icon"></i></span> Miya. If I see Miya, she <span class="answer-container" onclick="copyToClipboard('will ask')">will ask<i class="fas fa-copy copy-icon"></i></span> me to stay out late. If I <span class="answer-container" onclick="copyToClipboard('stay out')">stay out<i class="fas fa-copy copy-icon"></i></span> late, I will sleep all Sunday morning. If I sleep all Sunday morning, I <span class="answer-container" onclick="copyToClipboard('will not have')">will not have<i class="fas fa-copy copy-icon"></i></span> time to study for the exam. If I do so, I <span class="answer-container" onclick="copyToClipboard('will fail')">will fail<i class="fas fa-copy copy-icon"></i></span> the exam on Monday!
+        </p>
+    </div>
+</div>
+
+        <!-- Section D -->
+        <div class="section">
+            <div class="section-title">D. Complete the second conditional sentences using the prompts in the bracket.</div>
+            <div class="question">
+                <span class="question-number">1.</span>
+                <p class="question-text">
+                    Joey would stay in Madrid, if <span class="answer-container" onclick="copyToClipboard('he found another job there')">he found another job there<i class="fas fa-copy copy-icon"></i></span>.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">2.</span>
+                <p class="question-text">
+                    If I won the lottery, <span class="answer-container" onclick="copyToClipboard('I would buy a sports car')">I would buy a sports car<i class="fas fa-copy copy-icon"></i></span>.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">3.</span>
+                <p class="question-text">
+                    If <span class="answer-container" onclick="copyToClipboard('Alice were not so shy')">Alice were not so shy<i class="fas fa-copy copy-icon"></i></span>, she would be a better salesperson.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">4.</span>
+                <p class="question-text">
+                    <span class="answer-container" onclick="copyToClipboard('We would not use')">We would not use<i class="fas fa-copy copy-icon"></i></span> so much electricity if we turned off the lights every time we left a room.
+                </p>
+            </div>
+            <div class="question">
+                <span class="question-number">5.</span>
+                <p class="question-text">
+                    You wouldn’t spend so much on food if <span class="answer-container" onclick="copyToClipboard('you used coupons')">you used coupons<i class="fas fa-copy copy-icon"></i></span>.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
