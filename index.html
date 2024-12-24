@@ -500,6 +500,15 @@ h2 {
 }
 
 </style>
+<style>
+  /* เพิ่มการตั้งค่าการแสดงรูปภาพ */
+  #announcement-image {
+    display: none; /* รูปภาพจะถูกซ่อนในตอนแรก */
+    width: 100%;
+    max-width: 500px;
+    margin: 10px auto;
+  }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -535,7 +544,9 @@ function showPopup(message, imageUrl) {
   // ตั้งค่ารูปภาพ
   if (imageUrl) {
     popupImage.src = imageUrl;
-    popupImage.style.display = 'block';
+    popupImage.style.display = 'block'; // แสดงรูปภาพ
+    popupImage.alt = 'Important Announcement'; // เพิ่ม alt
+    popupImage.loading = 'lazy'; // เพิ่ม loading สำหรับการโหลดแบบ lazy
   }
 
   popup.style.display = 'flex'; // แสดง Popup
@@ -553,8 +564,8 @@ function closePopup() {
   const popup = document.getElementById('important-announcement-popup');
   popup.style.display = 'none'; // ปิด Popup
 }
-
 </script>
+
 
 
   <main>
