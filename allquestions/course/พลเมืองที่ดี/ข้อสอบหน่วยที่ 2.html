@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improved Grammar Quiz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Search Box Styles */
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            width: 70%; /* ลดขนาดช่องค้นหา */
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.3);
+        }
+
+        .search-btn, .clear-btn {
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-btn {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+        }
+
+        .search-btn:hover {
+            background-color: #005bb5;
+        }
+
+        .clear-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            display: none; /* Hide clear button initially */
+        }
+
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: #f9fafb;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+        }
+
+        .question:hover {
+            transform: translateY(-5px);
+            background-color: #f0f8ff;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #4a90e2;
+            font-size: 1.2rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 0;
+        }
+
+        .answer-container {
+            font-size: 1rem;
+            color: #333;
+            padding: 8px 12px;
+            margin: 8px 0;
+            background-color: #f4f6f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-container:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Correct Answer Highlight */
+        .correct {
+            background-color: #d4f8d4; /* Light green for correct answers */
+            color: #2e7d32;
+            font-weight: bold;
+            border-color: #6bc46d;
+        }
+
+        /* Disable Copy */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            h3 {
+                font-size: 1.8rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 60%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                font-size: 1.5rem;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .search-btn i, .clear-btn i {
+                font-size: 1.2rem;
+            }
+
+            .search-btn-text, .clear-btn-text {
+                display: none;
+            }
+
+            /* Hide the clear button on mobile */
+            .clear-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 50%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 35px;
+                height: 35px;
+                padding: 0;
+                font-size: 1rem;
+            }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .search-btn-text, .clear-btn-text {
+                display: inline-block;
+                margin-left: 8px;
+                font-size: 1rem;
+            }
+
+            .search-btn, .clear-btn {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+
+            /* Adjust width of search box for desktop */
+            .search-box {
+                width: 50%; /* ลดขนาดช่องค้นหาในเดสก์ท็อป */
+            }
+
+            /* Hide the clear button on desktop */
+            .clear-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3>Grammar Practice Quiz</h3>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search questions..." onkeyup="searchContent()">
+            <button class="search-btn" onclick="searchContent()">
+                <i class="fas fa-search"></i><span class="search-btn-text">Search</span>
+            </button>
+            <button class="clear-btn" onclick="clearSearch()">
+                <i class="fas fa-times"></i><span class="clear-btn-text">Clear</span>
+            </button>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quizContainer">
+
+<div class="question">
+        <div class="question-header">
+            <span class="question-number">1.</span>
+            <p class="question-text">กรณีศึกษาใดกล่าวผิดในสิทธิพื้นฐานของคนไทยระหว่างบุคคล</p>
+        </div>
+        <div class="answer-container">พิมพ์เรียนจบคณะวิศวกรรมศาสตร์เลือกทำงานเป็นวิศวกร</div>
+        <div class="answer-container">ปลาทูมีเสรีภาพในการนับถือศาสนาคริสต์ตั้งเเต่กำเนิด</div>
+        <div class="answer-container">แก้วมีเสรีภาพในการเเสดงความคิดเห็นโดยกล่าวถึงผู้อื่น</div>
+        <div class="answer-container correct">ปูเป้มีสิทธิได้ทุนเรียนต่อจากรัฐบาลจนจบปริญญาตรี</div>
+    </div>
+
+    <!-- Question 2 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">2.</span>
+            <p class="question-text">ข้อใดกล่าวถูกต้องในความหมายของ “เสรีภาพ”</p>
+        </div>
+        <div class="answer-container">ประสงค์จะทำกิจกรรมใดใดก็ได้ในที่สาธารณะโดยไม่ต้องสนใจสิ่งแวดล้อม</div>
+        <div class="answer-container">มีสิทธิในการละเมิดเสรีภาพผู้อื่น</div>
+        <div class="answer-container correct">สภาวการณ์ของมนุษย์ที่ไม่อยู่ภายใต้การครอบงำของบุคคลอื่น</div>
+        <div class="answer-container">หากกระทำการผิดได้รับการละเว้นโทษ</div>
+    </div>
+
+    <!-- Question 3 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">3.</span>
+            <p class="question-text">ข้อใดกล่าวผิดในเรื่องความเสมอภาคทางโอกาส (Equality of Opportunity)</p>
+        </div>
+        <div class="answer-container">พลเมืองมีโอกาสการได้รับการศึกษาแบบเท่าเทียมกัน</div>
+        <div class="answer-container">พลเมืองมีสิทธิได้รับการบริการสาธารณะของรัฐ</div>
+        <div class="answer-container correct">พลเมืองมีโอกาสถือครองกระบวนการทางกฎหมายที่มีผลต่อประชาชน</div>
+        <div class="answer-container">พลเมืองมีโอกาสได้รับบริการทั้งด้านการศึกษา ด้านสาธารณสุข และเข้าถึงยารักษาโรค</div>
+    </div>
+
+    <!-- Question 4 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">4.</span>
+            <p class="question-text">ข้อใดกล่าวถูกต้องในสิทธิทางสังคม</p>
+        </div>
+        <div class="answer-container">เป็นสิทธิในการปฏิบัติตามความเชื่อทางศาสนาเป็นหลัก</div>
+        <div class="answer-container">เป็นสิทธิในการแสดงความคิดเห็นและการแสดงออกกับรัฐ</div>
+        <div class="answer-container">เป็นสิทธิที่ได้รับการศึกษา หลักประกันและเสรีภาพ ความมั่นคง</div>
+        <div class="answer-container correct">เป็นสิทธิในการเลือกงานได้อย่างอิสระและรับค่าจ้างอย่างเป็นธรรม</div>
+    </div>
+           <div class="question">
+                <div class="question-header">
+                    <span class="question-number">5.</span>
+                    <p class="question-text">กรณีศึกษาใดไม่ใช่เป็นหน้าที่พลเมืองต่อสิทธิทางวัฒนธรรมที่พึงเข้าร่วม</p>
+                </div>
+                <div class="answer-container">ประเพณีชักพระเดือนสิบ</div>
+                <div class="answer-container">ประเพณีผีตาโขน</div>
+                <div class="answer-container correct">ประเพณีรำลึกเหตุการณ์การเปลี่ยนแปลงระบบประชาธิปไตย</div>
+                <div class="answer-container">ประเพณียี่เป็ง</div>
+            </div>
+
+            <div class="question">
+                <div class="question-header">
+                    <span class="question-number">6.</span>
+                    <p class="question-text">ข้อใดกล่าวผิดถึงปัจจัยในเรื่องความไม่เสมอภาคทางการศึกษา</p>
+                </div>
+                <div class="answer-container">ความเหลื่อมล้ำทางรายได้</div>
+                <div class="answer-container">ความเหลื่อมล้ำทางด้านโอกาส</div>
+                <div class="answer-container correct">ความเหลื่อมล้ำเรื่องทางวัฒนธรรม</div>
+                <div class="answer-container">ความเหลื่อมล้ำเรื่องทางทรัพย์สิน</div>
+            </div>
+
+            <div class="question">
+                <div class="question-header">
+                    <span class="question-number">7.</span>
+                    <p class="question-text">ข้อใดกล่าวผิดถึงความหมายของ “เสรีภาพ”</p>
+                </div>
+                <div class="answer-container correct">เป็นสิ่งที่บุคคลสามารถกระทำการใดใดก็ได้</div>
+                <div class="answer-container">หากละเมิดเสรีภาพบุคคลอื่นต้องได้รับโทษ</div>
+                <div class="answer-container">สามารถกระทำการได้อย่างอิสระ แต่ต้องอยู่ภายใต้กติกา</div>
+                <div class="answer-container">ประโยชน์ที่บุคคลกระทำการได้ แต่ต้องอยู่ภายใต้กฎระเบียบ</div>
+            </div>
+
+            <div class="question">
+                <div class="question-header">
+                    <span class="question-number">8.</span>
+                    <p class="question-text">ข้อใดกล่าวผิดในเรื่องเสรีภาพขั้นพื้นฐาน Fundamental Freedoms</p>
+                </div>
+                <div class="answer-container  correct">เสรีภาพที่เกิดจากความหวาดกลัว</div>
+                <div class="answer-container">เสรีภาพในการชุมนุมในหน่วยงานของรัฐ</div>
+                <div class="answer-container">เสรีภาพในการนับถือศาสนา</div>
+                <div class="answer-container">เสรีภาพในการพูดเเละแสดงออก</div>
+            </div>
+
+            <div class="question">
+                <div class="question-header">
+                    <span class="question-number">9.</span>
+                    <p class="question-text">ข้อใดกล่าวผิดในเรื่องเกี่ยวกับสิทธิมนุษยชน</p>
+                </div>
+                <div class="answer-container">เป็นสิทธิขั้นพื้นฐานในเรื่องสิทธิบุคคล</div>
+                <div class="answer-container">เป็นสิทธิที่ต้องเคารพและห้ามละเมิดสิทธิผู้อื่น</div>
+                <div class="answer-container">เป็นสิทธิที่ครอบคลุมความเท่าเทียมภายใต้สังคมที่หลากหลาย</div>
+                <div class="answer-container  correct">เป็นสิทธิที่เปิดช่องว่างให้ผู้อื่นสามารถเข้ามาออกสิทธิ ออกเสียงในชีวิตคนอื่น</div>
+            </div>
+
+            <div class="question">
+                <div class="question-header">
+                    <span class="question-number">10.</span>
+                    <p class="question-text">ข้อใดกล่าวถูกถึงหลักความโปร่งใส (Accountability) ของการนำความเสมอภาคไปใช้ทางการเมืองในข้อปฏิบัติ</p>
+                </div>
+                <div class="answer-container">การรักษาสมดุลและส่งเสริมให้ประชาชนพัฒนาตนเอง</div>
+                <div class="answer-container">การใส่ใจต่อระบบสาธารณะ ความกระตือรือร้นในการแก้ปัญหา</div>
+                <div class="answer-container correct">การบริหารจัดการทรัพยากรที่มีอยู่อย่างจำกัดให้เกิดประโยชน์สูงสุด</div>
+                <div class="answer-container correct">การอยู่ภายใต้กฎหมายและต้องเปิดเผยมีประสิทธิภาพ</div>
+            </div>
+
+<div class="question">
+        <div class="question-header">
+            <span class="question-number">11.</span>
+            <p class="question-text">กรณีศึกษาใดไม่เข้าเกณฑ์หลักคุณธรรม (Morality) ในเรื่องแนวคิดความเสมอภาค</p>
+        </div>
+        <div class="answer-container">น้องเอวาเป็นทีมแพทย์ที่รักษาผู้ป่วยยากไร้ในการผ่าตัด</div>
+
+<div class="answer-container">มะขิ่นทำขนมเค้กไปขายในราคาที่เป็นกลางและไม่หวังผลกำไรเกินตัว </div>
+        <div class="answer-container">หมูเด้งเข้าร่วมทีมตรวจสอบกลุ่มทุจริตในโรงพยาบาล</div>
+        <div class="answer-container correct">มาตาลดายึดหลักมาตรฐานของตนเองในการตัดสินผู้อื่น</div>
+    </div>
+
+    <!-- Question 12 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">12.</span>
+            <p class="question-text">ข้อใดกล่าวผิดในเรื่องเกี่ยวกับสิทธิมนุษยชน</p>
+        </div>
+        <div class="answer-container">เป็นสิทธิที่ต้องเคารพและห้ามละเมิดสิทธิผู้อื่น</div>
+        <div class="answer-container">เป็นสิทธิที่ต้องเคารพและห้ามละเมิดสิทธิผู้อื่น</div>
+       <div class="answer-container correct">เป็นสิทธิที่เปิดช่องว่างให้ผู้อื่นสามารถเข้ามาออกสิทธิ ออกเสียงในชีวิตคนอื่น</div>
+
+<div class="answer-container correct"> เป็นสิทธิขั้นพื้นฐานในเรื่องสิทธิบุคคล </div>
+
+    </div>
+
+    <!-- Question 13 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">13.</span>
+            <p class="question-text">ข้อใดกล่าวถูกต้องเกี่ยวกับความเสมอภาคในแนวนอน (Horizontal Equity)</p>
+        </div>
+        <div class="answer-container correct">คำนึงถึงประชาชนในเรื่องระบบบริการส่วนบุคคล</div>
+        <div class="answer-container">อยู่ในสถานภาพผู้ให้บริการ สถานบริการที่จัดสรรเพื่อคุณภาพชีวิต</div>
+       <div class="answer-container">เน้นในเรื่องคุณภาพที่เกี่ยวข้องกับเรื่องชีวิตส่วนตน</div>
+
+<div class="answer-container"> ความจำเป็นของชีวิตผูกกับเรื่องสถานะทางการเงิน เพศ อายุ ความเชื่อ เป็นต้น</div>
+
+    </div>
+
+    <!-- Question 14 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">14.</span>
+            <p class="question-text">ข้อใดกล่าวผิดเรื่องความเท่าเทียมกันของ "มนุษย์" (Human Dignity)</p>
+        </div>
+        <div class="answer-container">มนุษย์เท่าเทียมกันในฐานะที่เป็นมนุษยชาติ</div>
+        <div class="answer-container correct">มนุษย์ที่มีฐานะสูงกว่าย่อมมีสิทธิมีเสียงของความเป็นมนุษย์มากกว่าคนที่ด้อยกว่าเสมอ</div>
+        <div class="answer-container">มนุษย์มีความเท่าเทียมกันของโอกาสจากการแบ่งปันของบุคคลที่มีกำลังมากกว่าเสมอ</div>
+
+<div class="answer-container">มนุษย์เท่าเทียมกันในฐานะที่มีความสามารถทางศีลธรรม</div>
+
+
+    </div>
+
+    <!-- Question 15 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">15.</span>
+            <p class="question-text">องค์กรเอกชนใดมีบทบาทที่เข้ามาสนับสนุนเรื่องสิทธิมนุษยชน</p>
+        </div>
+        <div class="answer-container">PTT Public Company Limited</div>
+        <div class="answer-container">Siam Cement Group</div>
+        <div class="answer-container">Charoen Pokphand Group Company</div>
+        <div class="answer-container correct">Non-governmental organization</div>
+    </div>
+
+    <!-- Question 16 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">16.</span>
+            <p class="question-text">ข้อใดกล่าวผิดเกี่ยวกับสิทธิมนุษยชน (Human right)</p>
+        </div>
+        <div class="answer-container">ต้องอยู่ภายใต้พื้นฐานของสิทธิ เสรีภาพคำนึงถึงความเสมอภาคและเป็นธรรม</div>
+        <div class="answer-container correct">ต้องคำนึงถึงสิทธิประโยชน์ส่วนบุคคลเป็นหลัก และให้ภาครัฐช่วยเหลือเสมอ</div>
+        <div class="answer-container">ต้องคำนึงถึงความเป็นมนุษย์ของความแตกต่างที่หลากหลายในสังคม</div>
+
+<div class="answer-container">ต้องคำนึงถึงความเท่าเทียม ศักดิ์ ศรี ของความเป็นมนุษย์ (Human Dignity) </div>
+
+    </div>
+
+    <!-- Question 17 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">17.</span>
+            <p class="question-text">ข้อใดกล่าวอธิบายถึงความเสมอภาคทางโอกาส (Equality of Opportunity) ในการบริการจากสาธารณรัฐได้อย่างถูกต้อง</p>
+        </div>
+        <div class="answer-container">ได้รับโอกาสเป็นประธานนักเรียนได้</div>
+        <div class="answer-container">ได้รับโอกาสในการเกล่าวปราศัยเรื่องการเมือง</div>
+        <div class="answer-container correct">ได้รับโอกาสในการฉีดวัคซีน Covid 19</div>
+
+<div class="answer-container correct">ได้รับโอกาสในการฉีดวัคซีนที่ดีเพราะจ่ายมากกว่าคนอื่น</div>
+
+    </div>
+
+    <!-- Question 18 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">18.</span>
+            <p class="question-text">แนวคิดเป้าหมาย SDG 10 ของ Sustainable Development Goal ข้อใดกล่าวถูกถึงจุดเน้นที่สำคัญ</p>
+        </div>
+        <div class="answer-container">เน้นความเป็นหุ้นส่วนการพัฒนา (Partnership) ความร่วมมือของทุกภาคส่วน</div>
+        <div class="answer-container">เน้นการเติบโตทางเศรษฐกิจ (economic growth) เป็นสำคัญ</div>
+       
+
+<div class="answer-container correct">เน้นเสริมสร้างศักยภาพและส่งเสริมครอบคลุมถึงหลักประกันโอกาสในทางปฏิบัติตามที่เหมาะสมและเท่าเทียม</div>
+    </div>
+
+<div class="answer-container correct">เน้นเรื่องการแก้ไขปัญหาเรื่องการขจัดความยากจนและเสริมสร้างความมั่นคงทางอาหาร</div>
+    </div>
+
+    <!-- Question 19 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">19.</span>
+            <p class="question-text">ข้อใดไม่ใช่นิยามของสมาชิกในสังคมในนิยามพลเมืองในระบอบประชาธิปไตย</p>
+        </div>
+        <div class="answer-container">มีการขับเคลื่อนผ่านกระบวนการเคลื่อนไหวทางสังคม</div>
+        <div class="answer-container">มีจิตสำนึกร่วม จิตสาธารณะในการช่วยเหลือผู้อื่น</div>
+        <div class="answer-container correct">มีความคิดเห็นที่แตกต่างและมีข้อโต้แย้งบนพื้นฐานของตนเอง</div>
+        <div class="answer-container">มีกฎ ระเบียบ ข้อบังคับ ชัดเจนในสังคม</div>
+    </div>
+
+    <!-- Question 20 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">20.</span>
+            <p class="question-text">ข้อใดกล่าวผิดถึงลักษณะคุณสมบัติความเป็นพลเมืองของ Kahne (2004)</p>
+        </div>
+        <div class="answer-container">มีการอนุรักษ์วิถีชีวิต ประเพณีของชุมชนท้องถิ่น</div>
+        <div class="answer-container correct">มีการทำประชาพิจารณ์ผลประโยชน์ของตนเข้าสู่ชุมชน</div>
+        <div class="answer-container">มีจิตสำนึกรักบ้านเกิดจังหวัดของตนเอง</div>
+        <div class="answer-container">มีการนำสื่อดิจิทัลมาปรับใช้กับชนบท</div>
+    </div>
+
+    <!-- Question 21 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">21.</span>
+            <p class="question-text">พัฒนาการของสิทธิและเสรีภาพช่วงที่ 1 คืออะไร ?</p>
+        </div>
+        <div class="answer-container">เป็นเรื่องการแสดงความคิดเห็นการหาทางออกทางการเมือง</div>
+        <div class="answer-container">เป็นเรื่องเกี่ยวกับสินทรัพย์ของตนเอง</div>
+        <div class="answer-container correct">เป็นเรื่องลัทธิ การนับถือความเชื่อในการตัดสินความผิด</div>
+    </div>
+
+    <!-- Question 22 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">22.</span>
+            <p class="question-text">ข้อใดกล่าวผิดเกี่ยวกับสังคม “อนาธิปไตย”</p>
+        </div>
+        <div class="answer-container">เป็นสังคมกลุ่มเล็กที่คุ้มครองตนเอง</div>
+        <div class="answer-container">เป็นสังคมที่ไร้รัฐ ไร้การควบคุม</div>
+        <div class="answer-container correct">เป็นคู่ตรงข้าม (Binary Opposite) กับคำว่าประชาธิปไตย</div>
+
+<div class="answer-container correct"เป็นสังคมที่ไม่ได้สร้างคามเดือดร้อน และเบียดเบียนผู้ใด</div>
+
+    </div>
+
+    <!-- Question 23 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">23.</span>
+            <p class="question-text"การเคารพหลักความเสมอภาคแบบแนวระนาบ (Horizontal) ตรงข้ามกับแบบใด</p>
+        </div>
+        <div class="answer-container">แนวระบบราชการ (Bureaucracy)</div>
+        <div class="answer-container correct">แนวดิ่ง (Vertical)</div>
+        <div class="answer-container">แนวระดับทุนนิยม (Capitalist) </div>
+<div class="answer-container correct">แนวระดับบน (Top down)</div>
+
+    </div>
+
+<div class="question">
+        <div class="question-header">
+            <span class="question-number">24.</span>
+            <p class="question-text">ข้อใดกล่าวถึงความสำคัญของมนุษยชนได้อย่างครอบคลุม</p>
+        </div>
+        <div class="answer-container">ถูกนำมาใช้กับสังคมชั้นสูงในสังคม</div>
+        <div class="answer-container">ถูกนำมาใช้กับการขจัดคนการคนกลุ่มน้อยในสังคม</div>
+        <div class="answer-container">ถูกนำมาใช้กับประเทศพัฒนาแล้ว</div>
+        <div class="answer-container correct">ถูกนำมาใช้ในเรื่องเกี่ยวกับความสัมพันธ์ระหว่างประเทศ</div>
+    </div>
+
+    <!-- Question 25 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">25.</span>
+            <p class="question-text">“นักศึกษามหาวิทยาลัยสงขลานครินทร์ได้รับสิทธิรักษาในโรงพยาบาล” คำกล่าวข้างต้น อยู่ในสิทธิกลุ่มใด</p>
+        </div>
+        <div class="answer-container">สิทธิทางเศรษฐกิจ</div>
+        <div class="answer-container correct">สิทธิทางสังคม</div>
+        <div class="answer-container">สิทธิทางการเมือง</div>
+        <div class="answer-container">สิทธิทางพลเมือง</div>
+    </div>
+
+    <!-- Question 26 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">26.</span>
+            <p class="question-text">การปราบรามเรื่อง Corruption เป็นหน้าที่ของรัฐด้านใดที่ต้องเข้ามาควบคุมตามหน้าที่ของรัฐหมวด 5</p>
+        </div>
+        <div class="answer-container">ด้านข้อมูล ข่าวสาร สาธารณะ</div>
+        <div class="answer-container correct">ด้านขจัดทุจริตและประพฤติมิชอบ</div>
+        <div class="answer-container">ด้านการคุ้มครองผู้บริโภค</div>
+        <div class="answer-container">ด้านสาธารณูปโภค</div>
+    </div>
+
+    <!-- Question 27 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">27.</span>
+            <p class="question-text">สวัสดิการของสหภาพแรงงานเป็นเรื่องสิทธิและเสรีภาพในหมวดใด</p>
+        </div>
+        <div class="answer-container">สิทธิในกระบวนการยุติธรรม</div>
+        <div class="answer-container correct">สิทธิและเสรีภาพในการประกอบอาชีพ</div>
+        <div class="answer-container">สิทธิและเสรีภาพส่วนบุคคล</div>
+        <div class="answer-container">สิทธิในทรัพย์สิน</div>
+    </div>
+
+    <!-- Question 28 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">28.</span>
+            <p class="question-text">บิวกิ้นมีการต่อยอดทักษะเพิ่มเติมจากความรู้เดิมในฐานของคณะวิศวกรรมศาสตร์ บิวกิ้นมีทักษะของบทบาทนักศึกษาแบบใด</p>
+        </div>
+        <div class="answer-container correct">Up Skills</div>
+        <div class="answer-container">Adaptability Skills</div>
+        <div class="answer-container">Re Skills</div>
+        <div class="answer-container">New Skills</div>
+    </div>
+
+    <!-- Question 29 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">29.</span>
+            <p class="question-text">ข้อใดกล่าวถูกต้องถึงการสร้างโอกาสและความเสมอภาคในการมีส่วนร่วมในการกระจายอำนาจ</p>
+        </div>
+        <div class="answer-container">การพัฒนาความยั่งยืนและสร้างอนาคตให้ลูกหลาน</div>
+        <div class="answer-container correct">การเปิดเวทีการทำประชาพิจารณ์</div>
+        <div class="answer-container">การส่งเสริมสิทธิมนุษยชน</div>
+        <div class="answer-container">การกระจายทรัพยากรในการบริการ</div>
+    </div>
+
+    <!-- Question 30 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">30.</span>
+            <p class="question-text">นักปรัชญา John Locke กับ Jean-Jacques Rousseau) กล่าวถึงทฤษฎีใดที่พูดถึงแนวคิดความเสมอภาค</p>
+        </div>
+        <div class="answer-container">ทฤษฎีความสัมพันธ์เชิงสัญลักษณ์</div>
+        <div class="answer-container correct">ทฤษฎีสัญญาประชาคม</div>
+        <div class="answer-container">ทฤษฎีการเมืองเรื่องพื้นที่</div>
+        <div class="answer-container">ทฤษฎีความขัดแย้ง</div>
+    </div>
+
+    <!-- Question 31 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">31.</span>
+            <p class="question-text">ข้อใดกล่าวถึงความหมายของความเสมอภาคระหว่างบุคคลได้อย่างครอบคลุม</p>
+        </div>
+        <div class="answer-container correct">การไม่เลือกปฏิบัติเพราะความแตกต่างเฉพาะตัวของบุคคล</div>
+        <div class="answer-container">การมีสิทธิทางการเมืองและการเลือกตั้ง</div>
+        <div class="answer-container">การออกกฎหมาย กฎระเบียบต้องมีข้อบังคับอย่างเท่าเทียมกัน</div>
+        <div class="answer-container">การมีโอกาสเข้ารับการฉีดวัคซีน</div>
+    </div>
+
+    <!-- Question 32 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">32.</span>
+            <p class="question-text">ข้อใดอธิบายถึงเรื่องความเสมอภาคได้อย่างถูกต้อง</p>
+        </div>
+        <div class="answer-container">เป็นการเข้าถึงระบบบริการที่มีคุณภาพจากนโยบายเท่ากันทุกคน</div>
+        <div class="answer-container">เป็นการบริการที่มีคุณภาพที่รัฐจัดสรรให้อย่างเท่าเทียม</div>
+        <div class="answer-container">เป็นอำนาจจากผู้ที่มีปัจจัยมากกว่าคนอื่นในอภิสิทธิ์</div>
+        <div class="answer-container correct">เป็นฐานทรัพยากรทั้งในระดับรายบุคคล ครอบครัวและชุมชน</div>
+    </div>
+
+    <!-- Question 33 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">33.</span>
+            <p class="question-text">ระบบใดเป็นการอธิบายเรื่องช่องว่างของวรรณะ ชนชั้นและการแข่งขัน</p>
+        </div>
+        <div class="answer-container">ระบบสิ่งแวดล้อม</div>
+        <div class="answer-container">ระบบการศึกษา</div>
+        <div class="answer-container">ระบบเศรษฐกิจ</div>
+        <div class="answer-container correct">ระบบโครงสร้างทางสังคม</div>
+
+<div id="quizContainer">
+    <!-- Question 34 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">34.</span>
+            <p class="question-text">ข้อใดไม่ใช่จุดเน้นที่สำคัญของ SDG 10 ตามเป้า Sustainable Development Goal</p>
+        </div>
+        <div class="answer-container">การลดสงครามการเมืองที่เกิดขึ้นในแผนระยะสั้น</div>
+        <div class="answer-container">การลดความยากจนและอยู่ดีกินดี</div>
+        <div class="answer-container">การลดการใช้แรงงานเด็ก</div>
+        <div class="answer-container correct">การลดการช่วยเหลือผู้ลี้ภัย</div>
+    </div>
+
+    <!-- Question 35 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">35.</span>
+            <p class="question-text">นโยบาย 30 บาท รักษาทุกโรคเป็นการขับเคลื่อนความเท่าเทียมกลุ่มใด</p>
+        </div>
+        <div class="answer-container correct">ความเท่าเทียมในเรื่องโอกาส</div>
+        <div class="answer-container">ความเท่าเทียมในเรื่องรายได้</div>
+        <div class="answer-container">ความเท่าเทียมการเข้าถึงการศึกษา</div>
+        <div class="answer-container">ความเท่าเทียมในระบบเศรษฐกิจ</div>
+    </div>
+
+    <!-- Question 36 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">36.</span>
+            <p class="question-text">ข้อใดคือชุดคำศัพท์ของความจำเป็นในเรื่องความเสมอภาคกับความจำเป็นทางสังคม</p>
+        </div>
+        <div class="answer-container">พลเมือง กฎหมาย อนาธิปไตย</div>
+        <div class="answer-container">การปลดปล่อย ความเท่าเทียม ความเสมอภาค</div>
+        <div class="answer-container correct">ความหลากหลาย ความเป็นอยุติธรรม ความเสมอภาค</div>
+        <div class="answer-container">รัฐ กฎระเบียบ ผู้มีอำนาจ</div>
+    </div>
+
+    <!-- Question 37 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">37.</span>
+            <p class="question-text">ข้อใดไม่ใช่ความหมายของ Bernard (1962) ในเรื่องความเสมอภาค</p>
+        </div>
+        <div class="answer-container correct">การมีข้อโต้แย้งในเรื่องความหลากหลายเพราะความต่างทางชาติพันธุ์</div>
+        <div class="answer-container">การมีกำลังมากกว่าคนอื่นคือการแบ่งปันโอกาสทางสังคม</div>
+        <div class="answer-container">จริยธรรมคือความสามารถที่มนุษย์มีความเท่าเทียมกัน</div>
+        <div class="answer-container">การพูดและภาษาถือเป็นเครื่องมือการสร้างความสัมพันธ์ของมนุษย์</div>
+    </div>
+
+    <!-- Question 38 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">38.</span>
+            <p class="question-text">ข้อใดไม่ใช่ความแตกต่างหลากหลาย (Diversity)</p>
+        </div>
+        <div class="answer-container correct">ทรัพยากรธรรมชาติ</div>
+        <div class="answer-container">สีผิว</div>
+        <div class="answer-container">ชาติพันธุ์</div>
+        <div class="answer-container">ภาษา</div>
+    </div>
+
+    <!-- Question 39 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">39.</span>
+            <p class="question-text">ข้อใดกล่าวถึงคำสำคัญของ Equality Before the law ถูกต้อง</p>
+        </div>
+        <div class="answer-container correct">สิทธิ กฎหมาย การเมือง</div>
+        <div class="answer-container">พลเมือง มนุษย์ ระเบียบ</div>
+        <div class="answer-container">เสรีภาพ มาตรา ข้อบังคับ</div>
+        <div class="answer-container">อิสระ เสรีภาพขั้นพื้นฐาน กฎหมาย</div>
+    </div>
+
+    <!-- Question 40 -->
+    <div class="question">
+        <div class="question-header">
+            <span class="question-number">40.</span>
+            <p class="question-text">หลักการ CSR ทางสังคมเชิงบรรษัทนับเป็นหลักการความเป็นพลเมืองในข้อปฏิบัติประเภทใด</p>
+        </div>
+        <div class="answer-container">Participation</div>
+        <div class="answer-container">Accountability</div>
+        <div class="answer-container">Cost-effectiveness or Economy</div>
+        <div class="answer-container correct">Responsibility</div>
+    </div>
+
+    </div>
+
+        </div>
+
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            No results found!
+        </div>
+    </div>
+
+    <script>
+        function searchContent() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const questions = document.querySelectorAll('.question');
+            let hasResults = false;
+
+            questions.forEach(question => {
+                const text = question.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    question.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    question.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
+
+            const clearBtn = document.querySelector('.clear-btn');
+            if (input.length > 0) {
+                clearBtn.style.display = 'inline-block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchContent();
+        }
+    </script>
+</body>
+</html>
