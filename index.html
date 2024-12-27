@@ -603,10 +603,18 @@ function closePopup() {
   </footer>
 
   <script>
+// เรียกใช้ dotenv
+require('dotenv').config();
 
-const sheetId = "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc";
-const sheetRange = "Allquestions";
-const apiKey = "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw";
+// ดึงค่าจาก .env
+const sheetId = process.env.SHEET_ID;
+const sheetRange = process.env.SHEET_RANGE;
+const apiKey = process.env.API_KEY;
+
+console.log("Sheet ID:", sheetId);
+console.log("Sheet Range:", sheetRange);
+console.log("API Key:", apiKey);
+
 
 // ฟังก์ชันดึงข้อมูลจาก Google Sheets
 async function fetchSubjects() {
