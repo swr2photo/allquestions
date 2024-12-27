@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ย่อลิงก์ - Google Sheets</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ย่อลิงก์ - Google Sheets</h1>
+    <p>กรอกลิงก์ที่คุณต้องการย่อ:</p>
+    <input type="text" id="urlInput" placeholder="วางลิงก์ของคุณที่นี่">
+    <button onclick="shortenLink()">ย่อลิงก์</button>
+    <div class="result" id="result"></div>
+
+    <script>
+const apiUrl = 'https://script.google.com/macros/s/AKfycbzKYhRcikKjnmtKU6o5FBPkunaUjTBFmU6ASuH-bzOYzfjvs8NS0epwobkbZ7iWrgVY/exec';
+
+        async function shortenLink() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                alert('กรุณากรอกลิงก์');
+                return;
+            }
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'shorten',
+                        url: url
+                    })
+                });
+                const data = await response.json();
+                if (data.shortCode) {
+                    document.getElementById('result').innerHTML = `
+                        ลิงก์ย่อของคุณ: 
+                        <a href="${window.location.href}#${data.shortCode}" target="_blank">${window.location.href}#${data.shortCode}</a>
+                    `;
+                } else {
+                    document.getElementById('result').textContent = 'เกิดข้อผิดพลาด';
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = 'เกิดข้อผิดพลาด: ' + error.message;
+            }
+        }
+
+        window.onload = async function () {
+            const hash = window.location.hash.slice(1);
+            if (!hash) return;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'redirect',
+                        shortCode: hash
+                    })
+                });
+                const data = await response.json();
+                if (data.originalUrl) {
+                    window.location.href = data.originalUrl;
+                } else {
+                    alert('ไม่พบลิงก์');
+                }
+            } catch (error) {
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            }
+        };
+    </script>
+</body>
+</html>
