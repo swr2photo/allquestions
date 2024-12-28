@@ -804,25 +804,23 @@ function updateNotificationBell(closeToExpiry, latestUpdates) {
 
   noNotifications.style.display = "none";
 
-// เพิ่มหัวข้อสำหรับ "ควิซที่กำลังจะหมดอายุ"
-if (closeToExpiry.length > 0) {
-  const expiryHeader = document.createElement('h3');
-  expiryHeader.innerText = "ควิซที่จะหมดอายุเร็ว ๆ นี้";
-  notificationList.appendChild(expiryHeader);
+  // เพิ่มหัวข้อสำหรับ "ควิซที่กำลังจะหมดอายุ"
+  if (closeToExpiry.length > 0) {
+    const expiryHeader = document.createElement('h3');
+    expiryHeader.innerText = "ควิซที่จะหมดอายุเร็ว ๆ นี้";
+    notificationList.appendChild(expiryHeader);
 
-  closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours, timeLeftInMinutes }) => {
-    const li = document.createElement('li');
-    li.innerHTML = 
-      `ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-      เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong> 
-      หรือ <strong>${timeLeftInMinutes} นาที</strong>!
-      <br>
-      <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>`;
-    notificationList.appendChild(li);
-  });
-}
-
-
+    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
 
   // เพิ่มหัวข้อสำหรับ "ควิซที่เพิ่งอัพเดต"
   if (latestUpdates.length > 0) {
