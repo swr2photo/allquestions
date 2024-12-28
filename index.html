@@ -627,6 +627,14 @@ async function fetchSubjects() {
   }
 }
 
+// ฟังก์ชันคำนวณปีล่วงหน้า
+function getNextYearDate(yearsAhead = 1) {
+  const today = new Date();
+  const nextYear = today.getFullYear() + yearsAhead;
+  // วันที่ 1 มกราคมของปีถัดไปหรือปีที่กำหนด
+  return new Date(nextYear, 0, 1).toISOString();
+}
+
 // ฟังก์ชันคำนวณเวลา
 function calculateCountdown(expiryDate) {
   const [date, time] = expiryDate.split(", ");
@@ -636,9 +644,6 @@ function calculateCountdown(expiryDate) {
   const now = new Date();
   const endDate = new Date(formattedDate);
   const timeLeft = endDate.getTime() - now.getTime();
-
-  const currentYear = now.getFullYear();
-  const expiryYear = endDate.getFullYear();
 
   if (timeLeft <= 0) return null;
 
@@ -655,18 +660,27 @@ function calculateCountdown(expiryDate) {
   ].filter(Boolean).join(' ');
 }
 
-// ฟังก์ชันสำหรับคำนวณปีหน้า
-function getNextYearDate() {
-  const today = new Date();
-  const nextYear = today.getFullYear() + 1;
-  // วันที่ 1 มกราคมของปีถัดไป
-  return new Date(nextYear, 0, 1).toISOString();
-}
-
 // ฟังก์ชันแสดงเวลาใน Countdown
 function updateCountdowns() {
   document.querySelectorAll('.countdown').forEach(el => {
-    const expiryDate = el.getAttribute('data-expiry') || getNextYearDate(); // ใช้ปีถัดไปหากไม่มี expiry
+    let expiryDate = el.getAttribute('data-expiry');
+    
+    if (expiryDate) {
+      const [date, time] = expiryDate.split(", ");
+      const [day, month, year] = date.split("/");
+
+      const now = new Date();
+      const inputYear = parseInt(year, 10);
+      const currentYear = now.getFullYear();
+
+      // ถ้าปีที่กรอกมาเป็นปีที่ผ่านมา หรือปีปัจจุบัน
+      if (inputYear <= currentYear) {
+        expiryDate = getNextYearDate(); // ใช้ปีถัดไป
+      }
+    } else {
+      expiryDate = getNextYearDate(); // ถ้าไม่มี expiry ก็ใช้ปีถัดไป
+    }
+
     const countdown = calculateCountdown(expiryDate);
 
     if (!countdown) {
@@ -677,6 +691,7 @@ function updateCountdowns() {
     }
   });
 }
+
 
 function getStatusColor(status) {
   if (status && status.toLowerCase().includes("รอการแก้ไข")) {
