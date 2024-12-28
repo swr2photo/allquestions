@@ -804,22 +804,40 @@ function updateNotificationBell(closeToExpiry, latestUpdates) {
 
   noNotifications.style.display = "none";
 
+// ฟังก์ชันคำนวณเวลาที่เหลือในรูปแบบวัน ชั่วโมง นาที วินาที
+function calculateCountdown(expiryDate) {
+  const now = new Date();
+  const endDate = new Date(expiryDate);
+  const timeLeft = endDate.getTime() - now.getTime();
+
+  if (timeLeft <= 0) return null;
+
+  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+  return [
+    days > 0 ? `${days} วัน` : '',
+    hours > 0 ? `${hours} ชั่วโมง` : '',
+    minutes > 0 ? `${minutes} นาที` : '',
+    seconds > 0 ? `${seconds} วินาที` : '',
+  ].filter(Boolean).join(' ');
+}
+
 // เพิ่มหัวข้อสำหรับ "ควิซที่กำลังจะหมดอายุ"
 if (closeToExpiry.length > 0) {
   const expiryHeader = document.createElement('h3');
   expiryHeader.innerText = "ควิซที่จะหมดอายุเร็ว ๆ นี้";
   notificationList.appendChild(expiryHeader);
 
-  closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
-    // คำนวณชั่วโมงและนาทีจาก timeLeftInHours
-  // คำนวณวัน ชั่วโมง นาที วินาที
-  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // ชั่วโมง
-  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)); // นาที
+  closeToExpiry.forEach(({ subject, quizName, quizLink, expiryDate }) => {
+    const timeLeft = calculateCountdown(expiryDate); // คำนวณเวลาเหลือ
 
     const li = document.createElement('li');
     li.innerHTML = `
       ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-      เหลือเวลา <strong>${hours} ชั่วโมง ${minutes} นาที</strong>!
+      เหลือเวลา <strong>${timeLeft}</strong>!
       <br>
       <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
     `;
