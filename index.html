@@ -627,19 +627,13 @@ async function fetchSubjects() {
   }
 }
 
-// ฟังก์ชันคำนวณปีล่วงหน้า
-function getNextYearDate(yearsAhead = 1) {
-  const today = new Date();
-  const nextYear = today.getFullYear() + yearsAhead;
-  // วันที่ 1 มกราคมของปีถัดไปหรือปีที่กำหนด
-  return new Date(nextYear, 0, 1).toISOString();
-}
-
 // ฟังก์ชันคำนวณเวลา
 function calculateCountdown(expiryDate) {
   const [date, time] = expiryDate.split(", ");
   const [day, month, year] = date.split("/");
-  const formattedDate = `${year}-${month}-${day}T${time || "00:00:00"}+07:00`; // แปลงวันที่ให้เป็น ISO 8601
+
+  // แปลงวันที่เป็นฟอร์แมต ISO 8601
+  const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}+07:00`;
 
   const now = new Date();
   const endDate = new Date(formattedDate);
@@ -662,25 +656,8 @@ function calculateCountdown(expiryDate) {
 
 // ฟังก์ชันแสดงเวลาใน Countdown
 function updateCountdowns() {
-  document.querySelectorAll('.countdown').forEach(el => {
-    let expiryDate = el.getAttribute('data-expiry');
-    
-    if (expiryDate) {
-      const [date, time] = expiryDate.split(", ");
-      const [day, month, year] = date.split("/");
-
-      const now = new Date();
-      const inputYear = parseInt(year, 10);
-      const currentYear = now.getFullYear();
-
-      // ถ้าปีที่กรอกมาเป็นปีที่ผ่านมา หรือปีปัจจุบัน
-      if (inputYear <= currentYear) {
-        expiryDate = getNextYearDate(); // ใช้ปีถัดไป
-      }
-    } else {
-      expiryDate = getNextYearDate(); // ถ้าไม่มี expiry ก็ใช้ปีถัดไป
-    }
-
+  document.querySelectorAll('.expired').forEach(el => {
+    const expiryDate = el.getAttribute('data-expiry');
     const countdown = calculateCountdown(expiryDate);
 
     if (!countdown) {
