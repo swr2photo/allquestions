@@ -865,11 +865,16 @@ function showQuizzes(subject, quizzes) {
       quizCard.innerHTML = `<strong>${quizName}</strong>`;
 
       if (quizDescription) {
-        const description = document.createElement('div');
-        description.className = 'quiz-description';
-        description.innerHTML = `<strong>คำอธิบาย:</strong> ${quizDescription}`;
-        quizCard.appendChild(description);
-      }
+  const description = document.createElement('div');
+  description.className = 'quiz-description';
+  // ใช้ innerHTML เพื่อให้สามารถแสดงข้อความรวมทั้ง <br> ได้
+  description.innerHTML = `<strong>คำอธิบาย:</strong><br> ${quizDescription}`;
+
+  // ใช้ CSS เพื่อให้ข้อความแสดงการเว้นบรรทัดตามที่กรอก
+  description.style.whiteSpace = 'pre-line'; // จะแสดงข้อความตามบรรทัดที่มีการเว้นบรรทัด
+
+  quizCard.appendChild(description);
+}
 
       if (status) {
         const statusElement = document.createElement('div');
