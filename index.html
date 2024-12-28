@@ -633,9 +633,12 @@ function calculateCountdown(expiryDate) {
   const [day, month, year] = date.split("/");
   const formattedDate = `${year}-${month}-${day}T${time || "00:00:00"}+07:00`; // แปลงวันที่ให้เป็น ISO 8601
 
-  const now = new Date().getTime();
-  const endDate = new Date(formattedDate).getTime();
-  const timeLeft = endDate - now;
+  const now = new Date();
+  const endDate = new Date(formattedDate);
+  const timeLeft = endDate.getTime() - now.getTime();
+
+  const currentYear = now.getFullYear();
+  const expiryYear = endDate.getFullYear();
 
   if (timeLeft <= 0) return null;
 
