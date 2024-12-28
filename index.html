@@ -812,8 +812,9 @@ if (closeToExpiry.length > 0) {
 
   closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
     // คำนวณชั่วโมงและนาทีจาก timeLeftInHours
-    const hours = Math.floor(timeLeftInHours); // ชั่วโมง
-    const minutes = Math.round((timeLeftInHours - hours) * 60); // นาที
+  // คำนวณวัน ชั่วโมง นาที วินาที
+  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); // ชั่วโมง
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)); // นาที
 
     const li = document.createElement('li');
     li.innerHTML = `
