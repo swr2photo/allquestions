@@ -655,10 +655,18 @@ function calculateCountdown(expiryDate) {
   ].filter(Boolean).join(' ');
 }
 
+// ฟังก์ชันสำหรับคำนวณปีหน้า
+function getNextYearDate() {
+  const today = new Date();
+  const nextYear = today.getFullYear() + 1;
+  // วันที่ 1 มกราคมของปีถัดไป
+  return new Date(nextYear, 0, 1).toISOString();
+}
+
 // ฟังก์ชันแสดงเวลาใน Countdown
 function updateCountdowns() {
   document.querySelectorAll('.countdown').forEach(el => {
-    const expiryDate = el.getAttribute('data-expiry');
+    const expiryDate = el.getAttribute('data-expiry') || getNextYearDate(); // ใช้ปีถัดไปหากไม่มี expiry
     const countdown = calculateCountdown(expiryDate);
 
     if (!countdown) {
