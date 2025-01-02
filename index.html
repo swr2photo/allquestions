@@ -604,9 +604,36 @@ function closePopup() {
   </footer>
 
   <script>
-const sheetId = "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc";
-const sheetRange = "Allquestions";
-const apiKey = "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw";
+const mongoose = require('mongoose');
+
+// เชื่อมต่อกับ MongoDB Atlas (ใส่ URL ของ Cluster ที่เชื่อมต่อ)
+mongoose.connect('mongodb+srv://Doralaikon_th:Doralaikon_TH2025@cluster0.mongodb.net/myDatabase', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => {
+  console.log('Connected to MongoDB Atlas');
+}).catch((error) => {
+  console.error('Error connecting to MongoDB Atlas', error);
+});
+
+// สร้างโมเดลเพื่อเข้าถึงคอลเล็กชัน `api_keys`
+const ApiKey = mongoose.model('ApiKey', new mongoose.Schema({
+  sheetId: String,
+  sheetRange: String,
+  apiKey: String,
+}));
+
+// ดึงข้อมูลทั้งหมด
+async function getApiDetails() {
+  const apiDetails = await ApiKey.findOne();  // หากมีเอกสารเดียวให้ใช้ findOne
+  console.log('Sheet ID:', apiDetails.sheetId);
+  console.log('Sheet Range:', apiDetails.sheetRange);
+  console.log('API Key:', apiDetails.apiKey);
+}
+
+// เรียกใช้ฟังก์ชัน
+getApiDetails();
+
 
 
 // ฟังก์ชันดึงข้อมูลจาก Google Sheets
