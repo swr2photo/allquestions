@@ -735,6 +735,11 @@ function closePopup() {
   </footer>
 
   <script>
+
+window.onerror = function (message, source, lineno, colno, error) {
+    window.location.href = "/400.html";  // เปลี่ยนเส้นทางไปที่หน้า 400 เมื่อเกิดข้อผิดพลาด
+};
+
 const sheetId = "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc";
 const sheetRange = "Allquestions";
 const apiKey = "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw";
