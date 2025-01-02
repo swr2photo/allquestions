@@ -1,13 +1,13 @@
-name: Node.js CI
+name: Node.js CI with Google Sheets API
 
 on:
   push:
     branches:
-      - main  # หรือเลือก branch ที่ต้องการให้รัน
+      - main  # หรือเลือก branch ที่คุณต้องการให้รัน
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # เลือกระบบปฏิบัติการที่ใช้ในการรัน (Ubuntu, Windows, หรือ macOS)
+    runs-on: ubuntu-latest  # หรือเลือกระบบปฏิบัติการที่ต้องการ
 
     steps:
       # Step 1: Checkout โค้ดจาก repository
@@ -18,12 +18,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '16'  # เลือกเวอร์ชันของ Node.js ที่ต้องการใช้
+          node-version: '16'
 
       # Step 3: ติดตั้ง dependencies
       - name: Install dependencies
         run: npm install
 
-      # Step 4: รัน tests หรือคำสั่งอื่นๆ
-      - name: Run tests
-        run: npm test  # ใช้คำสั่งของคุณเช่น npm start หรือ npm run test
+      # Step 4: ตั้งค่าตัวแปรจาก GitHub Secrets
+      - name: Set environment variables
+        run: |
+          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> $GITHUB_ENV
+          echo "SHEET_RANGE=${{ secrets.SHEET_RANGE }}" >> $GITHUB_ENV
+          echo "API_KEY=${{ secrets.API_KEY }}" >> $GITHUB_ENV
+
+      # Step 5: รันคำสั่ง Node.js
+      - name: Run Node.js script
+        run: node yourscript.js  # ใส่คำสั่ง Node.js ที่คุณต้องการรัน

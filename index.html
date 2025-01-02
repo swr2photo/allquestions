@@ -604,35 +604,16 @@ function closePopup() {
   </footer>
 
   <script>
-const mongoose = require('mongoose');
+// เข้าถึงตัวแปรที่ได้จาก GitHub Secrets
+const sheetId = process.env.SHEET_ID;
+const sheetRange = process.env.SHEET_RANGE;
+const apiKey = process.env.API_KEY;
 
-// เชื่อมต่อกับ MongoDB Atlas (ใส่ URL ของ Cluster ที่เชื่อมต่อ)
-mongoose.connect('mongodb+srv://Doralaikon_th:Doralaikon_TH2025@doralaikon.ak4h5.mongodb.net/?retryWrites=true&w=majority&appName=Doralaikon', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => {
-  console.log('Connected to MongoDB Atlas');
-}).catch((error) => {
-  console.error('Error connecting to MongoDB Atlas', error);
-});
+console.log("Sheet ID:", sheetId);
+console.log("Sheet Range:", sheetRange);
+console.log("API Key:", apiKey);
 
-// สร้างโมเดลเพื่อเข้าถึงคอลเล็กชัน `api_keys`
-const ApiKey = mongoose.model('ApiKey', new mongoose.Schema({
-  sheetId: String,
-  sheetRange: String,
-  apiKey: String,
-}));
-
-// ดึงข้อมูลทั้งหมด
-async function getApiDetails() {
-  const apiDetails = await ApiKey.findOne();  // หากมีเอกสารเดียวให้ใช้ findOne
-  console.log('Sheet ID:', apiDetails.sheetId);
-  console.log('Sheet Range:', apiDetails.sheetRange);
-  console.log('API Key:', apiDetails.apiKey);
-}
-
-// เรียกใช้ฟังก์ชัน
-getApiDetails();
+// ใช้ตัวแปรเหล่านี้เพื่อเชื่อมต่อกับ Google Sheets API
 
 
 
