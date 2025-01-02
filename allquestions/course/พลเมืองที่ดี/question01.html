@@ -12,21 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- เพิ่ม Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // กำหนดช่วงเวลาที่อนุญาตให้เข้าถึง (24-hour format)
-            const startHour = 9; // เริ่มเวลา 09:00 น.
-            const endHour = 18;  // สิ้นสุดเวลา 17:00 น.
-            
-            const currentHour = new Date().getHours(); // เวลาปัจจุบัน
-
-            if (currentHour < startHour || currentHour >= endHour) {
-                // หากอยู่นอกช่วงเวลาที่กำหนด
-                alert("This page is only accessible between 09:00 and 18:00.");
-                window.location.href = "unavailable.html"; // เปลี่ยนเส้นทางไปยังหน้าอื่น
-            }
-        });
-    </script>
     <style>
         body, html {
             margin: 0;
