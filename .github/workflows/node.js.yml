@@ -1,0 +1,29 @@
+name: Node.js CI
+
+on:
+  push:
+    branches:
+      - main  # หรือเลือก branch ที่ต้องการให้รัน
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # เลือกระบบปฏิบัติการที่ใช้ในการรัน (Ubuntu, Windows, หรือ macOS)
+
+    steps:
+      # Step 1: Checkout โค้ดจาก repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Step 2: ตั้งค่า Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # เลือกเวอร์ชันของ Node.js ที่ต้องการใช้
+
+      # Step 3: ติดตั้ง dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 4: รัน tests หรือคำสั่งอื่นๆ
+      - name: Run tests
+        run: npm test  # ใช้คำสั่งของคุณเช่น npm start หรือ npm run test
