@@ -635,8 +635,13 @@ function calculateCountdown(expiryDate) {
   // ตรวจสอบว่าเป็นปีปัจจุบันหรือปีถัดไป
   const now = new Date();
   let expiryYear = parseInt(year, 10);
-  
-  // ถ้าปีที่ระบุเป็นปีปัจจุบันหรือปีที่ผ่านมา ให้ใช้ปีถัดไป
+
+  // ตรวจสอบว่าเป็นปีที่แล้วหรือไม่
+  if (expiryYear < now.getFullYear()) {
+    return 'ควิซนี้หมดเขตแล้ว'; // ถ้าเป็นปีที่แล้วแล้ว ให้แสดง "หมดเขต"
+  }
+
+  // ถ้าปีที่ระบุเป็นปีปัจจุบันหรือปีถัดไป ให้ใช้ปีถัดไป
   if (expiryYear < now.getFullYear() || (expiryYear === now.getFullYear() && (now.getMonth() + 1 > parseInt(month) || (now.getMonth() + 1 === parseInt(month) && now.getDate() > parseInt(day))))) {
     expiryYear = now.getFullYear(); // ใช้ปีปัจจุบันถ้าหมดเวลาแล้ว
   }
@@ -647,7 +652,7 @@ function calculateCountdown(expiryDate) {
   const endDate = new Date(formattedDate);
   const timeLeft = endDate.getTime() - now.getTime();
 
-  if (timeLeft <= 0) return null;
+  if (timeLeft <= 0) return 'ควิซนี้หมดเขตแล้ว'; // ถ้าหมดเวลาแล้ว
 
   const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
   const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -676,14 +681,15 @@ function updateCountdowns() {
     const expiryDate = el.getAttribute('data-expiry') || getNextYearDate(); // ใช้ปีถัดไปหากไม่มี expiry
     const countdown = calculateCountdown(expiryDate);
 
-    if (!countdown) {
+    if (countdown === 'ควิซนี้หมดเขตแล้ว') {
       el.className = 'expired';
-      el.innerText = 'ควิซนี้หมดเขตแล้ว';
+      el.innerText = countdown;
     } else {
       el.innerText = countdown;
     }
   });
 }
+
 
 
 
