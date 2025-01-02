@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Data</title>
+</head>
+<body>
+  <h1>API Key Details</h1>
+  <p id="api-details">Loading...</p>
+
+  <script>
+    fetch('http://localhost:3000/api/get-api-details')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('api-details').innerHTML = `
+          Sheet ID: ${data.sheetId}<br>
+          Sheet Range: ${data.sheetRange}<br>
+          API Key: ${data.apiKey}
+        `;
+      })
+      .catch(error => {
+        document.getElementById('api-details').innerHTML = 'Error fetching data';
+        console.error('Error fetching API details:', error);
+      });
+  </script>
+</body>
+</html>

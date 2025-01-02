@@ -607,7 +607,7 @@ function closePopup() {
 const mongoose = require('mongoose');
 
 // เชื่อมต่อกับ MongoDB Atlas (ใส่ URL ของ Cluster ที่เชื่อมต่อ)
-mongoose.connect('mongodb+srv://Doralaikon_th:Doralaikon_TH2025@cluster0.mongodb.net/myDatabase', {
+mongoose.connect('mongodb+srv://Doralaikon_th:Doralaikon_TH2025@doralaikon.ak4h5.mongodb.net/?retryWrites=true&w=majority&appName=Doralaikon', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {
