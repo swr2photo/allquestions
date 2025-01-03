@@ -641,94 +641,129 @@ h2 {
     margin: 10px auto;
   }
 </style>
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const announcementMessage = `ข้อสอบหน่วยที่ 2 (40 ข้อ 20 คะแนน)  
-23 ธ.ค. เวลา 00.00 น. - 26 ธ.ค. 2567 ก่อนเวลา 23.59 น. เท่านั้น !!!  
-ไม่มีการเปิดระบบนอกรอบ  
-
-ข้อสอบมีจำนวน 40 ข้อ 20 คะเเนน  
-นักศึกษามีเวลาทำข้อสอบ 2 ชั่วโมง  
-
-ทำข้อสอบได้ 1 ครั้ง  
-ทำเสร็จเเล้วอย่าลืม !!! กด Save เเละส่งเพื่อยืนยัน`;
-
-  const imageUrl = "https://media.discordapp.net/attachments/1058718167251288094/1320678806779990026/IMG_8524.png?ex=676c73bc&is=676b223c&hm=f1fb5c30ae7c09cfa6d6fdc8a28595e1073cb4697d2d5680225b58c22b1ee3f0&";
-
-  showPopup(announcementMessage, imageUrl);
-});
-
-function showPopup(message, imageUrl) {
-  const popup = document.getElementById('important-announcement-popup');
-  const popupMessage = document.getElementById('announcement-message');
-  const popupImage = document.getElementById('announcement-image');
-  const expandButton = document.getElementById('expand-text-button');
-
-  // ตั้งค่าข้อความ
-  popupMessage.innerHTML = message;
-
-  // ตรวจสอบความยาวข้อความ
-  if (popupMessage.scrollHeight > popupMessage.offsetHeight) {
-    expandButton.style.display = 'block'; // แสดงปุ่ม "แสดงเพิ่มเติม"
+  document.addEventListener('DOMContentLoaded', () => {
+    const announcementMessage = `ข้อสอบหน่วยที่ 2 (40 ข้อ 20 คะแนน)  
+  23 ธ.ค. เวลา 00.00 น. - 26 ธ.ค. 2567 ก่อนเวลา 23.59 น. เท่านั้น !!!  
+  ไม่มีการเปิดระบบนอกรอบ  
+  
+  ข้อสอบมีจำนวน 40 ข้อ 20 คะเเนน  
+  นักศึกษามีเวลาทำข้อสอบ 2 ชั่วโมง  
+  
+  ทำข้อสอบได้ 1 ครั้ง  
+  ทำเสร็จเเล้วอย่าลืม !!! กด Save เเละส่งเพื่อยืนยัน`;
+  
+    const imageUrl = "https://media.discordapp.net/attachments/1058718167251288094/1320678806779990026/IMG_8524.png?ex=676c73bc&is=676b223c&hm=f1fb5c30ae7c09cfa6d6fdc8a28595e1073cb4697d2d5680225b58c22b1ee3f0&";
+  
+    showPopup(announcementMessage, imageUrl);
+  });
+  
+  function showPopup(message, imageUrl) {
+    const popup = document.getElementById('important-announcement-popup');
+    const popupMessage = document.getElementById('announcement-message');
+    const popupImage = document.getElementById('announcement-image');
+    const expandButton = document.getElementById('expand-text-button');
+  
+    // ตั้งค่าข้อความ
+    popupMessage.innerHTML = message;
+  
+    // ตรวจสอบความยาวข้อความ
+    if (popupMessage.scrollHeight > popupMessage.offsetHeight) {
+      expandButton.style.display = 'block'; // แสดงปุ่ม "แสดงเพิ่มเติม"
+    }
+  
+    // ตั้งค่ารูปภาพ
+    if (imageUrl) {
+      popupImage.src = imageUrl;
+      popupImage.style.display = 'block'; // แสดงรูปภาพ
+      popupImage.alt = 'Important Announcement'; // เพิ่ม alt
+      popupImage.loading = 'lazy'; // เพิ่ม loading สำหรับการโหลดแบบ lazy
+    }
+  
+    popup.style.display = 'flex'; // แสดง Popup
+  
+    // ปิดป๊อปอัพเมื่อคลิกนอกป๊อปอัพ
+    popup.addEventListener('click', function(event) {
+      if (event.target === popup) {
+        closePopup();
+      }
+    });
+  }
+  
+  function expandText() {
+    const popupMessage = document.getElementById('announcement-message');
+    const expandButton = document.getElementById('expand-text-button');
+  
+    popupMessage.style.maxHeight = 'none'; // ยกเลิกข้อจำกัดความสูง
+    expandButton.style.display = 'none'; // ซ่อนปุ่ม "แสดงเพิ่มเติม"
+  }
+  
+  function closePopup() {
+    const popup = document.getElementById('important-announcement-popup');
+    popup.style.display = 'none'; // ปิด Popup
+  }
+  
+  function toggleNotificationList() {
+    const notificationList = document.getElementById('notification-list');
+    notificationList.style.display = notificationList.style.display === 'none' ? 'block' : 'none';
   }
 
-  // ตั้งค่ารูปภาพ
-  if (imageUrl) {
-    popupImage.src = imageUrl;
-    popupImage.style.display = 'block'; // แสดงรูปภาพ
-    popupImage.alt = 'Important Announcement'; // เพิ่ม alt
-    popupImage.loading = 'lazy'; // เพิ่ม loading สำหรับการโหลดแบบ lazy
+  function showPopup(message, imageUrl) {
+  try {
+    const popup = document.getElementById('important-announcement-popup');
+    const popupMessage = document.getElementById('announcement-message');
+    const popupImage = document.getElementById('announcement-image');
+    const expandButton = document.getElementById('expand-text-button');
+
+    if (popup && popupMessage) {
+      popupMessage.innerHTML = message;
+
+      if (popupMessage.scrollHeight > popupMessage.offsetHeight) {
+        expandButton.style.display = 'block';
+      }
+
+      if (imageUrl && popupImage) {
+        popupImage.src = imageUrl;
+        popupImage.style.display = 'block';
+        popupImage.alt = 'Important Announcement';
+        popupImage.loading = 'lazy';
+      }
+
+      popup.style.display = 'flex';
+    }
+  } catch (error) {
+    console.error('เกิดข้อผิดพลาดในการแสดงป๊อปอัพ:', error);
   }
-
-  popup.style.display = 'flex'; // แสดง Popup
 }
 
-function expandText() {
-  const popupMessage = document.getElementById('announcement-message');
-  const expandButton = document.getElementById('expand-text-button');
-
-  popupMessage.style.maxHeight = 'none'; // ยกเลิกข้อจำกัดความสูง
-  expandButton.style.display = 'none'; // ซ่อนปุ่ม "แสดงเพิ่มเติม"
-}
-
-function closePopup() {
-  const popup = document.getElementById('important-announcement-popup');
-  popup.style.display = 'none'; // ปิด Popup
-}
-</script>
-
-
-
+  </script>
+  
   <main>
-
- 
-    
-<div id="notification-bell-container">
-  <span id="notification-bell" onclick="toggleNotificationList()">
-    <i class="fas fa-bell"></i>
-    <span id="notification-count" style="display: none;">0</span>
-  </span>
-  <div id="notification-list" style="display: none;">
-    <div id="no-notifications">ไม่มีการแจ้งเตือน</div>
-    <ul id="notifications"></ul>
-  </div>
-</div>
-
+    <div id="notification-bell-container">
+      <span id="notification-bell" onclick="toggleNotificationList()">
+        <i class="fas fa-bell"></i>
+        <span id="notification-count" style="display: none;">0</span>
+      </span>
+      <div id="notification-list" style="display: none;">
+        <div id="no-notifications">ไม่มีการแจ้งเตือน</div>
+        <ul id="notifications"></ul>
+      </div>
+    </div>
+  
     <section id="subjects">
       <h2>เลือกวิชา</h2>
       <div class="subject-list" id="subject-list"></div>
     </section>
-
+  
     <section id="quiz-list" style="display: none;">
       <h2 id="subject-title">วิชา</h2>
       <div class="quiz-list" id="quiz-container"></div>
-      <div class="back-button" id="back-button">
-  <i class="fas fa-arrow-left"></i> ย้อนกลับ
-</div>
-
+      <div class="back-button" id="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> ย้อนกลับ
+      </div>
     </section>
   </main>
+  
 
   <footer>
     <p>© 2024 เว็บไซต์ควิซ | สงวนลิขสิทธิ์</p>
@@ -864,7 +899,11 @@ async function initializeSubjects() {
                 timeLeftInHours: Math.ceil(timeLeftInHours),
               });
             } else if (timeLeftInHours <= 0) {
-              expiredQuizzes.push({ subject, quizName, quizLink });
+              const timePassedInMilliseconds = now - endDate;
+              const timePassedInDays = timePassedInMilliseconds / (1000 * 60 * 60 * 24);
+              if (timePassedInDays <= 1) {
+                expiredQuizzes.push({ subject, quizName, quizLink });
+              }
             }
           }
         } catch (error) {
@@ -898,6 +937,175 @@ async function initializeSubjects() {
   });
 }
 
+// ฟังก์ชันอัปเดตรายการแจ้งเตือน
+function updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates) {
+  const notificationCount = document.getElementById('notification-count');
+  const notificationList = document.getElementById('notifications');
+  const noNotifications = document.getElementById('no-notifications');
+
+  notificationList.innerHTML = "";
+
+  if (closeToExpiry.length === 0 && expiredQuizzes.length === 0 && latestUpdates.length === 0) {
+    notificationCount.style.display = "none";
+    noNotifications.style.display = "block";
+    return;
+  }
+
+  notificationCount.style.display = "block";
+  notificationCount.innerText = closeToExpiry.length + expiredQuizzes.length + latestUpdates.length;
+
+  noNotifications.style.display = "none";
+
+  if (closeToExpiry.length > 0) {
+    const expiryHeader = document.createElement('h3');
+    expiryHeader.innerHTML = `
+      <i class="fas fa-clock"></i> ควิซที่จะหมดอายุเร็ว ๆ นี้
+    `;
+    notificationList.appendChild(expiryHeader);
+
+    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (expiredQuizzes.length > 0) {
+    const expiredHeader = document.createElement('h3');
+    expiredHeader.innerHTML = `
+      <i class="fas fa-times-circle"></i> ควิซที่หมดอายุแล้ว
+    `;
+    notificationList.appendChild(expiredHeader);
+
+    expiredQuizzes.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#FF0000";
+      li.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        <strong>หมดอายุแล้ว</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (latestUpdates.length > 0) {
+    const updateHeader = document.createElement('h3');
+    updateHeader.innerHTML = `
+      <i class="fas fa-sync-alt"></i> ควิซที่อัพเดตล่าสุด
+    `;
+    notificationList.appendChild(updateHeader);
+
+    latestUpdates.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#4CAF50";
+      li.innerHTML = `
+        <i class="fas fa-check-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        ถูก <strong>อัพเดตล่าสุด</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+}
+
+
+
+// ฟังก์ชันอัปเดตรายการแจ้งเตือน
+function updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates) {
+  const notificationCount = document.getElementById('notification-count');
+  const notificationList = document.getElementById('notifications');
+  const noNotifications = document.getElementById('no-notifications');
+
+  notificationList.innerHTML = "";
+
+  if (closeToExpiry.length === 0 && expiredQuizzes.length === 0 && latestUpdates.length === 0) {
+    notificationCount.style.display = "none";
+    noNotifications.style.display = "block";
+    return;
+  }
+
+  notificationCount.style.display = "block";
+  notificationCount.innerText = closeToExpiry.length + expiredQuizzes.length + latestUpdates.length;
+
+  noNotifications.style.display = "none";
+
+  if (closeToExpiry.length > 0) {
+    const expiryHeader = document.createElement('h3');
+    expiryHeader.innerHTML = `
+      <i class="fas fa-clock"></i> ควิซที่จะหมดอายุเร็ว ๆ นี้
+    `;
+    notificationList.appendChild(expiryHeader);
+
+    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (expiredQuizzes.length > 0) {
+    const expiredHeader = document.createElement('h3');
+    expiredHeader.innerHTML = `
+      <i class="fas fa-times-circle"></i> ควิซที่หมดอายุแล้ว
+    `;
+    notificationList.appendChild(expiredHeader);
+
+    expiredQuizzes.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#FF0000";
+      li.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        <strong>หมดอายุแล้ว</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (latestUpdates.length > 0) {
+    const updateHeader = document.createElement('h3');
+    updateHeader.innerHTML = `
+      <i class="fas fa-sync-alt"></i> ควิซที่อัพเดตล่าสุด
+    `;
+    notificationList.appendChild(updateHeader);
+
+    latestUpdates.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#4CAF50";
+      li.innerHTML = `
+        <i class="fas fa-check-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        ถูก <strong>อัพเดตล่าสุด</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+}
+
+
+
+
+// ฟังก์ชันเปิด/ปิดรายการแจ้งเตือน
+function toggleNotificationList() {
+  const notificationList = document.getElementById('notification-list');
+  notificationList.style.display = notificationList.style.display === "block" ? "none" : "block";
+}
+
 // ฟังก์ชันจัดการรูปแบบวันที่
 function parseExpiryDate(expiryDate) {
   const dateFormats = [
@@ -911,182 +1119,11 @@ function parseExpiryDate(expiryDate) {
     const match = expiryDate.match(regex);
     if (match) {
       const formattedDate = parse(...match.slice(1));
-      console.log('Matched format:', regex, 'Formatted date:', formattedDate);
       return new Date(formattedDate).getTime(); // แปลงเป็น timestamp
     }
   }
 
-  console.warn(`Unknown date format: ${expiryDate}`);
   return null;
-}
-
-// ฟังก์ชันอัปเดตรายการแจ้งเตือน
-function updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates) {
-  const notificationCount = document.getElementById('notification-count');
-  const notificationList = document.getElementById('notifications');
-  const noNotifications = document.getElementById('no-notifications');
-
-  notificationList.innerHTML = "";
-
-  if (closeToExpiry.length === 0 && expiredQuizzes.length === 0 && latestUpdates.length === 0) {
-    notificationCount.style.display = "none";
-    noNotifications.style.display = "block";
-    return;
-  }
-
-  notificationCount.style.display = "block";
-  notificationCount.innerText = closeToExpiry.length + expiredQuizzes.length + latestUpdates.length;
-
-  noNotifications.style.display = "none";
-
-  if (closeToExpiry.length > 0) {
-    const expiryHeader = document.createElement('h3');
-    expiryHeader.innerHTML = `
-      <i class="fas fa-clock"></i> ควิซที่จะหมดอายุเร็ว ๆ นี้
-    `;
-    notificationList.appendChild(expiryHeader);
-
-    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
-        <br>
-        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-      `;
-      notificationList.appendChild(li);
-    });
-  }
-
-  if (expiredQuizzes.length > 0) {
-    const expiredHeader = document.createElement('h3');
-    expiredHeader.innerHTML = `
-      <i class="fas fa-times-circle"></i> ควิซที่หมดอายุแล้ว
-    `;
-    notificationList.appendChild(expiredHeader);
-
-    expiredQuizzes.forEach(({ subject, quizName, quizLink }) => {
-      const li = document.createElement('li');
-      li.style.color = "#FF0000";
-      li.innerHTML = `
-        <i class="fas fa-exclamation-triangle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-        <strong>หมดอายุแล้ว</strong>!
-        <br>
-        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-      `;
-      notificationList.appendChild(li);
-    });
-  }
-
-  if (latestUpdates.length > 0) {
-    const updateHeader = document.createElement('h3');
-    updateHeader.innerHTML = `
-      <i class="fas fa-sync-alt"></i> ควิซที่อัพเดตล่าสุด
-    `;
-    notificationList.appendChild(updateHeader);
-
-    latestUpdates.forEach(({ subject, quizName, quizLink }) => {
-      const li = document.createElement('li');
-      li.style.color = "#4CAF50";
-      li.innerHTML = `
-        <i class="fas fa-check-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-        ถูก <strong>อัพเดตล่าสุด</strong>!
-        <br>
-        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-      `;
-      notificationList.appendChild(li);
-    });
-  }
-}
-
-
-// ฟังก์ชันอัปเดตรายการแจ้งเตือน
-function updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates) {
-  const notificationCount = document.getElementById('notification-count');
-  const notificationList = document.getElementById('notifications');
-  const noNotifications = document.getElementById('no-notifications');
-
-  notificationList.innerHTML = "";
-
-  if (closeToExpiry.length === 0 && expiredQuizzes.length === 0 && latestUpdates.length === 0) {
-    notificationCount.style.display = "none";
-    noNotifications.style.display = "block";
-    return;
-  }
-
-  notificationCount.style.display = "block";
-  notificationCount.innerText = closeToExpiry.length + expiredQuizzes.length + latestUpdates.length;
-
-  noNotifications.style.display = "none";
-
-  if (closeToExpiry.length > 0) {
-    const expiryHeader = document.createElement('h3');
-    expiryHeader.innerHTML = `
-      <i class="fas fa-clock"></i> ควิซที่จะหมดอายุเร็ว ๆ นี้
-    `;
-    notificationList.appendChild(expiryHeader);
-
-    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <i class="fas fa-exclamation-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
-        <br>
-        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-      `;
-      notificationList.appendChild(li);
-    });
-  }
-
-  if (expiredQuizzes.length > 0) {
-    const expiredHeader = document.createElement('h3');
-    expiredHeader.innerHTML = `
-      <i class="fas fa-times-circle"></i> ควิซที่หมดอายุแล้ว
-    `;
-    notificationList.appendChild(expiredHeader);
-
-    expiredQuizzes.forEach(({ subject, quizName, quizLink }) => {
-      const li = document.createElement('li');
-      li.style.color = "#FF0000";
-      li.innerHTML = `
-        <i class="fas fa-exclamation-triangle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-        <strong>หมดอายุแล้ว</strong>!
-        <br>
-        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-      `;
-      notificationList.appendChild(li);
-    });
-  }
-
-  if (latestUpdates.length > 0) {
-    const updateHeader = document.createElement('h3');
-    updateHeader.innerHTML = `
-      <i class="fas fa-sync-alt"></i> ควิซที่อัพเดตล่าสุด
-    `;
-    notificationList.appendChild(updateHeader);
-
-    latestUpdates.forEach(({ subject, quizName, quizLink }) => {
-      const li = document.createElement('li');
-      li.style.color = "#4CAF50";
-      li.innerHTML = `
-        <i class="fas fa-check-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
-        ถูก <strong>อัพเดตล่าสุด</strong>!
-        <br>
-        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
-      `;
-      notificationList.appendChild(li);
-    });
-  }
-}
-
-console.log('Fetched subjects:', subjects);
-
-
-
-// ฟังก์ชันเปิด/ปิดรายการแจ้งเตือน
-function toggleNotificationList() {
-  const notificationList = document.getElementById('notification-list');
-  notificationList.style.display = notificationList.style.display === "block" ? "none" : "block";
 }
 
 
