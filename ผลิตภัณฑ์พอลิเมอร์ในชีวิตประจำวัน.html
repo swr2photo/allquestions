@@ -702,90 +702,96 @@
             }
         });
 
+        
+
         document.getElementById('download-file').addEventListener('click', () => {
-            const fileType = document.getElementById('file-type').value; // ประเภทไฟล์ที่เลือก (pdf หรือ png หรือ zip)
+    const fileType = document.getElementById('file-type').value; // ประเภทไฟล์ที่เลือก (pdf หรือ png หรือ zip)
 
-            if (fileType === 'zip') {
-                const zip = new JSZip();
-                const folder = zip.folder(fileName); // ชื่อไฟล์จาก Google Drive
+    // ใช้ชื่อไฟล์จาก Google Drive โดยมีนามสกุลเป็นส่วนหนึ่งของชื่อ
+    const fileBaseName = fileName.split('.')[0];  // ถ้า fileName มีนามสกุลแล้วจะลบออกเพื่อให้ชื่อไฟล์หลักใช้ได้
 
-                // เพิ่ม PDF ลงในไฟล์ ZIP
-                folder.file(`${fileName}.pdf`, fetch(pdfUrl).then(res => res.blob()));
+    if (fileType === 'zip') {
+        const zip = new JSZip();
+        const folder = zip.folder(fileBaseName); // ชื่อไฟล์จาก Google Drive (ไม่มีนามสกุล)
 
-                // เพิ่ม PNG สำหรับแต่ละหน้า PDF ลงในไฟล์ ZIP
-                const promises = [];
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    promises.push(
-                        pdfDoc.getPage(i).then(function(page) {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            const scale = 2;
-                            const viewport = page.getViewport({ scale: scale });
-                            canvas.width = viewport.width;
-                            canvas.height = viewport.height;
-                            const renderContext = {
-                                canvasContext: ctx,
-                                viewport: viewport
-                            };
-                            return page.render(renderContext).promise.then(() => {
-                                return canvas.toDataURL('image/png');
-                            });
-                        }).then(dataUrl => {
-                            return fetch(dataUrl).then(res => res.blob()).then(blob => {
-                                folder.file(`${fileName}_page${i}.png`, blob);
-                            });
-                        })
-                    );
-                }
+        // เพิ่ม PDF ลงในไฟล์ ZIP
+        folder.file(`${fileBaseName}.pdf`, fetch(pdfUrl).then(res => res.blob()));
 
-                Promise.all(promises).then(() => {
-                    zip.generateAsync({ type: 'blob' }).then(content => {
+        // เพิ่ม PNG สำหรับแต่ละหน้า PDF ลงในไฟล์ ZIP
+        const promises = [];
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            promises.push(
+                pdfDoc.getPage(i).then(function(page) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const scale = 2;
+                    const viewport = page.getViewport({ scale: scale });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    return page.render(renderContext).promise.then(() => {
+                        return canvas.toDataURL('image/png');
+                    });
+                }).then(dataUrl => {
+                    return fetch(dataUrl).then(res => res.blob()).then(blob => {
+                        folder.file(`${fileBaseName}_page${i}.png`, blob);
+                    });
+                })
+            );
+        }
+
+        Promise.all(promises).then(() => {
+            zip.generateAsync({ type: 'blob' }).then(content => {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = URL.createObjectURL(content);
+                downloadLink.download = `${fileBaseName}.zip`; // ใช้ชื่อไฟล์จาก Google Drive
+                downloadLink.click();
+            });
+        });
+
+    } else if (fileType === 'pdf') {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = pdfUrl;
+        downloadLink.download = `${fileBaseName}.pdf`; // ใช้ชื่อไฟล์จาก Google Drive
+        downloadLink.click();
+    } else if (fileType === 'png') {
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+            (function(pageNum) {
+                pdfDoc.getPage(pageNum).then(function(page) {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const scale = 2;
+                    const viewport = page.getViewport({ scale: scale });
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    page.render(renderContext).promise.then(function() {
                         const downloadLink = document.createElement('a');
-                        downloadLink.href = URL.createObjectURL(content);
-                        downloadLink.download = `${fileName}.zip`;
+                        downloadLink.href = canvas.toDataURL('image/png');
+                        downloadLink.download = `${fileBaseName}_page${pageNum}.png`; // ใช้ชื่อไฟล์จาก Google Drive
                         downloadLink.click();
                     });
                 });
+            })(i);
+        }
+    }
 
-            } else if (fileType === 'pdf') {
-                const downloadLink = document.createElement('a');
-                downloadLink.href = pdfUrl;
-                downloadLink.download = `${fileName}.pdf`;
-                downloadLink.click();
-            } else if (fileType === 'png') {
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    (function(pageNum) {
-                        pdfDoc.getPage(pageNum).then(function(page) {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            const scale = 2;
-                            const viewport = page.getViewport({ scale: scale });
-                            canvas.width = viewport.width;
-                            canvas.height = viewport.height;
-                            const renderContext = {
-                                canvasContext: ctx,
-                                viewport: viewport
-                            };
-                            page.render(renderContext).promise.then(function() {
-                                const downloadLink = document.createElement('a');
-                                downloadLink.href = canvas.toDataURL('image/png');
-                                downloadLink.download = `${fileName}_page${pageNum}.png`;
-                                downloadLink.click();
-                            });
-                        });
-                    })(i);
-                }
-            }
+    // ปิด popup หลังการดาวน์โหลด
+    document.getElementById('download-popup').style.display = 'none';
+});
 
-            // ปิด popup หลังการดาวน์โหลด
-            document.getElementById('download-popup').style.display = 'none';
-        });
+// ปิด popup ดาวน์โหลดไฟล์เมื่อกดปุ่มปิด
+document.getElementById('close-popup').addEventListener('click', () => {
+    const downloadPopup = document.getElementById('download-popup');
+    downloadPopup.style.display = 'none';
+});
 
-        // ปิด popup ดาวน์โหลดไฟล์เมื่อกดปุ่มปิด
-        document.getElementById('close-popup').addEventListener('click', () => {
-            const downloadPopup = document.getElementById('download-popup');
-            downloadPopup.style.display = 'none';
-        });
 
         function showAlert(message) {
             const alertMessage = document.createElement('div');
