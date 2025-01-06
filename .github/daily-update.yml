@@ -1,0 +1,26 @@
+name: Daily Update index.html with Google Sheets Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # รันทุกวันเวลาเที่ยงคืน UTC
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Replace API Key and Sheet ID in index.html
+        run: |
+          sed -i 's|{{GOOGLE_API_KEY}}|${{ secrets.GOOGLE_API_KEY }}|g' index.html
+          sed -i 's|{{SHEET_ID}}|${{ secrets.SHEET_ID }}|g' index.html
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add index.html
+          git commit -m "Daily update: index.html with latest data" || echo "No changes to commit"
+          git push
