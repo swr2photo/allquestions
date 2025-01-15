@@ -274,18 +274,25 @@
         popupOverlay.style.display = "none";
         redirectOverlay.style.display = "flex";
 
-// ตั้งเวลา Redirect
-setTimeout(() => {
-  window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
-}, 5000); // Redirect หลัง 5 วินาที
-
-// ป้องกันไม่ให้ผู้ใช้ย้อนกลับไปยังหน้าเดิมหลังจากการเปลี่ยนหน้า
+// ป้องกันการย้อนกลับและแสดงอนิเมชั่นก่อนการเปลี่ยนหน้า
 window.addEventListener('load', () => {
-  history.replaceState(null, null, location.href); // เปลี่ยนสถานะประวัติการเข้าชม
+  // ป้องกันไม่ให้ผู้ใช้ย้อนกลับไปยังหน้าเดิม
+  history.replaceState(null, null, location.href);
   window.onpopstate = () => {
     history.go(1); // เมื่อผู้ใช้กดปุ่มย้อนกลับ, ระบบจะไปยังหน้าใหม่ทันที
   };
+
+  // ตั้งเวลา Redirect
+  setTimeout(() => {
+    // ทำให้แอนิเมชั่นยังคงแสดงในช่วงนี้
+    document.querySelector('.redirect-overlay').style.display = 'flex'; // แสดงอนิเมชั่นก่อน
+    setTimeout(() => {
+      window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
+    }, 1000); // ใช้เวลานิดหน่อยก่อนการ Redirect เพื่อให้แอนิเมชั่นแสดง
+
+  }, 5000); // Redirect หลัง 5 วินาที
 });
+
 
     });
     }); 
