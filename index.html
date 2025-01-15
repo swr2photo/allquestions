@@ -769,7 +769,7 @@ Time limit: 1 hour
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(145deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.6));
+  background: rgba(0, 0, 0, 0.8);
   display: none;
   justify-content: center;
   align-items: center;
@@ -777,24 +777,24 @@ Time limit: 1 hour
 }
 
 .popup-content {
-  background-color: #fdfdfd;
+  background: linear-gradient(145deg, #ffffff, #f9f9f9);
   border-radius: 15px;
   padding: 30px 20px;
   width: 90%;
   max-width: 500px;
-  text-align: center;
+  text-align: left;
   position: relative;
-  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.3);
   animation: fadeIn 0.3s ease-in-out;
 }
 
 @keyframes fadeIn {
   from {
-    transform: scale(0.9);
+    transform: translateY(-30px);
     opacity: 0;
   }
   to {
-    transform: scale(1);
+    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -803,8 +803,8 @@ Time limit: 1 hour
   position: absolute;
   top: 15px;
   right: 15px;
-  font-size: 24px;
-  color: #666;
+  font-size: 20px;
+  color: #333;
   cursor: pointer;
   font-weight: bold;
   transition: color 0.3s ease;
@@ -815,10 +815,11 @@ Time limit: 1 hour
 }
 
 h2 {
-  font-size: 20px;
-  color: #333;
-  font-weight: 600;
+  font-size: 22px;
+  color: #007BFF;
+  font-weight: 700;
   margin-bottom: 15px;
+  text-align: center;
 }
 
 .popup-image {
@@ -831,12 +832,11 @@ h2 {
 }
 
 #announcement-message {
-  color: #555;
+  color: #444;
   font-size: 16px;
   line-height: 1.7;
   white-space: pre-wrap;
   word-wrap: break-word;
-  text-align: center;
   overflow: hidden;
   max-height: 6em; /* แสดงข้อความ 4 บรรทัด */
   margin-bottom: 15px;
@@ -858,6 +858,17 @@ h2 {
   background-color: #0056b3;
 }
 
+a {
+  color: #007BFF;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+
 </style>
 <style>
   /* เพิ่มการตั้งค่าการแสดงรูปภาพ */
@@ -870,22 +881,45 @@ h2 {
 </style>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const announcementMessage = `***Link เข้าทำข้อสอบกลางภาค ธรรมชาติบำบัด (20%)***
-ข้อสอบ จำนวน 48 ข้อ ใช้เวลาทำ 60 นาที. ทำข้อสอบให้แล้วเสร็จในช่วงเวลา 19.00-23.59น. เท่านั้น
+  const announcements = [
+    {
+      title: "ประกาศข้อสอบกลางภาค ธรรมชาติบำบัด",
+      message: `ข้อสอบ จำนวน 48 ข้อ ใช้เวลาทำ 60 นาที. ทำข้อสอบให้แล้วเสร็จในช่วงเวลา 19.00-23.59น. เท่านั้น\n\n<a href="https://lms2.psu.ac.th/mod/quiz/view.php?id=473714">กดที่นี่เพื่อเข้าสู่ข้อสอบ</a>`,
+      imageUrl: "",
+    },
+  ];
 
-Attempts allowed: 1
+  announcements.forEach(announcement => showPopup(announcement.title, announcement.message, announcement.imageUrl));
+});
 
-The quiz will not be available until Thursday, 16 January 2025, 7:00 PM
+function showPopup(title, message, imageUrl) {
+  const popupContainer = document.createElement('div');
+  popupContainer.classList.add('popup');
 
-This quiz will close on Thursday, 16 January 2025, 11:59 PM.
+  const popupContent = `
+    <div class="popup-content">
+      <span class="close-button" onclick="closePopup(this)">&times;</span>
+      <h2>${title}</h2>
+      ${imageUrl ? `<img src="${imageUrl}" alt="ประกาศ" class="popup-image" />` : ''}
+      <p id="announcement-message">${message}</p>
+    </div>
+  `;
 
-Time limit: 1 hour`;
-  
-    const imageUrl = "";
-  
-    showPopup(announcementMessage, imageUrl);
+  popupContainer.innerHTML = popupContent;
+  document.body.appendChild(popupContainer);
+
+  popupContainer.style.display = 'flex';
+  popupContainer.addEventListener('click', function (event) {
+    if (event.target === popupContainer) {
+      closePopup(event.target.querySelector('.popup-content'));
+    }
   });
-  
+}
+
+function closePopup(element) {
+  element.parentElement.remove();
+}
+
   function showPopup(message, imageUrl) {
     const popup = document.getElementById('important-announcement-popup');
     const popupMessage = document.getElementById('announcement-message');
