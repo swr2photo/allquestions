@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="th">
+<!--#include file="header.html" -->
+<head>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link rel="icon" href="/image/logo-01.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Allquiz เว็บไซต์เฉลยคำตอบรายวิชาต่างๆ">
+  <meta property="og:title" content="Allquiz - เฉลยคำตอบรายวิชา">
+  <meta property="og:description" content="เว็บไซต์ Allquiz ที่ให้บริการเฉลยคำตอบในรายวิชาต่างๆ สำหรับนักศึกษาและผู้ที่ต้องการคำแนะนำในการศึกษา">
+  <meta property="og:image" content="image/logo.png">
+  <meta property="og:url" content="https://www.instagram.com/doralaikon_th/">
+  <meta property="og:type" content="website">
+  <title>Allquiz - Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    /* ตั้งค่าพื้นฐาน */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #ffffff; /* เปลี่ยนเป็นสีขาว */
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* สไตล์การแสดงสกอล์เมาส์ */
+    ::-webkit-scrollbar {
+      width: 12px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 10px;
+      transition: background-color 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    /* Popup Overlay */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 1s ease-in-out;
+      overflow: auto; /* เพิ่มการเลื่อนหน้าจอ */
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Popup Content */
+    .popup-content {
+      position: relative;
+      text-align: center;
+      width: 90%;
+      max-width: 450px;
+      background: #1e1e1e;
+      border-radius: 15px;
+      box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.6);
+      color: #e0e0e0;
+      max-height: 80%; /* กำหนดความสูงสูงสุด */
+      overflow-y: auto; /* ทำให้เนื้อหาภายในสามารถเลื่อนขึ้นลงได้ */
+    }
+
+    .popup-header {
+      background: linear-gradient(90deg, #ff5722, #ff9800);
+      padding: 15px;
+      border-radius: 15px 15px 0 0;
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .popup-content h1 {
+      font-size: 22px;
+      color: #ffcc00;
+      margin: 15px 0 10px;
+    }
+
+    .popup-content p {
+      font-size: 14px;
+      line-height: 1.8;
+      margin: 10px 20px;
+      color: #bdbdbd;
+    }
+
+    .popup-content .update-time {
+      font-size: 12px;
+      color: #8d8d8d;
+      margin-bottom: 15px;
+    }
+
+    .popup-content .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #fff;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 30px; /* เว้นระยะห่างจาก Footer */
+    }
+
+    .popup-content .btn:hover {
+      background-color: #0056b3;
+    }
+
+    .popup-content .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .popup-content .close-btn:hover {
+      color: #ff4d4d;
+    }
+
+    .popup-footer {
+      background: linear-gradient(90deg, #03a9f4, #00bcd4);
+      padding: 10px;
+      border-radius: 0 0 15px 15px;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    /* Redirect Overlay */
+    .redirect-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .redirect-overlay .animated-text {
+      font-size: 1.5rem;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 5s steps(40, end) forwards, blink 0.7s step-end infinite;
+    }
+
+    @keyframes typing {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
+
+    @keyframes blink {
+      0%, 100% {
+        border-color: transparent;
+      }
+      50% {
+        border-color: white;
+      }
+    }
+
+    .redirect-overlay .progress-bar {
+      position: relative;
+      width: 80%;
+      max-width: 300px;
+      height: 10px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
+
+    .redirect-overlay .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background: white;
+      animation: progress 5s linear forwards;
+    }
+
+    @keyframes progress {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Popup Announcement -->
+  <div class="popup-overlay" id="popup-overlay">
+    <div class="popup-content">
+      <div class="popup-header">ธรรมชาติบำบัด - ประกาศสำคัญ</div>
+      <span class="close-btn" id="close-popup">&times;</span>
+      <h1>ข้อสอบกลางภาค (20%)</h1>
+      <p>
+        ข้อสอบ จำนวน 48 ข้อ ใช้เวลาทำ 60 นาที<br>
+        ทำข้อสอบให้แล้วเสร็จในช่วงเวลา 19.00-23.59น. เท่านั้น<br><br>
+        Attempts allowed: 1<br>
+        The quiz will not be available until Thursday, 16 January 2025, 7:00 PM<br>
+        This quiz will close on Thursday, 16 January 2025, 11:59 PM<br>
+        Time limit: 1 hour
+      </p>
+      <p class="update-time">Updated: 16 January 2025</p>
+      <button class="btn" id="start-redirect">Start Quiz</button>
+      <div class="popup-footer">© ธรรมชาติบำบัด | PSU</div>
+    </div>
+  </div>
+
+  <!-- Redirect Animation -->
+  <div class="redirect-overlay" id="redirect-overlay">
+    <div class="animated-text">Redirecting to Quiz...</div>
+    <div class="progress-bar">
+      <div class="progress-bar-inner"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const popupOverlay = document.getElementById("popup-overlay");
+      const redirectOverlay = document.getElementById("redirect-overlay");
+      const closePopup = document.getElementById("close-popup");
+      const startRedirect = document.getElementById("start-redirect");
+
+      // ตั้งค่าเวลาสำหรับแสดง Popup
+      const now = new Date();
+      const startDate = new Date("2025-01-16T00:00:00");
+      const endDate = new Date("2025-01-17T23:59:00");
+
+      if (now >= startDate && now <= endDate) {
+        popupOverlay.style.display = "flex";
+      }
+
+      // ปิด Popup
+      closePopup.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+      });
+
+      // เริ่ม Redirect เมื่อกดปุ่ม
+      startRedirect.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+        redirectOverlay.style.display = "flex";
+
+        // ตั้งเวลา Redirect
+        setTimeout(() => {
+          window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
+        }, 5000); // Redirect หลัง 5 วินาที
+      });
+    });
+  </script>
+  <style>
+/* ตั้งต้นสำหรับการตั้งค่าเบื้องต้น */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  -webkit-user-select: none;  /* สำหรับเบราว์เซอร์บน macOS, iOS */
+  user-select: none;          /* สำหรับเบราว์เซอร์อื่นๆ */
+  font-family: 'Arial', sans-serif;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  color: #333;
+  font-size: 1rem;
+}
+
+h2 {
+  text-align: center;
+  color: #fff;
+  margin-top: 20px;
+  background-color: #000;
+  padding: 15px 20px;
+  border-radius: 15px;
+  font-size: 2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+} body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #ffffff;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-y: auto; /* เปิดการเลื่อนสกอล์เมาส์ในหน้า */
+}
+
+main {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow-y: auto; /* เพิ่มการเลื่อนสำหรับเนื้อหาภายใน */
+}
+
+
+section {
+  max-width: 1000px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.subject-list, .quiz-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* จัดเรียงเป็นกริด */
+  gap: 20px;
+  margin-top: 20px;
+  justify-content: center;
+  z-index: 10; /* ตั้งค่า z-index เพื่อป้องกันการซ้อนทับ */
+  overflow: auto; /* ให้สามารถเลื่อนขึ้นลงได้ */
+}
+
+.subject-card, .quiz-card {
+  background-color: #fff;
+  border: 2px solid #000;
+  border-radius: 15px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.subject-card:hover, .quiz-card:hover {
+  background-color: #000;
+  color: white;
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+
+.waiting-for-update {
+  color: #FF5722;
+  background-color: #FFEBEE;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1rem;
+  border: 2px solid #FF5722;
+}
+
+.expired {
+  color: #fff;
+  background-color: #FF5722;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+  margin-top: 10px;
+  font-size: 1rem;
+  border: 2px solid #FF5722;
+}
+
+.countdown {
+  color: #FF5722;
+  font-size: 0.87rem; /* ปรับขนาดฟอนต์ให้พอดี */
+  margin-top: 10px; /* เพิ่มระยะห่างระหว่างเวลาที่แสดงกับองค์ประกอบอื่น */
+  font-weight: bold;
+  line-height: 1.4; /* ปรับระยะห่างระหว่างบรรทัด */
+}
+
+.answer-button {
+  display: inline-block;
+  background-color: #1976D2;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  margin-top: 20px;  /* เพิ่มระยะห่างด้านบน */
+  margin-bottom: 20px;  /* เพิ่มระยะห่างด้านล่าง */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.answer-button:hover {
+  background-color: #1565C0;
+  transform: scale(1.05);
+}
+
+footer {
+  text-align: center;
+  padding: 15px;
+  background-color: #000;
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 20px;
+}
+
+footer p {
+  margin: 0;
+}
+
+.back-button {
+  display: inline-block;
+  background-color: #000;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 20px;
+  text-align: center;
+  margin-top: 20px;  /* เพิ่มระยะห่างด้านบน */
+  margin-bottom: 20px;  /* เพิ่มระยะห่างด้านล่าง */
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:hover {
+  background-color: #444;
+}
+
+.quiz-card p {
+  color: #fff;
+  font-size: 1rem;
+  line-height: 1.5;
+  background-color: #333;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.quiz-description {
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #333;
+  text-align: left;
+}
+
+.status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: #fff;
+  background-color: #000;
+  padding: 8px 12px;
+  border-radius: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* สถานะ 'รอการแก้ไข' */
+.status.waiting-for-update {
+  color: #FF5722;
+  background-color: #FFEBEE;
+}
+
+/* สถานะ 'ปิดปรับปรุง' */
+.status.maintenance {
+  color: #fff;
+  background-color: #FF5722;
+}
+
+/* สถานะ 'กำหนดเอง' - สีจะเปลี่ยนตามคำ */
+.status.selected {
+  color: #000;
+  background-color: #fff;
+}
+
+/* เมื่อพบคำว่า 'รอการแก้ไข' หรือ 'ปิดปรับปรุง' */
+.status:contains('รอการแก้ไข'),
+.status:contains('ปิดปรับปรุง') {
+  color: #fff;
+  background-color: #FF5722;
+}
+
+/* สถานะที่หมดเขตหรือหมดอายุ */
+.status.expired {
+  color: #fff;
+  background-color: #FF5722;
+}
+
+.status.custom-status {
+  color: #fff;
+  background-color: #1976D2;
+}
+
+/* สถานะ 'กำหนดเอง' เมื่อเลือก */
+.status.custom-status.selected {
+  color: #1976D2;
+  background-color: #fff;
+}
+
+/* สำหรับอุปกรณ์ที่มีขนาดหน้าจอเล็กลง (แท็บเล็ตและโทรศัพท์) */
+@media (max-width: 768px) {
+  h2 {
+    font-size: 1.5rem;
+  }
+
+  .subject-card, .quiz-card {
+    width: 100%;
+    margin: 0 auto;
+    padding: 15px;
+  }
+
+  .countdown {
+    font-size: 0.85rem; /* ปรับขนาดฟอนต์ในอุปกรณ์ขนาดเล็ก */
+  }
+
+  footer {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  .subject-card, .quiz-card {
+    width: 100%;
+    padding: 12px;
+  }
+
+  .countdown {
+    font-size: 0.85rem; /* ปรับขนาดฟอนต์ในหน้าจอขนาดเล็กมาก */
+  }
+
+  footer {
+    font-size: 0.85rem;
+  }
+
+  .answer-button {
+    font-size: 0.9rem;
+    padding: 10px 18px;
+  }
+}
+
+/* ทั่วไป */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* สำหรับการแสดงผลวิชา */
+#subject-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px;
+}
+
+.subject-card {
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 250px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.subject-card:hover {
+  background-color: #f4f4f4;
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.subject-card .waiting-for-update {
+  color: #ff9800;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.subject-card strong {
+  font-size: 18px;
+  color: #333;
+}
+
+/* ควิซที่หมดอายุเร็วๆ นี้ */
+.expiry-quiz {
+  background-color: #ffccbc;
+  color: #d32f2f;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.expiry-quiz strong {
+  font-weight: bold;
+}
+
+.expiry-quiz a {
+  color: #d32f2f;
+  text-decoration: underline;
+}
+
+/* ควิซที่ได้รับการอัพเดตล่าสุด */
+.latest-update {
+  background-color: #e8f5e9;
+  border: 1px solid #4CAF50;
+  color: #388e3c;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.latest-update strong {
+  font-weight: bold;
+}
+
+/* ไอคอนกระดิ่ง */
+#notification-bell-container {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+#notification-bell {
+  font-size: 30px;
+  position: relative;
+  color: #333;
+}
+
+#notification-bell:hover {
+  color: #ff9800;
+}
+
+/* Drop-down รายการแจ้งเตือน */
+#notification-list {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 300px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+}
+
+#notification-list ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#notification-list li {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+#notification-list li:last-child {
+  border-bottom: none;
+}
+
+#no-notifications {
+  padding: 10px;
+  text-align: center;
+  color: #888;
+}
+
+/* สีพื้นหลังของแจ้งเตือน */
+.notification-item {
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+/* ควิซที่จะหมดอายุเร็ว ๆ นี้ */
+.notification-expiry {
+  background-color: #FFEBEE; /* สีชมพูอ่อน */
+  border-left: 5px solid #FF5252; /* เส้นข้างสีแดง */
+}
+
+.notification-expiry i {
+  color: #FF5252; /* สีแดงสำหรับไอคอน */
+}
+
+/* ควิซที่อัพเดตล่าสุด */
+.notification-update {
+  background-color: #E8F5E9; /* สีเขียวอ่อน */
+  border-left: 5px solid #4CAF50; /* เส้นข้างสีเขียว */
+}
+
+.notification-update i {
+  color: #4CAF50; /* สีเขียวสำหรับไอคอน */
+}
+
+.notification-item-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.notification-item-link:hover {
+  text-decoration: underline;
+}
+/* การตั้งค่าเบื้องต้นของการแจ้งเตือน */
+#notification-bell-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+#notification-bell {
+  font-size: 30px;
+  position: relative;
+  color: #007bff;
+  transition: color 0.3s ease;
+}
+
+#notification-bell:hover {
+  color: #ff9800;
+}
+
+#notification-list {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 8px;
+  width: 320px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
+  max-height: 350px;
+  overflow-y: auto;
+  padding: 10px 15px;
+}
+
+#notification-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#notification-list li {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  color: #333;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+#notification-list li:hover {
+  background-color: #e3f2fd;
+  transform: translateX(5px);
+}
+
+#notification-list li:last-child {
+  margin-bottom: 0;
+}
+
+#no-notifications {
+  padding: 10px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.notification-item i {
+  font-size: 18px;
+  margin-right: 10px;
+}
+
+.notification-item-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.notification-item-link:hover {
+  text-decoration: underline;
+}
+
+/* การออกแบบการแจ้งเตือนที่สำคัญ */
+.notification-expiry {
+  background-color: #ffebee; /* สีชมพูอ่อน */
+  border-left: 5px solid #f44336; /* เส้นข้างสีแดง */
+  padding-left: 15px;
+}
+
+.notification-expiry i {
+  color: #f44336; /* สีแดงสำหรับไอคอน */
+}
+
+/* การออกแบบการแจ้งเตือนอัพเดต */
+.notification-update {
+  background-color: #e8f5e9; /* สีเขียวอ่อน */
+  border-left: 5px solid #4caf50; /* เส้นข้างสีเขียว */
+  padding-left: 15px;
+}
+
+.notification-update i {
+  color: #4caf50; /* สีเขียวสำหรับไอคอน */
+}
+
+/* การแจ้งเตือนปกติ */
+.notification-normal {
+  background-color: #e3f2fd; /* สีฟ้าอ่อน */
+  border-left: 5px solid #2196f3; /* เส้นข้างสีน้ำเงิน */
+  padding-left: 15px;
+}
+
+.notification-normal i {
+  color: #2196f3; /* สีน้ำเงินสำหรับไอคอน */
+}
+
+/* การออกแบบสำหรับปุ่มปิดการแจ้งเตือน */
+.notification-close-button {
+  background-color: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 18px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.notification-close-button:hover {
+  color: #f44336;
+}
+
+/* ปรับให้การแจ้งเตือนดูสะดวกและทันสมัยมากขึ้น */
+.notification-item.active {
+  background-color: #e0f7fa;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.notification-item.active i {
+  color: #009688;
+}
+
+/* การตั้งค่าของการแจ้งเตือนกระดิ่ง */
+#notification-bell-container {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  cursor: pointer;
+}
+
+#notification-bell {
+  font-size: 24px;
+  position: relative;
+  color: #333; /* เปลี่ยนสีได้ตามต้องการ */
+}
+
+#notification-bell:hover {
+  color: #ff9800;
+}
+
+#notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: red;
+  color: white;
+  font-size: 14px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+}
+
+/* Drop-down รายการแจ้งเตือน */
+#notification-list {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 300px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  z-index: 1001;
+}
+
+#notification-list ul {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#notification-list li {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+#notification-list li:last-child {
+  border-bottom: none;
+}
+
+#no-notifications {
+  padding: 10px;
+  text-align: center;
+  color: #888;
+}
+
+/* สีพื้นหลังของแจ้งเตือน */
+.notification-item {
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+/* ควิซที่จะหมดอายุเร็ว ๆ นี้ */
+.notification-expiry {
+  background-color: #FFEBEE; /* สีชมพูอ่อน */
+  border-left: 5px solid #FF5252; /* เส้นข้างสีแดง */
+}
+
+.notification-expiry i {
+  color: #FF5252; /* สีแดงสำหรับไอคอน */
+}
+
+/* ควิซที่อัพเดตล่าสุด */
+.notification-update {
+  background-color: #E8F5E9; /* สีเขียวอ่อน */
+  border-left: 5px solid #4CAF50; /* เส้นข้างสีเขียว */
+}
+
+.notification-update i {
+  color: #4CAF50; /* สีเขียวสำหรับไอคอน */
+}
+
+.notification-item-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.notification-item-link:hover {
+  text-decoration: underline;
+}
+
+/* ปรับสไตล์ไอคอน */
+.latest-update {
+  padding: 10px;
+  margin: 5px 0;
+  border: 1px solid #4CAF50;
+  border-radius: 5px;
+  background: #e8f5e9;
+  font-size: 14px;
+}
+
+.latest-update strong {
+  font-weight: bold;
+}
+
+
+  </style>
+
+
+
+  
+  <main>
+    <div id="notification-bell-container">
+      <span id="notification-bell" onclick="toggleNotificationList()">
+        <i class="fas fa-bell"></i>
+        <span id="notification-count" style="display: none;">0</span>
+      </span>
+      <div id="notification-list" style="display: none;">
+        <div id="no-notifications">ไม่มีการแจ้งเตือน</div>
+        <ul id="notifications"></ul>
+      </div>
+    </div>
+  
+    <section id="subjects">
+      <h2>เลือกวิชา</h2>
+      <div class="subject-list" id="subject-list"></div>
+    </section>
+  
+    <section id="quiz-list" style="display: none;">
+      <h2 id="subject-title">วิชา</h2>
+      <div class="quiz-list" id="quiz-container"></div>
+      <div class="back-button" id="back-button" onclick="goBack()">
+        <i class="fas fa-arrow-left"></i> ย้อนกลับ
+      </div>
+    </section>
+  </main>
+  
+
+  <footer>
+    <p>© 2025 Doralaikon_TH Allquizes | สงวนลิขสิทธิ์</p>
+  </footer>
+
+  <script>
+
+
+const sheetId = "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc";
+const sheetRange = "Allquestions";
+const apiKey = "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw";
+
+
+// ฟังก์ชันดึงข้อมูลจาก Google Sheets
+async function fetchSubjects() {
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${sheetRange}?key=${apiKey}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    if (data.values) {
+      return data.values;
+    } else {
+      console.error("ไม่พบข้อมูลใน Google Sheets");
+      return [];
+    }
+  } catch (error) {
+    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+    return [];
+  }
+}
+
+// ฟังก์ชันคำนวณเวลา
+function calculateCountdown(expiryDate) {
+  const [date, time] = expiryDate.split(", ");
+  const [day, month, year] = date.split("/");
+
+  // ตรวจสอบว่าเป็นปีปัจจุบันหรือปีถัดไป
+  const now = new Date();
+  let expiryYear = parseInt(year, 10);
+
+  // ตรวจสอบว่าเป็นปีที่แล้วหรือไม่
+  if (expiryYear < now.getFullYear()) {
+    return 'ควิซนี้หมดเขตแล้ว'; // ถ้าเป็นปีที่แล้วแล้ว ให้แสดง "หมดเขต"
+  }
+
+  // ถ้าปีที่ระบุเป็นปีปัจจุบันหรือปีถัดไป ให้ใช้ปีถัดไป
+  if (expiryYear < now.getFullYear() || (expiryYear === now.getFullYear() && (now.getMonth() + 1 > parseInt(month) || (now.getMonth() + 1 === parseInt(month) && now.getDate() > parseInt(day))))) {
+    expiryYear = now.getFullYear(); // ใช้ปีปัจจุบันถ้าหมดเวลาแล้ว
+  }
+
+  // แปลงวันที่ให้เป็น ISO 8601 โดยใช้ปีที่คำนวณใหม่
+  const formattedDate = `${expiryYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}+07:00`;
+
+  const endDate = new Date(formattedDate);
+  const timeLeft = endDate.getTime() - now.getTime();
+
+  if (timeLeft <= 0) return 'ควิซนี้หมดเขตแล้ว'; // ถ้าหมดเวลาแล้ว
+
+  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+  return [
+    days > 0 ? `${days} วัน` : '',
+    hours > 0 ? `${hours} ชั่วโมง` : '',
+    minutes > 0 ? `${minutes} นาที` : '',
+    seconds > 0 ? `${seconds} วินาที` : '',
+  ].filter(Boolean).join(' ');
+}
+
+// ฟังก์ชันสำหรับคำนวณปีถัดไป
+function getNextYearDate() {
+  const today = new Date();
+  const nextYear = today.getFullYear() + 1;
+  // วันที่ 1 มกราคมของปีถัดไป
+  return new Date(nextYear, 0, 1).toISOString();
+}
+
+// ฟังก์ชันแสดงเวลาใน Countdown
+function updateCountdowns() {
+  document.querySelectorAll('.countdown').forEach(el => {
+    const expiryDate = el.getAttribute('data-expiry') || getNextYearDate(); // ใช้ปีถัดไปหากไม่มี expiry
+    const countdown = calculateCountdown(expiryDate);
+
+    if (countdown === 'ควิซนี้หมดเขตแล้ว') {
+      el.className = 'expired';
+      el.innerText = countdown;
+    } else {
+      el.innerText = countdown;
+    }
+  });
+}
+
+
+
+
+async function initializeSubjects() {
+  const subjects = await fetchSubjects(); // ดึงข้อมูลจากชีต
+  const subjectList = document.getElementById('subject-list');
+  const subjectMap = {};
+  const closeToExpiry = [];
+  const expiredQuizzes = [];
+  const latestUpdates = [];
+
+  subjects.forEach((row, index) => {
+    if (index === 0) return; // ข้ามหัวตาราง
+
+    // ตรวจสอบว่า row มีข้อมูลเพียงพอ
+    const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
+
+    if (subject && subject.trim() !== "") {
+      if (!subjectMap[subject]) {
+        subjectMap[subject] = [];
+      }
+
+      subjectMap[subject].push({ quizName, quizLink, quizDescription, expiryDate, status });
+
+      if (expiryDate) {
+        try {
+          const now = new Date().getTime();
+          const endDate = parseExpiryDate(expiryDate); // ฟังก์ชันแยกและจัดการรูปแบบวันที่
+
+          if (endDate) {
+            const timeLeftInMilliseconds = endDate - now;
+            const timeLeftInHours = timeLeftInMilliseconds / (1000 * 60 * 60);
+
+            if (timeLeftInHours > 0 && timeLeftInHours <= 24) {
+              closeToExpiry.push({
+                subject,
+                quizName,
+                quizLink,
+                timeLeftInHours: Math.ceil(timeLeftInHours),
+              });
+            } else if (timeLeftInHours <= 0) {
+              const timePassedInMilliseconds = now - endDate;
+              const timePassedInDays = timePassedInMilliseconds / (1000 * 60 * 60 * 24);
+              if (timePassedInDays <= 1) {
+                expiredQuizzes.push({ subject, quizName, quizLink });
+              }
+            }
+          }
+        } catch (error) {
+          console.warn(`Error parsing expiry date for quiz: ${quizName}`, error);
+        }
+      }
+
+      if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
+        latestUpdates.push({ subject, quizName, quizLink });
+      }
+    }
+  });
+
+  updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates);
+
+  subjectList.innerHTML = "";
+  Object.keys(subjectMap).forEach(subject => {
+    const quizzes = subjectMap[subject];
+    const subjectCard = document.createElement('div');
+    subjectCard.className = 'subject-card';
+    subjectCard.innerHTML = `
+      <strong>${subject}</strong>
+      <i class="fas fa-book"></i>
+    `;
+    if (quizzes.every(quiz => !quiz.quizName)) {
+      subjectCard.innerHTML += `<div class="waiting-for-update">รออัพเดต</div>`;
+    } else {
+      subjectCard.onclick = () => showQuizzes(subject, quizzes);
+    }
+    subjectList.appendChild(subjectCard);
+  });
+}
+
+// ฟังก์ชันอัปเดตรายการแจ้งเตือน
+function updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates) {
+  const notificationCount = document.getElementById('notification-count');
+  const notificationList = document.getElementById('notifications');
+  const noNotifications = document.getElementById('no-notifications');
+
+  notificationList.innerHTML = "";
+
+  if (closeToExpiry.length === 0 && expiredQuizzes.length === 0 && latestUpdates.length === 0) {
+    notificationCount.style.display = "none";
+    noNotifications.style.display = "block";
+    return;
+  }
+
+  notificationCount.style.display = "block";
+  notificationCount.innerText = closeToExpiry.length + expiredQuizzes.length + latestUpdates.length;
+
+  noNotifications.style.display = "none";
+
+  if (closeToExpiry.length > 0) {
+    const expiryHeader = document.createElement('h3');
+    expiryHeader.innerHTML = `
+      <i class="fas fa-clock"></i> ควิซที่จะหมดอายุเร็ว ๆ นี้
+    `;
+    notificationList.appendChild(expiryHeader);
+
+    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (expiredQuizzes.length > 0) {
+    const expiredHeader = document.createElement('h3');
+    expiredHeader.innerHTML = `
+      <i class="fas fa-times-circle"></i> ควิซที่หมดอายุแล้ว
+    `;
+    notificationList.appendChild(expiredHeader);
+
+    expiredQuizzes.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#FF0000";
+      li.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        <strong>หมดอายุแล้ว</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (latestUpdates.length > 0) {
+    const updateHeader = document.createElement('h3');
+    updateHeader.innerHTML = `
+      <i class="fas fa-sync-alt"></i> ควิซที่อัพเดตล่าสุด
+    `;
+    notificationList.appendChild(updateHeader);
+
+    latestUpdates.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#4CAF50";
+      li.innerHTML = `
+        <i class="fas fa-check-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        ถูก <strong>อัพเดตล่าสุด</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+}
+
+
+
+// ฟังก์ชันอัปเดตรายการแจ้งเตือน
+function updateNotificationBell(closeToExpiry, expiredQuizzes, latestUpdates) {
+  const notificationCount = document.getElementById('notification-count');
+  const notificationList = document.getElementById('notifications');
+  const noNotifications = document.getElementById('no-notifications');
+
+  notificationList.innerHTML = "";
+
+  if (closeToExpiry.length === 0 && expiredQuizzes.length === 0 && latestUpdates.length === 0) {
+    notificationCount.style.display = "none";
+    noNotifications.style.display = "block";
+    return;
+  }
+
+  notificationCount.style.display = "block";
+  notificationCount.innerText = closeToExpiry.length + expiredQuizzes.length + latestUpdates.length;
+
+  noNotifications.style.display = "none";
+
+  if (closeToExpiry.length > 0) {
+    const expiryHeader = document.createElement('h3');
+    expiryHeader.innerHTML = `
+      <i class="fas fa-clock"></i> ควิซที่จะหมดอายุเร็ว ๆ นี้
+    `;
+    notificationList.appendChild(expiryHeader);
+
+    closeToExpiry.forEach(({ subject, quizName, quizLink, timeLeftInHours }) => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <i class="fas fa-exclamation-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        เหลือเวลา <strong>${timeLeftInHours} ชั่วโมง</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (expiredQuizzes.length > 0) {
+    const expiredHeader = document.createElement('h3');
+    expiredHeader.innerHTML = `
+      <i class="fas fa-times-circle"></i> ควิซที่หมดอายุแล้ว
+    `;
+    notificationList.appendChild(expiredHeader);
+
+    expiredQuizzes.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#FF0000";
+      li.innerHTML = `
+        <i class="fas fa-exclamation-triangle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        <strong>หมดอายุแล้ว</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+
+  if (latestUpdates.length > 0) {
+    const updateHeader = document.createElement('h3');
+    updateHeader.innerHTML = `
+      <i class="fas fa-sync-alt"></i> ควิซที่อัพเดตล่าสุด
+    `;
+    notificationList.appendChild(updateHeader);
+
+    latestUpdates.forEach(({ subject, quizName, quizLink }) => {
+      const li = document.createElement('li');
+      li.style.color = "#4CAF50";
+      li.innerHTML = `
+        <i class="fas fa-check-circle"></i> ควิซ "<strong>${quizName}</strong>" ในวิชา "<strong>${subject}</strong>" 
+        ถูก <strong>อัพเดตล่าสุด</strong>!
+        <br>
+        <a href="${quizLink}" target="_blank" class="notification-item-link">ดูรายละเอียด</a>
+      `;
+      notificationList.appendChild(li);
+    });
+  }
+}
+
+
+
+
+// ฟังก์ชันเปิด/ปิดรายการแจ้งเตือน
+function toggleNotificationList() {
+  const notificationList = document.getElementById('notification-list');
+  notificationList.style.display = notificationList.style.display === "block" ? "none" : "block";
+}
+
+// ฟังก์ชันจัดการรูปแบบวันที่
+function parseExpiryDate(expiryDate) {
+  const dateFormats = [
+    { regex: /^(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2}):(\d{2})$/, parse: (d, m, y, h, min, sec) => `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T${h.padStart(2, '0')}:${min}:${sec}` }, // d/M/yyyy, HH:mm:ss
+    { regex: /^(\d{1,2})\/(\d{1,2})\/(\d{4}),\s*(\d{1,2}):(\d{2})$/, parse: (d, m, y, h, min) => `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T${h.padStart(2, '0')}:${min}:00` }, // d/M/yyyy, HH:mm
+    { regex: /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/, parse: (d, m, y) => `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T00:00:00` }, // d/M/yyyy
+    { regex: /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})$/, parse: (y, m, d, h, min, sec) => `${y}-${m}-${d}T${h}:${min}:${sec}` }, // ISO 8601
+  ];
+
+  for (const { regex, parse } of dateFormats) {
+    const match = expiryDate.match(regex);
+    if (match) {
+      const formattedDate = parse(...match.slice(1));
+      return new Date(formattedDate).getTime(); // แปลงเป็น timestamp
+    }
+  }
+
+  return null;
+}
+
+
+// ฟังก์ชันแสดงควิซในรายวิชา
+function showQuizzes(subject, quizzes) {
+  document.getElementById('subjects').style.display = 'none';
+  document.getElementById('quiz-list').style.display = 'block';
+  document.getElementById('subject-title').innerText = `ควิซในวิชา ${subject}`;
+
+  const quizContainer = document.getElementById('quiz-container');
+  quizContainer.innerHTML = '';
+
+ quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status, buttonText }) => {
+    const quizCard = document.createElement('div');
+    quizCard.className = 'quiz-card';
+
+    if (quizName) {
+      quizCard.innerHTML = `<strong>${quizName}</strong>`;
+
+      if (quizDescription) {
+        const description = document.createElement('div');
+        description.className = 'quiz-description';
+        description.innerHTML = `<strong>คำอธิบาย:</strong><br> ${quizDescription}`;
+        description.style.whiteSpace = 'pre-line';
+        quizCard.appendChild(description);
+      }
+
+      // แสดงสถานะจาก Google Sheets ถ้ามี
+      if (status) {
+        const statusElement = document.createElement('div');
+        statusElement.className = 'status';
+        statusElement.innerText = status;
+        statusElement.style.backgroundColor = getStatusColor(status);
+        quizCard.appendChild(statusElement);
+      } 
+
+      // หากไม่มีสถานะจาก Google Sheets แต่มี expiryDate
+      else if (expiryDate) {
+        const countdown = document.createElement('div');
+        countdown.className = 'countdown';
+        countdown.setAttribute('data-expiry', expiryDate);
+        quizCard.appendChild(countdown);
+      }
+
+      // ถ้าไม่มีลิงก์ ให้แสดงข้อความ "รออัพเดต" และไม่มีสถานะ
+      if (!quizLink && !status) {
+        const waitingUpdate = document.createElement('div');
+        waitingUpdate.className = 'waiting-for-update';
+        waitingUpdate.innerText = 'รออัพเดต';
+        quizCard.appendChild(waitingUpdate);
+      }
+
+      // ถ้ามีลิงก์ ให้แสดงปุ่มลิงก์ไปยังเฉลย
+      if (quizLink) {
+        const answerButton = document.createElement('a');
+        answerButton.className = 'answer-button';
+        answerButton.href = quizLink;
+        answerButton.target = '_blank';
+        
+        // ตรวจสอบว่า `buttonText` มีค่าอะไร ถ้าไม่มีจะใช้ 'ดูเฉลย'
+        if (buttonText) {
+          answerButton.innerText = buttonText; // ใช้ค่าที่ได้รับจาก Google Sheets หรือแหล่งข้อมูล
+        } else {
+          answerButton.innerText = 'ดูเฉลย'; // ค่าเริ่มต้น
+        }
+
+        quizCard.appendChild(answerButton);
+      }
+
+    } else {
+      // หากไม่มีชื่อควิซ ก็แสดงข้อความ "รออัพเดต"
+      const waitingUpdate = document.createElement('div');
+      waitingUpdate.className = 'waiting-for-update';
+      waitingUpdate.innerText = 'รออัพเดต';
+      quizCard.appendChild(waitingUpdate);
+    }
+
+    quizContainer.appendChild(quizCard);
+  });
+
+  updateCountdowns();
+  setInterval(updateCountdowns, 1000);
+}
+
+
+// ฟังก์ชันตรวจสอบสีของสถานะ
+function getStatusColor(status) {
+  switch (status.toLowerCase()) {
+    case 'เสร็จสิ้น':
+      return '#4CAF50';  // สีเขียวสำหรับ "เสร็จสิ้น"
+    case 'กำลังดำเนินการ':
+      return '#FFEB3B';  // สีเหลืองสำหรับ "กำลังดำเนินการ"
+    case 'รออัพเดต':
+      return '#FF5722';  // สีส้มสำหรับ "รออัพเดต"
+    case 'ปิดปรับปรุง':
+      return '#FF5722';  // สีส้มสำหรับ "ปิดปรับปรุง"
+    case 'หมดอายุ':
+      return '#9E9E9E';  // สีเทาสำหรับ "หมดอายุ"
+    case 'เริ่มต้น':
+      return '#1976D2';  // สีน้ำเงินสำหรับ "เริ่มต้น"
+    default:
+      return '#000000';  // สีดำสำหรับสถานะอื่นๆ
+  }
+}
+
+
+
+// กลับไปยังหน้าหลัก
+document.getElementById('back-button').onclick = () => {
+  document.getElementById('quiz-list').style.display = 'none';
+  document.getElementById('subjects').style.display = 'block';
+};
+
+// ตั้งค่าเริ่มต้น
+setInterval(updateCountdowns, 1000);
+initializeSubjects();
+
+   
+    
+  </script>
+
+  
+</body>
+</html>
