@@ -165,31 +165,24 @@
     }
 
     .redirect-overlay .animated-text {
-      font-size: 1.5rem;
-      color: white;
-      white-space: nowrap;
-      overflow: hidden;
-      width: 0;
-      animation: typing 5s steps(40, end) forwards, blink 0.7s step-end infinite;
-    }
+  font-size: 1.5rem;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  display: inline-block; /* เพิ่มให้เป็นแบบ inline-block เพื่อให้ข้อความพิมพ์ทีละตัว */
+  width: 0;
+  animation: typing 5s steps(40, end) forwards; /* ใช้แอนิเมชั่นพิมพ์ทีละตัว */
+}
 
-    @keyframes typing {
-      from {
-        width: 0;
-      }
-      to {
-        width: 100%;
-      }
-    }
+@keyframes typing {
+  from {
+    width: 0; /* เริ่มจาก 0 */
+  }
+  to {
+    width: 100%; /* จบที่ความกว้างเต็ม */
+  }
+}
 
-    @keyframes blink {
-      0%, 100% {
-        border-color: transparent;
-      }
-      50% {
-        border-color: white;
-      }
-    }
 
     .redirect-overlay .progress-bar {
       position: relative;
@@ -274,25 +267,18 @@
         popupOverlay.style.display = "none";
         redirectOverlay.style.display = "flex";
 
-// ป้องกันการย้อนกลับและแสดงอนิเมชั่นก่อนการเปลี่ยนหน้า
+// ตั้งเวลา Redirect
+setTimeout(() => {
+  window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
+}, 5000); // Redirect หลัง 5 วินาที
+
+// ป้องกันไม่ให้ผู้ใช้ย้อนกลับไปยังหน้าเดิมหลังจากการเปลี่ยนหน้า
 window.addEventListener('load', () => {
-  // ป้องกันไม่ให้ผู้ใช้ย้อนกลับไปยังหน้าเดิม
-  history.replaceState(null, null, location.href);
+  history.replaceState(null, null, location.href); // เปลี่ยนสถานะประวัติการเข้าชม
   window.onpopstate = () => {
     history.go(1); // เมื่อผู้ใช้กดปุ่มย้อนกลับ, ระบบจะไปยังหน้าใหม่ทันที
   };
-
-  // ตั้งเวลา Redirect
-  setTimeout(() => {
-    // ทำให้แอนิเมชั่นยังคงแสดงในช่วงนี้
-    document.querySelector('.redirect-overlay').style.display = 'flex'; // แสดงอนิเมชั่นก่อน
-    setTimeout(() => {
-      window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
-    }, 1000); // ใช้เวลานิดหน่อยก่อนการ Redirect เพื่อให้แอนิเมชั่นแสดง
-
-  }, 5000); // Redirect หลัง 5 วินาที
 });
-
 
     });
     }); 
