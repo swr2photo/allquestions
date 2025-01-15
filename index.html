@@ -735,250 +735,256 @@ body {
 
 
   </style>
-</head>
-<body>
 
-  
+  <style>
+    /* ตั้งค่าพื้นฐาน */
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
+    /* Popup Overlay */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.95);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 1s ease-in-out;
+    }
 
-<style>
-/* Popup Styles */
-.popup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
 
-.popup-content {
-  background: linear-gradient(145deg, #ffffff, #f9f9f9);
-  border-radius: 15px;
-  padding: 30px 20px;
-  width: 90%;
-  max-width: 500px;
-  text-align: left;
-  position: relative;
-  box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.3);
-  animation: fadeIn 0.3s ease-in-out;
-}
+    /* Popup Content */
+    .popup-content {
+      position: relative;
+      text-align: center;
+      width: 90%;
+      max-width: 450px;
+      background: #1e1e1e;
+      border-radius: 15px;
+      box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.6);
+      color: #e0e0e0;
+    }
 
-@keyframes fadeIn {
-  from {
-    transform: translateY(-30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
+    .popup-header {
+      background: linear-gradient(90deg, #ff5722, #ff9800);
+      padding: 15px;
+      border-radius: 15px 15px 0 0;
+      color: #fff;
+      font-size: 20px;
+      font-weight: bold;
+    }
 
-.close-button {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  font-size: 20px;
-  color: #333;
-  cursor: pointer;
-  font-weight: bold;
-  transition: color 0.3s ease;
-}
+    .popup-content h1 {
+      font-size: 22px;
+      color: #ffcc00;
+      margin: 15px 0 10px;
+    }
 
-.close-button:hover {
-  color: #ff4d4d;
-}
+    .popup-content p {
+      font-size: 14px;
+      line-height: 1.8;
+      margin: 10px 20px;
+      color: #bdbdbd;
+    }
 
-h2 {
-  font-size: 22px;
-  color: #007BFF;
-  font-weight: 700;
-  margin-bottom: 15px;
-  text-align: center;
-}
+    .popup-content .update-time {
+      font-size: 12px;
+      color: #8d8d8d;
+      margin-bottom: 15px;
+    }
 
-.popup-image {
-  max-width: 100%;
-  height: auto;
-  margin: 20px 0;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  display: none;
-}
+    .popup-content .btn {
+      padding: 10px 20px;
+      font-size: 14px;
+      color: #fff;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 30px; /* เว้นระยะห่างจาก Footer */
+    }
 
-#announcement-message {
-  color: #444;
-  font-size: 16px;
-  line-height: 1.7;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow: hidden;
-  max-height: 6em; /* แสดงข้อความ 4 บรรทัด */
-  margin-bottom: 15px;
-}
+    .popup-content .btn:hover {
+      background-color: #0056b3;
+    }
 
-#expand-text-button {
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+    .popup-content .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
 
-#expand-text-button:hover {
-  background-color: #0056b3;
-}
+    .popup-content .close-btn:hover {
+      color: #ff4d4d;
+    }
 
-a {
-  color: #007BFF;
-  text-decoration: underline;
-  cursor: pointer;
-}
+    .popup-footer {
+      background: linear-gradient(90deg, #03a9f4, #00bcd4);
+      padding: 10px;
+      border-radius: 0 0 15px 15px;
+      color: #fff;
+      font-size: 12px;
+    }
 
-a:hover {
-  color: #0056b3;
-}
+    /* Redirect Overlay */
+    .redirect-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 2000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
 
+    .redirect-overlay .animated-text {
+      font-size: 1.5rem;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0;
+      animation: typing 5s steps(40, end) forwards, blink 0.7s step-end infinite;
+    }
 
-</style>
-<style>
-  /* เพิ่มการตั้งค่าการแสดงรูปภาพ */
-  #announcement-image {
-    display: none; /* รูปภาพจะถูกซ่อนในตอนแรก */
-    width: 100%;
-    max-width: 500px;
-    margin: 10px auto;
-  }
-</style>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-  const announcements = [
-    {
-      title: "ประกาศข้อสอบกลางภาค ธรรมชาติบำบัด",
-      message: `ข้อสอบ จำนวน 48 ข้อ ใช้เวลาทำ 60 นาที. ทำข้อสอบให้แล้วเสร็จในช่วงเวลา 19.00-23.59น. เท่านั้น\n\n<a href="https://lms2.psu.ac.th/mod/quiz/view.php?id=473714">กดที่นี่เพื่อเข้าสู่ข้อสอบ</a>`,
-      imageUrl: "",
-    },
-  ];
+    @keyframes typing {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
 
-  announcements.forEach(announcement => showPopup(announcement.title, announcement.message, announcement.imageUrl));
-});
+    @keyframes blink {
+      0%, 100% {
+        border-color: transparent;
+      }
+      50% {
+        border-color: white;
+      }
+    }
 
-function showPopup(title, message, imageUrl) {
-  const popupContainer = document.createElement('div');
-  popupContainer.classList.add('popup');
+    .redirect-overlay .progress-bar {
+      position: relative;
+      width: 80%;
+      max-width: 300px;
+      height: 10px;
+      background: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 15px;
+    }
 
-  const popupContent = `
+    .redirect-overlay .progress-bar-inner {
+      height: 100%;
+      width: 0;
+      background: white;
+      animation: progress 5s linear forwards;
+    }
+
+    @keyframes progress {
+      from {
+        width: 0;
+      }
+      to {
+        width: 100%;
+      }
+    }
+  </style>
+
+  <!-- Popup Announcement -->
+  <div class="popup-overlay" id="popup-overlay">
     <div class="popup-content">
-      <span class="close-button" onclick="closePopup(this)">&times;</span>
-      <h2>${title}</h2>
-      ${imageUrl ? `<img src="${imageUrl}" alt="ประกาศ" class="popup-image" />` : ''}
-      <p id="announcement-message">${message}</p>
+      <div class="popup-header">ธรรมชาติบำบัด - ประกาศสำคัญ</div>
+      <span class="close-btn" id="close-popup">&times;</span>
+      <h1>ข้อสอบกลางภาค (20%)</h1>
+      <p>
+        ข้อสอบ จำนวน 48 ข้อ ใช้เวลาทำ 60 นาที<br>
+        ทำข้อสอบให้แล้วเสร็จในช่วงเวลา 19.00-23.59น. เท่านั้น<br><br>
+        Attempts allowed: 1<br>
+        The quiz will not be available until Thursday, 16 January 2025, 7:00 PM<br>
+        This quiz will close on Thursday, 16 January 2025, 11:59 PM<br>
+        Time limit: 1 hour
+      </p>
+      <p class="update-time">Updated: 16 January 2025</p>
+      <button class="btn" id="start-redirect">Start Quiz</button>
+      <div class="popup-footer">© ธรรมชาติบำบัด | PSU</div>
     </div>
-  `;
+  </div>
 
-  popupContainer.innerHTML = popupContent;
-  document.body.appendChild(popupContainer);
+  <!-- Redirect Animation -->
+  <div class="redirect-overlay" id="redirect-overlay">
+    <div class="animated-text">Redirecting to Quiz...</div>
+    <div class="progress-bar">
+      <div class="progress-bar-inner"></div>
+    </div>
+  </div>
 
-  popupContainer.style.display = 'flex';
-  popupContainer.addEventListener('click', function (event) {
-    if (event.target === popupContainer) {
-      closePopup(event.target.querySelector('.popup-content'));
-    }
-  });
-}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const popupOverlay = document.getElementById("popup-overlay");
+      const redirectOverlay = document.getElementById("redirect-overlay");
+      const closePopup = document.getElementById("close-popup");
+      const startRedirect = document.getElementById("start-redirect");
 
-function closePopup(element) {
-  element.parentElement.remove();
-}
+      // ตั้งค่าเวลาสำหรับแสดง Popup
+      const now = new Date();
+      const startDate = new Date("2025-01-16T00:00:00");
+      const endDate = new Date("2025-01-17T23:59:00");
 
-  function showPopup(message, imageUrl) {
-    const popup = document.getElementById('important-announcement-popup');
-    const popupMessage = document.getElementById('announcement-message');
-    const popupImage = document.getElementById('announcement-image');
-    const expandButton = document.getElementById('expand-text-button');
-  
-    // ตั้งค่าข้อความ
-    popupMessage.innerHTML = message;
-  
-    // ตรวจสอบความยาวข้อความ
-    if (popupMessage.scrollHeight > popupMessage.offsetHeight) {
-      expandButton.style.display = 'block'; // แสดงปุ่ม "แสดงเพิ่มเติม"
-    }
-  
-    // ตั้งค่ารูปภาพ
-    if (imageUrl) {
-      popupImage.src = imageUrl;
-      popupImage.style.display = 'block'; // แสดงรูปภาพ
-      popupImage.alt = 'Important Announcement'; // เพิ่ม alt
-      popupImage.loading = 'lazy'; // เพิ่ม loading สำหรับการโหลดแบบ lazy
-    }
-  
-    popup.style.display = 'flex'; // แสดง Popup
-  
-    // ปิดป๊อปอัพเมื่อคลิกนอกป๊อปอัพ
-    popup.addEventListener('click', function(event) {
-      if (event.target === popup) {
-        closePopup();
+      if (now >= startDate && now <= endDate) {
+        popupOverlay.style.display = "flex";
       }
+
+      // ปิด Popup
+      closePopup.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+      });
+
+      // เริ่ม Redirect เมื่อกดปุ่ม
+      startRedirect.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+        redirectOverlay.style.display = "flex";
+
+        // ตั้งเวลา Redirect
+        setTimeout(() => {
+          window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
+        }, 5000); // Redirect หลัง 5 วินาที
+      });
     });
-  }
-  
-  function expandText() {
-    const popupMessage = document.getElementById('announcement-message');
-    const expandButton = document.getElementById('expand-text-button');
-  
-    popupMessage.style.maxHeight = 'none'; // ยกเลิกข้อจำกัดความสูง
-    expandButton.style.display = 'none'; // ซ่อนปุ่ม "แสดงเพิ่มเติม"
-  }
-  
-  function closePopup() {
-    const popup = document.getElementById('important-announcement-popup');
-    popup.style.display = 'none'; // ปิด Popup
-  }
-  
-  function toggleNotificationList() {
-    const notificationList = document.getElementById('notification-list');
-    notificationList.style.display = notificationList.style.display === 'none' ? 'block' : 'none';
-  }
-
-  function showPopup(message, imageUrl) {
-  try {
-    const popup = document.getElementById('important-announcement-popup');
-    const popupMessage = document.getElementById('announcement-message');
-    const popupImage = document.getElementById('announcement-image');
-    const expandButton = document.getElementById('expand-text-button');
-
-    if (popup && popupMessage) {
-      popupMessage.innerHTML = message;
-
-      if (popupMessage.scrollHeight > popupMessage.offsetHeight) {
-        expandButton.style.display = 'block';
-      }
-
-      if (imageUrl && popupImage) {
-        popupImage.src = imageUrl;
-        popupImage.style.display = 'block';
-        popupImage.alt = 'Important Announcement';
-        popupImage.loading = 'lazy';
-      }
-
-      popup.style.display = 'flex';
-    }
-  } catch (error) {
-    console.error('เกิดข้อผิดพลาดในการแสดงป๊อปอัพ:', error);
-  }
-}
-
   </script>
+
+
   
   <main>
     <div id="notification-bell-container">
