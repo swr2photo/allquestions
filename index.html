@@ -274,12 +274,16 @@
         popupOverlay.style.display = "none";
         redirectOverlay.style.display = "flex";
 
-        // ตั้งเวลา Redirect
-        setTimeout(() => {
-          window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
-        }, 5000); // Redirect หลัง 5 วินาที
-      });
+// ตั้งเวลา Redirect
+setTimeout(() => {
+  location.reload(); // รีเซ็ตหน้าเว็บ
+  setTimeout(() => {
+    window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
+  }, 1000); // ใช้เวลานิดหน่อยก่อนการ Redirect เพื่อให้การรีเซ็ตทำงานได้
+}, 5000); // Redirect หลัง 5 วินาที
+     });
     });
+    
   </script>
   <style>
 /* ตั้งต้นสำหรับการตั้งค่าเบื้องต้น */
