@@ -276,10 +276,7 @@
 
 // ตั้งเวลา Redirect
 setTimeout(() => {
-  location.reload(); // รีเซ็ตหน้าเว็บ
-  setTimeout(() => {
-    window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
-  }, 1000); // ใช้เวลานิดหน่อยก่อนการ Redirect เพื่อให้การรีเซ็ตทำงานได้
+  window.location.href = "https://lms2.psu.ac.th/mod/quiz/view.php?id=473714"; // URL ของข้อสอบ
 }, 5000); // Redirect หลัง 5 วินาที
 
 // ป้องกันไม่ให้ผู้ใช้ย้อนกลับไปยังหน้าเดิมหลังจากการเปลี่ยนหน้า
@@ -289,6 +286,7 @@ window.addEventListener('load', () => {
     history.go(1); // เมื่อผู้ใช้กดปุ่มย้อนกลับ, ระบบจะไปยังหน้าใหม่ทันที
   };
 });
+
     });
     }); 
     
