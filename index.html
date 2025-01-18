@@ -236,44 +236,38 @@
  <script>
   document.addEventListener("DOMContentLoaded", () => {
     const popupOverlay = document.getElementById("popup-overlay");
-    const redirectOverlay = document.getElementById("redirect-overlay");
     const closePopup = document.getElementById("close-popup");
     const startRedirect = document.getElementById("start-redirect");
 
-    // ตั้งค่าเวลาสำหรับแสดง Popup (เวลาประเทศไทย UTC+7)
+    // ตั้งค่าเวลาตามเวลาประเทศไทย (UTC+7)
     const now = new Date();
     const bangkokOffset = 7 * 60 * 60 * 1000; // ชดเชย 7 ชั่วโมงเป็นมิลลิวินาที
     const bangkokTime = new Date(now.getTime() + bangkokOffset);
 
-    const startDate = new Date("2025-01-16T00:00:00+07:00");
-    const endDate = new Date("2025-01-16T12:59:00+07:00");
+    // กำหนดช่วงเวลาเปิด Popup
+    const startDate = new Date("2025-01-16T19:00:00+07:00");
+    const endDate = new Date("2025-01-16T23:59:59+07:00");
 
+    // แสดง Popup หากอยู่ในช่วงเวลา
     if (bangkokTime >= startDate && bangkokTime <= endDate) {
       popupOverlay.style.display = "flex";
+    } else {
+      popupOverlay.style.display = "none";
     }
 
-    // ปิด Popup
+    // ปิด Popup เมื่อกดปุ่ม
     closePopup.addEventListener("click", () => {
       popupOverlay.style.display = "none";
     });
 
-    // เริ่ม Redirect เมื่อกดปุ่ม
+    // เมื่อกดปุ่มเริ่ม Redirect
     startRedirect.addEventListener("click", () => {
       popupOverlay.style.display = "none";
-      redirectOverlay.style.display = "flex";
 
-      // ตั้งเวลา Redirect
+      // ตั้งเวลา Redirect ไปยังหน้าข้อสอบ
       setTimeout(() => {
         window.location.href = "https://doralaikon.online/allquestions/course/ธรรมชาติบำบัด/ข้อสอบกลางภาคธรรมชาติบำบัด"; // URL ของข้อสอบ
       }, 5000); // Redirect หลัง 5 วินาที
-
-      // ป้องกันไม่ให้ผู้ใช้ย้อนกลับไปยังหน้าเดิมหลังจากการเปลี่ยนหน้า
-      window.addEventListener('load', () => {
-        history.replaceState(null, null, location.href); // เปลี่ยนสถานะประวัติการเข้าชม
-        window.onpopstate = () => {
-          history.go(1); // เมื่อผู้ใช้กดปุ่มย้อนกลับ, ระบบจะไปยังหน้าใหม่ทันที
-        };
-      });
     });
   });
 </script>
