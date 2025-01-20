@@ -216,20 +216,18 @@
   <!-- Popup Announcement -->
   <div class="popup-overlay" id="popup-overlay">
     <div class="popup-content">
-      <div class="popup-header">ธรรมชาติบำบัด - ประกาศสำคัญ</div>
+      <div class="popup-header">พลเมืองที่ดี - ประกาศสำคัญ</div>
       <span class="close-btn" id="close-popup">&times;</span>
-      <h1>ข้อสอบกลางภาค (20%)</h1>
+      <h1>ข้อสอบย่อย หน่วยที่ 3 15 คะแนน (20-24 มกราคม 2568 )</h1>
       <p>
-        ข้อสอบ จำนวน 48 ข้อ ใช้เวลาทำ 60 นาที<br>
-        ทำข้อสอบให้แล้วเสร็จในช่วงเวลา 19.00-23.59น. เท่านั้น<br><br>
-        Attempts allowed: 1<br>
-        The quiz will not be available until Thursday, 16 January 2025, 7:00 PM<br>
-        This quiz will close on Thursday, 16 January 2025, 11:59 PM<br>
-        Time limit: 1 hour
+นักศึกษามีสิทธิเข้าระบบเพื่อทำข้อสอบได้ครั้งเดียว ครั้งที่สองจะไม่มีสิทธิทำข้อสอบ<br>
+         Attempts allowed: 1 <br>
+        This quiz opened at Monday, 20 January 2025, 1:00 AM<br>
+        This quiz will close on Friday, 24 January 2025, 11:40 PM.
       </p>
-      <p class="update-time">Updated: 16 January 2025</p>
+      <p class="update-time">Updated: 20 January 2025</p>
       <button class="btn" id="start-redirect">ดูคำตอบข้อสอบ</button>
-      <div class="popup-footer">© ธรรมชาติบำบัด | PSU</div>
+      <div class="popup-footer">© พลเมืองที่ดี | PSU</div>
     </div>
   </div>
 
@@ -245,8 +243,8 @@
     const bangkokTime = new Date(now.getTime() + bangkokOffset);
 
     // กำหนดช่วงเวลาเปิด Popup
-    const startDate = new Date("2025-01-16T19:00:00+07:00");
-    const endDate = new Date("2025-01-16T23:59:59+07:00");
+    const startDate = new Date("2025-01-20T19:00:00+07:00");
+    const endDate = new Date("2025-01-24T23:59:59+07:00");
 
     // แสดง Popup หากอยู่ในช่วงเวลา
     if (bangkokTime >= startDate && bangkokTime <= endDate) {
