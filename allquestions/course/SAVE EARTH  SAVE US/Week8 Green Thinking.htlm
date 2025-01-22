@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> แบบทดสอบหลังเรียน วิชา 820-100 รักษ์โลก รักษ์เรา Week8 : Green Thinking
+ </title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Search Box Styles */
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            width: 70%; /* ลดขนาดช่องค้นหา */
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.3);
+        }
+
+        .search-btn, .clear-btn {
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-btn {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+        }
+
+        .search-btn:hover {
+            background-color: #005bb5;
+        }
+
+        .clear-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            display: none; /* Hide clear button initially */
+        }
+
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: #f9fafb;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+        }
+
+        .question:hover {
+            transform: translateY(-5px);
+            background-color: #f0f8ff;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #4a90e2;
+            font-size: 1.2rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 0;
+        }
+
+        .answer-container {
+            font-size: 1rem;
+            color: #333;
+            padding: 8px 12px;
+            margin: 8px 0;
+            background-color: #f4f6f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-container:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Correct Answer Highlight */
+        .correct {
+            background-color: #d4f8d4; /* Light green for correct answers */
+            color: #2e7d32;
+            font-weight: bold;
+            border-color: #6bc46d;
+        }
+
+        /* Disable Copy */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            h3 {
+                font-size: 1.8rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 60%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                font-size: 1.5rem;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .search-btn i, .clear-btn i {
+                font-size: 1.2rem;
+            }
+
+            .search-btn-text, .clear-btn-text {
+                display: none;
+            }
+
+            /* Hide the clear button on mobile */
+            .clear-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 50%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 35px;
+                height: 35px;
+                padding: 0;
+                font-size: 1rem;
+            }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .search-btn-text, .clear-btn-text {
+                display: inline-block;
+                margin-left: 8px;
+                font-size: 1rem;
+            }
+
+            .search-btn, .clear-btn {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+
+            /* Adjust width of search box for desktop */
+            .search-box {
+                width: 50%; /* ลดขนาดช่องค้นหาในเดสก์ท็อป */
+            }
+
+            /* Hide the clear button on desktop */
+            .clear-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3> แบบทดสอบหลังเรียน วิชา 820-100 รักษ์โลก รักษ์เรา Week8 : Green Thinking
+ </h3>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search questions..." onkeyup="searchContent()">
+            <button class="search-btn" onclick="searchContent()">
+                <i class="fas fa-search"></i><span class="search-btn-text">Search</span>
+            </button>
+            <button class="clear-btn" onclick="clearSearch()">
+                <i class="fas fa-times"></i><span class="clear-btn-text">Clear</span>
+            </button>
+        </div>
+
+        <!-- Quiz Section -->
+        <div id="quizContainer">
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">1.</span>
+        <p class="question-text">ข้อใดต่อไปนี้ไม่ใช่วัตถุอันตราย</p>
+    </div>
+    <div class="answer-container">
+        ก. หนุ่มหึงโหดสารภาพสาดน้ำกรดใส่เมียตาย เล่าปมแค้นวางแผนตั้งแต่สงกรานต์
+    </div>
+    <div class="answer-container">
+        ข. Samsung Galaxy S7 edge ลุกไหม้ระหว่างชาร์จแบตเตอรี่ข้ามคืน
+    </div>
+    <div class="answer-container">
+        ค. นักดนตรีหนุ่มอกหัก เขียนจดหมายลาตาย บน FaceBook ก่อนซดยาฆ่าแมลง
+    </div>
+    <div class="answer-container">
+        ง. ถูกทุกข้อ
+    </div>
+    <div class="answer-container correct">
+        จ. ผิดทุกข้อ
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">2.</span>
+        <p class="question-text">ผลกระทบจากวัตถุอันตรายคือ</p>
+    </div>
+    <div class="answer-container">
+        ก. กัดกร่อน
+    </div>
+    <div class="answer-container">
+        ข. ติดไฟง่าย
+    </div>
+    <div class="answer-container">
+        ค. ระเบิด
+    </div>
+    <div class="answer-container">
+        ง. เป็นอันตราย
+    </div>
+    <div class="answer-container correct">
+        จ. ก-ข-ค-ง ถูก
+    </div>
+    <div class="answer-container">
+        ฉ. ก-ข-ค-ง ผิด
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">3.</span>
+        <p class="question-text">NIMBY คืออะไร</p>
+    </div>
+    <div class="answer-container">
+        ก. การมีส่วนร่วมของประชาชน
+    </div>
+    <div class="answer-container">
+        ข. Not in my backyard syndrome
+    </div>
+    <div class="answer-container">
+        ค. การต่อต้านจากประชาชน
+    </div>
+    <div class="answer-container correct">
+        ง. ข้อ ข และ ค ถูก
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">4.</span>
+        <p class="question-text">ข้อดี ของการมีส่วนร่วมคือ</p>
+    </div>
+    <div class="answer-container">
+        ก. มีผู้นำกลุ่มชี้นำความคิด
+    </div>
+    <div class="answer-container">
+        ข. ให้ประโยชน์กับกลุ่มคนบางกลุ่ม
+    </div>
+    <div class="answer-container correct">
+        ค. ลดปัญหาการเพิกเฉย การทอดทิ้งทางสังคม
+    </div>
+    <div class="answer-container">
+        ง. ลดความขัดแย้งทางความคิด
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">5.</span>
+        <p class="question-text">ข้อเสีย ของการมีส่วนร่วมของประชาชนข้อใดต่อไปนี้ไม่ถูกต้อง</p>
+    </div>
+    <div class="answer-container">
+        ก. มีค่าใช้จ่ายสูง
+    </div>
+    <div class="answer-container">
+        ข. ใช้เวลามาก
+    </div>
+    <div class="answer-container correct">
+        ค. ทำลายความน่าเชื่อถือขององค์กร
+    </div>
+    <div class="answer-container">
+        ง. ก่อให้เกิดการประท้วง
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">6.</span>
+        <p class="question-text">ประชาชนทั่วไปมีสิทธิ์ในการมีส่วนร่วมอะไรบ้าง</p>
+    </div>
+    <div class="answer-container">
+        ก. ร่วมได้รับข้อมูลข่าวสารจากหน่วยงาน
+    </div>
+    <div class="answer-container">
+        ข. ร่วมแสดงความคิดเห็น
+    </div>
+    <div class="answer-container">
+        ค. ร่วมพิจารณาประเด็นสิ่งแวดล้อม
+    </div>
+    <div class="answer-container">
+        ง. ร่วมรับผลประโยชน์
+    </div>
+    <div class="answer-container correct">
+        จ. ก+ข+ค ถูกต้อง
+    </div>
+    <div class="answer-container">
+        ฉ. ก+ข+ง ถูกต้อง
+    </div>
+    <div class="answer-container">
+        ช. ก+ข+ค+ง ถูกต้อง
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">7.</span>
+        <p class="question-text">ใครคือบุคคลชายขอบ</p>
+    </div>
+    <div class="answer-container">
+        ก. ผู้สูงอายุ ที่มีอายุเกิน 60 ปี ขึ้นไป
+    </div>
+    <div class="answer-container">
+        ข. เด็กที่มีอายุต่ำกว่า 15 ปี
+    </div>
+    <div class="answer-container">
+        ค. ผู้พิการ
+    </div>
+    <div class="answer-container">
+        ง. ชนกลุ่มน้อย
+    </div>
+    <div class="answer-container">
+        จ. ผู้ที่ไม่ได้รับการศึกษา
+    </div>
+    <div class="answer-container correct">
+        ฉ. ถูกทุกข้อ
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">8.</span>
+        <p class="question-text">นาย เท้ง ณัฐพงษ์ เรืองปัญญาวุฒิ   ตรงกับการมีส่วนร่วมทางการเมืองในข้อใด</p>
+    </div>
+    <div class="answer-container">
+        ก. ไม่มีกิจกรรมใดๆ ทางการเมือง (Apathetics)
+    </div>
+    <div class="answer-container">
+        ข. ผู้ชม (Spectator Activities)
+    </div>
+    <div class="answer-container">
+        ค. ช่วงเปลี่ยนแปลง (Transitional Activities)
+    </div>
+    <div class="answer-container correct">
+        ง. ระดับนักสู้ (Gladiatorial Activities)
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">9.</span>
+        <p class="question-text">การประชาพิจารณ์ คือ</p>
+    </div>
+    <div class="answer-container">
+        ก. Polling
+    </div>
+    <div class="answer-container correct">
+        ข. Public Hearing
+    </div>
+    <div class="answer-container">
+        ค. Referendum
+    </div>
+    <div class="answer-container">
+        ง. การประชามติ
+    </div>
+    <div class="answer-container">
+        จ. ถูกทุกข้อ
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <span class="question-number">10.</span>
+        <p class="question-text">ผลของการมีส่วนร่วมของประชาชนจะออกมาในรูปแบบใดได้บ้าง</p>
+    </div>
+    <div class="answer-container">
+        ก. ยิ่งประชาชนมีส่วนร่วมมาก มีโอกาสประสบความสำเร็จ
+    </div>
+    <div class="answer-container">
+        ข. ยิ่งประชาชนมีส่วนร่วมมาก ก็อาจจะไม่ประสบความสำเร็จ
+    </div>
+    <div class="answer-container">
+        ค. ยิ่งประชาชนมีส่วนร่วมมาก การตัดสินใจจะยิ่งมีประสิทธิภาพ
+    </div>
+    <div class="answer-container">
+        ง. ยิ่งประชาชนมีส่วนร่วมจำนวนมาก การตัดสินใจอาจไม่มีมีประสิทธิภาพ
+    </div>
+    <div class="answer-container">
+        จ. ก+ค ถูกต้อง
+    </div>
+    <div class="answer-container">
+        ฉ. ข+ง ถูกต้อง
+    </div>
+    <div class="answer-container correct">
+        ช. ก+ข+ค+ง ถูกต้อง
+    </div>
+</div>
+
+</div>
+
+<style>
+
+/* Match Container */
+.match-container {
+    display: flex;
+    justify-content: space-between; /* จัดเรียงสองฝั่ง */
+    gap: 20px;
+    margin-top: 10px;
+}
+
+/* Match Column */
+.match-column {
+    flex: 1; /* ให้ขนาดคอลัมน์เท่ากัน */
+    display: flex;
+    flex-direction: column; /* ปรับให้เป็นแนวตั้งในจอเล็ก */
+    gap: 15px;
+}
+
+/* Match Item */
+.match-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Hover Effect */
+.match-item:hover {
+    background-color: #e8f4ff;
+    transform: scale(1.02);
+}
+
+/* Correct Answer */
+.match-item.correct {
+    background-color: #d4f8d4; /* สีเขียวอ่อน */
+    color: #2e7d32; /* สีเขียวเข้ม */
+    border-color: #6bc46d; /* เส้นขอบสีเขียว */
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    .match-container {
+        flex-direction: column; /* เปลี่ยนเป็นแนวตั้งในจอเล็ก */
+    }
+
+    .match-column {
+        flex: none; /* ให้คอลัมน์กลับมาเป็นขนาดอัตโนมัติ */
+    }
+
+    .match-item {
+        padding: 10px; /* ลดขนาด padding สำหรับจอเล็ก */
+    }
+}
+
+.match-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.match-item.correct {
+    background-color: #d4f8d4;
+    color: #2e7d32;
+    border-color: #6bc46d;
+}
+
+</style>
+
+
+
+       
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            No results found!
+        </div>
+   
+
+    <script>
+        function searchContent() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const questions = document.querySelectorAll('.question');
+            let hasResults = false;
+
+            questions.forEach(question => {
+                const text = question.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    question.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    question.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
+
+            const clearBtn = document.querySelector('.clear-btn');
+            if (input.length > 0) {
+                clearBtn.style.display = 'inline-block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchContent();
+        }
+    </script>
+</body>
+</html>
