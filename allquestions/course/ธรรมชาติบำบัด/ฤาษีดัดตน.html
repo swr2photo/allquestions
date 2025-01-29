@@ -249,6 +249,19 @@
                 display: none;
             }
         }
+        /* เพิ่มการตั้งค่าภาพในคำถาม */
+.question-image {
+    width: 100%; /* ขยายให้ภาพเต็มความกว้างของบล็อก */
+    height: auto; /* ปรับขนาดความสูงตามอัตราส่วนของภาพ */
+    border-radius: 15px; /* มุมโค้งมน */
+    margin-bottom: 15px; /* เพิ่มช่องว่างด้านล่างของภาพ */
+}
+
+/* ปรับให้มุมโค้งมนมากขึ้นหากต้องการ */
+.question-image {
+    border-radius: 25px; /* หรือค่าอื่นๆ ตามที่ต้องการ */
+}
+
     </style>
 </head>
 <body>
@@ -360,7 +373,10 @@
 <div class="question-header">
 <span class="question-number">8.</span>
 <p class="question-text">จากภาพวาด ตรงกับฤาษีดัดตนในท่าใด</p>
+      
 </div>
+    <!-- เพิ่มภาพในคำถาม -->
+    <img src="ฤาษีดัดตน01.jpg" alt="Image description" class="question-image">
 <div class="answer-container correct">ท่าแก้เกียจ</div>
 <div class="answer-container">ท่าแก้ลมในแขน</div>
 <div class="answer-container">ท่าแก้ลมในข้อมือและในลำไส้</div>
