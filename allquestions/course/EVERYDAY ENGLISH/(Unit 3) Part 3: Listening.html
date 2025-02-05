@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Singapore Transportation</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #555;
+            --accent-color: #74ebd5;
+            --light-bg: #f9f9f9;
+            --hover-bg: #eef7ff;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--accent-color), #acb6e5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--primary-color);
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .table-container {
+            overflow-x: auto; /* ให้ตารางเลื่อนได้ในแนวนอน */
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px; /* ป้องกันตารางเล็กเกินไป */
+            border-collapse: collapse;
+            border-radius: 12px;
+            white-space: nowrap; /* ป้องกันข้อความขึ้นบรรทัดใหม่ */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+            background-color: #fff;
+        }
+
+        th {
+            background-color: #4285f4;
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .answer {
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fdecea;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .list-container {
+            margin-top: 20px;
+        }
+
+        .question {
+            background: var(--light-bg);
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 5px solid var(--accent-color);
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .question:hover {
+            background: var(--hover-bg);
+            border-left-color: #58c7f5;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Singapore Transportation</h1>
+        <p class="subtitle">From Changi Airport to the city</p>
+
+        <section class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>MRT</th>
+                        <th>Airport Shuttle Bus</th>
+                        <th>Taxi</th>
+                        <th>Public Buses</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Where can you find it?</strong></td>
+                        <td>Terminal 2 and 3</td>
+                        <td>Arrival hall</td>
+                        <td>In front of the arrival hall</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>How long does it take to the city?</strong></td>
+                        <td>30 minutes</td>
+                        <td>N/A</td>
+                        <td>20 minutes</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <td><strong>How much does it cost?</strong></td>
+                        <td><span class="answer">2 SGD</span></td>
+                        <td><span class="answer">7 SGD</span></td>
+                        <td><span class="answer">15-25 SGD</span></td>
+                        <td><span class="answer">2 SGD</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="list-container">
+            <h2>B. Transportation in Singapore</h2>
+            <div class="question">1. According to the audio, there are <span class="answer">3</span> options tourists can choose for traveling in Singapore.</div>
+            <div class="question">2. <span class="answer">MRT train</span> is available between 5.30 A.M. and 0.30 A.M.</div>
+            <div class="question">3. You can buy <span class="answer">MRT train</span> tickets at the ticket machines.</div>
+            <div class="question">4. Traveling by <span class="answer">bus</span>, you have to prepare the exact amount of the fare because there is no change.</div>
+            <div class="question">5. However, taking <span class="answer">taxi</span> is the most expensive way, but it is comfortable.</div>
+        </section>
+    </div>
+</body>
+</html>
