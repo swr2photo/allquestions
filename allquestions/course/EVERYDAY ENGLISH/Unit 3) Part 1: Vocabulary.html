@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 750px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 5px solid #74ebd5;
+            border-radius: 8px;
+            text-align: left;
+            transition: 0.3s;
+        }
+
+        .question:hover {
+            background: #eef7ff;
+            border-left-color: #58c7f5;
+        }
+
+        .answer {
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fdecea;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .no-results {
+            display: none;
+            color: red;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            .subtitle {
+                font-size: 14px;
+            }
+            .question {
+                font-size: 14px;
+                padding: 12px;
+            }
+            .search-box {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Vocabulary (15 marks)</h1>
+        <p class="subtitle">Complete each sentence with the most appropriate word.</p>
+
+        <input type="text" class="search-box" id="search" placeholder="Search for a question...">
+        
+        <p class="no-results" id="no-results">No results found.</p>
+
+        <div class="question">1. The farmer set up a <span class="answer">stall</span> at the market to sell his fresh produce.</div>
+        <div class="question">2. Sarah showed a genuine <span class="answer">interest</span> in art, spending hours painting and sketching.</div>
+        <div class="question">3. The city's urban <span class="answer">development</span> has led to the construction of modern skyscrapers.</div>
+        <div class="question">4. The chef prepared a delicious <span class="answer">specialty</span> dish that was a hit among the restaurant's patrons.</div>
+        <div class="question">5. During their trip, the tourists were eager to <span class="answer">witness</span> the famous tourist places and experience the local culture.</div>
+        <div class="question">6. The friendly residents always greeted each other with a <span class="answer">neighborly</span> wave and a smile.</div>
+        <div class="question">7. The restaurant owner was quick to <span class="answer">recommend</span> a delicious dish to the first-time visitors.</div>
+        <div class="question">8. Paris is a popular <span class="answer">destination</span> for travelers due to its iconic landmarks and rich history.</div>
+        <div class="question">9. The flight <span class="answer">departure</span> was delayed by two hours due to bad weather conditions.</div>
+        <div class="question">10. The adventurous couple decided to <span class="answer">explore</span> the hidden gems of the tropical island on their own.</div>
+        <div class="question">11. There is an <span class="answer">entrance fee</span> to access the national park and enjoy its natural beauty.</div>
+        <div class="question">12. A good way to gain insights into a culture is by having conversations with <span class="answer">local</span> people.</div>
+        <div class="question">13. The Eiffel Tower is one of the most famous <span class="answer">landmarks</span> in the world.</div>
+        <div class="question">14. It is advisable to <span class="answer">reserve</span> a hotel room in advance during peak tourist seasons.</div>
+        <div class="question">15. The city's efficient public <span class="answer">transportation</span> system made it convenient for tourists to get around.</div>
+    </div>
+
+    <script>
+        document.getElementById('search').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            let questions = document.querySelectorAll('.question');
+            let found = false;
+
+            questions.forEach(q => {
+                let text = q.textContent.toLowerCase();
+                let words = filter.split(" ");
+
+                let match = words.some(word => text.includes(word));
+
+                if (match) {
+                    q.style.display = "block";
+                    found = true;
+                } else {
+                    q.style.display = "none";
+                }
+            });
+
+            document.getElementById('no-results').style.display = found ? "none" : "block";
+        });
+
+        document.addEventListener('selectstart', event => event.preventDefault());
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('dragstart', event => event.preventDefault());
+        document.addEventListener('touchstart', event => {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'j' || event.key === 'p')) {
+                event.preventDefault();
+            }
+        });
+    </script>
+
+</body>
+</html>
