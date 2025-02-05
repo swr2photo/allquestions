@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 750px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+
+        .question {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 5px solid #74ebd5;
+            border-radius: 8px;
+            text-align: left;
+            transition: 0.3s;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .question:hover {
+            background: #eef7ff;
+            border-left-color: #58c7f5;
+        }
+
+        .answer {
+            font-weight: bold;
+            color: #e74c3c;
+            background: #fdecea;
+            padding: 3px 6px;
+            border-radius: 4px;
+        }
+
+        .no-results {
+            display: none;
+            color: red;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* New styles for the second set of questions */
+        .section-title {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        .question-container {
+            margin-top: 20px;
+            width: 100%;
+            padding: 15px;
+        }
+
+        .question-container .question {
+            background: #e8f0fe;
+            border-left: 5px solid #4285f4;
+            font-size: 18px;
+        }
+
+        .question-container .question span {
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            .subtitle {
+                font-size: 14px;
+            }
+            .question {
+                font-size: 14px;
+                padding: 12px;
+            }
+            .search-box {
+                font-size: 14px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Grammar (15 marks)</h1>
+        <p class="subtitle">Choose the best answer for each question.</p>
+
+        <input type="text" class="search-box" id="search" placeholder="Search for a question...">
+        
+        <p class="no-results" id="no-results">No results found.</p>
+
+        <section>
+            <div class="section-title">Grammar Questions</div>
+            <div class="question">1. Waitress: What would you like to drink, sir? Customer: _____ an orange juice, please. <br> <span class="answer">I'll have</span></div>
+            <div class="question">2. What _____ when you finish university? <br> <span class="answer">are you going to do</span></div>
+            <div class="question">3. What _____ this weekend? <br> <span class="answer">are you doing</span></div>
+            <div class="question">4. When I get my pay rise, _____ a bigger flat. <br> <span class="answer">I'm going to get</span></div>
+            <div class="question">5. Oh, it's getting late. I ________ a taxi instead of waiting for a bus. <br> <span class="answer">I'll call</span></div>
+            <div class="question">6. Passive voice of "The travel agent books the flights for the customers"? <br> <span class="answer">The flights are booked for the customers by the travel agent.</span></div>
+            <div class="question">7. Passive voice of "They built a new hotel near the airport"? <br> <span class="answer">A new hotel was built near the airport by them.</span></div>
+            <div class="question">8. Passive voice of "The airline company announced the new routes"? <br> <span class="answer">The new routes were announced by the airline company.</span></div>
+            <div class="question">9. Passive voice of "The chef prepares the meals in the kitchen"? <br> <span class="answer">The meals are prepared in the kitchen by the chef.</span></div>
+            <div class="question">10. Passive voice of "The company launched a new travel package last month"? <br> <span class="answer">A new travel package was launched by the company last month.</span></div>
+        </section>
+
+        <section>
+            <div class="section-title">Comparative Statements</div>
+            <div class="question"><span>1.</span> Traveling by taxi is more relaxing than traveling by bus.</div>
+            <div class="question"><span>2.</span> Trying street food can be cheaper than dining at upscale restaurants.</div>
+            <div class="question"><span>3.</span> Staying in a hostel is usually more budget-friendly than booking a luxury resort.</div>
+            <div class="question"><span>4.</span> Traveling by the bullet train is the fastest way to get to your destination.</div>
+            <div class="question"><span>5.</span> The new road design is much safer than the old one.</div>
+        </section>
+    </div>
+
+    <script>
+        document.getElementById('search').addEventListener('keyup', function() {
+            let filter = this.value.toLowerCase();
+            let questions = document.querySelectorAll('.question');
+            let found = false;
+
+            questions.forEach(q => {
+                let text = q.textContent.toLowerCase();
+                let words = filter.split(" ");
+
+                let match = words.some(word => text.includes(word));
+
+                if (match) {
+                    q.style.display = "block";
+                    found = true;
+                } else {
+                    q.style.display = "none";
+                }
+            });
+
+            document.getElementById('no-results').style.display = found ? "none" : "block";
+        });
+
+        document.addEventListener('selectstart', event => event.preventDefault());
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.addEventListener('dragstart', event => event.preventDefault());
+        document.addEventListener('touchstart', event => {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && (event.key === 'c' || event.key === 'u' || event.key === 's' || event.key === 'j' || event.key === 'p')) {
+                event.preventDefault();
+            }
+        });
+    </script>
+
+</body>
+</html>
