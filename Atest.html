@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>แบบทดสอบ</title>
     <style>
-        /* ตั้งค่าพื้นฐาน */
         body {
             font-family: Arial, sans-serif;
             text-align: center;
@@ -13,8 +12,6 @@
             padding: 0;
             background-color: #f4f4f4;
         }
-
-        /* ส่วนของแบบทดสอบ */
         #quiz {
             max-width: 500px;
             margin: 20px auto;
@@ -23,7 +20,6 @@
             border-radius: 10px;
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
-
         button {
             display: block;
             width: 100%;
@@ -37,37 +33,19 @@
             color: white;
             transition: 0.3s;
         }
-
         button:hover {
             background: #0056b3;
         }
-
-        /* ปรับขนาดของ canvas */
         #resultCanvas {
             width: 100%;
             max-width: 500px;
             height: auto;
             display: none;
         }
-
-        /* ปรับขนาดของปุ่มแชร์ */
         #shareBtn {
             width: 80%;
             max-width: 300px;
             margin-top: 20px;
-        }
-
-        /* ทำให้เว็บ responsive */
-        @media (max-width: 600px) {
-            #quiz {
-                width: 90%;
-                padding: 15px;
-            }
-
-            button {
-                font-size: 16px;
-                padding: 12px;
-            }
         }
     </style>
 </head>
@@ -84,17 +62,13 @@
     <script>
         function submitAnswer(answer) {
             let scoreText = (answer === 4) ? "คุณตอบถูก! 🎉" : "ผิดแล้ว! ❌";
-            
             let canvas = document.getElementById("resultCanvas");
             let ctx = canvas.getContext("2d");
-            
             ctx.fillStyle = "#fff";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
             ctx.fillStyle = "#000";
             ctx.font = "80px Arial";
             ctx.fillText(scoreText, 100, 400);
-            
             document.getElementById("resultCanvas").style.display = "block";
             document.getElementById("shareBtn").style.display = "block";
         }
@@ -102,21 +76,21 @@
         function shareToInstagram() {
             let canvas = document.getElementById("resultCanvas");
             canvas.toBlob(blob => {
-                let file = new File([blob], "result.png", { type: "image/png" });
-                let reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onloadend = function () {
-                    let base64data = reader.result.split(',')[1];
-                    let url = "instagram://story?source_application=your_app_package_name";
-                    let intentUrl = `intent://story_camera?image=${base64data}#Intent;package=com.instagram.android;scheme=instagram;end;`;
-                    
-                    let userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                    if (/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-                        window.location.href = url;
-                    } else {
-                        window.location.href = intentUrl;
-                    }
+                let filesArray = [new File([blob], "result.png", { type: "image/png" })];
+                let dataTransfer = new DataTransfer();
+                filesArray.forEach(file => dataTransfer.items.add(file));
+                
+                let shareData = {
+                    files: filesArray,
+                    title: "แชร์ผลลัพธ์",
+                    text: "ลองทำแบบทดสอบนี้ดูสิ!"
                 };
+                
+                if (navigator.canShare && navigator.canShare(shareData)) {
+                    navigator.share(shareData).catch(error => console.log("Error sharing:", error));
+                } else {
+                    alert("อุปกรณ์ของคุณไม่รองรับการแชร์ไปยัง Instagram โดยตรง");
+                }
             }, 'image/png');
         }
     </script>
