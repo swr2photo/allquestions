@@ -26,7 +26,7 @@
             height: 20px;
             background-color: red;
             transform: rotate(-45deg);
-            animation: float 3s infinite ease-in-out;
+            animation: float 5s infinite ease-in-out;
         }
         .heart:before,
         .heart:after {
@@ -90,9 +90,37 @@
             display: none;
         }
 
+        #voteSection {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #ff4d6d;
+            color: white;
+            border-radius: 10px;
+            display: none;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            color: #ddd;
+            font-size: 40px;
+            cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .star-rating input:checked ~ label,
+        .star-rating input:hover ~ label {
+            color: #ffcc00;
         }
     </style>
 </head>
@@ -110,15 +138,32 @@
     <img id="resultImage" alt="ผลลัพธ์">
     <a id="shareDownloadBtn" download="result.png">📥 ดาวน์โหลดและแชร์</a>
 
+    <!-- โหวตเว็บ -->
+    <div id="voteSection">
+        <h3>ถ้าคุณชอบแบบทดสอบนี้, ให้คะแนนเราด้วย!</h3>
+        <div class="star-rating">
+            <input type="radio" id="star5" name="rating" value="5">
+            <label for="star5">★</label>
+            <input type="radio" id="star4" name="rating" value="4">
+            <label for="star4">★</label>
+            <input type="radio" id="star3" name="rating" value="3">
+            <label for="star3">★</label>
+            <input type="radio" id="star2" name="rating" value="2">
+            <label for="star2">★</label>
+            <input type="radio" id="star1" name="rating" value="1">
+            <label for="star1">★</label>
+        </div>
+    </div>
+
     <script>
         function createHearts() {
             for (let i = 0; i < 10; i++) {
                 let heart = document.createElement("div");
                 heart.classList.add("heart");
                 heart.style.left = Math.random() * 100 + "vw";
-                heart.style.animationDuration = Math.random() * 2 + 2 + "s";
+                heart.style.animationDuration = Math.random() * 3 + 4 + "s";
                 document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 3000);
+                setTimeout(() => heart.remove(), 5000);
             }
         }
         setInterval(createHearts, 1000);
@@ -178,16 +223,14 @@
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "#d6335b";
             ctx.font = "60px Arial";
-            ctx.fillText(resultText, 100, 400);
+            ctx.fillText(resultText, 100, 500);
 
-            let imgElement = document.getElementById("resultImage");
-            let imageData = canvas.toDataURL("image/png");
-            imgElement.src = imageData;
-            imgElement.style.display = "block";
+            let resultImage = document.getElementById("resultImage");
+            resultImage.src = canvas.toDataURL();
+            resultImage.style.display = "block";
 
-            let shareDownloadBtn = document.getElementById("shareDownloadBtn");
-            shareDownloadBtn.href = imageData;
-            shareDownloadBtn.style.display = "block";
+            document.getElementById("shareDownloadBtn").style.display = "block";
+            document.getElementById("voteSection").style.display = "block";
         }
 
         loadQuestion();
