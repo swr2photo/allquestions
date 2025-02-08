@@ -49,7 +49,7 @@
             border-radius: 12px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
-        #shareBtn {
+        #downloadBtn, #shareBtn {
             width: 80%;
             max-width: 300px;
             margin-top: 20px;
@@ -65,7 +65,8 @@
         <button onclick="submitAnswer(5)">5</button>
     </div>
     <img id="resultImage" alt="ผลลัพธ์">
-    <button id="shareBtn" onclick="shareToInstagram()">แชร์ลง IG Story</button>
+    <a id="downloadBtn" download="result.png">ดาวน์โหลดภาพ</a>
+    <button id="shareBtn" onclick="alert('เปิด Instagram และอัปโหลดภาพด้วยตัวเอง')">แชร์ลง IG Story</button>
 
     <script>
         function submitAnswer(answer) {
@@ -80,19 +81,19 @@
             ctx.font = "80px Arial";
             ctx.fillText(scoreText, 100, 400);
             let imgElement = document.getElementById("resultImage");
-            imgElement.src = canvas.toDataURL("image/png");
+            let imageData = canvas.toDataURL("image/png");
+            imgElement.src = imageData;
             imgElement.style.display = "block";
+            
+            let downloadBtn = document.getElementById("downloadBtn");
+            downloadBtn.href = imageData;
+            downloadBtn.style.display = "block";
+            
             document.getElementById("shareBtn").style.display = "block";
-        }
-
-        function shareToInstagram() {
-            let imgElement = document.getElementById("resultImage");
-            let imageData = imgElement.src;
-            let instagramURL = `https://www.instagram.com/stories/create/?background=${encodeURIComponent(imageData)}`;
-            window.location.href = instagramURL;
         }
     </script>
 </body>
 </html>
+
 
 
