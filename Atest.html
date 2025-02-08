@@ -35,7 +35,7 @@
             position: relative;
             opacity: 0;
             animation: fadeInQuiz 1s forwards;
-            animation-delay: 0.5s;
+            animation-delay: 0.5s; /* เพิ่มความล่าช้าในการแสดงผล */
         }
 
         @keyframes fadeInQuiz {
@@ -48,7 +48,7 @@
             color: #ff4d6d;
             margin-bottom: 20px;
             animation: fadeInText 1s ease-out forwards;
-            animation-delay: 0.7s;
+            animation-delay: 0.7s; /* ความล่าช้าในการแสดงข้อความ */
         }
 
         @keyframes fadeInText {
@@ -139,7 +139,6 @@
             background-color: #d6335b;
         }
 
-        /* กราฟ */
         .graph-container {
             width: 100%;
             height: 200px;
@@ -154,41 +153,6 @@
             border-radius: 10px;
         }
 
-        /* แสดงหน้าดาวน์โหลด */
-        #loadingScreen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            animation: fadeIn 2s ease-out;
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        #loadingScreen .spinner {
-            border: 8px solid rgba(255, 255, 255, 0.3);
-            border-top: 8px solid #ff4d6d;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* ปรับหน้าจอให้รองรับทุกอุปกรณ์ */
         @media screen and (max-width: 600px) {
             #quiz {
                 width: 90%;
@@ -201,40 +165,10 @@
                 width: 95%;
             }
         }
-
-        /* ปุ่มแชร์ */
-        #shareBtn {
-            background-color: #ffffff;
-            color: #ff4d6d;
-            padding: 15px 40px;
-            border: 2px solid #ff4d6d;
-            border-radius: 50px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-            margin-top: 20px;
-            text-decoration: none;
-        }
-
-        #shareBtn:hover {
-            background-color: #ff4d6d;
-            color: white;
-        }
-
-        #shareBtn:active {
-            transform: scale(0.98);
-        }
     </style>
 </head>
 <body>
 
-    <!-- หน้าจอดาวน์โหลด -->
-    <div id="loadingScreen">
-        <div class="spinner"></div>
-    </div>
-
-    <!-- หน้าแบบทดสอบ -->
     <div id="quiz">
         <h1>ทดสอบความรักของคุณ</h1>
         <p id="question">กำลังโหลดคำถาม...</p>
@@ -244,14 +178,13 @@
         <button onclick="submitAnswer(3)" id="btn4" style="display: none;"></button>
     </div>
 
-    <!-- หน้าแสดงผลลัพธ์ -->
     <div id="resultPopup">
         <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
         <p id="resultText"></p>
         <div class="graph-container">
             <canvas id="resultGraph" width="400" height="200"></canvas>
         </div>
-        <button id="shareBtn" onclick="shareResult()"><i class="fas fa-share-alt"></i> แชร์ผลลัพธ์</button>
+        <a id="shareDownloadBtn" href="#" download="result.png"><i class="fas fa-download"></i> ดาวน์โหลดและแชร์</a>
         <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
     </div>
 
@@ -264,15 +197,6 @@
 
         let currentQuestion = 0;
         let answers = [];
-
-        // ฟังก์ชันแสดงหน้าจอโหลด
-        function showLoadingScreen() {
-            document.getElementById("loadingScreen").style.display = "flex";
-            setTimeout(function() {
-                document.getElementById("loadingScreen").style.display = "none";
-                showQuestion();
-            }, 3000);  // โหลดหน้าทดสอบหลังจาก 3 วินาที
-        }
 
         // ฟังก์ชันเริ่มต้นแสดงหน้าแบบทดสอบ
         function showQuestion() {
@@ -296,12 +220,14 @@
 
         // ฟังก์ชันแสดงผลลัพธ์
         function showResult() {
-            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น";
+            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
             let resultDetails = "สไตล์ความรักของคุณเน้นการแสดงออกและการให้ความสนใจในความรู้สึกของคู่รัก";
 
+            // ใส่ข้อมูลการสนับสนุน
             document.getElementById("resultText").innerHTML = resultText + "<br>" + resultDetails;
             drawGraph();
 
+            // แสดงป๊อปอัพผลลัพธ์
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
@@ -311,8 +237,9 @@
             const canvas = document.getElementById("resultGraph");
             const ctx = canvas.getContext("2d");
 
+            // ตัวอย่างการวาดกราฟ
             ctx.fillStyle = "#ff4d6d";
-            ctx.fillRect(50, 150, 50, -80);
+            ctx.fillRect(50, 150, 50, -80); // ตัวอย่างกราฟแท่ง
             ctx.fillRect(150, 150, 50, -60);
             ctx.fillRect(250, 150, 50, -40);
             ctx.fillRect(350, 150, 50, -100);
@@ -327,26 +254,19 @@
             showQuestion();
         }
 
-        // ฟังก์ชันการแชร์ผลลัพธ์
-        function shareResult() {
-            const resultText = document.getElementById("resultText").innerText;
-            const shareData = {
-                title: 'ทดสอบความรักของคุณ',
-                text: resultText,
-                url: window.location.href
-            };
+        // ฟังก์ชันแชร์ผลลัพธ์
+        document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
+            event.preventDefault();
+            const canvas = document.getElementById("resultGraph");
+            const imgURL = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.href = imgURL;
+            link.download = "result.png";
+            link.click();
+        });
 
-            if (navigator.share) {
-                navigator.share(shareData)
-                    .then(() => console.log('ผลลัพธ์ถูกแชร์'))
-                    .catch((error) => console.log('เกิดข้อผิดพลาดในการแชร์', error));
-            } else {
-                alert('ไม่สามารถแชร์ในเบราว์เซอร์นี้ได้');
-            }
-        }
-
-        // เริ่มการโหลดหน้าแรก
-        showLoadingScreen();
+        // เริ่มต้นการทดสอบ
+        showQuestion();
     </script>
 
 </body>
