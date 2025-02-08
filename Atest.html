@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบ</title>
+    <style>
+        /* ตั้งค่าพื้นฐาน */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* ส่วนของแบบทดสอบ */
+        #quiz {
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: #007bff;
+            color: white;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        /* ปรับขนาดของ canvas */
+        #resultCanvas {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            display: none;
+        }
+
+        /* ปรับขนาดของปุ่มแชร์ */
+        #shareBtn {
+            width: 80%;
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
+        /* ทำให้เว็บ responsive */
+        @media (max-width: 600px) {
+            #quiz {
+                width: 90%;
+                padding: 15px;
+            }
+
+            button {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>แบบทดสอบ</h1>
+    <div id="quiz">
+        <p>ข้อ 1: 2 + 2 เท่ากับ?</p>
+        <button onclick="submitAnswer(4)">4</button>
+        <button onclick="submitAnswer(5)">5</button>
+    </div>
+    <canvas id="resultCanvas" width="1080" height="1920"></canvas>
+    <button id="shareBtn" style="display:none;" onclick="shareToInstagram()">แชร์ลง IG Story</button>
+
+    <script>
+        function submitAnswer(answer) {
+            let scoreText = (answer === 4) ? "คุณตอบถูก! 🎉" : "ผิดแล้ว! ❌";
+            
+            let canvas = document.getElementById("resultCanvas");
+            let ctx = canvas.getContext("2d");
+            
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = "#000";
+            ctx.font = "80px Arial";
+            ctx.fillText(scoreText, 100, 400);
+            
+            document.getElementById("resultCanvas").style.display = "block";
+            document.getElementById("shareBtn").style.display = "block";
+        }
+
+        function shareToInstagram() {
+            let canvas = document.getElementById("resultCanvas");
+            canvas.toBlob(blob => {
+                let file = new File([blob], "result.png", { type: "image/png" });
+                let data = new FormData();
+                data.append("file", file);
+
+                let userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                let url = "";
+
+                if (/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                    url = "instagram://story-camera";
+                } else {
+                    url = "intent://story_camera#Intent;package=com.instagram.android;scheme=instagram;end;";
+                }
+
+                // เปิดแอป Instagram
+                window.location.href = url;
+                
+                // ถ้าไม่สามารถเปิดแอป ให้ใช้ fallback ไปยังเว็บ Instagram
+                setTimeout(() => {
+                    window.location.href = "https://www.instagram.com";
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
