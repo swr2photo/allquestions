@@ -103,26 +103,21 @@
             let canvas = document.getElementById("resultCanvas");
             canvas.toBlob(blob => {
                 let file = new File([blob], "result.png", { type: "image/png" });
-                let data = new FormData();
-                data.append("file", file);
-
-                let userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                let url = "";
-
-                if (/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
-                    url = "instagram://story-camera";
-                } else {
-                    url = "intent://story_camera#Intent;package=com.instagram.android;scheme=instagram;end;";
-                }
-
-                // เปิดแอป Instagram
-                window.location.href = url;
-                
-                // ถ้าไม่สามารถเปิดแอป ให้ใช้ fallback ไปยังเว็บ Instagram
-                setTimeout(() => {
-                    window.location.href = "https://www.instagram.com";
-                }, 2000);
-            });
+                let reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function () {
+                    let base64data = reader.result.split(',')[1];
+                    let url = "instagram://story?source_application=your_app_package_name";
+                    let intentUrl = `intent://story_camera?image=${base64data}#Intent;package=com.instagram.android;scheme=instagram;end;`;
+                    
+                    let userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                    if (/iPad|iPhone|iPod/.test(userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) {
+                        window.location.href = url;
+                    } else {
+                        window.location.href = intentUrl;
+                    }
+                };
+            }, 'image/png');
         }
     </script>
 </body>
