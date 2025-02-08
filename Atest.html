@@ -115,7 +115,7 @@
 
         .graph-container {
             width: 100%;
-            height: 200px;
+            height: 250px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -125,6 +125,17 @@
         canvas {
             max-width: 100%;
             border-radius: 10px;
+        }
+
+        .link-text {
+            font-size: 14px;
+            color: #ff4d6d;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .link-text:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -145,9 +156,7 @@
         <div class="graph-container">
             <canvas id="resultGraph" width="400" height="400"></canvas>
         </div>
-        <a id="shareDownloadBtn" href="#" download="result.png">
-            <button>ดาวน์โหลดและแชร์</button>
-        </a>
+        <button id="shareDownloadBtn">แชร์ผลลัพธ์</button>
         <button class="retry-btn" onclick="restartQuiz()">ทำควิซอีกครั้ง</button>
     </div>
 
@@ -160,7 +169,6 @@
         let currentQuestion = 0;
         let answers = [];
 
-        // ฟังก์ชันเริ่มต้นแสดงหน้าแบบทดสอบ
         function showQuestion() {
             document.getElementById("question").innerHTML = questions[currentQuestion].q;
             for (let i = 0; i < 4; i++) {
@@ -169,7 +177,6 @@
             }
         }
 
-        // ฟังก์ชันตอบคำถาม
         function submitAnswer(answer) {
             answers.push(answer);
             currentQuestion++;
@@ -180,7 +187,6 @@
             }
         }
 
-        // ฟังก์ชันแสดงผลลัพธ์
         function showResult() {
             let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น";
             let resultDetails = "สไตล์ความรักของคุณเน้นการแสดงออกและการให้ความสนใจในความรู้สึกของคู่รัก";
@@ -188,12 +194,10 @@
             document.getElementById("resultText").innerHTML = resultText + "<br>" + resultDetails;
             drawCanvas();
 
-            // แสดงป๊อปอัพผลลัพธ์
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
 
-        // ฟังก์ชันวาดแผนภูมิและข้อความลงบนแคนวาส
         function drawCanvas() {
             const canvas = document.getElementById("resultGraph");
             const ctx = canvas.getContext("2d");
@@ -206,26 +210,33 @@
             ctx.fillRect(350, 300, 50, -100);
 
             // วาดข้อความ
-            ctx.fillStyle = "#333";
+            ctx.fillStyle = "#fff";
             ctx.font = "18px Arial";
             ctx.fillText("สไตล์ความรัก: ใส่ใจและอบอุ่น", 50, 350);
             ctx.fillText("คำนิยาม: แสดงออกและดูแลคู่รัก", 50, 380);
+
+            // เพิ่มลิงก์เว็บไซต์ลงในแคนวาส
+            ctx.font = "14px Arial";
+            ctx.fillStyle = "#ff4d6d";
+            ctx.fillText("เยี่ยมชมเว็บไซต์ของเรา: www.yourwebsite.com", 50, 420); // เพิ่มลิงก์ของเว็บไซต์ที่นี่
         }
 
-        // ฟังก์ชันวาดฟังก์ชันแชร์ผลลัพธ์
         document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
             event.preventDefault();
-
             const canvas = document.getElementById("resultGraph");
             const imgURL = canvas.toDataURL("image/png");
 
-            const link = document.createElement('a');
-            link.href = imgURL;
-            link.download = "result.png";
-            link.click();
+            if (navigator.share) {
+                navigator.share({
+                    title: 'ผลลัพธ์ทดสอบความรัก',
+                    text: 'ผลลัพธ์ของการทดสอบความรักของคุณ!',
+                    url: imgURL
+                }).catch(console.error);
+            } else {
+                alert("การแชร์ไม่รองรับในเบราว์เซอร์นี้");
+            }
         });
 
-        // ฟังก์ชันรีเซ็ตควิซ
         function restartQuiz() {
             currentQuestion = 0;
             answers = [];
@@ -234,7 +245,6 @@
             showQuestion();
         }
 
-        // เริ่มต้นการทดสอบ
         showQuestion();
     </script>
 
