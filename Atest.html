@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทดสอบความรักของคุณ</title>
 
+    <!-- Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -31,7 +34,7 @@
             position: relative;
             opacity: 0;
             animation: fadeInQuiz 1s forwards;
-            animation-delay: 0.5s;
+            animation-delay: 0.5s; /* เพิ่มความล่าช้าในการแสดงผล */
         }
 
         @keyframes fadeInQuiz {
@@ -43,6 +46,13 @@
             font-size: 32px;
             color: #ff4d6d;
             margin-bottom: 20px;
+            animation: fadeInText 1s ease-out forwards;
+            animation-delay: 0.7s; /* ความล่าช้าในการแสดงข้อความ */
+        }
+
+        @keyframes fadeInText {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         button {
@@ -57,12 +67,20 @@
             background: #ff4d6d;
             color: white;
             transition: 0.3s;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeInButton 1s ease-out forwards;
+        }
+
+        @keyframes fadeInButton {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         button:hover {
             background: #d6335b;
         }
 
+        /* Popup Style */
         #resultPopup {
             display: none;
             position: fixed;
@@ -78,6 +96,12 @@
             max-width: 600px;
             text-align: center;
             background: linear-gradient(135deg, #ff5e62, #ff9966);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
 
         #resultPopup h2 {
@@ -107,6 +131,7 @@
             border-radius: 8px;
             color: white;
             cursor: pointer;
+            transition: 0.3s;
         }
 
         .retry-btn:hover {
@@ -115,7 +140,7 @@
 
         .graph-container {
             width: 100%;
-            height: 250px;
+            height: 200px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -127,15 +152,17 @@
             border-radius: 10px;
         }
 
-        .link-text {
-            font-size: 14px;
-            color: #ff4d6d;
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .link-text:hover {
-            text-decoration: underline;
+        @media screen and (max-width: 600px) {
+            #quiz {
+                width: 90%;
+                padding: 10px;
+            }
+            button {
+                font-size: 16px;
+            }
+            #resultPopup {
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -154,10 +181,10 @@
         <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
         <p id="resultText"></p>
         <div class="graph-container">
-            <canvas id="resultGraph" width="400" height="400"></canvas>
+            <canvas id="resultGraph" width="400" height="200"></canvas>
         </div>
-        <button id="shareDownloadBtn">แชร์ผลลัพธ์</button>
-        <button class="retry-btn" onclick="restartQuiz()">ทำควิซอีกครั้ง</button>
+        <button id="shareDownloadBtn"><i class="fas fa-share-alt"></i> แชร์ผลลัพธ์</button>
+        <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
     </div>
 
     <script>
@@ -188,54 +215,26 @@
         }
 
         function showResult() {
-            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น";
+            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น"; 
             let resultDetails = "สไตล์ความรักของคุณเน้นการแสดงออกและการให้ความสนใจในความรู้สึกของคู่รัก";
 
             document.getElementById("resultText").innerHTML = resultText + "<br>" + resultDetails;
-            drawCanvas();
+            drawGraph();
 
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
 
-        function drawCanvas() {
+        function drawGraph() {
             const canvas = document.getElementById("resultGraph");
             const ctx = canvas.getContext("2d");
 
-            // วาดแผนภูมิ
             ctx.fillStyle = "#ff4d6d";
-            ctx.fillRect(50, 300, 50, -80);
-            ctx.fillRect(150, 300, 50, -60);
-            ctx.fillRect(250, 300, 50, -40);
-            ctx.fillRect(350, 300, 50, -100);
-
-            // วาดข้อความ
-            ctx.fillStyle = "#fff";
-            ctx.font = "18px Arial";
-            ctx.fillText("สไตล์ความรัก: ใส่ใจและอบอุ่น", 50, 350);
-            ctx.fillText("คำนิยาม: แสดงออกและดูแลคู่รัก", 50, 380);
-
-            // เพิ่มลิงก์เว็บไซต์ลงในแคนวาส
-            ctx.font = "14px Arial";
-            ctx.fillStyle = "#ff4d6d";
-            ctx.fillText("เยี่ยมชมเว็บไซต์ของเรา: www.yourwebsite.com", 50, 420); // เพิ่มลิงก์ของเว็บไซต์ที่นี่
+            ctx.fillRect(50, 150, 50, -80);
+            ctx.fillRect(150, 150, 50, -60);
+            ctx.fillRect(250, 150, 50, -40);
+            ctx.fillRect(350, 150, 50, -100);
         }
-
-        document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
-            event.preventDefault();
-            const canvas = document.getElementById("resultGraph");
-            const imgURL = canvas.toDataURL("image/png");
-
-            if (navigator.share) {
-                navigator.share({
-                    title: 'ผลลัพธ์ทดสอบความรัก',
-                    text: 'ผลลัพธ์ของการทดสอบความรักของคุณ!',
-                    url: imgURL
-                }).catch(console.error);
-            } else {
-                alert("การแชร์ไม่รองรับในเบราว์เซอร์นี้");
-            }
-        });
 
         function restartQuiz() {
             currentQuestion = 0;
@@ -243,6 +242,35 @@
             document.getElementById("resultPopup").style.display = "none";
             document.getElementById("quiz").style.display = "block";
             showQuestion();
+        }
+
+        document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
+            event.preventDefault();
+            const canvas = document.getElementById("resultGraph");
+            const imgURL = canvas.toDataURL("image/png");
+
+            const blob = dataURItoBlob(imgURL);
+            const url = URL.createObjectURL(blob);
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'ผลลัพธ์ทดสอบความรัก',
+                    text: 'ผลลัพธ์ของการทดสอบความรักของคุณ!',
+                    url: url // ใช้ URL แทน Base64
+                }).catch(console.error);
+            } else {
+                alert("การแชร์ไม่รองรับในเบราว์เซอร์นี้");
+            }
+        });
+
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const arrayBuffer = new ArrayBuffer(byteString.length);
+            const view = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < byteString.length; i++) {
+                view[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([view], {type: 'image/png'});
         }
 
         showQuestion();
