@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทดสอบความรักของคุณ</title>
-
-    <!-- Font Awesome CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- เพิ่ม Chart.js CDN -->
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -22,33 +20,6 @@
             height: 100vh;
             overflow: hidden;
             position: relative;
-        }
-
-        /* การแสดงหัวใจที่ลอย */
-        .heart {
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            background-color: red;
-            transform: rotate(-45deg);
-            animation: float 7s infinite ease-in-out;
-        }
-        .heart:before,
-        .heart:after {
-            content: "";
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            background-color: red;
-            border-radius: 50%;
-        }
-        .heart:before { top: -12px; left: 0; }
-        .heart:after { left: 12px; top: 0; }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(-45deg); opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0; }
         }
 
         #quiz {
@@ -76,6 +47,7 @@
             transition: 0.3s;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
+
         button:hover {
             background: #d6335b;
         }
@@ -148,7 +120,6 @@
             color: white;
         }
 
-        /* ปรับปุ่มทำควิซใหม่ */
         .retry-btn {
             background-color: #ff7f7f;
             margin-top: 10px;
@@ -164,33 +135,16 @@
             background-color: #d6335b;
         }
 
-        /* กราฟ */
+        /* กราฟวงกลม */
         .graph-container {
             width: 100%;
-            height: 200px;
+            height: 300px;
             margin-top: 20px;
         }
 
-        .graph {
+        #myPieChart {
             width: 100%;
             height: 100%;
-            background: #ffb3b3;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            border-radius: 8px;
-        }
-
-        .graph-bar {
-            width: 20%;
-            background-color: #ff4d6d;
-            height: 0;
-            animation: growBar 1s forwards;
-        }
-
-        @keyframes growBar {
-            0% { height: 0; }
-            100% { height: 100%; }
         }
     </style>
 </head>
@@ -213,14 +167,9 @@
         <a id="shareDownloadBtn" href="#" download="result.png"><i class="fas fa-download"></i> ดาวน์โหลดและแชร์</a>
         <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
 
-        <!-- กราฟ -->
+        <!-- กราฟวงกลม -->
         <div class="graph-container">
-            <div class="graph">
-                <div class="graph-bar" style="height: 80%;"></div>
-                <div class="graph-bar" style="height: 60%;"></div>
-                <div class="graph-bar" style="height: 50%;"></div>
-                <div class="graph-bar" style="height: 90%;"></div>
-            </div>
+            <canvas id="myPieChart"></canvas> <!-- เปลี่ยนจาก div เป็น canvas -->
         </div>
 
     </div>
@@ -240,7 +189,6 @@
         let currentQuestion = 0;
         let answers = [];
 
-        // ฟังก์ชันแสดงคำถามและคำตอบ
         function showQuestion() {
             document.getElementById("question").innerHTML = questions[currentQuestion].q;
             for (let i = 0; i < 4; i++) {
@@ -249,7 +197,6 @@
             }
         }
 
-        // ฟังก์ชันสำหรับบันทึกคำตอบ
         function submitAnswer(answer) {
             answers.push(answer);
             currentQuestion++;
@@ -260,17 +207,35 @@
             }
         }
 
-        // ฟังก์ชันแสดงผลลัพธ์
+        // ปรับแสดงผลลัพธ์และกราฟวงกลม
         function showResult() {
             let result = "คุณมีความรักที่ใส่ใจและอบอุ่น";
             document.getElementById("resultText").innerHTML = result;
-            document.getElementById("resultImage").src = "https://www.example.com/image.jpg"; // เปลี่ยน URL เป็นรูปที่คุณต้องการ
+            document.getElementById("resultImage").src = "https://www.example.com/image.jpg"; 
+
+            // สร้างกราฟวงกลม
+            var ctx = document.getElementById('myPieChart').getContext('2d');
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['การสื่อสารที่ดี', 'ความเชื่อมั่น', 'ความซื่อสัตย์', 'การสนับสนุน'],
+                    datasets: [{
+                        label: 'ผลลัพธ์ความรัก',
+                        data: [30, 40, 20, 10],
+                        backgroundColor: ['#ff4d6d', '#ff9966', '#ffcc00', '#66cc66'],
+                        borderColor: ['#fff', '#fff', '#fff', '#fff'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true
+                }
+            });
 
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
 
-        // ฟังก์ชันสำหรับเริ่มทำควิซใหม่
         function restartQuiz() {
             currentQuestion = 0;
             answers = [];
@@ -279,7 +244,7 @@
             showQuestion();
         }
 
-        showQuestion(); // เริ่มการแสดงคำถามแรก
+        showQuestion();
     </script>
 
 </body>
