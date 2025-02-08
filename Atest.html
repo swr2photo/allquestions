@@ -59,7 +59,7 @@
             background: #d6335b;
         }
 
-        .popup {
+        #resultPopup {
             display: none;
             position: fixed;
             top: 0;
@@ -104,22 +104,6 @@
             margin-top: 20px;
         }
 
-        #shareLinkBtn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #ffffff;
-            color: #ff4d6d;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        #shareLinkBtn:hover {
-            background-color: #ff4d6d;
-            color: white;
-        }
-
         #retryBtn {
             padding: 12px 20px;
             margin-top: 20px;
@@ -161,11 +145,34 @@
         .star:hover {
             color: orange;
         }
+
+        #startQuizBtn {
+            font-size: 20px;
+            padding: 15px 30px;
+            background-color: #ff4d6d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        #startQuizBtn:hover {
+            background-color: #d6335b;
+        }
     </style>
 </head>
 <body>
 
-    <div id="quiz">
+    <!-- หน้าเริ่มต้น -->
+    <div id="startPage">
+        <h1>ทดสอบความรักของคุณ</h1>
+        <p>คลิกที่ปุ่มเพื่อเริ่มทำแบบทดสอบ</p>
+        <button id="startQuizBtn" onclick="startQuiz()">เริ่มทำแบบทดสอบ</button>
+    </div>
+
+    <!-- หน้าแบบทดสอบ -->
+    <div id="quiz" style="display:none;">
         <h1>ทดสอบความรักของคุณ</h1>
         <p id="question">กำลังโหลดคำถาม...</p>
         <button onclick="submitAnswer(0)" id="btn1"></button>
@@ -180,21 +187,8 @@
             <h2>ผลลัพธ์ของคุณ:</h2>
             <p id="resultText">คุณมีความรักแบบใส่ใจและอบอุ่น</p>
             <canvas id="resultGraph"></canvas>
-            <button id="shareLinkBtn" onclick="copyResult()">คัดลอกผลลัพธ์ไปยังคลิบบอร์ด</button>
             <button id="retryBtn" onclick="restartQuiz()">ทำควิซอีกครั้ง</button>
         </div>
-    </div>
-
-    <div id="ratingStars" style="display:none;">
-        <h2>กรุณาให้คะแนนผลลัพธ์ของคุณ</h2>
-        <div class="stars">
-            <i class="fa fa-star star" onclick="rateQuiz(1)"></i>
-            <i class="fa fa-star star" onclick="rateQuiz(2)"></i>
-            <i class="fa fa-star star" onclick="rateQuiz(3)"></i>
-            <i class="fa fa-star star" onclick="rateQuiz(4)"></i>
-            <i class="fa fa-star star" onclick="rateQuiz(5)"></i>
-        </div>
-        <button onclick="submitRating()">ยืนยันการให้คะแนน</button>
     </div>
 
     <script>
@@ -206,7 +200,12 @@
 
         let currentQuestion = 0;
         let answers = [];
-        let rating = 0;
+
+        function startQuiz() {
+            document.getElementById("startPage").style.display = "none";
+            document.getElementById("quiz").style.display = "block";
+            showQuestion();
+        }
 
         function showQuestion() {
             document.getElementById("question").innerHTML = questions[currentQuestion].q;
@@ -269,52 +268,12 @@
             });
         }
 
-        function copyResult() {
-            const resultText = document.getElementById("resultText").innerText;
-            const canvas = document.getElementById("resultGraph");
-            canvas.toBlob(function(blob) {
-                const reader = new FileReader();
-                reader.onloadend = function() {
-                    const dataURL = reader.result;
-                    const result = `${resultText}\n\nกราฟ: ${dataURL}`;
-                    navigator.clipboard.writeText(result).then(() => {
-                        alert("ผลลัพธ์ได้ถูกคัดลอกไปยังคลิบบอร์ดแล้ว!");
-                    }).catch(err => {
-                        console.error("ไม่สามารถคัดลอกผลลัพธ์: ", err);
-                    });
-                };
-                reader.readAsDataURL(blob);
-            });
-        }
-
         function restartQuiz() {
             currentQuestion = 0;
             answers = [];
             document.getElementById("resultPopup").style.display = "none";
-            document.getElementById("quiz").style.display = "block";
-            showQuestion();
+            document.getElementById("startPage").style.display = "block";
         }
-
-        // เพิ่มฟังก์ชันการให้คะแนน
-        function rateQuiz(ratingVal) {
-            rating = ratingVal;
-            const stars = document.querySelectorAll('.star');
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.add('active');
-                } else {
-                    star.classList.remove('active');
-                }
-            });
-        }
-
-        function submitRating() {
-            alert(`ขอบคุณที่ให้คะแนน: ${rating} ดาว`);
-            document.getElementById("ratingStars").style.display = "none";
-            restartQuiz(); // ให้ผู้ใช้ทำแบบทดสอบใหม่
-        }
-
-        showQuestion();
     </script>
 </body>
 </html>
