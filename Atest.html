@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทดสอบความรักของคุณ</title>
+
+    <!-- Font Awesome CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- เพิ่ม Chart.js CDN -->
+
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -20,6 +22,33 @@
             height: 100vh;
             overflow: hidden;
             position: relative;
+        }
+
+        /* การแสดงหัวใจที่ลอย */
+        .heart {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: red;
+            transform: rotate(-45deg);
+            animation: float 7s infinite ease-in-out;
+        }
+        .heart:before,
+        .heart:after {
+            content: "";
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        .heart:before { top: -12px; left: 0; }
+        .heart:after { left: 12px; top: 0; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(-45deg); opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0; }
         }
 
         #quiz {
@@ -47,7 +76,6 @@
             transition: 0.3s;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
-
         button:hover {
             background: #d6335b;
         }
@@ -135,16 +163,31 @@
             background-color: #d6335b;
         }
 
-        /* กราฟวงกลม */
         .graph-container {
             width: 100%;
-            height: 300px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-top: 20px;
         }
 
-        #myPieChart {
-            width: 100%;
-            height: 100%;
+        canvas {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        @media screen and (max-width: 600px) {
+            #quiz {
+                width: 90%;
+                padding: 10px;
+            }
+            button {
+                font-size: 16px;
+            }
+            #resultPopup {
+                width: 95%;
+            }
         }
     </style>
 </head>
@@ -159,31 +202,19 @@
         <button onclick="submitAnswer(3)" id="btn4" style="display: none;"></button>
     </div>
 
-    <!-- ผลลัพธ์ใน Popup -->
     <div id="resultPopup">
         <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
         <p id="resultText"></p>
-        <img id="resultImage" alt="ผลลัพธ์">
+        <canvas id="resultGraph" width="400" height="200"></canvas>
         <a id="shareDownloadBtn" href="#" download="result.png"><i class="fas fa-download"></i> ดาวน์โหลดและแชร์</a>
         <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
-
-        <!-- กราฟวงกลม -->
-        <div class="graph-container">
-            <canvas id="myPieChart"></canvas> <!-- เปลี่ยนจาก div เป็น canvas -->
-        </div>
-
     </div>
 
     <script>
         const questions = [
             { q: "เมื่อคุณมีความรู้สึกดีๆ กับใครสักคน คุณจะทำอย่างไร?", a: ["แสดงออกทันทีและบอกความรู้สึก", "เก็บความรู้สึกเอาไว้จนกว่าจะมั่นใจ", "แสดงออกในบางครั้ง เมื่อรู้สึกปลอดภัย", "รอให้คนที่ชอบบอกความรู้สึกก่อน"] },
             { q: "ถ้าคู่รักของคุณทำให้คุณผิดหวัง คุณจะ...?", a: ["พูดคุยกันและหาทางแก้ไข", "เก็บความรู้สึกและพยายามลืมมัน", "พยายามทำให้เขารู้สึกผิด", "มองปัญหาด้วยมุมมองที่เข้าใจ"] },
-            { q: "คุณคิดว่าความสัมพันธ์ที่ดีควรมีองค์ประกอบอะไรบ้าง?", a: ["ความสนุกสนานและการผจญภัย", "ความเชื่อมั่นและการสนับสนุน", "การเติบโตและการพัฒนาร่วมกัน", "ความเหมือนกันในความสนใจและค่านิยม"] },
-            { q: "ในความสัมพันธ์ของคุณ คุณรู้สึกว่าคุณให้ความสำคัญกับสิ่งใดมากที่สุด?", a: ["การได้รับการยอมรับจากคู่ของคุณ", "การดูแลคู่ของคุณให้มีความสุข", "การให้พื้นที่ส่วนตัว", "การมีอิสระในความสัมพันธ์"] },
-            { q: "คุณคิดว่าองค์ประกอบใดในความรักที่ทำให้มันยั่งยืน?", a: ["การสื่อสารที่ดี", "การสนับสนุนซึ่งกันและกัน", "การมีเป้าหมายร่วมกัน", "ความซื่อสัตย์และการไว้วางใจ"] },
-            { q: "คุณรู้สึกอย่างไรเมื่อความรักของคุณไม่สมหวัง?", a: ["รู้สึกโกรธและผิดหวัง", "รู้สึกเศร้าและท้อแท้", "พยายามเรียนรู้จากมัน", "ไม่รู้สึกอะไรมากนัก"] },
-            { q: "เมื่อคุณเจอความขัดแย้งในความสัมพันธ์ คุณจะทำอย่างไร?", a: ["หลีกเลี่ยงการเผชิญหน้าจนกว่าจะสงบ", "พูดคุยเพื่อหาทางออก", "ยอมรับข้อผิดพลาดและขอโทษ", "ทำเหมือนไม่มีอะไรเกิดขึ้น"] },
-            { q: "คุณให้ความสำคัญกับการมีพื้นที่ส่วนตัวในความสัมพันธ์มากแค่ไหน?", a: ["เป็นเรื่องสำคัญที่สุด", "สำคัญแต่ก็ยังให้ความสำคัญกับคู่รัก", "ไม่ค่อยสำคัญเท่าไหร่", "ไม่คิดว่ามันเป็นสิ่งจำเป็น"] },
+            // เพิ่มคำถามตามต้องการ
         ];
 
         let currentQuestion = 0;
@@ -207,33 +238,25 @@
             }
         }
 
-        // ปรับแสดงผลลัพธ์และกราฟวงกลม
         function showResult() {
-            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น";
+            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
             document.getElementById("resultText").innerHTML = result;
-            document.getElementById("resultImage").src = "https://www.example.com/image.jpg"; 
-
-            // สร้างกราฟวงกลม
-            var ctx = document.getElementById('myPieChart').getContext('2d');
-            var myPieChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['การสื่อสารที่ดี', 'ความเชื่อมั่น', 'ความซื่อสัตย์', 'การสนับสนุน'],
-                    datasets: [{
-                        label: 'ผลลัพธ์ความรัก',
-                        data: [30, 40, 20, 10],
-                        backgroundColor: ['#ff4d6d', '#ff9966', '#ffcc00', '#66cc66'],
-                        borderColor: ['#fff', '#fff', '#fff', '#fff'],
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
+            drawGraph();
 
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
+        }
+
+        function drawGraph() {
+            const canvas = document.getElementById("resultGraph");
+            const ctx = canvas.getContext("2d");
+            
+            // กราฟตัวอย่าง
+            ctx.fillStyle = "#ff4d6d";
+            ctx.fillRect(50, 150, 50, -80); // ตัวอย่างกราฟแท่ง
+            ctx.fillRect(150, 150, 50, -60);
+            ctx.fillRect(250, 150, 50, -40);
+            ctx.fillRect(350, 150, 50, -100);
         }
 
         function restartQuiz() {
@@ -249,3 +272,4 @@
 
 </body>
 </html>
+
