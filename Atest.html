@@ -41,7 +41,7 @@
         .heart:after { left: 10px; top: 0; }
 
         @keyframes float {
-            0% { transform: translateY(0) rotate(-45deg); opacity: 1; }
+            0% { transform: translateY(100vh) rotate(-45deg); opacity: 1; }
             50% { opacity: 0.6; }
             100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0; }
         }
@@ -74,10 +74,30 @@
             background: #d6335b;
         }
 
+        #resultPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        #resultPopup h2 {
+            font-size: 24px;
+            color: #d6335b;
+        }
+
         #resultImage {
             width: 100%;
             max-width: 400px;
-            display: none;
             margin-top: 20px;
             border-radius: 12px;
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
@@ -90,37 +110,24 @@
             display: none;
         }
 
-        #voteSection {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #ff4d6d;
-            color: white;
-            border-radius: 10px;
-            display: none;
-        }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .star-rating {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .star-rating input {
-            display: none;
-        }
-        .star-rating label {
-            color: #ddd;
-            font-size: 40px;
+        .close-btn {
+            background-color: #d6335b;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: color 0.2s ease-in-out;
+            margin-top: 10px;
+            font-size: 18px;
         }
-        .star-rating input:checked ~ label,
-        .star-rating input:hover ~ label {
-            color: #ffcc00;
+
+        .close-btn:hover {
+            background-color: #ff4d6d;
         }
     </style>
 </head>
@@ -135,33 +142,23 @@
         <button onclick="submitAnswer(3)" id="btn4" style="display: none;"></button>
     </div>
 
-    <img id="resultImage" alt="ผลลัพธ์">
-    <a id="shareDownloadBtn" download="result.png">📥 ดาวน์โหลดและแชร์</a>
-
-    <!-- โหวตเว็บ -->
-    <div id="voteSection">
-        <h3>ถ้าคุณชอบแบบทดสอบนี้, ให้คะแนนเราด้วย!</h3>
-        <div class="star-rating">
-            <input type="radio" id="star5" name="rating" value="5">
-            <label for="star5">★</label>
-            <input type="radio" id="star4" name="rating" value="4">
-            <label for="star4">★</label>
-            <input type="radio" id="star3" name="rating" value="3">
-            <label for="star3">★</label>
-            <input type="radio" id="star2" name="rating" value="2">
-            <label for="star2">★</label>
-            <input type="radio" id="star1" name="rating" value="1">
-            <label for="star1">★</label>
-        </div>
+    <!-- ผลลัพธ์ใน Popup -->
+    <div id="resultPopup">
+        <h2>❤️ สไตล์ความรักของคุณคือ:</h2>
+        <p id="resultText"></p>
+        <img id="resultImage" alt="ผลลัพธ์">
+        <a id="shareDownloadBtn" download="result.png">📥 ดาวน์โหลดและแชร์</a>
+        <button class="close-btn" onclick="closeResult()">ปิด</button>
     </div>
 
     <script>
         function createHearts() {
-            for (let i = 0; i < 10; i++) {
+            // สร้างหัวใจให้ลอยขึ้นจากล่างสุด
+            if (Math.random() < 0.1) {
                 let heart = document.createElement("div");
                 heart.classList.add("heart");
                 heart.style.left = Math.random() * 100 + "vw";
-                heart.style.animationDuration = Math.random() * 3 + 4 + "s";
+                heart.style.animationDuration = Math.random() * 3 + 4 + "s"; // สุ่มเวลาการเคลื่อนไหว
                 document.body.appendChild(heart);
                 setTimeout(() => heart.remove(), 5000);
             }
@@ -229,8 +226,13 @@
             resultImage.src = canvas.toDataURL();
             resultImage.style.display = "block";
 
+            document.getElementById("resultText").innerText = resultText;
+            document.getElementById("resultPopup").style.display = "block";
             document.getElementById("shareDownloadBtn").style.display = "block";
-            document.getElementById("voteSection").style.display = "block";
+        }
+
+        function closeResult() {
+            document.getElementById("resultPopup").style.display = "none";
         }
 
         loadQuestion();
