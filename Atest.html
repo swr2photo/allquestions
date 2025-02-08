@@ -24,33 +24,7 @@
             position: relative;
         }
 
-        /* การแสดงหัวใจที่ลอย */
-        .heart {
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            background-color: red;
-            transform: rotate(-45deg);
-            animation: float 7s infinite ease-in-out;
-        }
-        .heart:before,
-        .heart:after {
-            content: "";
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            background-color: red;
-            border-radius: 50%;
-        }
-        .heart:before { top: -12px; left: 0; }
-        .heart:after { left: 12px; top: 0; }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(-45deg); opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0; }
-        }
-
+        /* ปุ่มและสไตล์ต่างๆ */
         #quiz {
             max-width: 400px;
             width: 90%;
@@ -205,7 +179,9 @@
     <div id="resultPopup">
         <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
         <p id="resultText"></p>
-        <canvas id="resultGraph" width="400" height="200"></canvas>
+        <div class="graph-container">
+            <canvas id="resultGraph" width="400" height="200"></canvas>
+        </div>
         <a id="shareDownloadBtn" href="#" download="result.png"><i class="fas fa-download"></i> ดาวน์โหลดและแชร์</a>
         <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
     </div>
@@ -239,10 +215,14 @@
         }
 
         function showResult() {
-            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
-            document.getElementById("resultText").innerHTML = result;
+            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
+            let resultDetails = "สไตล์ความรักของคุณเน้นการแสดงออกและการให้ความสนใจในความรู้สึกของคู่รัก";
+
+            // ใส่ข้อมูลการสนับสนุน
+            document.getElementById("resultText").innerHTML = resultText + "<br>" + resultDetails;
             drawGraph();
 
+            // แสดงป๊อปอัพผลลัพธ์
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
@@ -251,7 +231,7 @@
             const canvas = document.getElementById("resultGraph");
             const ctx = canvas.getContext("2d");
             
-            // กราฟตัวอย่าง
+            // ตัวอย่างการวาดกราฟ
             ctx.fillStyle = "#ff4d6d";
             ctx.fillRect(50, 150, 50, -80); // ตัวอย่างกราฟแท่ง
             ctx.fillRect(150, 150, 50, -60);
@@ -267,9 +247,20 @@
             showQuestion();
         }
 
+        // ฟังก์ชันแชร์ผลลัพธ์
+        document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
+            event.preventDefault();
+            const canvas = document.getElementById("resultGraph");
+            const imgURL = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.href = imgURL;
+            link.download = "result.png";
+            link.click();
+        });
+
+        // เริ่มต้นการทดสอบ
         showQuestion();
     </script>
 
 </body>
 </html>
-
