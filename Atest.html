@@ -69,7 +69,7 @@
 
     <script>
         function submitAnswer(answer) {
-            let scoreText = (answer === 4) ? "คุณตอบถูก! 🎉" : "ผิดแล้ว! ❌";
+            let scoreText = (answer === 4) ? "คุณตอบถูก! 🎉\nจากเว็บ doralaikon" : "ผิดแล้ว! ❌\nจากเว็บ doralaikon";
             let canvas = document.createElement("canvas");
             canvas.width = 1080;
             canvas.height = 1920;
@@ -87,23 +87,12 @@
 
         function shareToInstagram() {
             let imgElement = document.getElementById("resultImage");
-            fetch(imgElement.src)
-                .then(res => res.blob())
-                .then(blob => {
-                    let filesArray = [new File([blob], "result.png", { type: "image/png" })];
-                    let shareData = {
-                        files: filesArray,
-                        title: "แชร์ผลลัพธ์",
-                        text: "ลองทำแบบทดสอบนี้ดูสิ!"
-                    };
-                    if (navigator.canShare && navigator.canShare(shareData)) {
-                        navigator.share(shareData).catch(error => console.log("Error sharing:", error));
-                    } else {
-                        alert("อุปกรณ์ของคุณไม่รองรับการแชร์ไปยัง Instagram โดยตรง");
-                    }
-                });
+            let imageData = imgElement.src;
+            let instagramURL = `https://www.instagram.com/stories/create/?background=${encodeURIComponent(imageData)}`;
+            window.location.href = instagramURL;
         }
     </script>
 </body>
 </html>
+
 
