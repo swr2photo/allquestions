@@ -9,19 +9,21 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
             text-align: center;
-            margin: 0;
-            padding: 0;
-            background-color: #ffe6e6;
+            background-color: #f4f4f9;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
+            align-items: center;
+            min-height: 100vh;
         }
 
         #quiz {
@@ -30,13 +32,17 @@
             padding: 20px;
             background: white;
             border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             position: relative;
             animation: fadeIn 1s;
         }
 
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         button {
-            display: block;
             width: 100%;
             padding: 15px;
             margin: 10px 0;
@@ -47,31 +53,36 @@
             background: #ff4d6d;
             color: white;
             transition: 0.3s;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
+
         button:hover {
             background: #d6335b;
         }
 
-        #resultPopup {
+        .popup {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-            z-index: 10;
-            text-align: center;
-            animation: slideIn 0.5s ease-out;
-            background: linear-gradient(135deg, #ff5e62, #ff9966);
+            background-color: rgba(0, 0, 0, 0.6);
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .popup-content {
+            background: linear-gradient(135deg, #ff5e62, #ff9966);
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: slideIn 0.5s ease-out;
         }
 
         @keyframes slideIn {
@@ -79,43 +90,29 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        #resultPopup h2 {
-            font-size: 26px;
-            color: white;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        #resultPopup p {
-            font-size: 18px;
-            color: #fff;
-            margin-bottom: 20px;
-        }
-
         #resultImage {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+        }
+
+        #resultGraph {
             width: 100%;
             max-width: 400px;
+            height: 300px;
+            border-radius: 10px;
             margin-top: 20px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
         }
 
         #shareLinkBtn {
-            width: 80%;
-            max-width: 300px;
             margin-top: 20px;
-            display: inline-block;
+            padding: 10px 20px;
             background-color: #ffffff;
             color: #ff4d6d;
+            border: none;
             border-radius: 8px;
-            padding: 12px;
             cursor: pointer;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
         }
 
         #shareLinkBtn:hover {
@@ -123,35 +120,46 @@
             color: white;
         }
 
-        .retry-btn {
+        #retryBtn {
+            padding: 12px 20px;
+            margin-top: 20px;
             background-color: #ff7f7f;
-            margin-top: 10px;
-            padding: 12px 30px;
-            font-size: 18px;
+            border: none;
             border-radius: 8px;
-            color: white;
             cursor: pointer;
-            transition: 0.3s;
+            font-size: 18px;
         }
 
-        .retry-btn:hover {
-            background-color: #d6335b;
+        #retryBtn:hover {
+            background-color: #ff4d6d;
         }
 
         .result-container {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin-top: 30px;
+            text-align: center;
         }
 
         canvas {
-            width: 100%;
-            height: 60vh; /* ขยายขนาดให้เต็มหน้าผลลัพธ์ */
-            border-radius: 10px;
-            margin-top: 20px; /* ระยะห่างจากข้อความ */
+            margin-top: 20px;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 30px;
+        }
+
+        .star {
+            color: gold;
+            cursor: pointer;
+        }
+
+        .star.active {
+            color: orange;
+        }
+
+        .star:hover {
+            color: orange;
         }
     </style>
 </head>
@@ -166,14 +174,27 @@
         <button onclick="submitAnswer(3)" id="btn4" style="display: none;"></button>
     </div>
 
-    <div id="resultPopup">
-        <div class="result-container">
-            <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
-            <p id="resultText"></p>
+    <!-- Popup Result -->
+    <div id="resultPopup" class="popup">
+        <div class="popup-content">
+            <h2>ผลลัพธ์ของคุณ:</h2>
+            <p id="resultText">คุณมีความรักแบบใส่ใจและอบอุ่น</p>
             <canvas id="resultGraph"></canvas>
-            <button id="shareLinkBtn" onclick="copyResult()"><i class="fas fa-share-alt"></i> คัดลอกผลลัพธ์ไปยังคลิบบอร์ด</button>
-            <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
+            <button id="shareLinkBtn" onclick="copyResult()">คัดลอกผลลัพธ์ไปยังคลิบบอร์ด</button>
+            <button id="retryBtn" onclick="restartQuiz()">ทำควิซอีกครั้ง</button>
         </div>
+    </div>
+
+    <div id="ratingStars" style="display:none;">
+        <h2>กรุณาให้คะแนนผลลัพธ์ของคุณ</h2>
+        <div class="stars">
+            <i class="fa fa-star star" onclick="rateQuiz(1)"></i>
+            <i class="fa fa-star star" onclick="rateQuiz(2)"></i>
+            <i class="fa fa-star star" onclick="rateQuiz(3)"></i>
+            <i class="fa fa-star star" onclick="rateQuiz(4)"></i>
+            <i class="fa fa-star star" onclick="rateQuiz(5)"></i>
+        </div>
+        <button onclick="submitRating()">ยืนยันการให้คะแนน</button>
     </div>
 
     <script>
@@ -185,6 +206,7 @@
 
         let currentQuestion = 0;
         let answers = [];
+        let rating = 0;
 
         function showQuestion() {
             document.getElementById("question").innerHTML = questions[currentQuestion].q;
@@ -205,7 +227,7 @@
         }
 
         function showResult() {
-            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
+            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คำนวณจากคำตอบ
             document.getElementById("resultText").innerHTML = result;
             drawGraph();
             document.getElementById("resultPopup").style.display = "flex";
@@ -214,7 +236,7 @@
 
         function drawGraph() {
             const ctx = document.getElementById("resultGraph").getContext("2d");
-            const data = [50, 25, 15, 10]; // ตัวอย่างข้อมูลสำหรับ Pie chart
+            const data = [50, 25, 15, 10]; // ข้อมูลแสดงผลกราฟ
             const labels = ["รักมาก", "รักปานกลาง", "รักน้อย", "ไม่รัก"];
             const colors = ["#ff4d6d", "#ff9966", "#ffcc99", "#ff6666"];
 
@@ -273,8 +295,26 @@
             showQuestion();
         }
 
+        // เพิ่มฟังก์ชันการให้คะแนน
+        function rateQuiz(ratingVal) {
+            rating = ratingVal;
+            const stars = document.querySelectorAll('.star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+        }
+
+        function submitRating() {
+            alert(`ขอบคุณที่ให้คะแนน: ${rating} ดาว`);
+            document.getElementById("ratingStars").style.display = "none";
+            restartQuiz(); // ให้ผู้ใช้ทำแบบทดสอบใหม่
+        }
+
         showQuestion();
     </script>
-
 </body>
 </html>
