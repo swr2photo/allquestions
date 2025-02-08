@@ -241,14 +241,14 @@
             const canvas = document.getElementById("resultGraph");
             const imgURL = canvas.toDataURL("image/png");
 
-            const blob = dataURItoBlob(imgURL);
-            const url = URL.createObjectURL(blob);
-
             if (navigator.share) {
                 navigator.share({
                     title: 'ผลลัพธ์ทดสอบความรัก',
                     text: 'ผลลัพธ์ของการทดสอบความรักของคุณ!',
-                    url: url
+                    files: [
+                        new File([dataURItoBlob(imgURL)], "result.png", { type: "image/png" })
+                    ],
+                    url: imgURL
                 }).catch(console.error);
             } else {
                 alert("การแชร์ไม่รองรับในเบราว์เซอร์นี้");
