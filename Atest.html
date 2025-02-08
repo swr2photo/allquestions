@@ -101,12 +101,55 @@
             background-color: #d6335b;
         }
 
+        .graph-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            border-radius: 15px;
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        #shareDownloadBtn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            background-color: #ff4d6d;
+            color: white;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #shareDownloadBtn:hover {
+            background-color: #d6335b;
+        }
+
         .footer {
             position: fixed;
             bottom: 10px;
             font-size: 14px;
             color: #333;
             text-align: center;
+        }
+
+        @media screen and (max-width: 600px) {
+            #quiz {
+                width: 90%;
+                padding: 20px;
+            }
+
+            button {
+                font-size: 16px;
+            }
+
+            #resultPopup {
+                width: 90%;
+            }
         }
     </style>
 </head>
@@ -124,6 +167,10 @@
     <div id="resultPopup">
         <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
         <p id="resultText"></p>
+        <div class="graph-container">
+            <canvas id="resultGraph" width="400" height="200"></canvas>
+        </div>
+        <button id="shareDownloadBtn"><i class="fas fa-share-alt"></i> แชร์ผลลัพธ์</button>
         <button class="retry-btn" onclick="restartQuiz()">ทำควิซอีกครั้ง</button>
     </div>
 
@@ -133,26 +180,9 @@
 
     <script>
         const questions = [
-            { q: "เมื่อคู่รักของคุณทำให้คุณรู้สึกแย่ คุณจะพูดคุยเกี่ยวกับความรู้สึกของคุณหรือไม่?", 
-              a: ["พูดคุยกับเขาทันที", "พูดคุยเมื่อพร้อม", "เก็บเงียบและพยายามลืม", "หนีปัญหาออกไป"] },
-            { q: "คุณรู้สึกว่าความรักของคุณมีการพัฒนาอย่างต่อเนื่อง หรือว่าไม่ค่อยมีการเปลี่ยนแปลง?", 
-              a: ["ความรักพัฒนาอย่างต่อเนื่อง", "ความรักไม่ค่อยมีการเปลี่ยนแปลง", "บางครั้งพัฒนา", "ไม่แน่ใจ"] },
-            { q: "หากคู่รักของคุณทำสิ่งที่คุณไม่ชอบ คุณจะบอกเขาหรือเก็บเงียบไว้?", 
-              a: ["บอกเขาทันที", "เก็บเงียบไว้", "หาทางเปลี่ยนแปลงสิ่งที่ไม่ชอบ", "รอเวลาที่เหมาะสม"] },
-            { q: "คุณเชื่อว่าการมีความรักที่ดีคือการให้ความสำคัญกับคู่รักในทุกๆ ด้านหรือไม่?", 
-              a: ["ใช่, การให้ความสำคัญมีความสำคัญที่สุด", "ไม่, ต้องมีความสมดุล", "บางครั้งต้องให้ความสำคัญในบางด้าน", "ไม่แน่ใจ"] },
-            { q: "คุณรู้สึกว่าคุณสามารถไว้วางใจคู่รักได้เต็มที่หรือไม่?", 
-              a: ["ไว้วางใจเต็มที่", "ไว้วางใจบางส่วน", "ไม่ค่อยไว้วางใจ", "ไม่สามารถไว้วางใจได้"] },
-            { q: "ถ้าคู่รักของคุณมีปัญหาทางการเงินหรือการงาน คุณจะช่วยเหลือเขาอย่างไร?", 
-              a: ["ช่วยเหลือทุกวิถีทาง", "ช่วยเหลือบางเรื่อง", "รอให้เขาจัดการเอง", "จะไม่ช่วย"] },
-            { q: "ความรักในความสัมพันธ์ของคุณควรจะเป็นการให้และรับในสัดส่วนที่เท่ากันหรือไม่?", 
-              a: ["ใช่, ต้องให้และรับในสัดส่วนที่เท่ากัน", "ไม่จำเป็นต้องเท่ากัน", "ให้มากกว่าหรือรับมากกว่าก็ได้", "ไม่แน่ใจ"] },
-            { q: "คุณคิดว่าการให้ความสำคัญกับความสุขของคู่รักมีความสำคัญมากกว่าความสุขของตัวเองหรือไม่?", 
-              a: ["ใช่, ความสุขของคู่รักสำคัญที่สุด", "บางครั้งความสุขของตัวเองก็ควรสำคัญ", "ไม่จำเป็นต้องให้ความสำคัญเท่ากัน", "ไม่แน่ใจ"] },
-            { q: "เมื่อคุณต้องทำการตัดสินใจใหญ่ๆ คุณจะปรึกษาคู่รักของคุณก่อนหรือไม่?", 
-              a: ["ปรึกษาเขาทุกครั้ง", "บางครั้ง", "ไม่เคย", "ไม่แน่ใจ"] },
-            { q: "คุณคิดว่าการแก้ปัญหาความรัก ควรจะให้ความสำคัญกับการพูดคุยเปิดเผยหรือไม่?", 
-              a: ["ใช่, การพูดคุยเปิดเผยมีความสำคัญ", "บางครั้ง", "ไม่จำเป็นต้องพูดคุย", "ไม่แน่ใจ"] }
+            { q: "เมื่อคุณมีความรู้สึกดีๆ กับใครสักคน คุณจะทำอย่างไร?", a: ["แสดงออกทันทีและบอกความรู้สึก", "เก็บความรู้สึกเอาไว้จนกว่าจะมั่นใจ", "แสดงออกในบางครั้ง เมื่อรู้สึกปลอดภัย", "รอให้คนที่ชอบบอกความรู้สึกก่อน"] },
+            { q: "ถ้าคู่รักของคุณทำให้คุณผิดหวัง คุณจะ...?", a: ["พูดคุยกันและหาทางแก้ไข", "เก็บความรู้สึกและพยายามลืมมัน", "พยายามทำให้เขารู้สึกผิด", "มองปัญหาด้วยมุมมองที่เข้าใจ"] },
+            // คำถามอื่น ๆ เพิ่มเติม
         ];
 
         let currentQuestion = 0;
@@ -177,20 +207,25 @@
         }
 
         function showResult() {
-            let resultText = "";
-            if (answers[0] === 0 && answers[1] === 0) {
-                resultText = "คุณเป็นคนที่เปิดใจและพร้อมพูดคุยเรื่องความรู้สึกของตัวเองกับคู่รัก โดยมีความเชื่อในความรักที่พัฒนาได้ตลอดเวลา.";
-            } else if (answers[0] === 2 && answers[1] === 1) {
-                resultText = "คุณเป็นคนที่อาจจะเลือกเก็บความรู้สึกไว้ และไม่ค่อยเปิดใจคุย แต่คุณยังคงเชื่อว่าความรักมีการพัฒนาได้.";
-            } else if (answers[0] === 1 && answers[1] === 2) {
-                resultText = "คุณเป็นคนที่คิดว่าความสัมพันธ์ควรต้องมีความสมดุล และรู้สึกว่าความรักไม่จำเป็นต้องเปลี่ยนแปลงบ่อย.";
-            } else {
-                resultText = "คุณมีทัศนคติที่คิดว่าเวลาที่ดีและความเข้าใจซึ่งกันและกันคือสิ่งสำคัญในความสัมพันธ์.";
-            }
+            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น";
+            let resultDetails = "สไตล์ความรักของคุณเน้นการแสดงออกและการให้ความสนใจในความรู้สึกของคู่รัก";
 
-            document.getElementById("resultText").innerHTML = resultText;
+            document.getElementById("resultText").innerHTML = resultText + "<br>" + resultDetails;
+            drawGraph();
+
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
+        }
+
+        function drawGraph() {
+            const canvas = document.getElementById("resultGraph");
+            const ctx = canvas.getContext("2d");
+
+            ctx.fillStyle = "#ff4d6d";
+            ctx.fillRect(50, 150, 50, -80);
+            ctx.fillRect(150, 150, 50, -60);
+            ctx.fillRect(250, 150, 50, -40);
+            ctx.fillRect(350, 150, 50, -100);
         }
 
         function restartQuiz() {
@@ -199,6 +234,36 @@
             document.getElementById("resultPopup").style.display = "none";
             document.getElementById("quiz").style.display = "block";
             showQuestion();
+        }
+
+        document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
+            event.preventDefault();
+
+            const canvas = document.getElementById("resultGraph");
+            const imgURL = canvas.toDataURL("image/png");
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'ผลลัพธ์ทดสอบความรัก',
+                    text: 'ผลลัพธ์ของการทดสอบความรักของคุณ!',
+                    files: [
+                        new File([dataURItoBlob(imgURL)], "result.png", { type: "image/png" })
+                    ],
+                    url: imgURL
+                }).catch(console.error);
+            } else {
+                alert("การแชร์ไม่รองรับในเบราว์เซอร์นี้");
+            }
+        });
+
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const arrayBuffer = new ArrayBuffer(byteString.length);
+            const view = new Uint8Array(arrayBuffer);
+            for (let i = 0; i < byteString.length; i++) {
+                view[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([view], {type: 'image/png'});
         }
 
         showQuestion();
