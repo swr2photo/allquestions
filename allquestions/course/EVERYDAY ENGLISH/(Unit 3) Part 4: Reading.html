@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 750px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .question {
+            background: #f9f9f9;
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 5px solid #74ebd5;
+            border-radius: 8px;
+            text-align: left;
+            transition: 0.3s;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .question:hover {
+            background: #eef7ff;
+            border-left-color: #58c7f5;
+        }
+
+        .options {
+            margin-top: 8px;
+        }
+
+        .option {
+            display: block;
+            margin: 5px 0;
+            padding-left: 20px;
+            position: relative;
+            cursor: default;
+        }
+
+        .option::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            font-size: 20px;
+            color: #74ebd5;
+        }
+
+        /* Style for correct answers */
+        .correct {
+            background-color: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        /* Disable selection */
+        .options .option {
+            pointer-events: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            .question {
+                font-size: 14px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Hotel Booking Quiz</h1>
+
+        <div class="question">
+            <p>1. What type of room did Jenny reserve?</p>
+            <div class="options">
+                <div class="correct option">a. Superior Twin bed</div>
+                <div class="option">b. Suite Room</div>
+                <div class="option">c. Deluxe Twin bed</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>2. How many nights did she want to stay at this hotel?</p>
+            <div class="options">
+                <div class="correct option">a. 2</div>
+                <div class="option">b. 1</div>
+                <div class="option">c. 3</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>3. How much is the total price?</p>
+            <div class="options">
+                <div class="option">a. S$340</div>
+                <div class="option">b. S$272</div>
+                <div class="correct option">c. S$272.16</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>4. Which facilities are not available in the room?</p>
+            <div class="options">
+                <div class="option">a. Iron and hairdryer</div>
+                <div class="option">b. TV and electric kettle</div>
+                <div class="correct option">c. Refrigerator and coffee maker</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>5. What is the arrival date?</p>
+            <div class="options">
+                <div class="correct option">a. 8 April</div>
+                <div class="option">b. 9 April</div>
+                <div class="option">c. 10 April</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>6. When is the estimated arrival time?</p>
+            <div class="options">
+                <div class="option">a. 14.00-15.00</div>
+                <div class="option">b. 16.00-17.00</div>
+                <div class="correct option">c. 15.00-16.00</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>7. Can Jenny get a refund if she cancels the booking?</p>
+            <div class="options">
+                <div class="correct option">a. No, she can't.</div>
+                <div class="option">b. Yes, she can.</div>
+                <div class="option">c. The information is not mentioned in the booking.</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>8. What is the guest’s special request?</p>
+            <div class="options">
+                <div class="option">a. Vegetarian breakfast</div>
+                <div class="option">b. Limousine upon arrival</div>
+                <div class="correct option">c. Late check-out</div>
+            </div>
+        </div>
+
+        <div class="question">
+            <p>9. Who did Jenny book the room for?</p>
+            <div class="options">
+                <div class="correct option">a. Herself</div>
+                <div class="option">b. Her customers</div>
+                <div class="option">c. Her boss</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
