@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ทดสอบความรักของคุณ</title>
 
-    <!-- Font Awesome CDN -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
     <style>
@@ -24,7 +23,6 @@
             position: relative;
         }
 
-        /* ปุ่มและสไตล์ต่างๆ */
         #quiz {
             max-width: 400px;
             width: 90%;
@@ -54,23 +52,25 @@
             background: #d6335b;
         }
 
-        /* Popup Style */
         #resultPopup {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-color: #ffffff;
             padding: 30px;
             border-radius: 15px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
             z-index: 10;
-            width: 80%;
-            max-width: 600px;
             text-align: center;
             animation: slideIn 0.5s ease-out;
             background: linear-gradient(135deg, #ff5e62, #ff9966);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         @keyframes slideIn {
@@ -102,7 +102,7 @@
             margin-right: auto;
         }
 
-        #shareDownloadBtn {
+        #shareLinkBtn {
             width: 80%;
             max-width: 300px;
             margin-top: 20px;
@@ -117,7 +117,7 @@
             transition: all 0.3s ease;
         }
 
-        #shareDownloadBtn:hover {
+        #shareLinkBtn:hover {
             background-color: #ff4d6d;
             color: white;
         }
@@ -137,31 +137,20 @@
             background-color: #d6335b;
         }
 
-        .graph-container {
-            width: 100%;
-            height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
-        }
-
         canvas {
-            max-width: 100%;
+            width: 100%;
+            height: 60vh; /* ขยายขนาดให้เต็มหน้าผลลัพธ์ */
             border-radius: 10px;
+            margin-top: 20px; /* ระยะห่างจากข้อความ */
         }
 
-        @media screen and (max-width: 600px) {
-            #quiz {
-                width: 90%;
-                padding: 10px;
-            }
-            button {
-                font-size: 16px;
-            }
-            #resultPopup {
-                width: 95%;
-            }
+        .result-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
         }
     </style>
 </head>
@@ -177,13 +166,13 @@
     </div>
 
     <div id="resultPopup">
-        <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
-        <p id="resultText"></p>
-        <div class="graph-container">
-            <canvas id="resultGraph" width="400" height="200"></canvas>
+        <div class="result-container">
+            <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
+            <p id="resultText"></p>
+            <canvas id="resultGraph"></canvas>
+            <a id="shareLinkBtn" href="#" target="_blank"><i class="fas fa-share-alt"></i> แชร์ผลลัพธ์</a>
+            <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
         </div>
-        <a id="shareDownloadBtn" href="#" download="result.png"><i class="fas fa-download"></i> ดาวน์โหลดและแชร์</a>
-        <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
     </div>
 
     <script>
@@ -215,28 +204,36 @@
         }
 
         function showResult() {
-            let resultText = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
-            let resultDetails = "สไตล์ความรักของคุณเน้นการแสดงออกและการให้ความสนใจในความรู้สึกของคู่รัก";
-
-            // ใส่ข้อมูลการสนับสนุน
-            document.getElementById("resultText").innerHTML = resultText + "<br>" + resultDetails;
+            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น"; // คุณสามารถคำนวณจากคำตอบที่ผู้ใช้กรอก
+            document.getElementById("resultText").innerHTML = result;
             drawGraph();
+            updateShareLink();
 
-            // แสดงป๊อปอัพผลลัพธ์
-            document.getElementById("resultPopup").style.display = "block";
+            document.getElementById("resultPopup").style.display = "flex";
             document.getElementById("quiz").style.display = "none";
         }
 
         function drawGraph() {
             const canvas = document.getElementById("resultGraph");
             const ctx = canvas.getContext("2d");
-            
-            // ตัวอย่างการวาดกราฟ
+            canvas.width = window.innerWidth; // ขยายกราฟให้เต็มหน้าจอ
+            canvas.height = window.innerHeight * 0.6; // กำหนดขนาดความสูงของกราฟ
+
+            // วาดกราฟตัวอย่าง
             ctx.fillStyle = "#ff4d6d";
-            ctx.fillRect(50, 150, 50, -80); // ตัวอย่างกราฟแท่ง
-            ctx.fillRect(150, 150, 50, -60);
-            ctx.fillRect(250, 150, 50, -40);
-            ctx.fillRect(350, 150, 50, -100);
+            ctx.fillRect(50, canvas.height - 80, 50, -80); // ตัวอย่างกราฟแท่ง
+            ctx.fillRect(150, canvas.height - 60, 50, -60);
+            ctx.fillRect(250, canvas.height - 40, 50, -40);
+            ctx.fillRect(350, canvas.height - 100, 50, -100);
+        }
+
+        function updateShareLink() {
+            const canvas = document.getElementById("resultGraph");
+            const dataURL = canvas.toDataURL();  // แปลงกราฟเป็น URL
+
+            // ใช้ dataURL เป็นลิงค์สำหรับการแชร์
+            const shareLink = `https://twitter.com/intent/tweet?text=ผลลัพธ์ของฉันคือ: ${encodeURIComponent(document.getElementById("resultText").innerText)}&url=${encodeURIComponent(dataURL)}`;
+            document.getElementById("shareLinkBtn").href = shareLink;
         }
 
         function restartQuiz() {
@@ -247,18 +244,6 @@
             showQuestion();
         }
 
-        // ฟังก์ชันแชร์ผลลัพธ์
-        document.getElementById("shareDownloadBtn").addEventListener("click", function(event) {
-            event.preventDefault();
-            const canvas = document.getElementById("resultGraph");
-            const imgURL = canvas.toDataURL("image/png");
-            const link = document.createElement('a');
-            link.href = imgURL;
-            link.download = "result.png";
-            link.click();
-        });
-
-        // เริ่มต้นการทดสอบ
         showQuestion();
     </script>
 
