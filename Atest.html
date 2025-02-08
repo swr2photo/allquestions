@@ -3,187 +3,253 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>แบบทดสอบความรัก</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>ทดสอบความรักของคุณ</title>
+
+    <!-- Font Awesome CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f9f9f9;
+            font-family: 'Arial', sans-serif;
             text-align: center;
             margin: 0;
             padding: 0;
+            background-color: #ffe6e6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
         }
+
+        /* การแสดงหัวใจที่ลอย */
+        .heart {
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: red;
+            transform: rotate(-45deg);
+            animation: float 7s infinite ease-in-out;
+        }
+        .heart:before,
+        .heart:after {
+            content: "";
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            background-color: red;
+            border-radius: 50%;
+        }
+        .heart:before { top: -12px; left: 0; }
+        .heart:after { left: 12px; top: 0; }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(-45deg); opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { transform: translateY(-100vh) rotate(-45deg); opacity: 0; }
+        }
+
         #quiz {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 30px;
-            background-color: #fff;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 90%;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            animation: fadeIn 1s;
         }
+
         button {
-            display: inline-block;
+            display: block;
             width: 100%;
             padding: 15px;
             margin: 10px 0;
             font-size: 18px;
             cursor: pointer;
             border: none;
-            border-radius: 10px;
-            background-color: #ff4081;
+            border-radius: 8px;
+            background: #ff4d6d;
             color: white;
             transition: 0.3s;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
         }
         button:hover {
-            background-color: #ff80ab;
+            background: #d6335b;
         }
+
+        /* Popup Style */
         #resultPopup {
             display: none;
-            background-color: rgba(0, 0, 0, 0.5);
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 1000;
-            padding-top: 100px;
-            text-align: center;
-        }
-        #resultPopup .popup-content {
-            background-color: #fff;
-            width: 90%;
-            max-width: 500px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+            z-index: 10;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            animation: slideIn 0.5s ease-out;
+            background: linear-gradient(135deg, #ff5e62, #ff9966);
         }
-        #resultPopup img {
+
+        @keyframes slideIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        #resultPopup h2 {
+            font-size: 26px;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        #resultPopup p {
+            font-size: 18px;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        #resultImage {
             width: 100%;
-            border-radius: 10px;
+            max-width: 400px;
+            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
         }
-        .close-btn {
-            background-color: #ff4081;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
+
+        #shareDownloadBtn {
+            width: 80%;
+            max-width: 300px;
+            margin-top: 20px;
+            display: inline-block;
+            background-color: #ffffff;
+            color: #ff4d6d;
+            border-radius: 8px;
+            padding: 12px;
             cursor: pointer;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
         }
-        .share-btn {
-            background-color: #008CBA;
+
+        #shareDownloadBtn:hover {
+            background-color: #ff4d6d;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
         }
-        .share-btn:hover {
-            background-color: #005f73;
-        }
+
+        /* ปรับปุ่มทำควิซใหม่ */
         .retry-btn {
-            background-color: #4CAF50;
+            background-color: #ff7f7f;
+            margin-top: 10px;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 8px;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
             cursor: pointer;
+            transition: 0.3s;
         }
+
         .retry-btn:hover {
-            background-color: #45a049;
-        }
-        canvas {
-            max-width: 100%;
-            margin: 30px 0;
+            background-color: #d6335b;
         }
 
-        /* Animation for Heart */
-        @keyframes floatHeart {
-            0% { transform: translateY(100vh); opacity: 0; }
-            100% { transform: translateY(-100vh); opacity: 1; }
-        }
-        .floating-heart {
-            position: fixed;
-            bottom: -50px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 3rem;
-            color: #ff4081;
-            animation: floatHeart 6s infinite;
+        /* กราฟ */
+        .graph-container {
+            width: 100%;
+            height: 200px;
+            margin-top: 20px;
         }
 
-        /* Mobile responsiveness */
-        @media (max-width: 600px) {
-            #quiz {
-                padding: 20px;
-            }
-            button {
-                font-size: 16px;
-                padding: 12px;
-            }
+        .graph {
+            width: 100%;
+            height: 100%;
+            background: #ffb3b3;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-radius: 8px;
+        }
+
+        .graph-bar {
+            width: 20%;
+            background-color: #ff4d6d;
+            height: 0;
+            animation: growBar 1s forwards;
+        }
+
+        @keyframes growBar {
+            0% { height: 0; }
+            100% { height: 100%; }
         }
     </style>
 </head>
 <body>
-    <!-- Quiz section -->
+
     <div id="quiz">
-        <h1>แบบทดสอบความรัก</h1>
-        <p id="question">คำถามจะปรากฏที่นี่</p>
-        <button id="btn1" onclick="submitAnswer(0)">คำตอบ 1</button>
-        <button id="btn2" onclick="submitAnswer(1)">คำตอบ 2</button>
-        <button id="btn3" onclick="submitAnswer(2)">คำตอบ 3</button>
-        <button id="btn4" onclick="submitAnswer(3)">คำตอบ 4</button>
+        <h1>ทดสอบความรักของคุณ</h1>
+        <p id="question">กำลังโหลดคำถาม...</p>
+        <button onclick="submitAnswer(0)" id="btn1"></button>
+        <button onclick="submitAnswer(1)" id="btn2"></button>
+        <button onclick="submitAnswer(2)" id="btn3"></button>
+        <button onclick="submitAnswer(3)" id="btn4" style="display: none;"></button>
     </div>
 
-    <!-- Result Popup -->
+    <!-- ผลลัพธ์ใน Popup -->
     <div id="resultPopup">
-        <div class="popup-content">
-            <h2>ผลลัพธ์ของคุณ</h2>
-            <p id="resultText">คำตอบจะปรากฏที่นี่</p>
-            <canvas id="resultChart"></canvas>
-            <button class="share-btn" onclick="shareResult()">แชร์ลง Instagram</button>
-            <button class="retry-btn" onclick="restartQuiz()">ทำควิซอีกครั้ง</button>
-            <button class="close-btn" onclick="closePopup()">ปิด</button>
-        </div>
-    </div>
+        <h2><i class="fas fa-heart"></i> สไตล์ความรักของคุณคือ:</h2>
+        <p id="resultText"></p>
+        <img id="resultImage" alt="ผลลัพธ์">
+        <a id="shareDownloadBtn" href="#" download="result.png"><i class="fas fa-download"></i> ดาวน์โหลดและแชร์</a>
+        <button class="retry-btn" onclick="restartQuiz()"><i class="fas fa-redo-alt"></i> ทำควิซอีกครั้ง</button>
 
-    <!-- Floating Hearts -->
-    <div class="floating-heart">❤️</div>
-    <div class="floating-heart" style="animation-delay: 2s;">❤️</div>
-    <div class="floating-heart" style="animation-delay: 4s;">❤️</div>
+        <!-- กราฟ -->
+        <div class="graph-container">
+            <div class="graph">
+                <div class="graph-bar" style="height: 80%;"></div>
+                <div class="graph-bar" style="height: 60%;"></div>
+                <div class="graph-bar" style="height: 50%;"></div>
+                <div class="graph-bar" style="height: 90%;"></div>
+            </div>
+        </div>
+
+    </div>
 
     <script>
+        const questions = [
+            { q: "เมื่อคุณมีความรู้สึกดีๆ กับใครสักคน คุณจะทำอย่างไร?", a: ["แสดงออกทันทีและบอกความรู้สึก", "เก็บความรู้สึกเอาไว้จนกว่าจะมั่นใจ", "แสดงออกในบางครั้ง เมื่อรู้สึกปลอดภัย", "รอให้คนที่ชอบบอกความรู้สึกก่อน"] },
+            { q: "ถ้าคู่รักของคุณทำให้คุณผิดหวัง คุณจะ...?", a: ["พูดคุยกันและหาทางแก้ไข", "เก็บความรู้สึกและพยายามลืมมัน", "พยายามทำให้เขารู้สึกผิด", "มองปัญหาด้วยมุมมองที่เข้าใจ"] },
+            { q: "คุณคิดว่าความสัมพันธ์ที่ดีควรมีองค์ประกอบอะไรบ้าง?", a: ["ความสนุกสนานและการผจญภัย", "ความเชื่อมั่นและการสนับสนุน", "การเติบโตและการพัฒนาร่วมกัน", "ความเหมือนกันในความสนใจและค่านิยม"] },
+            { q: "ในความสัมพันธ์ของคุณ คุณรู้สึกว่าคุณให้ความสำคัญกับสิ่งใดมากที่สุด?", a: ["การได้รับการยอมรับจากคู่ของคุณ", "การดูแลคู่ของคุณให้มีความสุข", "การให้พื้นที่ส่วนตัว", "การมีอิสระในความสัมพันธ์"] },
+            { q: "คุณคิดว่าองค์ประกอบใดในความรักที่ทำให้มันยั่งยืน?", a: ["การสื่อสารที่ดี", "การสนับสนุนซึ่งกันและกัน", "การมีเป้าหมายร่วมกัน", "ความซื่อสัตย์และการไว้วางใจ"] },
+            { q: "คุณรู้สึกอย่างไรเมื่อความรักของคุณไม่สมหวัง?", a: ["รู้สึกโกรธและผิดหวัง", "รู้สึกเศร้าและท้อแท้", "พยายามเรียนรู้จากมัน", "ไม่รู้สึกอะไรมากนัก"] },
+            { q: "เมื่อคุณเจอความขัดแย้งในความสัมพันธ์ คุณจะทำอย่างไร?", a: ["หลีกเลี่ยงการเผชิญหน้าจนกว่าจะสงบ", "พูดคุยเพื่อหาทางออก", "ยอมรับข้อผิดพลาดและขอโทษ", "ทำเหมือนไม่มีอะไรเกิดขึ้น"] },
+            { q: "คุณให้ความสำคัญกับการมีพื้นที่ส่วนตัวในความสัมพันธ์มากแค่ไหน?", a: ["เป็นเรื่องสำคัญที่สุด", "สำคัญแต่ก็ยังให้ความสำคัญกับคู่รัก", "ไม่ค่อยสำคัญเท่าไหร่", "ไม่คิดว่ามันเป็นสิ่งจำเป็น"] },
+        ];
+
         let currentQuestion = 0;
         let answers = [];
 
-        const questions = [
-            {
-                q: "คุณคิดว่าอะไรสำคัญที่สุดในความสัมพันธ์?",
-                a: ["ความรัก", "ความซื่อสัตย์", "ความเข้าใจ", "ความสนุก"]
-            },
-            {
-                q: "คุณมองว่าความรักเป็นสิ่งที่ต้องลงทุนหรือไม่?",
-                a: ["ใช่", "ไม่ใช่", "บางครั้ง", "ไม่ค่อยสำคัญ"]
-            },
-            {
-                q: "ในวันที่คุณรู้สึกแย่ คุณอยากให้คู่รักของคุณทำอะไร?",
-                a: ["ปลอบใจ", "ให้กำลังใจ", "อยู่ข้างๆ", "ไม่ทำอะไร"]
-            },
-            {
-                q: "คุณเชื่อมั่นในรักแท้หรือไม่?",
-                a: ["เชื่อ", "ไม่เชื่อ", "ไม่แน่ใจ", "ขึ้นอยู่กับสถานการณ์"]
-            }
-        ];
-
+        // ฟังก์ชันแสดงคำถามและคำตอบ
         function showQuestion() {
-            const question = questions[currentQuestion];
-            document.getElementById("question").textContent = question.q;
-            document.getElementById("btn1").textContent = question.a[0];
-            document.getElementById("btn2").textContent = question.a[1];
-            document.getElementById("btn3").textContent = question.a[2];
-            document.getElementById("btn4").textContent = question.a[3];
+            document.getElementById("question").innerHTML = questions[currentQuestion].q;
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`btn${i+1}`).innerHTML = questions[currentQuestion].a[i];
+                document.getElementById(`btn${i+1}`).style.display = "inline-block";
+            }
         }
 
+        // ฟังก์ชันสำหรับบันทึกคำตอบ
         function submitAnswer(answer) {
             answers.push(answer);
             currentQuestion++;
@@ -194,34 +260,17 @@
             }
         }
 
+        // ฟังก์ชันแสดงผลลัพธ์
         function showResult() {
-            let result = "คุณมีความรักที่อบอุ่นและใส่ใจ!";
-            if (answers[0] == 0) {
-                result = "คุณให้ความสำคัญกับความรักและความเชื่อใจในคู่รัก!";
-            }
-            document.getElementById("resultText").textContent = result;
-
-            // Generate chart
-            const ctx = document.getElementById('resultChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['คำตอบ 1', 'คำตอบ 2', 'คำตอบ 3', 'คำตอบ 4'],
-                    datasets: [{
-                        data: [10, 20, 30, 40], // Adjust according to answers
-                        backgroundColor: ['#ff4d6d', '#ff9966', '#ffb3b3', '#ffccd9']
-                    }]
-                }
-            });
+            let result = "คุณมีความรักที่ใส่ใจและอบอุ่น";
+            document.getElementById("resultText").innerHTML = result;
+            document.getElementById("resultImage").src = "https://www.example.com/image.jpg"; // เปลี่ยน URL เป็นรูปที่คุณต้องการ
 
             document.getElementById("resultPopup").style.display = "block";
             document.getElementById("quiz").style.display = "none";
         }
 
-        function shareResult() {
-            alert("แชร์ไปที่ Instagram ของคุณ");
-        }
-
+        // ฟังก์ชันสำหรับเริ่มทำควิซใหม่
         function restartQuiz() {
             currentQuestion = 0;
             answers = [];
@@ -230,11 +279,8 @@
             showQuestion();
         }
 
-        function closePopup() {
-            document.getElementById("resultPopup").style.display = "none";
-        }
-
-        showQuestion();
+        showQuestion(); // เริ่มการแสดงคำถามแรก
     </script>
+
 </body>
 </html>
