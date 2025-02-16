@@ -8,8 +8,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet"> <!-- ฟอนต์ Kanit -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome -->
-
     <style>
         body {
             font-family: 'Kanit', sans-serif;
@@ -19,7 +17,7 @@
 
         .container {
             background-color: #fff;
-            border-radius: 8px;
+            border-radius: 12px;
             padding: 30px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
@@ -34,11 +32,10 @@
         .table {
             border-radius: 8px;
             border: none;
-            width: 100%;
         }
 
         .table th, .table td {
-            text-align: center;
+            text-align: left;
             vertical-align: middle;
             padding: 12px;
             border-bottom: 1px solid #ddd;
@@ -119,30 +116,6 @@
         .btn-container button {
             margin-right: 10px;
         }
-
-        .summary-row {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            text-align: left;
-            padding: 15px;
-        }
-
-        .summary-row td {
-            background-color: #007bff;
-            color: white;
-        }
-
-        /* Styling the modal */
-        .modal-content {
-            padding: 20px;
-        }
-
-        .modal-body input {
-            width: 100%;
-        }
-
     </style>
 </head>
 <body>
@@ -153,7 +126,7 @@
         
         <div class="row mt-3">
             <div class="col-md-6">
-                <input type="text" id="searchField" class="form-control" placeholder="ค้นหาหลายชื่อ (ตัวอย่าง: 6710210057, ชนิสรณ์ ท่าจีน)" oninput="searchData()">
+                <input type="text" id="searchField" class="form-control" placeholder="ค้นหาด้วยรหัสนักศึกษา หรือ ชื่อ" oninput="searchData()">
             </div>
             <div class="col-md-6">
                 <select id="filterStatus" class="form-control" onchange="filterData()">
@@ -169,10 +142,8 @@
             <p>จำนวนผู้ที่ไม่ไปค่าย: <span id="countNotAttended">0</span> คน</p>
             <p>จำนวนรายชื่อทั้งหมด: <span id="countTotal">0</span> คน</p>
             <div class="btn-container">
-                <!-- ปุ่มดาวน์โหลดเดียว -->
-                <button class="btn btn-primary" onclick="showExportModal()">
-                    <i class="fas fa-download"></i> ส่งออกข้อมูล
-                </button>
+                <button class="btn btn-success" onclick="exportData(true)">ส่งออกเฉพาะคนที่ไปค่าย</button>
+                <button class="btn btn-primary" onclick="exportData(false)">ส่งออกรายชื่อทั้งหมด</button>
             </div>
         </div>
 
@@ -187,41 +158,6 @@
             </thead>
             <tbody id="tableBody"></tbody>
         </table>
-
-        <table class="table table-bordered table-striped mt-3">
-            <tbody>
-                <tr class="summary-row">
-                    <td colspan="4">
-                        สรุป: จำนวนที่ไปค่าย: <span id="attendedCount">0</span> คน, จำนวนที่ไม่ไปค่าย: <span id="notAttendedCount">0</span> คน
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Modal สำหรับการเลือกประเภทการส่งออก -->
-    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exportModalLabel">เลือกประเภทการส่งออกข้อมูล</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- ตัวเลือกในการดาวน์โหลด -->
-                    <select id="exportType" class="form-control">
-                        <option value="all">ทั้งหมด</option>
-                        <option value="attended">เฉพาะคนที่ไปค่าย</option>
-                        <option value="not_attended">เฉพาะคนที่ไม่ไปค่าย</option>
-                    </select>
-                    <input type="text" id="fileName" class="form-control mt-3" placeholder="ใส่ชื่อไฟล์">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                    <button type="button" class="btn btn-primary" onclick="exportData()">ดาวน์โหลด</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -250,7 +186,8 @@
 
                 studentData.forEach(student => {
                     if (student["ชื่อ-นามสกุล"]) {
-                        student["ชื่อ-นามสกุล"] = student["ชื่อ-นามสกุล"].replace(/(นาย|นางสาว|นาง|ดร\.)\s+/g, '$1');
+                        student["ชื่อ-นามสกุล"] = student["ชื่อ-นามสกุล"].replace(/(นาย|น\.ส\.)\s*/g, '$1');
+                        student["ชื่อ-นามสกุล"] = student["ชื่อ-นามสกุล"].replace(/น\.ส\./g, 'นางสาว').trim();
                     }
                     student["ไปค่าย"] = student["ไปค่าย"] || false;
                 });
@@ -279,29 +216,32 @@
         }
 
         function updateStatus(index, checked) {
-            studentData[index]["ไปค่าย"] = checked;
+            let student = filteredData[index];
+            student["ไปค่าย"] = checked;
             localStorage.setItem('studentData', JSON.stringify(studentData));
             updateCount();
         }
 
         function updateCount() {
-            let attended = studentData.filter(student => student["ไปค่าย"]).length;
-            let notAttended = studentData.length - attended;
+            let attended = filteredData.filter(student => student["ไปค่าย"]).length;
+            let notAttended = filteredData.length - attended;
             document.getElementById("countAttended").innerText = attended;
             document.getElementById("countNotAttended").innerText = notAttended;
-            document.getElementById("countTotal").innerText = studentData.length;
-            document.getElementById("attendedCount").innerText = attended;
-            document.getElementById("notAttendedCount").innerText = notAttended;
+            document.getElementById("countTotal").innerText = filteredData.length;
         }
 
         function searchData() {
-            let query = document.getElementById("searchField").value.toLowerCase();
-            let queries = query.split(",").map(q => q.trim());
-
-            filteredData = studentData.filter(student =>
-                queries.some(q => student["รหัสนักศึกษา"].toString().includes(q) || student["ชื่อ-นามสกุล"].toLowerCase().includes(q))
-            );
-
+            let query = document.getElementById("searchField").value.toLowerCase().trim();
+            let queries = query.split(",").map(q => q.trim()).filter(q => q.length > 0);
+            if (queries.length === 0) {
+                filteredData = studentData;
+            } else {
+                filteredData = studentData.filter(student => {
+                    return queries.some(q => {
+                        return student["รหัสนักศึกษา"].toString().includes(q) || student["ชื่อ-นามสกุล"].toLowerCase().includes(q);
+                    });
+                });
+            }
             displayData(filteredData);
         }
 
@@ -317,36 +257,29 @@
             displayData(filteredData);
         }
 
-        // เปิด modal ให้เลือกการส่งออก
-        function showExportModal() {
-            let modal = new bootstrap.Modal(document.getElementById('exportModal'));
-            modal.show();
-        }
+        function exportData(onlyAttended) {
+            let exportData = onlyAttended ? studentData.filter(s => s["ไปค่าย"]) : studentData;
 
-        // ฟังก์ชันการดาวน์โหลด
-        function exportData() {
-            let fileName = document.getElementById("fileName").value || "students";  // ตั้งชื่อไฟล์จาก input
-            let exportType = document.getElementById("exportType").value;
+            // Add row numbers
+            exportData.forEach((student, index) => {
+                student["ลำดับ"] = index + 1;
+            });
 
-            let dataToExport = [];
-            if (exportType === "attended") {
-                dataToExport = studentData.filter(student => student["ไปค่าย"]);
-            } else if (exportType === "not_attended") {
-                dataToExport = studentData.filter(student => !student["ไปค่าย"]);
-            } else {
-                dataToExport = studentData;
-            }
+            // Create Excel sheet
+            let ws = XLSX.utils.json_to_sheet(exportData, { header: ["ลำดับ", "รหัสนักศึกษา", "ชื่อ-นามสกุล", "ไปค่าย"] });
+            
+            // Add summary row for attended count
+            let attendedCount = exportData.filter(s => s["ไปค่าย"]).length;
+            let notAttendedCount = exportData.length - attendedCount;
+            let summaryRow = [
+                { "ลำดับ": "สรุป", "รหัสนักศึกษา": "", "ชื่อ-นามสกุล": `จำนวนที่ไปค่าย: ${attendedCount}`, "ไปค่าย": "" }
+            ];
+            XLSX.utils.sheet_add_json(ws, summaryRow, { skipHeader: true, origin: -1 });
 
-            let worksheet = XLSX.utils.json_to_sheet(dataToExport);
-            let workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Students");
-            let wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-            let blob = new Blob([wbout], { type: "application/octet-stream" });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName + ".xlsx";
-            link.click();
+            // Write to file
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            XLSX.writeFile(wb, "export.xlsx");
         }
     </script>
 </body>
