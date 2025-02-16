@@ -94,8 +94,7 @@
         .menu-item:active {
             background-color: #666;
         }
-        
-        /* แอนิเมชั่นที่ทำให้เลขแสดงสีไล่ไปมา */
+
         @keyframes heartbeat {
             0% {
                 color: #ff0000;
@@ -108,12 +107,10 @@
             }
         }
 
-        /* ใช้ gradient กับตัวเลขเมื่อเวลาเหลือ 10 วินาที */
         .countdown {
-            animation: heartbeat 1s infinite; /* กระพริบสี */
+            animation: heartbeat 1s infinite;
         }
 
-        /* ปุ่มเต็มจอ */
         #fullscreenButton {
             position: fixed;
             right: 20px;
@@ -143,11 +140,10 @@
     <div id="fullscreenButton" onclick="toggleFullscreen()">เต็มจอ</div>
 
     <script>
-        let timeLeft = localStorage.getItem('timeLeft') ? parseInt(localStorage.getItem('timeLeft')) : 1200; // เริ่มต้นเวลา 20 นาที (1200 วินาที)
+        let timeLeft = localStorage.getItem('timeLeft') ? parseInt(localStorage.getItem('timeLeft')) : 1200;
         let timer;
         let isRunning = false;
 
-        // ข้อความแจ้งเตือนตามนาที:วินาที
         let alertTimes = [
             {time: "8:00", message: "เหลือ 8 นาที ใกล้หมดเวลานำเสนอ"},
             {time: "5:00", message: "หมดเวลานำเสนอ"},
@@ -157,20 +153,18 @@
         function updateDisplay() {
             let minutes = Math.floor(timeLeft / 60);
             let seconds = timeLeft % 60;
-            let displayString = minutes + ':' + seconds.toString().padStart(2, '0');
+            let displayString = minutes > 0 ? minutes + ':' + seconds.toString().padStart(2, '0') : seconds.toString().padStart(2, '0');
 
             const timerDisplay = document.getElementById("timerDisplay");
             timerDisplay.innerText = displayString;
 
-            // เพิ่มการเปลี่ยนสีเมื่อเหลือ 10 วินาที
             if (timeLeft <= 10 && timeLeft > 0) {
                 timerDisplay.classList.add("countdown");
             } else {
                 timerDisplay.classList.remove("countdown");
-                timerDisplay.style.color = 'white'; // กลับเป็นสีขาว
+                timerDisplay.style.color = 'white';
             }
 
-            // บันทึกค่าเวลาใน localStorage
             localStorage.setItem('timeLeft', timeLeft);
         }
 
@@ -188,7 +182,7 @@
 
                             if (timeLeft === alertTimeInSeconds) {
                                 document.getElementById("timerDisplay").style.opacity = 0;
-                                
+
                                 const messageElement = document.getElementById("message");
                                 messageElement.innerText = alert.message;
                                 messageElement.style.display = "block";
@@ -211,9 +205,9 @@
                             clearInterval(timer);
                             isRunning = false;
                             document.getElementById("timerDisplay").innerText = alertTimes[alertTimes.length - 1].message;
-                            
+
                             setTimeout(() => {
-                                timeLeft = 1200; // รีเซ็ตเวลา
+                                timeLeft = 1200;
                                 updateDisplay();
                             }, 2000);
                         }
@@ -237,7 +231,7 @@
             event.stopPropagation();
             const sidebar = document.getElementById("sidebar");
             sidebar.classList.toggle("open");
-            resetMenuTimer(); // รีเซ็ตเวลาเมื่อเปิดเมนู
+            resetMenuTimer();
         }
 
         document.body.addEventListener('click', function(event) {
@@ -247,7 +241,8 @@
             if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
                 sidebar.classList.remove("open");
             }
-            resetMenuTimer(); // รีเซ็ตเวลาเมื่อมีการคลิกที่อื่น
+            resetMenuTimer();
+            resetFullscreenTimer();
         });
 
         let menuTimeout;
@@ -255,20 +250,31 @@
             clearTimeout(menuTimeout);
 
             menuTimeout = setTimeout(() => {
-                document.getElementById("menuButton").style.display = "none"; // ซ่อนปุ่มเมนู
+                document.getElementById("menuButton").style.display = "none";
             }, 5000);
 
-            document.getElementById("menuButton").style.display = "block"; // แสดงปุ่มเมนู
+            document.getElementById("menuButton").style.display = "block";
+        }
+
+        let fullscreenTimeout;
+        function resetFullscreenTimer() {
+            clearTimeout(fullscreenTimeout);
+
+            fullscreenTimeout = setTimeout(() => {
+                document.getElementById("fullscreenButton").style.display = "none";
+            }, 5000);
+
+            document.getElementById("fullscreenButton").style.display = "block";
         }
 
         function toggleFullscreen() {
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+            } else if (document.documentElement.mozRequestFullScreen) {
                 document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+            } else if (document.documentElement.webkitRequestFullscreen) {
                 document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+            } else if (document.documentElement.msRequestFullscreen) {
                 document.documentElement.msRequestFullscreen();
             }
         }
