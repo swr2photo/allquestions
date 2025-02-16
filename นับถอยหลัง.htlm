@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation Timer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #111;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            flex-direction: column;
+            transition: background-color 0.3s ease;
+        }
+        #timerDisplay {
+            font-size: 20vw;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+            transition: opacity 0.3s ease;
+        }
+        #message {
+            font-size: 5em;
+            margin-top: 20px;
+            color: #ffcc00;
+            display: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100%;
+            background: #222;
+            backdrop-filter: blur(10px);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            padding: 20px;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .sidebar.open {
+            transform: translateX(0);
+        }
+        .menu-button {
+            position: fixed;
+            left: 20px;
+            top: 20px;
+            background: #333;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        .menu-button:hover {
+            background-color: #444;
+        }
+        .menu-item {
+            margin: 20px 0;
+            font-size: 18px;
+            cursor: pointer;
+            color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .menu-item:hover {
+            background-color: #555;
+        }
+        .menu-item:active {
+            background-color: #666;
+        }
+        
+        /* แอนิเมชั่นที่ทำให้เลขแสดงสีไล่ไปมา */
+        @keyframes heartbeat {
+            0% {
+                color: #ff0000;
+            }
+            50% {
+                color: #ff8000;
+            }
+            100% {
+                color: #ff0000;
+            }
+        }
+
+        /* ใช้ gradient กับตัวเลขเมื่อเวลาเหลือ 10 วินาที */
+        .countdown {
+            animation: heartbeat 1s infinite; /* กระพริบสี */
+        }
+
+        /* ปุ่มเต็มจอ */
+        #fullscreenButton {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background-color: #333;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.5em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        #fullscreenButton:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-button" id="menuButton" onclick="toggleMenu(event)">☰ เมนู</div>
+    <div class="sidebar" id="sidebar">
+        <div class="menu-item" onclick="startTimer()">เริ่มจับเวลา</div>
+        <div class="menu-item" onclick="stopTimer()">หยุดจับเวลา</div>
+        <div class="menu-item" onclick="resetTimer()">รีเซ็ตเวลา</div>
+    </div>
+    <div id="timerDisplay">20:00</div>
+    <div id="message"></div>
+    <div id="fullscreenButton" onclick="toggleFullscreen()">เต็มจอ</div>
+
+    <script>
+        let timeLeft = localStorage.getItem('timeLeft') ? parseInt(localStorage.getItem('timeLeft')) : 1200; // เริ่มต้นเวลา 20 นาที (1200 วินาที)
+        let timer;
+        let isRunning = false;
+
+        // ข้อความแจ้งเตือนตามนาที:วินาที
+        let alertTimes = [
+            {time: "8:00", message: "เหลือ 8 นาที ใกล้หมดเวลานำเสนอ"},
+            {time: "5:00", message: "หมดเวลานำเสนอ"},
+            {time: "00:00", message: "หมดเวลาถาม-ตอบ"}
+        ];
+
+        function updateDisplay() {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            let displayString = minutes + ':' + seconds.toString().padStart(2, '0');
+
+            const timerDisplay = document.getElementById("timerDisplay");
+            timerDisplay.innerText = displayString;
+
+            // เพิ่มการเปลี่ยนสีเมื่อเหลือ 10 วินาที
+            if (timeLeft <= 10 && timeLeft > 0) {
+                timerDisplay.classList.add("countdown");
+            } else {
+                timerDisplay.classList.remove("countdown");
+                timerDisplay.style.color = 'white'; // กลับเป็นสีขาว
+            }
+
+            // บันทึกค่าเวลาใน localStorage
+            localStorage.setItem('timeLeft', timeLeft);
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                timer = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+
+                        alertTimes.forEach(alert => {
+                            let [alertMinutes, alertSeconds] = alert.time.split(":");
+                            let alertTimeInSeconds = parseInt(alertMinutes) * 60 + parseInt(alertSeconds);
+
+                            if (timeLeft === alertTimeInSeconds) {
+                                document.getElementById("timerDisplay").style.opacity = 0;
+                                
+                                const messageElement = document.getElementById("message");
+                                messageElement.innerText = alert.message;
+                                messageElement.style.display = "block";
+                                setTimeout(() => {
+                                    messageElement.style.opacity = 1;
+                                }, 50);
+
+                                setTimeout(() => {
+                                    messageElement.style.opacity = 0;
+                                    setTimeout(() => {
+                                        messageElement.style.display = "none";
+                                        updateDisplay();
+                                        document.getElementById("timerDisplay").style.opacity = 1;
+                                    }, 500);
+                                }, 10000);
+                            }
+                        });
+
+                        if (timeLeft === 0) {
+                            clearInterval(timer);
+                            isRunning = false;
+                            document.getElementById("timerDisplay").innerText = alertTimes[alertTimes.length - 1].message;
+                            
+                            setTimeout(() => {
+                                timeLeft = 1200; // รีเซ็ตเวลา
+                                updateDisplay();
+                            }, 2000);
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timer);
+            isRunning = false;
+        }
+
+        function resetTimer() {
+            stopTimer();
+            timeLeft = 1200;
+            updateDisplay();
+        }
+
+        function toggleMenu(event) {
+            event.stopPropagation();
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("open");
+            resetMenuTimer(); // รีเซ็ตเวลาเมื่อเปิดเมนู
+        }
+
+        document.body.addEventListener('click', function(event) {
+            const sidebar = document.getElementById("sidebar");
+            const menuButton = document.getElementById("menuButton");
+
+            if (!sidebar.contains(event.target) && !menuButton.contains(event.target)) {
+                sidebar.classList.remove("open");
+            }
+            resetMenuTimer(); // รีเซ็ตเวลาเมื่อมีการคลิกที่อื่น
+        });
+
+        let menuTimeout;
+        function resetMenuTimer() {
+            clearTimeout(menuTimeout);
+
+            menuTimeout = setTimeout(() => {
+                document.getElementById("menuButton").style.display = "none"; // ซ่อนปุ่มเมนู
+            }, 5000);
+
+            document.getElementById("menuButton").style.display = "block"; // แสดงปุ่มเมนู
+        }
+
+        function toggleFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+                document.documentElement.msRequestFullscreen();
+            }
+        }
+
+        updateDisplay();
+    </script>
+</body>
+</html>
