@@ -277,7 +277,17 @@
             } else if (document.documentElement.msRequestFullscreen) {
                 document.documentElement.msRequestFullscreen();
             }
+
+            // ซ่อนปุ่มเต็มจอเมื่อเข้าสู่โหมดเต็มจอ
+            document.getElementById("fullscreenButton").style.display = "none";
         }
+
+        // ฟังก์ชันเมื่อออกจากโหมดเต็มจอ
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement) {
+                document.getElementById("fullscreenButton").style.display = "block"; // แสดงปุ่มเมื่อออกจากโหมดเต็มจอ
+            }
+        });
 
         updateDisplay();
     </script>
