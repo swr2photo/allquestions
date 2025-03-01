@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Quiz 4% หัวข้อ สีบำบัด </title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Search Box Styles */
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            width: 70%; /* ลดขนาดช่องค้นหา */
+            padding: 12px 15px;
+            font-size: 1.1rem;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 5px rgba(0, 120, 212, 0.3);
+        }
+
+        .search-btn, .clear-btn {
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-btn {
+            background-color: #0078d4;
+            color: white;
+            border: none;
+        }
+
+        .search-btn:hover {
+            background-color: #005bb5;
+        }
+
+        .clear-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            display: none; /* Hide clear button initially */
+        }
+
+        .clear-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #d32f2f;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .question {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            background: #f9fafb;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+            transition: transform 0.3s ease-in-out, background-color 0.3s ease;
+        }
+
+        .question:hover {
+            transform: translateY(-5px);
+            background-color: #f0f8ff;
+        }
+
+        .question-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .question-number {
+            font-weight: bold;
+            color: #4a90e2;
+            font-size: 1.2rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: #555;
+            margin: 0;
+        }
+
+        .answer-container {
+            font-size: 1rem;
+            color: #333;
+            padding: 8px 12px;
+            margin: 8px 0;
+            background-color: #f4f6f8;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .answer-container:hover {
+            background-color: #e0e0e0;
+        }
+
+        /* Correct Answer Highlight */
+        .correct {
+            background-color: #d4f8d4; /* Light green for correct answers */
+            color: #2e7d32;
+            font-weight: bold;
+            border-color: #6bc46d;
+        }
+
+        /* Disable Copy */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            h3 {
+                font-size: 1.8rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 60%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 40px;
+                height: 40px;
+                padding: 0;
+                font-size: 1.5rem;
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .search-btn i, .clear-btn i {
+                font-size: 1.2rem;
+            }
+
+            .search-btn-text, .clear-btn-text {
+                display: none;
+            }
+
+            /* Hide the clear button on mobile */
+            .clear-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h3 {
+                font-size: 1.5rem;
+            }
+
+            .search-container {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .search-box {
+                width: 50%;
+            }
+
+            .search-btn, .clear-btn {
+                width: 35px;
+                height: 35px;
+                padding: 0;
+                font-size: 1rem;
+            }
+        }
+
+        /* Desktop Styles */
+        @media (min-width: 769px) {
+            .search-btn-text, .clear-btn-text {
+                display: inline-block;
+                margin-left: 8px;
+                font-size: 1rem;
+            }
+
+            .search-btn, .clear-btn {
+                font-size: 1.2rem;
+                padding: 12px 25px;
+            }
+
+            /* Adjust width of search box for desktop */
+            .search-box {
+                width: 50%; /* ลดขนาดช่องค้นหาในเดสก์ท็อป */
+            }
+
+            /* Hide the clear button on desktop */
+            .clear-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h3> Quiz 4% หัวข้อ สีบำบัด </h3>
+
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-box" placeholder="Search questions..." onkeyup="searchContent()">
+            <button class="search-btn" onclick="searchContent()">
+                <i class="fas fa-search"></i><span class="search-btn-text">Search</span>
+            </button>
+            <button class="clear-btn" onclick="clearSearch()">
+                <i class="fas fa-times"></i><span class="clear-btn-text">Clear</span>
+            </button>
+        </div>
+
+        <!-- Quiz Section -->
+       <div id="quizContainer">
+
+  <div class="question">
+    <div class="question-header">
+        <p class="question-text">กระบวนการกลืนกลายทางวัฒนธรรมที่จัดว่าสมบูรณ์ที่สุด คือ</p>
+    </div>
+    <div class="answer-container correct">
+        กระบวนการกลืนกลายทางชีวภาพ
+    </div>
+    <div class="answer-container">
+        กระบวนการกลืนกลายทางสังคม
+    </div>
+    <div class="answer-container">
+        การบูรณาการทางวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        การสังสรรค์ทางวัฒนธรรม
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">การที่วัฒนธรรมจากกลุ่มหนึ่งถ่ายทอดไปสู่กลุ่มอื่นเรียกว่าการแพร่กระจายทางวัฒนธรรม</p>
+    </div>
+    <div class="answer-container correct">
+        True
+    </div>
+    <div class="answer-container">
+        False
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ข้อใดไม่ใช่ลักษณะพื้นฐานที่สำคัญของวัฒนธรรม</p>
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมเป็นสิ่งที่ไม่หยุดนิ่ง และวัฒนธรรมเป็นสิ่งที่มนุษย์เรียนรู้ทีละเล็กน้อย
+    </div>
+    <div class="answer-container correct">
+        วัฒนธรรมเป็นเรื่องของกิจกรรมที่กำหนดขึ้นโดยองค์กรภาครัฐ มีจุดเริ่มต้นและการกำหนดวันสิ้นสุด มีลักษณะชั่วคราว
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมเป็นความคิดร่วม และวัฒนธรรมมีพื้นฐานมาจากการใช้สัญลักษณ์
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมเป็นองค์รวมของความรู้และภูมิปัญญา
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">การสื่อสารภายใต้มิติความหลากหลายทางวัฒนธรรมต้องให้ความสำคัญกับการศึกษาลักษณะเฉพาะข้อใด</p>
+    </div>
+    <div class="answer-container">
+        ความแตกต่างในเรื่องของบทบาทพฤติกรรมที่เหมาะสมระหว่างผู้ชายและผู้หญิงในแต่ละวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        ช่องว่างของอำนาจ ความเป็นส่วนตัว และการรวมเป็นกลุ่ม
+    </div>
+    <div class="answer-container">
+       การหลีกเลี่ยงความไม่แน่นอน เช่น เหตุการณ์ที่อาจจะก่อให้เกิดความไม่มั่นใจ ซึ่งความไม่มั่นใจนั้นเป็นบ่อเกิดของความกังวลใจ และแน่นอนว่าบุคคลจะแสดงออกถึงความไม่มั่นใจในรูปแบบที่แตกต่างกัน
+    </div>
+    <div class="answer-container correct">
+        ถูกทุกข้อ
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">วัฒนธรรมมีหน้าที่สนองตอบความต้องการพื้นฐานของมนุษย์ เช่น สอนให้มนุษย์รู้จักหาอาหารอย่างมีประสิทธิภาพ วางกฎเกณฑ์ให้มนุษย์ดำเนินชีวิตอย่างมีระเบียบแบบแผน เพื่อให้สังคมทำงานได้อย่างมีระบบ หมายถึงสิ่งใด</p>
+    </div>
+    <div class="answer-container correct">
+        วัฒนธรรมเป็นองค์รวมของความรู้
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมมีพื้นฐานมาจากการใช้สัญลักษณ์
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมเป็นสิ่งที่ไม่หยุดนิ่ง
+    </div>
+    <div class="answer-container">
+        การแพร่วัฒนธรรม
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">"เมื่อกลุ่มชนที่มีวัฒนธรรมต่างกันมีการแพร่กระจายและการรับวัฒนธรรมกันขึ้น ส่งผลให้เกิดการเปลี่ยนแปลงขึ้นกับฝ่ายใดฝ่ายหนึ่งหรือทั้งสองฝ่ายก็ได้ เช่น ชาวไทยมีความสัมพันธ์อย่างใกล้ชิดกับชาวจีนจึงรับอาหารจีนมาบริโภค" ข้อความดังเป็นเรื่องการสังสรรค์วัฒนธรรม</p>
+    </div>
+    <div class="answer-container">
+        True
+    </div>
+    <div class="answer-container correct">
+        False
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ข้อใดกล่าวไม่ถูกต้องเกี่ยวกับ ความสำคัญของวัฒนธรรม</p>
+    </div>
+    <div class="answer-container correct">
+        วัฒนธรรมคือสิ่งที่อยู่เหนือมนุษย์
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมเป็นเครื่องแสดงเอกลักษณ์ของชาติ
+    </div>
+    <div class="answer-container">
+        แสดงถึงเอกลักษณ์ของสังคม
+    </div>
+    <div class="answer-container">
+       วัฒนธรรมเป็นตัวกำหนดรูปแบบของสถาบัน
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ข้อใดเป็นลักษณะหรืออาการของบุคคลที่ไม่สามารถที่จะปรับตัวให้สอดคล้องหรือเข้ากับวัฒนธรรมใหม่ที่ไม่คุ้นเคย ซึ่งอาจมีอาการ ตื่นเต้น วิตกกังวล ประหม่า และอาจถึงขั้นเป็นลมหมดสติ หรือหัวใจวายจนถึงแก่ชีวิต</p>
+    </div>
+    <div class="answer-container correct">
+        การตื่นตระหนกทางวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        ความรู้สึกสอดคล้องทางวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        การปรับตัวทางวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        การแพร่กระจายและการยืมวัฒนธรรม
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">วัฒนธรรมคือ วิถีการดำเนินชีวิต ความคิด ความเชื่อ ค่านิยม จารีตประเพณี พิธีกรรม และภูมิปัญญา ซึ่งกลุ่มชนและสังคมได้ร่วมสร้างสรรค์สั่งสม ปลูกฝัง สืบทอด เรียนรู้ ปรับปรุง และ เปลี่ยนแปลง เพื่อให้เกิดความเจริญงอกงามทั้งด้านจิตใจและวัตถุอย่างสันติสุขและยั่งยืน</p>
+    </div>
+    <div class="answer-container correct">
+        True
+    </div>
+    <div class="answer-container">
+        False
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">อัตราในการตื่นตระหนกทางวัฒนธรรมของบุคคล จะมากหรือน้อยขึ้นอยู่กับสิ่งใด</p>
+    </div>
+    <div class="answer-container correct">
+        ขบวนการปลูกฝังสั่งสอนวัฒนธรรมเดิม มีความนิยมในวัฒนธรรมของตนเองมากเกินไป
+    </div>
+    <div class="answer-container">
+       การส่งเสริมให้เกิดการยอมรับในความแตกต่างหลายทางวัฒนธรรมอย่างเท่าเทียม
+    </div>
+    <div class="answer-container">
+        การฟื้นตัวและการเรียนรู้วัฒนธรรมใหม่
+    </div>
+    <div class="answer-container">
+        การฟักตัวและวิกฤติของวัฒนธรรมใหม่
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ข้อใดไม่ใช่เป็นสาเหตุของความแตกต่างทางวัฒนธรรม ท่ามกลางการเปลี่ยนแปลงของสังคมยุคใหม่ที่มีการพัฒนาอย่างก้าวกระโดดของนวัตกรรม เทคโนโลยี ความรู้ใหม่ และการสื่อสารที่ไร้พรมแดน</p>
+    </div>
+    <div class="answer-container correct">
+        เป็นสภาวะที่เกิดขึ้นทางจิตใจ อารมณ์ และความรู้สึกที่มีต่อพฤติกรรมที่แตกต่างไปจากพฤติกรรมเดิมที่บุคคลเคยรับรู้ เคยเห็น เคยปฏิบัติ และมีประสบการณ์มาก่อน
+    </div>
+    <div class="answer-container">
+        การท่องเที่ยวเป็นอีกกิจกรรมหนึ่งที่ทำให้ผู้อาศัยอยู่ในประเทศต่าง ๆ ได้เดินทางไปมาหาสู่
+    </div>
+    <div class="answer-container">
+        ความสัมพันธ์ในระดับรัฐกับกลุ่มนักลงทุน อันเป็นเรื่องของการค้า การลงทุน การทำธุรกิจ เพื่อหวังผลตอบแทน ในด้านเศรษฐกิจ หรือการศึกษาและการเมืองเป็นสำคัญ
+    </div>
+   <div class="answer-container">
+        การอพยพจากสภาพสังคมแบบชนบทไปสู่สังคมเมืองภายในประเทศเดียวกันหรือต่างประเทศ เพื่อการศึกษาหาความรู้ การทำงาน หรือการประกอบอาชีพ อันเป็นส่วนหนึ่งของการเคลื่อนย้ายแรงงาน
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ข้อใดเป็นองค์ประกอบของบุคคลที่มีความรู้สึกสอดคล้องกลมกลืนในการดำเนินชีวิตท่ามกลางความหลากหลายทางวัฒนธรรม ได้เป็นอย่างดี</p>
+    </div>
+   <div class="answer-container">
+        การรับรู้และประเมินของบุคคลว่าปัญหาหรือสิ่งที่เกิดขึ้นในชีวิตเป็นสิ่งที่มีความหมาย มีคุณค่าและตนมีกําลังความสามารถเพียงพอที่จะเข้าไปจัดการ โดยมองปัญหาที่เกิดขึ้นว่าเป็นสิ่งที่ท้าท้าย คุ้มค่าที่จะจัดการมากกว่าที่จะมองว่าเป็นปัญหา
+    </div>
+    <div class="answer-container">
+        เมื่อบุคคลต้องเผชิญเหตุการณ์ต่าง ๆ บุคคลสามารถเข้าใจความหมายของสิ่งที่เกิดขึ้นนั้น ๆ ได้ โดยใช้สติปัญญาในการทําความเข้าใจ ว่าเป็นสิ่งธรรมดาที่บุคคลอาจจะต้องพบเจอ
+    </div>
+    <div class="answer-container correct">
+        ถูกทุกข้อ
+    </div>
+    <div class="answer-container">
+        การรับรู้และประเมินของบุคคลว่าตนมีแหล่งทรัพยากรเพียงพอที่จะใช้ตอบสนอง หรือจัดการกับปัญหาที่รุมเร้าตนอยู่ ซึ่งสิ่งที่นํามาจัดการนั้นอาจนํามาจากความสามารถภายในตนเอง เช่น สติปัญญา การค้นคว้าหาความรู้ หรือจากความสามารถภายนอกจากแหล่งอื่น เช่นกลุ่มเพื่อน
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ลักษณะบุคคลที่พยายามใช้องค์ความรู้ทางวัฒนธรรมเพื่อให้เข้าใจแก่นแท้ มีความยินดีและพยายามที่จะมีปฏิสัมพันธ์กับผู้ที่มีวัฒนธรรมแตกต่างที่อยู่ในวัฒนธรรมที่แตกต่างด้วยความตั้งใจ ใฝ่รู้และเคารพ มีความสามารถในการปรับตัวเองไปมาระหว่างสองวัฒนธรรมได้อย่างเหมาะสมกลมกลืน พร้อมทั้งมีความเชื่อในวีถีของตนเองว่าเป็นวิถีสากลหรือวิถีทางปกติ เป็นลักษณะกลุ่มใด</p>
+    </div>
+    <div class="answer-container">
+        กลุ่มปรับตัว (adjusting)
+    </div>
+    <div class="answer-container">
+       กลุ่มเข้าใจ (understanding)
+    </div>
+     <div class="answer-container">
+        กลุ่มไม่ปรับตัว (no adapt)
+    </div>
+    <div class="answer-container correct">
+        กลุ่มเรียนรู้ (learning)
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">กระบวนการที่เกิดขึ้นเมื่อคนสองกลุ่มที่มีวัฒนธรรมที่ต่างกันติดต่อกันยาวนานและต่อเนื่อง จนกระทั่ง ได้มีการเปลี่ยนแปลงวัฒนธรรมเดิมและหันไปรับวัฒนธรรมใหม่ทั้งหมด หมายถึงสิ่งใด</p>
+    </div>
+    <div class="answer-container correct">
+       กระบวนการกลืนกลายทางวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        ความร่วมมือทางวัฒนธรรม
+    </div>
+   <div class="answer-container">
+        การยืมวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        ความซับซ้อนของวัฒนธรรม
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ข้อใดกล่าวถึงแนวคิดพื้นฐานเกี่ยวกับความแตกต่างและความหลากหลายทางวัฒนธรรมได้อย่างถูกต้อง</p>
+    </div>
+    <div class="answer-container correct">
+        ถูกทุกข้อ
+    </div>
+  <div class="answer-container">
+        การยืนยันอัตลักษณ์ทางวัฒนธรรมของกลุ่มตนเอง และเรียนรู้คุณค่าของมรดกทางวัฒนธรรม ของกลุ่มตน
+    </div>
+    <div class="answer-container">
+        การให้คุณค่าความหลากหลายทางวัฒนธรรม เอาใจใส่ต่อการดำรงอยู่ของกลุ่มวัฒนธรรมที่แตกต่าง โดยมีวัตถุประสงค์ให้ผู้คนมีความเคารพวัฒนธรรมที่แตกต่างในพื้นที่ต่าง ๆ ที่มีกลุ่มวัฒนธรรมดำรงอยู่
+    </div>
+    <div class="answer-container">
+       การเคารพและมีความปรารถนาที่จะเรียนรู้เพื่อทำความเข้าใจและเรียนรู้วัฒนธรรมของคนอื่น
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">อุดมการณ์ ค่านิยม แนวคิด ภาษา ความเชื่อทางศาสนา ขนมธรรมเนียมประเพณี ลัทธิการเมือง กฎหมาย วิธีการกระทำ และแบบแผนในการดำเนินชีวิต อันเป็นวัฒนธรรมในรูปแบบใด</p>
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมเชิงกระบวนการ
+    </div>
+    <div class="answer-container correct">
+        วัฒนธรรมที่ไม่ใช่วัตถุ
+    </div>
+     <div class="answer-container">
+        การยืมวัฒนธรรม
+    </div>
+    <div class="answer-container">
+        วัฒนธรรมร่วมสมัย
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">การปรับตัวแบบ W-curve ในส่วนที่ 3 หมายถึงสิ่งใด</p>
+    </div>
+    <div class="answer-container">
+        ช่วงเปลี่ยนถิ่นฐาน
+    </div>
+    <div class="answer-container">
+        ภาวะความเครียด
+    </div>
+    <div class="answer-container correct">
+        ช่วงที่บุคคลรู้สึกเข้าที่เข้าทางมากขึ้น
+    </div>
+    <div class="answer-container">
+        ช่วงที่บุคคลรู้สึกเข้าที่เข้าทางกับสภาพแวดล้อมใหม่มากขึ้น
+    </div>
+</div>
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">บุคคลที่สามารถปรับตัวต่อการ เปลี่ยนแปลงของสภาพแวดล้อมทั้งทางกายภาพและทางจิตวิทยาได้ดีนั้น จะนํามาซึ่งความสงบสุขทั้ง ทางกาย และทางใจ รวมทั้งส่งผลดีต่อบุคคลรอบข้าง คนใกล้ชิด ตลอดจนคนที่อยู่ในสังคมนั้นด้วย</p>
+    </div>
+    <div class="answer-container correct">
+        True
+    </div>
+    <div class="answer-container">
+        False
+    </div>
+</div>
+
+<div class="question">
+    <div class="question-header">
+        <p class="question-text">ความคิดและพฤติกรรมที่ติดตัวบุคคล เมื่อบุคคลไปถึงที่ใดวัฒนธรรมก็จะไปถึงที่นั้นด้วย ดังนั้นการแพร่กระจายของวัฒนธรรมจะ ขึ้นอยู่กับปัจจัยหลักภูมิศาสตร์ ปัจจัยทางเศรษฐกิจ ปัจจัยทางสังคม การคมนาคมขนส่ง</p>
+    </div>
+    <div class="answer-container correct">
+        True
+    </div>
+    <div class="answer-container">
+        False
+    </div>
+</div>
+</div>
+<style>
+
+/* Match Container */
+.match-container {
+    display: flex;
+    justify-content: space-between; /* จัดเรียงสองฝั่ง */
+    gap: 20px;
+    margin-top: 10px;
+}
+
+/* Match Column */
+.match-column {
+    flex: 1; /* ให้ขนาดคอลัมน์เท่ากัน */
+    display: flex;
+    flex-direction: column; /* ปรับให้เป็นแนวตั้งในจอเล็ก */
+    gap: 15px;
+}
+
+/* Match Item */
+.match-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Hover Effect */
+.match-item:hover {
+    background-color: #e8f4ff;
+    transform: scale(1.02);
+}
+
+/* Correct Answer */
+.match-item.correct {
+    background-color: #d4f8d4; /* สีเขียวอ่อน */
+    color: #2e7d32; /* สีเขียวเข้ม */
+    border-color: #6bc46d; /* เส้นขอบสีเขียว */
+}
+
+/* Responsive Design for Small Screens */
+@media (max-width: 768px) {
+    .match-container {
+        flex-direction: column; /* เปลี่ยนเป็นแนวตั้งในจอเล็ก */
+    }
+
+    .match-column {
+        flex: none; /* ให้คอลัมน์กลับมาเป็นขนาดอัตโนมัติ */
+    }
+
+    .match-item {
+        padding: 10px; /* ลดขนาด padding สำหรับจอเล็ก */
+    }
+}
+
+.match-item {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.match-item.correct {
+    background-color: #d4f8d4;
+    color: #2e7d32;
+    border-color: #6bc46d;
+}
+
+</style>
+
+
+
+       
+        <!-- No Results Message -->
+        <div id="noResults" class="no-results" style="display: none;">
+            No results found!
+        </div>
+   
+
+    <script>
+        function searchContent() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const questions = document.querySelectorAll('.question');
+            let hasResults = false;
+
+            questions.forEach(question => {
+                const text = question.textContent.toLowerCase();
+                if (text.includes(input)) {
+                    question.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    question.style.display = 'none';
+                }
+            });
+
+            document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
+
+            const clearBtn = document.querySelector('.clear-btn');
+            if (input.length > 0) {
+                clearBtn.style.display = 'inline-block';
+            } else {
+                clearBtn.style.display = 'none';
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchContent();
+        }
+    </script>
+</body>
+</html>
