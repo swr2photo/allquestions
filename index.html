@@ -216,18 +216,17 @@
   <!-- Popup Announcement -->
   <div class="popup-overlay" id="popup-overlay">
     <div class="popup-content">
-      <div class="popup-header">พลเมืองที่ดี - ประกาศสำคัญ</div>
+      <div class="popup-header">ธรรมชาติบำบัด- ประกาศสำคัญ</div>
       <span class="close-btn" id="close-popup">&times;</span>
-      <h1>ข้อสอบย่อย หน่วยที่ 3 15 คะแนน <br> (20-24 มกราคม 2568 )</h1>
+      <h1>ข้อสอบปลายภาค 20 คะแนน <br> </h1>
       <p>
 นักศึกษามีสิทธิเข้าระบบเพื่อทำข้อสอบได้ครั้งเดียว ครั้งที่สองจะไม่มีสิทธิทำข้อสอบ<br>
-         Attempts allowed: 1 <br>
-        This quiz opened at Monday, 20 January 2025, 1:00 AM<br>
-        This quiz will close on Friday, 24 January 2025, 11:40 PM.
+         
+        
       </p>
-      <p class="update-time">Updated: 20 January 2025</p>
+      <p class="update-time">Updated: 19 มีนาคม 2568</p>
       <button class="btn" id="start-redirect">เปิดทำข้อสอบ</button>
-      <div class="popup-footer">© พลเมืองที่ดี | PSU</div>
+      <div class="popup-footer">© doralaikon | PSU</div>
     </div>
   </div>
 
@@ -243,8 +242,8 @@
     const bangkokTime = new Date(now.getTime() + bangkokOffset);
 
     // กำหนดช่วงเวลาเปิด Popup
-    const startDate = new Date("2025-01-20T19:00:00+07:00");
-    const endDate = new Date("2025-01-22T23:59:59+07:00");
+    const startDate = new Date("2025-03-19T12:00:00+07:00");
+    const endDate = new Date("2025-03-19T23:59:59+07:00");
 
     // แสดง Popup หากอยู่ในช่วงเวลา
     if (bangkokTime >= startDate && bangkokTime <= endDate) {
@@ -263,7 +262,7 @@
       popupOverlay.style.display = "none";
 
       setTimeout(() => {
-        window.location.href = "https://doralaikon.online/allquestions/course/ธรรมชาติบำบัด/ข้อสอบกลางภาคธรรมชาติบำบัด"; // URL ของข้อสอบ
+        window.location.href = "https://doralaikon.online/allquestions/course/ธรรมชาติบำบัด/ข้อสอบปลายภาคธรรมชาติบำบัด"; // URL ของข้อสอบ
       }, 5000); // Redirect หลัง 5 วินาที
     });
   });
