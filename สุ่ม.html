@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สุ่มแบ่งกลุ่ม (สูงสุด 9 คนต่อกลุ่ม)</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            margin: 20px;
+            background: #f0f8ff;
+        }
+        .container {
+            max-width: 400px;
+            margin: auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            width: 90%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .name-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+        }
+        .name-list li {
+            padding: 5px;
+            background: #dff0d8;
+            margin: 5px 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .delete-btn {
+            background: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .group-box {
+            padding: 10px;
+            margin: 10px 0;
+            background: #e0f7fa;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .copy-btn {
+            margin-top: 10px;
+            background: #28a745;
+        }
+        .copy-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>สุ่มแบ่งกลุ่ม (สูงสุด 9 คนต่อกลุ่ม)</h2>
+        <input type="text" id="nameInput" placeholder="กรอกชื่อเล่น">
+        <button onclick="addName()">เพิ่ม</button>
+        <h3>รายชื่อที่เพิ่ม</h3>
+        <ul id="nameList" class="name-list"></ul>
+        <button onclick="shuffleGroups()">สุ่มแบ่งกลุ่ม</button>
+        <h3>ผลลัพธ์การแบ่งกลุ่ม</h3>
+        <div id="groupResult"></div>
+        <button class="copy-btn" onclick="copyResults()">คัดลอกผลลัพธ์</button>
+    </div>
+
+    <script>
+        let names = [];
+
+        function addName() {
+            let name = document.getElementById("nameInput").value.trim();
+            if (name && !names.includes(name)) {
+                names.push(name);
+                document.getElementById("nameInput").value = "";
+                displayNames();
+            }
+        }
+
+        function displayNames() {
+            let nameList = document.getElementById("nameList");
+            nameList.innerHTML = names.map((n, index) => 
+                `<li>${n} <button class="delete-btn" onclick="removeName(${index})">ลบ</button></li>`
+            ).join("");
+        }
+
+        function removeName(index) {
+            names.splice(index, 1);
+            displayNames();
+        }
+
+        function shuffleGroups() {
+            let shuffled = [...names].sort(() => Math.random() - 0.5);
+            let groups = [];
+            while (shuffled.length) {
+                groups.push(shuffled.splice(0, 9));
+            }
+
+            let result = document.getElementById("groupResult");
+            result.innerHTML = groups.map((group, i) => 
+                `<div class="group-box"><strong>กลุ่มที่ ${i + 1}:</strong> ${group.join(", ")}</div>`
+            ).join("");
+        }
+
+        function copyResults() {
+            let text = document.getElementById("groupResult").innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("คัดลอกผลลัพธ์เรียบร้อย!");
+            });
+        }
+    </script>
+
+</body>
+</html>
