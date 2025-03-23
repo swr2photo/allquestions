@@ -8,13 +8,14 @@
         body {
             font-family: 'Arial', sans-serif;
             text-align: center;
-            margin: 20px;
+            margin: 10px;
             background: #f0f8ff;
         }
         .container {
-            max-width: 500px;
+            max-width: 95%;
+            width: 400px;
             margin: auto;
-            padding: 20px;
+            padding: 15px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -26,6 +27,11 @@
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
         }
         button {
             background: #007bff;
@@ -49,6 +55,15 @@
         }
         .copy-btn:hover {
             background: #218838;
+        }
+        .name-list {
+            max-height: 100px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background: #fff;
         }
         .name-list span {
             display: inline-block;
@@ -94,10 +109,19 @@
             let shuffled = [...names].sort(() => Math.random() - 0.5);
             let groups = Array.from({ length: groupCount }, () => []);
 
-            let i = 0;
+            // กระจายคนให้แต่ละกลุ่มมีจำนวนใกล้เคียงกัน
+            let baseSize = Math.floor(names.length / groupCount);
+            let extraMembers = names.length % groupCount;
+
+            // เติมสมาชิกตามขนาดพื้นฐานก่อน
+            for (let i = 0; i < groupCount; i++) {
+                groups[i] = shuffled.splice(0, baseSize);
+            }
+
+            // แจกคนที่เหลือไปยังกลุ่มแบบสุ่ม
             while (shuffled.length > 0) {
-                groups[i % groupCount].push(shuffled.pop());
-                i++;
+                let randomGroup = Math.floor(Math.random() * groupCount);
+                groups[randomGroup].push(shuffled.pop());
             }
 
             let groupResultDiv = document.getElementById("groupResult");
@@ -113,7 +137,7 @@
 
                 groupResultDiv.innerHTML += `<div class="group-box"><strong>กลุ่มที่ ${index + 1}:</strong> ${groups[index].join(", ")}</div>`;
                 
-                setTimeout(() => showNextGroup(index + 1), 1000);
+                setTimeout(() => showNextGroup(index + 1), 800);
             }
 
             showNextGroup(0);
