@@ -109,19 +109,21 @@
             let shuffled = [...names].sort(() => Math.random() - 0.5);
             let groups = Array.from({ length: groupCount }, () => []);
 
-            // กระจายคนให้แต่ละกลุ่มมีจำนวนใกล้เคียงกัน
-            let baseSize = Math.floor(names.length / groupCount);
-            let extraMembers = names.length % groupCount;
+            // คำนวณจำนวนขั้นต่ำต่อกลุ่ม
+            let minSize = Math.floor(names.length / groupCount);
+            let extraMembers = names.length % groupCount; // คนที่เหลือ
 
-            // เติมสมาชิกตามขนาดพื้นฐานก่อน
+            // เติมแต่ละกลุ่มให้ได้ขนาดขั้นต่ำก่อน
             for (let i = 0; i < groupCount; i++) {
-                groups[i] = shuffled.splice(0, baseSize);
+                groups[i] = shuffled.splice(0, minSize);
             }
 
-            // แจกคนที่เหลือไปยังกลุ่มแบบสุ่ม
+            // สุ่มแจกคนที่เหลือไปยังกลุ่มต่าง ๆ
             while (shuffled.length > 0) {
                 let randomGroup = Math.floor(Math.random() * groupCount);
-                groups[randomGroup].push(shuffled.pop());
+                if (groups[randomGroup].length === minSize) { // เพิ่มเฉพาะกลุ่มที่ยังไม่ได้คนที่เหลือ
+                    groups[randomGroup].push(shuffled.pop());
+                }
             }
 
             let groupResultDiv = document.getElementById("groupResult");
