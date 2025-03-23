@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สุ่มแบ่งกลุ่ม (สูงสุด 9 คนต่อกลุ่ม)</title>
+    <title>สุ่มแบ่งกลุ่มอัตโนมัติ</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -12,15 +12,15 @@
             background: #f0f8ff;
         }
         .container {
-            max-width: 400px;
+            max-width: 500px;
             margin: auto;
             padding: 20px;
             background: white;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        input, button {
-            width: 90%;
+        textarea, button {
+            width: 100%;
             padding: 10px;
             margin: 5px 0;
             border: 1px solid #ccc;
@@ -35,27 +35,6 @@
         }
         button:hover {
             background: #0056b3;
-        }
-        .name-list {
-            list-style: none;
-            padding: 0;
-            text-align: left;
-        }
-        .name-list li {
-            padding: 5px;
-            background: #dff0d8;
-            margin: 5px 0;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-        .delete-btn {
-            background: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 3px;
         }
         .group-box {
             padding: 10px;
@@ -76,42 +55,22 @@
 <body>
 
     <div class="container">
-        <h2>สุ่มแบ่งกลุ่ม (สูงสุด 9 คนต่อกลุ่ม)</h2>
-        <input type="text" id="nameInput" placeholder="กรอกชื่อเล่น">
-        <button onclick="addName()">เพิ่ม</button>
-        <h3>รายชื่อที่เพิ่ม</h3>
-        <ul id="nameList" class="name-list"></ul>
-        <button onclick="shuffleGroups()">สุ่มแบ่งกลุ่ม</button>
+        <h2>สุ่มแบ่งกลุ่มอัตโนมัติ</h2>
+        <textarea id="nameInput" rows="5" placeholder="ใส่ชื่อเล่นทั้งหมด (คั่นด้วย , หรือ Enter)"></textarea>
+        <button onclick="shuffleGroups()">คำนวณแบ่งกลุ่ม</button>
         <h3>ผลลัพธ์การแบ่งกลุ่ม</h3>
         <div id="groupResult"></div>
         <button class="copy-btn" onclick="copyResults()">คัดลอกผลลัพธ์</button>
     </div>
 
     <script>
-        let names = [];
-
-        function addName() {
-            let name = document.getElementById("nameInput").value.trim();
-            if (name && !names.includes(name)) {
-                names.push(name);
-                document.getElementById("nameInput").value = "";
-                displayNames();
-            }
-        }
-
-        function displayNames() {
-            let nameList = document.getElementById("nameList");
-            nameList.innerHTML = names.map((n, index) => 
-                `<li>${n} <button class="delete-btn" onclick="removeName(${index})">ลบ</button></li>`
-            ).join("");
-        }
-
-        function removeName(index) {
-            names.splice(index, 1);
-            displayNames();
-        }
-
         function shuffleGroups() {
+            let inputText = document.getElementById("nameInput").value.trim();
+            if (!inputText) return;
+            
+            // แยกชื่อจาก input (รองรับทั้ง , และ Enter)
+            let names = inputText.split(/\s*[\n,]\s*/).filter(n => n);
+            
             let shuffled = [...names].sort(() => Math.random() - 0.5);
             let groups = [];
             while (shuffled.length) {
