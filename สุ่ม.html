@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สุ่มแบ่งกลุ่มอัตโนมัติ</title>
+    <title>สุ่มแบ่ง 9 กลุ่ม</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -50,16 +50,32 @@
         .copy-btn:hover {
             background: #218838;
         }
+        .name-list span {
+            display: inline-block;
+            padding: 5px;
+            margin: 3px;
+            border-radius: 5px;
+            background: #dff0d8;
+        }
+        .faded {
+            opacity: 0.5;
+            background: #ffdddd;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>สุ่มแบ่งกลุ่มอัตโนมัติ</h2>
+        <h2>สุ่มแบ่ง 9 กลุ่ม</h2>
         <textarea id="nameInput" rows="5" placeholder="ใส่ชื่อเล่นทั้งหมด (คั่นด้วย , หรือ Enter)"></textarea>
         <button onclick="shuffleGroups()">คำนวณแบ่งกลุ่ม</button>
+        
+        <h3>รายชื่อทั้งหมด</h3>
+        <div id="nameList" class="name-list"></div>
+
         <h3>ผลลัพธ์การแบ่งกลุ่ม</h3>
         <div id="groupResult"></div>
+
         <button class="copy-btn" onclick="copyResults()">คัดลอกผลลัพธ์</button>
     </div>
 
@@ -68,19 +84,37 @@
             let inputText = document.getElementById("nameInput").value.trim();
             if (!inputText) return;
             
-            // แยกชื่อจาก input (รองรับทั้ง , และ Enter)
             let names = inputText.split(/\s*[\n,]\s*/).filter(n => n);
-            
+
+            let nameListDiv = document.getElementById("nameList");
+            nameListDiv.innerHTML = names.map((n, i) => `<span id="name-${i}">${n}</span>`).join(" ");
+
             let shuffled = [...names].sort(() => Math.random() - 0.5);
-            let groups = [];
-            while (shuffled.length) {
-                groups.push(shuffled.splice(0, 9));
+            let groups = Array.from({ length: 9 }, () => []);
+
+            let i = 0;
+            while (shuffled.length > 0) {
+                groups[i % 9].push(shuffled.pop());
+                i++;
             }
 
-            let result = document.getElementById("groupResult");
-            result.innerHTML = groups.map((group, i) => 
-                `<div class="group-box"><strong>กลุ่มที่ ${i + 1}:</strong> ${group.join(", ")}</div>`
-            ).join("");
+            let groupResultDiv = document.getElementById("groupResult");
+            groupResultDiv.innerHTML = "";
+
+            function showNextGroup(index) {
+                if (index >= 9) return;
+
+                groups[index].forEach(name => {
+                    let nameIndex = names.indexOf(name);
+                    document.getElementById(`name-${nameIndex}`).classList.add("faded");
+                });
+
+                groupResultDiv.innerHTML += `<div class="group-box"><strong>กลุ่มที่ ${index + 1}:</strong> ${groups[index].join(", ")}</div>`;
+                
+                setTimeout(() => showNextGroup(index + 1), 1000);
+            }
+
+            showNextGroup(0);
         }
 
         function copyResults() {
