@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>สุ่มแบ่ง 9 กลุ่ม</title>
+    <title>สุ่มแบ่งกลุ่ม</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -19,7 +19,7 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        textarea, button {
+        textarea, button, input {
             width: 100%;
             padding: 10px;
             margin: 5px 0;
@@ -66,8 +66,9 @@
 <body>
 
     <div class="container">
-        <h2>สุ่มแบ่ง 9 กลุ่ม</h2>
+        <h2>สุ่มแบ่งกลุ่ม</h2>
         <textarea id="nameInput" rows="5" placeholder="ใส่ชื่อเล่นทั้งหมด (คั่นด้วย , หรือ Enter)"></textarea>
+        <input type="number" id="groupCount" placeholder="ใส่จำนวนกลุ่ม" min="1" value="9">
         <button onclick="shuffleGroups()">คำนวณแบ่งกลุ่ม</button>
         
         <h3>รายชื่อทั้งหมด</h3>
@@ -82,19 +83,20 @@
     <script>
         function shuffleGroups() {
             let inputText = document.getElementById("nameInput").value.trim();
-            if (!inputText) return;
+            let groupCount = parseInt(document.getElementById("groupCount").value);
+
+            if (!inputText || isNaN(groupCount) || groupCount < 1) return;
             
             let names = inputText.split(/\s*[\n,]\s*/).filter(n => n);
-
             let nameListDiv = document.getElementById("nameList");
             nameListDiv.innerHTML = names.map((n, i) => `<span id="name-${i}">${n}</span>`).join(" ");
 
             let shuffled = [...names].sort(() => Math.random() - 0.5);
-            let groups = Array.from({ length: 9 }, () => []);
+            let groups = Array.from({ length: groupCount }, () => []);
 
             let i = 0;
             while (shuffled.length > 0) {
-                groups[i % 9].push(shuffled.pop());
+                groups[i % groupCount].push(shuffled.pop());
                 i++;
             }
 
@@ -102,7 +104,7 @@
             groupResultDiv.innerHTML = "";
 
             function showNextGroup(index) {
-                if (index >= 9) return;
+                if (index >= groupCount) return;
 
                 groups[index].forEach(name => {
                     let nameIndex = names.indexOf(name);
