@@ -14,7 +14,7 @@
   <title>Allquiz - Home</title>
   <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* Responsive Enhancement */
+    /* Base styles from the original template */
     :root {
       --primary-color: #7C4DFF;
       --secondary-color: #651FFF;
@@ -53,929 +53,676 @@
       overflow-x: hidden;
     }
 
-    /* สไตล์การแสดงสกอล์เมาส์ */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary-color);
-      border-radius: 10px;
-      transition: background-color 0.3s ease;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--secondary-color);
-    }
-
-    /* Navbar */
-    .navbar {
-      background: linear-gradient(135deg, var(--dark-color), #424242);
-      color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 20px;
-      height: var(--navbar-height);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-    }
-
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .navbar-brand img {
-      height: 40px;
-      width: auto;
-    }
-
-    .navbar-brand h1 {
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: white;
-      margin: 0;
-    }
-
-    .navbar-menu {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-
-    .navbar-item {
-      color: rgba(255, 255, 255, 0.8);
-      text-decoration: none;
-      font-size: 1.1rem;
-      padding: 8px 12px;
-      border-radius: 4px;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-
-    .navbar-item:hover, .navbar-item.active {
-      color: white;
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .navbar-item i {
-      margin-right: 5px;
-    }
-
-    /* Popup Overlay */
-    .popup-overlay {
+    /* Include all the other styles from the original template */
+    
+    /* Add new styles for admin functionality */
+    
+    /* Admin Login Form */
+    .admin-login-modal {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       background: rgba(0, 0, 0, 0.85);
-      z-index: 1000;
+      z-index: 1100;
       display: flex;
       justify-content: center;
       align-items: center;
       animation: fadeIn 0.5s ease-in-out;
-      overflow: auto;
     }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* Popup Content */
-    .popup-content {
-      position: relative;
-      text-align: center;
+    
+    .admin-login-container {
+      background: white;
+      border-radius: var(--card-radius);
       width: 90%;
-      max-width: 450px;
-      background: #2c2c2c;
-      border-radius: 15px;
-      box-shadow: 0px 8px 30px rgba(0, 0, 0, 0.6);
-      color: #e0e0e0;
-      max-height: 80%;
-      overflow-y: auto;
+      max-width: 400px;
+      box-shadow: var(--shadow-dark);
+      overflow: hidden;
       animation: slideUp 0.5s ease-out;
     }
-
-    @keyframes slideUp {
-      from { transform: translateY(30px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    
+    .admin-login-header {
+      background: linear-gradient(90deg, var(--dark-color), #424242);
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
     }
-
-    .popup-header {
-      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-      padding: 15px;
-      border-radius: 15px 15px 0 0;
-      color: #fff;
-      font-size: 20px;
-      font-weight: bold;
+    
+    .admin-login-header h2 {
+      font-size: 1.5rem;
+      margin: 0;
     }
-
-    .popup-content h1 {
-      font-size: 22px;
-      color: #ffcc00;
-      margin: 15px 0 10px;
+    
+    .admin-login-content {
+      padding: 20px;
     }
-
-    .popup-content p {
-      font-size: 16px;
-      line-height: 1.8;
-      margin: 15px 25px;
-      color: #e0e0e0;
-    }
-
-    .popup-content .update-time {
-      font-size: 12px;
-      color: #8d8d8d;
+    
+    .admin-login-form .form-group {
       margin-bottom: 15px;
     }
-
-    .popup-content .btn {
-      padding: 12px 25px;
-      font-size: 16px;
-      color: #fff;
+    
+    .admin-login-form label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--dark-color);
+    }
+    
+    .admin-login-form input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: var(--button-radius);
+      font-family: 'Kanit', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    
+    .admin-login-form input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+    }
+    
+    .admin-login-form .admin-login-button {
       background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: white;
       border: none;
-      border-radius: 30px;
+      border-radius: var(--button-radius);
+      padding: 12px 25px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(124, 77, 255, 0.25);
+    }
+    
+    .admin-login-form .admin-login-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(124, 77, 255, 0.35);
+    }
+    
+    .admin-login-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      margin: 10px 0 30px;
-      font-weight: 500;
-      box-shadow: 0 4px 12px rgba(124, 77, 255, 0.3);
     }
-
-    .popup-content .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 15px rgba(124, 77, 255, 0.4);
-    }
-
-    .popup-content .close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 24px;
-      color: rgba(255, 255, 255, 0.8);
-      cursor: pointer;
-      transition: color 0.3s ease;
-      z-index: 10;
-    }
-
-    .popup-content .close-btn:hover {
+    
+    .admin-login-close:hover {
       color: var(--danger-color);
-    }
-
-    .popup-footer {
-      background: linear-gradient(90deg, var(--info-color), #03A9F4);
-      padding: 12px;
-      border-radius: 0 0 15px 15px;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    /* Container for main content */
-    .main-container {
-      margin-top: calc(var(--navbar-height) + 20px);
-      padding: 20px;
-      flex: 1;
-    }
-
-    /* Section styles */
-    section {
-      max-width: 1200px;
-      margin: 0 auto 30px;
-      padding: 20px;
-      background-color: #fff;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 1.8rem;
-      font-weight: 600;
-      color: var(--dark-color);
-      margin-bottom: 30px;
-      position: relative;
-      padding-bottom: 15px;
-    }
-
-    .section-title::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100px;
-      height: 4px;
-      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-      border-radius: 10px;
-    }
-
-    /* Subject and Quiz Card Redesign - Grid Layout */
-    .subject-list, .quiz-list {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr); /* 4 cards per row on desktop */
-      gap: var(--element-spacing);
-      margin-top: 30px;
-    }
-
-    .subject-card, .quiz-card {
-      background-color: #fff;
-      border-radius: var(--card-radius);
-      padding: 25px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all var(--transition-speed) ease;
-      box-shadow: var(--shadow-light);
-      border: 1px solid #eee;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      min-height: 200px; /* Fixed minimum height */
-      aspect-ratio: 1 / 1; /* Square aspect ratio */
-    }
-
-    .subject-card::before, .quiz-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 5px;
-      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-      transform: scaleX(0);
-      transform-origin: left;
-      transition: transform var(--transition-speed) ease;
-    }
-
-    .subject-card:hover::before, .quiz-card:hover::before {
-      transform: scaleX(1);
-    }
-
-    .subject-card:hover, .quiz-card:hover {
-      transform: translateY(-5px);
-      box-shadow: var(--shadow-medium);
-      border-color: var(--primary-color);
-    }
-
-    .subject-card i, .quiz-card i {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
-      color: var(--primary-color);
-      transition: transform var(--transition-speed) ease;
-    }
-
-    .subject-card:hover i, .quiz-card:hover i {
       transform: scale(1.1);
     }
-
-    .subject-card strong, .quiz-card strong {
-      font-size: 1.3rem;
-      color: var(--dark-color);
-      display: block;
-      margin-bottom: 10px;
-    }
-
-    /* Enhanced Time Display */
-    .waiting-for-update, .quiz-count {
-      color: #fff;
-      background-color: var(--warning-color);
-      padding: 8px 15px;
-      border-radius: var(--button-radius);
-      font-weight: 500;
+    
+    .login-error {
+      color: var(--danger-color);
       font-size: 0.9rem;
-      display: inline-block;
       margin-top: 15px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      display: none;
     }
     
-    .quiz-count {
-      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-    }
-
-    .status {
-      display: inline-block;
-      font-weight: 500;
-      color: #fff;
-      padding: 8px 15px;
-      border-radius: var(--button-radius);
-      margin: 15px 0;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      letter-spacing: 0.5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .status.waiting-for-update {
-      background-color: var(--warning-color);
-    }
-
-    .status.expired {
-      background: linear-gradient(to right, #FF5252, #FF1744);
-    }
-
-    .status.success {
-      background: linear-gradient(to right, #4CAF50, #2E7D32);
-    }
-
-    .countdown {
-      color: var(--dark-color);
-      font-size: 0.95rem;
-      margin: 15px 0;
-      font-weight: 500;
-      background-color: #f5f5f5;
-      padding: 12px;
-      border-radius: var(--button-radius);
-      display: inline-block;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      border: 1px solid #eee;
-      position: relative;
+    /* Admin Panel */
+    .admin-panel {
+      display: none;
+      background: white;
+      border-radius: var(--card-radius);
+      margin: 20px auto;
+      max-width: 1200px;
+      box-shadow: var(--shadow-medium);
       overflow: hidden;
     }
     
-    .countdown::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 5px;
-      height: 100%;
-      background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
-    }
-    
-    .countdown i {
-      margin-right: 8px;
-      color: var(--primary-color);
-    }
-
-    .quiz-description {
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      padding: 15px;
-      margin: 15px 0;
-      font-size: 0.95rem;
-      color: #555;
-      text-align: left;
-      flex: 1;
-      border: 1px solid #eee;
-    }
-
-    .answer-button {
-      display: inline-block;
-      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+    .admin-header {
+      background: linear-gradient(90deg, var(--dark-color), #424242);
       color: white;
-      padding: 8px 16px;
-      border-radius: var(--button-radius);
-      text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
-      margin-top: 15px;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 3px 8px rgba(124, 77, 255, 0.25);
-    }
-
-    .answer-button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(124, 77, 255, 0.35);
-    }
-    
-    .answer-button i {
-      font-size: 0.85rem;
-      margin-right: 5px;
-    }
-
-    .back-button {
-      display: inline-block;
-      background-color: #424242;
-      color: white;
-      padding: 12px 25px;
-      border-radius: 30px;
-      text-align: center;
-      margin: 20px auto;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: 500;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .back-button:hover {
-      background-color: #333;
-      transform: translateY(-3px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    /* Notification System */
-    #notification-center {
-      position: fixed;
-      top: var(--navbar-height);
-      right: 0;
-      width: 350px;
-      max-height: calc(100vh - var(--navbar-height));
-      background-color: white;
-      box-shadow: -3px 3px 15px rgba(0, 0, 0, 0.1);
-      z-index: 999;
-      overflow-y: auto;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
-      border-radius: 0 0 0 15px;
-    }
-
-    #notification-center.active {
-      transform: translateX(0);
-    }
-
-    .notification-header {
-      background: linear-gradient(135deg, var(--dark-color), #424242);
-      color: white;
-      padding: 15px;
-      font-size: 1.2rem;
+      padding: 15px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .notification-header h3 {
+    
+    .admin-header h2 {
+      font-size: 1.5rem;
       margin: 0;
-      font-size: 1.2rem;
     }
-
-    .notification-close {
+    
+    .admin-controls {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .admin-button {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: var(--button-radius);
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .admin-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    
+    .admin-button.danger {
+      background: rgba(255, 82, 82, 0.8);
+    }
+    
+    .admin-button.danger:hover {
+      background: rgba(255, 82, 82, 1);
+    }
+    
+    .admin-content {
+      padding: 20px;
+    }
+    
+    /* Subject selection for admin */
+    .admin-subject-selector {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    
+    .admin-subject-card {
+      background: white;
+      border: 1px solid #eee;
+      border-radius: var(--card-radius);
+      padding: 15px;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-light);
+    }
+    
+    .admin-subject-card:hover {
+      border-color: var(--primary-color);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-medium);
+    }
+    
+    .admin-subject-card.active {
+      background: linear-gradient(to right, rgba(124, 77, 255, 0.1), rgba(101, 31, 255, 0.1));
+      border-color: var(--primary-color);
+    }
+    
+    .admin-subject-card i {
+      font-size: 2rem;
+      color: var(--primary-color);
+      margin-bottom: 10px;
+    }
+    
+    .admin-subject-card h4 {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+    
+    /* Quiz editor */
+    .quiz-editor {
+      display: none;
+      margin-top: 20px;
+    }
+    
+    .quiz-editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .quiz-editor-header h3 {
+      font-size: 1.3rem;
+      margin: 0;
+      color: var(--dark-color);
+    }
+    
+    .quiz-editor-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .quiz-editor-button {
+      padding: 8px 16px;
+      border-radius: var(--button-radius);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.3s ease;
+    }
+    
+    .quiz-editor-button.add {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      color: white;
+      box-shadow: 0 3px 8px rgba(124, 77, 255, 0.25);
+    }
+    
+    .quiz-editor-button.add:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(124, 77, 255, 0.35);
+    }
+    
+    /* Quiz table */
+    .quiz-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    .quiz-table th {
+      background: #f5f5f5;
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 500;
+      color: #555;
+      border-bottom: 2px solid #eee;
+    }
+    
+    .quiz-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+    
+    .quiz-table tr:hover {
+      background-color: rgba(124, 77, 255, 0.05);
+    }
+    
+    .quiz-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    
+    .quiz-action-button {
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    
+    .quiz-action-button.edit {
+      color: var(--info-color);
+      background: rgba(33, 150, 243, 0.1);
+    }
+    
+    .quiz-action-button.edit:hover {
+      background: rgba(33, 150, 243, 0.2);
+    }
+    
+    .quiz-action-button.delete {
+      color: var(--danger-color);
+      background: rgba(255, 82, 82, 0.1);
+    }
+    
+    .quiz-action-button.delete:hover {
+      background: rgba(255, 82, 82, 0.2);
+    }
+    
+    /* Modal for quiz editing and adding */
+    .quiz-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1200;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    .quiz-modal-container {
+      background: white;
+      border-radius: var(--card-radius);
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-dark);
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    .quiz-modal-header {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 15px 20px;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .quiz-modal-header h3 {
+      font-size: 1.3rem;
+      margin: 0;
+    }
+    
+    .quiz-modal-close {
       background: none;
       border: none;
       color: white;
       font-size: 1.2rem;
       cursor: pointer;
     }
-
-    .notification-tabs {
-      display: flex;
-      border-bottom: 1px solid #eee;
-    }
-
-    .notification-tab {
-      flex: 1;
-      padding: 12px;
-      text-align: center;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      color: #777;
-      background-color: #f9f9f9;
-    }
-
-    .notification-tab.active {
-      background-color: white;
-      color: var(--primary-color);
-      border-bottom: 3px solid var(--primary-color);
-    }
-
-    .notification-content {
-      padding: 15px;
-    }
-
-    .notification-section {
-      margin-bottom: 15px;
-    }
-
-    .notification-section-title {
-      font-size: 1rem;
-      font-weight: 500;
-      margin-bottom: 10px;
-      color: #555;
-      padding-bottom: 5px;
-      border-bottom: 1px solid #eee;
-    }
-
-    .notification-list {
-      list-style: none;
-    }
-
-    .notification-item {
-      margin-bottom: 15px;
-      padding: 12px;
-      border-radius: 10px;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-
-    .notification-item:hover {
-      transform: translateX(5px);
-    }
-
-    .notification-item.expiry {
-      background-color: rgba(255, 82, 82, 0.1);
-      border-left: 3px solid var(--danger-color);
-    }
-
-    .notification-item.update {
-      background-color: rgba(76, 175, 80, 0.1);
-      border-left: 3px solid var(--success-color);
-    }
-
-    .notification-title {
-      font-weight: 500;
-      margin-bottom: 5px;
-      font-size: 0.95rem;
-      color: #333;
-    }
-
-    .notification-desc {
-      font-size: 0.85rem;
-      color: #666;
-      margin-bottom: 8px;
-    }
-
-    .notification-link {
-      font-size: 0.85rem;
-      color: var(--primary-color);
-      text-decoration: none;
-      display: inline-block;
-      font-weight: 500;
-    }
-
-    .notification-link:hover {
-      text-decoration: underline;
-    }
-
-    .notification-icon {
-      margin-right: 8px;
-      color: inherit;
-    }
-
-    .notification-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background-color: var(--primary-color);
-      color: white;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.7rem;
-      font-weight: bold;
-    }
-
-    /* Footer styles */
-    footer {
-      background: linear-gradient(135deg, var(--dark-color), #424242);
-      color: white;
-      padding: 30px 20px;
-      text-align: center;
-    }
-
-    .footer-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      gap: 30px;
-    }
-
-    .footer-section {
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .footer-section h3 {
-      font-size: 1.2rem;
-      margin-bottom: 15px;
-      position: relative;
-      padding-bottom: 10px;
-    }
-
-    .footer-section h3::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 50px;
-      height: 3px;
-      background: var(--primary-color);
-      border-radius: 3px;
-    }
-
-    .footer-section p {
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 0.9rem;
-      line-height: 1.6;
-    }
-
-    .footer-section ul {
-      list-style: none;
-    }
-
-    .footer-section ul li {
-      margin-bottom: 10px;
-    }
-
-    .footer-section ul li a {
-      color: rgba(255, 255, 255, 0.7);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .footer-section ul li a:hover {
-      color: white;
-    }
-
-    .social-icons {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .social-icons a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .social-icons a:hover {
-      background-color: var(--primary-color);
-      transform: translateY(-3px);
-    }
-
-    .footer-bottom {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.6);
-    }
-
-    /* No Notifications */
-    .no-notifications {
-      padding: 30px 15px;
-      text-align: center;
-      color: #777;
-      font-size: 0.9rem;
-    }
-
-    .no-notifications i {
-      font-size: 3rem;
-      color: #ddd;
-      margin-bottom: 15px;
-      display: block;
-    }
-
-    /* Responsive Enhancement - Adjusted Grid Layout */
-    @media (max-width: 1200px) {
-      .main-container {
-        padding: 15px;
-      }
-      
-      section {
-        padding: 15px;
-      }
-      
-      .subject-list, .quiz-list {
-        grid-template-columns: repeat(3, 1fr); /* 3 cards per row */
-        gap: 20px;
-      }
-      
-      .subject-card, .quiz-card {
-        min-height: 180px;
-      }
+    
+    .quiz-modal-content {
+      padding: 20px;
     }
     
-    @media (max-width: 992px) {
-      .navbar-brand h1 {
-        font-size: 1.6rem;
-      }
-      
-      .navbar-menu {
-        gap: 15px;
-      }
-      
-      .section-title {
-        font-size: 1.6rem;
-      }
-      
-      .footer-content {
-        gap: 20px;
-      }
-      
-      .subject-list, .quiz-list {
-        grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
-      }
-      
-      .subject-card, .quiz-card {
-        min-height: 160px;
-      }
+    .quiz-form .form-group {
+      margin-bottom: 15px;
     }
-
-    @media (max-width: 768px) {
-      :root {
-        --navbar-height: 60px;
-      }
-      
-      .navbar {
-        padding: 0 15px;
-      }
-
-      .navbar-brand h1 {
-        font-size: 1.4rem;
-      }
-
-      .navbar-menu {
-        gap: 8px;
-      }
-
-      .navbar-item {
-        font-size: 0.9rem;
-        padding: 8px;
-      }
-      
-      .navbar-item i {
-        margin-right: 3px;
-      }
-
-      .section-title {
-        font-size: 1.5rem;
-        margin-bottom: 20px;
-      }
-
-      .subject-list, .quiz-list {
-        grid-template-columns: repeat(2, 1fr); /* 2 cards per row */
-        gap: 15px;
-      }
-
-      .subject-card, .quiz-card {
-        padding: 20px 15px;
-        min-height: 180px;
-        aspect-ratio: auto; /* Remove fixed aspect ratio on smaller screens */
-      }
-      
-      .subject-card i, .quiz-card i {
-        font-size: 2rem;
-        margin-bottom: 10px;
-      }
-      
-      .subject-card strong, .quiz-card strong {
-        font-size: 1.1rem;
-      }
-
-      #notification-center {
-        width: 300px;
-      }
-
-      .footer-content {
-        flex-direction: column;
-        gap: 20px;
-      }
-      
-      .popup-content {
-        width: 95%;
-        max-width: 400px;
-      }
-      
-      .popup-content h1 {
-        font-size: 20px;
-      }
-      
-      .popup-content p {
-        font-size: 14px;
-      }
+    
+    .quiz-form label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: var(--dark-color);
     }
-
-    @media (max-width: 576px) {
-      :root {
-        --navbar-height: 55px;
-        --card-radius: 12px;
-        --button-radius: 20px;
-      }
-      
-      .navbar-brand h1 {
-        font-size: 1.2rem;
-      }
-      
-      .navbar-brand img {
-        height: 30px;
-      }
-
-      .navbar-menu {
-        gap: 5px;
-      }
-
-      .navbar-item {
-        font-size: 0.8rem;
-        padding: 6px;
-      }
-      
-      .navbar-item span {
-        display: none;
-      }
-      
-      .navbar-item i {
-        margin-right: 0;
-        font-size: 1.1rem;
-      }
-
-      .subject-list, .quiz-list {
-        grid-template-columns: 1fr; /* 1 card per row on mobile */
-        gap: 12px;
-      }
-      
-      .subject-card, .quiz-card {
-        margin: 0 auto;
-        max-width: 100%;
-        min-height: 150px;
-        padding: 15px 10px;
-      }
-      
-      .answer-button {
-        padding: 6px 12px;
-        font-size: 0.85rem;
-      }
-
-      #notification-center {
-        width: 100%;
-      }
-
-      .section-title {
-        font-size: 1.3rem;
-      }
-      
-      .popup-content h1 {
-        font-size: 18px;
-      }
-      
-      .popup-content p {
-        font-size: 13px;
-      }
-      
-      .popup-content .btn {
-        font-size: 14px;
-        padding: 10px 20px;
-      }
+    
+    .quiz-form input,
+    .quiz-form textarea,
+    .quiz-form select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-family: 'Kanit', sans-serif;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
     }
-
-    /* Animation keyframes */
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
+    
+    .quiz-form textarea {
+      min-height: 100px;
+      resize: vertical;
     }
-
-    .pulse {
-      animation: pulse 2s infinite;
+    
+    .quiz-form input:focus,
+    .quiz-form textarea:focus,
+    .quiz-form select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
     }
-
-    /* Bell notification animation */
-    @keyframes bellRing {
-      0% { transform: rotate(0); }
-      10% { transform: rotate(15deg); }
-      20% { transform: rotate(-15deg); }
-      30% { transform: rotate(15deg); }
-      40% { transform: rotate(-15deg); }
-      50% { transform: rotate(0); }
-      100% { transform: rotate(0); }
+    
+    .quiz-form .form-row {
+      display: flex;
+      gap: 15px;
     }
-
-    .bell-ring {
-      animation: bellRing 1s ease;
+    
+    .quiz-form .form-row .form-group {
+      flex: 1;
     }
-
-    .notification-badge-count {
-      position: absolute;
-      top: 10px;
-      right: 5px;
-      background-color: var(--danger-color);
+    
+    .quiz-form .quiz-save-button {
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
       color: white;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
+      border: none;
+      border-radius: var(--button-radius);
+      padding: 12px 25px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(124, 77, 255, 0.25);
+    }
+    
+    .quiz-form .quiz-save-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(124, 77, 255, 0.35);
+    }
+    
+    /* Confirmation Modal */
+    .confirm-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1300;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    .confirm-container {
+      background: white;
+      border-radius: var(--card-radius);
+      width: 90%;
+      max-width: 400px;
+      box-shadow: var(--shadow-dark);
+      animation: scaleIn 0.3s ease-out;
+      overflow: hidden;
+    }
+    
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    
+    .confirm-header {
+      background: var(--danger-color);
+      color: white;
+      padding: 15px 20px;
+    }
+    
+    .confirm-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    
+    .confirm-content {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .confirm-content p {
+      margin-bottom: 20px;
+      font-size: 1rem;
+      color: #555;
+    }
+    
+    .confirm-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    
+    .confirm-button {
+      padding: 10px 20px;
+      border-radius: var(--button-radius);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+    }
+    
+    .confirm-button.cancel {
+      background: #eee;
+      color: #555;
+    }
+    
+    .confirm-button.cancel:hover {
+      background: #ddd;
+    }
+    
+    .confirm-button.confirm {
+      background: var(--danger-color);
+      color: white;
+    }
+    
+    .confirm-button.confirm:hover {
+      background: #ff1744;
+    }
+    
+    /* Toast notifications */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1500;
+    }
+    
+    .toast {
+      min-width: 250px;
+      margin-top: 10px;
+      border-radius: var(--card-radius);
+      padding: 15px 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      font-weight: bold;
+      box-shadow: var(--shadow-medium);
+      animation: slideInRight 0.5s, fadeOut 0.5s 2.5s forwards;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    .toast::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 100%;
+    }
+    
+    .toast.success {
+      background: #f1f8e9;
+      color: var(--success-color);
+    }
+    
+    .toast.success::before {
+      background: var(--success-color);
+    }
+    
+    .toast.error {
+      background: #fdecea;
+      color: var(--danger-color);
+    }
+    
+    .toast.error::before {
+      background: var(--danger-color);
+    }
+    
+    .toast.info {
+      background: #e3f2fd;
+      color: var(--info-color);
+    }
+    
+    .toast.info::before {
+      background: var(--info-color);
+    }
+    
+    .toast i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+    
+    /* Admin indicator on navbar */
+    .admin-indicator {
+      display: none;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      margin-left: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Status badges for quiz table */
+    .status-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      text-align: center;
+      min-width: 80px;
+    }
+    
+    .status-badge.active {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: var(--success-color);
+      border: 1px solid rgba(76, 175, 80, 0.3);
+    }
+    
+    .status-badge.waiting {
+      background-color: rgba(255, 193, 7, 0.1);
+      color: var(--warning-color);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+    }
+    
+    .status-badge.expired {
+      background-color: rgba(255, 82, 82, 0.1);
+      color: var(--danger-color);
+      border: 1px solid rgba(255, 82, 82, 0.3);
+    }
+    
+    /* Responsive adjustments for admin features */
+    @media (max-width: 768px) {
+      .quiz-form .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+      
+      .admin-subject-selector {
+        flex-direction: column;
+      }
+      
+      .quiz-table {
+        display: block;
+        overflow-x: auto;
+      }
+      
+      .admin-subject-card {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
@@ -994,8 +741,115 @@
         <i class="fas fa-bell"></i>
         <span class="notification-badge-count" id="notification-badge">0</span>
       </div>
+      <div class="navbar-item" id="admin-toggle" onclick="showAdminLogin()">
+        <i class="fas fa-lock"></i> <span>Admin</span>
+        <span class="admin-indicator" id="admin-indicator">เข้าสู่ระบบแล้ว</span>
+      </div>
     </div>
   </nav>
+
+  <!-- Admin Login Modal -->
+  <div class="admin-login-modal" id="admin-login-modal" style="display: none;">
+    <div class="admin-login-container">
+      <div class="admin-login-header">
+        <h2>เข้าสู่ระบบผู้ดูแล</h2>
+        <button class="admin-login-close" onclick="hideAdminLogin()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="admin-login-content">
+        <form class="admin-login-form" id="admin-login-form">
+          <div class="form-group">
+            <label for="admin-username">ชื่อผู้ใช้</label>
+            <input type="text" id="admin-username" placeholder="ชื่อผู้ใช้ผู้ดูแลระบบ" required>
+          </div>
+          <div class="form-group">
+            <label for="admin-password">รหัสผ่าน</label>
+            <input type="password" id="admin-password" placeholder="รหัสผ่าน" required>
+          </div>
+          <button type="submit" class="admin-login-button">
+            <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+          </button>
+          <div class="login-error" id="login-error">
+            ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Quiz Edit/Add Modal -->
+  <div class="quiz-modal" id="quiz-modal" style="display: none;">
+    <div class="quiz-modal-container">
+      <div class="quiz-modal-header">
+        <h3 id="quiz-modal-title">เพิ่มควิซใหม่</h3>
+        <button class="quiz-modal-close" onclick="hideQuizModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="quiz-modal-content">
+        <form class="quiz-form" id="quiz-form">
+          <input type="hidden" id="edit-quiz-id" value="">
+          <input type="hidden" id="edit-subject" value="">
+          
+          <div class="form-group">
+            <label for="quiz-name">ชื่อควิซ <span style="color: var(--danger-color);">*</span></label>
+            <input type="text" id="quiz-name" placeholder="ชื่อควิซ" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="quiz-link">ลิงก์เฉลย</label>
+            <input type="url" id="quiz-link" placeholder="https://example.com/quiz-answers">
+          </div>
+          
+          <div class="form-group">
+            <label for="quiz-description">คำอธิบาย</label>
+            <textarea id="quiz-description" placeholder="รายละเอียดเกี่ยวกับควิซนี้"></textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="quiz-expiry">วันหมดอายุ</label>
+              <input type="datetime-local" id="quiz-expiry">
+            </div>
+            
+            <div class="form-group">
+              <label for="quiz-status">สถานะ</label>
+              <select id="quiz-status">
+                <option value="">-- ไม่ระบุ --</option>
+                <option value="อัพเดตล่าสุด">อัพเดตล่าสุด</option>
+                <option value="รออัพเดต">รออัพเดต</option>
+                <option value="ปิดปรับปรุง">ปิดปรับปรุง</option>
+              </select>
+            </div>
+          </div>
+          
+          <button type="submit" class="quiz-save-button" id="quiz-save-button">
+            <i class="fas fa-save"></i> บันทึก
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="confirm-modal" id="confirm-modal" style="display: none;">
+    <div class="confirm-container">
+      <div class="confirm-header">
+        <h3>ยืนยันการลบ</h3>
+      </div>
+      <div class="confirm-content">
+        <p id="confirm-message">คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?</p>
+        <div class="confirm-actions">
+          <button class="confirm-button cancel" onclick="hideConfirmModal()">ยกเลิก</button>
+          <button class="confirm-button confirm" id="confirm-delete-button">ลบ</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Notification Center -->
   <div id="notification-center">
@@ -1010,6 +864,53 @@
     </div>
     <div class="notification-content" id="notification-content">
       <!-- Notification content will be loaded here by JS -->
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div class="admin-panel" id="admin-panel">
+    <div class="admin-header">
+      <h2>ระบบจัดการควิซ</h2>
+      <div class="admin-controls">
+        <button class="admin-button" onclick="refreshQuizData()">
+          <i class="fas fa-sync-alt"></i> รีเฟรช
+        </button>
+        <button class="admin-button danger" onclick="logoutAdmin()">
+          <i class="fas fa-sign-out-alt"></i> ออกจากระบบ
+        </button>
+      </div>
+    </div>
+    <div class="admin-content">
+      <h3>เลือกวิชาที่ต้องการจัดการ</h3>
+      <div class="admin-subject-selector" id="admin-subject-selector">
+        <!-- Subjects will be loaded here -->
+      </div>
+      
+      <div class="quiz-editor" id="quiz-editor">
+        <div class="quiz-editor-header">
+          <h3 id="quiz-editor-subject">ควิซในวิชา</h3>
+          <div class="quiz-editor-actions">
+            <button class="quiz-editor-button add" onclick="showAddQuizModal()">
+              <i class="fas fa-plus"></i> เพิ่มควิซใหม่
+            </button>
+          </div>
+        </div>
+        
+        <table class="quiz-table">
+          <thead>
+            <tr>
+              <th style="width: 30%">ชื่อควิซ</th>
+              <th style="width: 20%">วันหมดอายุ</th>
+              <th style="width: 15%">สถานะ</th>
+              <th style="width: 20%">ลิงก์</th>
+              <th style="width: 15%">การจัดการ</th>
+            </tr>
+          </thead>
+          <tbody id="quiz-table-body">
+            <!-- Quiz data will be loaded here -->
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -1084,12 +985,555 @@
     const sheetRange = "Allquestions";
     const apiKey = "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw";
 
+    // Admin credentials (In production, these should be stored securely on the server)
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "allquiz2025";
+
+    // Global variables
+    let allSubjects = [];
+    let allQuizzes = {};
+    let selectedSubject = "";
+    let editingQuizIndex = -1;
+    let isAdminLoggedIn = false;
+    
     // Global variables for notifications
     let allNotifications = [];
     let closeToExpiryQuizzes = [];
     let expiredQuizzes = [];
     let latestUpdates = [];
     let activeNotificationTab = 'all';
+
+    // Initialize the application
+    document.addEventListener("DOMContentLoaded", async () => {
+      setupEventListeners();
+      
+      // Check for admin login in session storage
+      checkAdminLoginStatus();
+      
+      // Initialize the website
+      await initializeSubjects();
+    });
+    
+    // Setup all event listeners
+    function setupEventListeners() {
+      // Admin login form submission
+      document.getElementById("admin-login-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        attemptAdminLogin();
+      });
+      
+      // Quiz form submission
+      document.getElementById("quiz-form").addEventListener("submit", function(e) {
+        e.preventDefault();
+        saveQuiz();
+      });
+      
+      // Back button for quiz list
+      document.getElementById("back-button").addEventListener("click", goBack);
+      
+      // Popup close
+      const popupOverlay = document.getElementById("popup-overlay");
+      const closePopup = document.getElementById("close-popup");
+      const startRedirect = document.getElementById("start-redirect");
+      
+      // ตั้งค่าเวลาตามเวลาประเทศไทย (UTC+7)
+      const now = new Date();
+      const bangkokOffset = 7 * 60 * 60 * 1000; // ชดเชย 7 ชั่วโมงเป็นมิลลิวินาที
+      const bangkokTime = new Date(now.getTime() + bangkokOffset);
+
+      // กำหนดช่วงเวลาเปิด Popup
+      const startDate = new Date("2025-03-19T12:00:00+07:00");
+      const endDate = new Date("2025-03-19T23:59:59+07:00");
+
+      // แสดง Popup หากอยู่ในช่วงเวลา
+      if (bangkokTime >= startDate && bangkokTime <= endDate) {
+        popupOverlay.style.display = "flex";
+      } else {
+        popupOverlay.style.display = "none";
+      }
+
+      closePopup.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+      });
+
+      startRedirect.addEventListener("click", () => {
+        popupOverlay.style.display = "none";
+        setTimeout(() => {
+          window.location.href = "https://doralaikon.online/allquestions/course/ธรรมชาติบำบัด/ข้อสอบปลายภาคธรรมชาติบำบัด";
+        }, 1000);
+      });
+      
+      // Notification tabs
+      const notificationTabs = document.querySelectorAll(".notification-tab");
+      notificationTabs.forEach(tab => {
+        tab.addEventListener("click", (e) => {
+          const tabType = e.currentTarget.getAttribute('data-tab');
+          switchNotificationTab(tabType);
+        });
+      });
+      
+      // Close notification when clicking outside
+      document.addEventListener("click", (e) => {
+        const notificationCenter = document.getElementById("notification-center");
+        const notificationToggle = document.getElementById("notification-toggle");
+        if (notificationCenter.classList.contains("active") && 
+            !notificationCenter.contains(e.target) && 
+            e.target !== notificationToggle && 
+            !notificationToggle.contains(e.target)) {
+          notificationCenter.classList.remove("active");
+        }
+      });
+    }
+    
+    // Check if admin is logged in from session storage
+    function checkAdminLoginStatus() {
+      const storedLoginStatus = sessionStorage.getItem("adminLoggedIn");
+      
+      if (storedLoginStatus === "true") {
+        isAdminLoggedIn = true;
+        document.getElementById("admin-indicator").style.display = "inline-block";
+        document.getElementById("admin-panel").style.display = "block";
+      }
+    }
+    
+    // Admin login attempt
+    function attemptAdminLogin() {
+      const username = document.getElementById("admin-username").value;
+      const password = document.getElementById("admin-password").value;
+      const loginError = document.getElementById("login-error");
+      
+      if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+        // Login successful
+        isAdminLoggedIn = true;
+        
+        // Save login status to session storage (will be cleared when browser is closed)
+        sessionStorage.setItem("adminLoggedIn", "true");
+        
+        // Show admin indicator in navbar
+        document.getElementById("admin-indicator").style.display = "inline-block";
+        
+        // Show admin panel
+        document.getElementById("admin-panel").style.display = "block";
+        
+        // Hide login modal
+        hideAdminLogin();
+        
+        // Initialize admin subject selector
+        initializeAdminSubjects();
+        
+        // Show success toast
+        showToast("เข้าสู่ระบบสำเร็จ", "success");
+      } else {
+        // Login failed
+        loginError.style.display = "block";
+        
+        // Clear password field
+        document.getElementById("admin-password").value = "";
+        
+        // Focus on username field
+        document.getElementById("admin-username").focus();
+      }
+    }
+    
+    // Admin logout
+    function logoutAdmin() {
+      isAdminLoggedIn = false;
+      
+      // Clear login status from session storage
+      sessionStorage.removeItem("adminLoggedIn");
+      
+      // Hide admin indicator in navbar
+      document.getElementById("admin-indicator").style.display = "none";
+      
+      // Hide admin panel
+      document.getElementById("admin-panel").style.display = "none";
+      
+      // Reset form fields
+      document.getElementById("admin-username").value = "";
+      document.getElementById("admin-password").value = "";
+      
+      // Show success toast
+      showToast("ออกจากระบบสำเร็จ", "info");
+    }
+    
+    // Show admin login modal
+    function showAdminLogin() {
+      // If already logged in, show admin panel
+      if (isAdminLoggedIn) {
+        document.getElementById("admin-panel").style.display = "block";
+        return;
+      }
+      
+      document.getElementById("admin-login-modal").style.display = "flex";
+      document.getElementById("login-error").style.display = "none";
+      document.getElementById("admin-username").focus();
+    }
+    
+    // Hide admin login modal
+    function hideAdminLogin() {
+      document.getElementById("admin-login-modal").style.display = "none";
+    }
+    
+    // Initialize admin subject selector
+    function initializeAdminSubjects() {
+      const adminSubjectSelector = document.getElementById("admin-subject-selector");
+      adminSubjectSelector.innerHTML = "";
+      
+      Object.keys(allQuizzes).forEach(subject => {
+        const subjectCard = document.createElement('div');
+        subjectCard.className = 'admin-subject-card';
+        
+        // Choose appropriate icon based on subject name
+        let icon = 'fa-book';
+        if (subject.toLowerCase().includes('คอมพิวเตอร์') || subject.toLowerCase().includes('computer')) {
+          icon = 'fa-laptop-code';
+        } else if (subject.toLowerCase().includes('คณิตศาสตร์') || subject.toLowerCase().includes('math')) {
+          icon = 'fa-calculator';
+        } else if (subject.toLowerCase().includes('วิทยาศาสตร์') || subject.toLowerCase().includes('science')) {
+          icon = 'fa-flask';
+        } else if (subject.toLowerCase().includes('ภาษา') || subject.toLowerCase().includes('language')) {
+          icon = 'fa-language';
+        }
+        
+        subjectCard.innerHTML = `
+          <i class="fas ${icon}"></i>
+          <h4>${subject}</h4>
+        `;
+        
+        subjectCard.onclick = () => selectAdminSubject(subject);
+        
+        adminSubjectSelector.appendChild(subjectCard);
+      });
+    }
+    
+    // Select a subject in admin panel
+    function selectAdminSubject(subject) {
+      // Update UI
+      const subjectCards = document.querySelectorAll('.admin-subject-card');
+      subjectCards.forEach(card => {
+        if (card.querySelector('h4').textContent === subject) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+      
+      // Update selected subject
+      selectedSubject = subject;
+      
+      // Update quiz editor header
+      document.getElementById("quiz-editor-subject").textContent = `ควิซในวิชา ${subject}`;
+      
+      // Show quiz editor
+      document.getElementById("quiz-editor").style.display = "block";
+      
+      // Populate quiz table
+      populateQuizTable(subject);
+    }
+    
+    // Populate quiz table with quizzes from selected subject
+    function populateQuizTable(subject) {
+      const quizzes = allQuizzes[subject] || [];
+      const tableBody = document.getElementById("quiz-table-body");
+      tableBody.innerHTML = "";
+      
+      if (quizzes.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 30px;">
+              <i class="fas fa-info-circle" style="font-size: 2rem; color: #aaa; margin-bottom: 10px;"></i>
+              <p>ยังไม่มีควิซในวิชานี้</p>
+              <button class="quiz-editor-button add" onclick="showAddQuizModal()" style="margin-top: 15px; display: inline-block;">
+                <i class="fas fa-plus"></i> เพิ่มควิซใหม่
+              </button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      quizzes.forEach((quiz, index) => {
+        const row = document.createElement("tr");
+        
+        // Format expiry date
+        let expiryDisplay = '';
+        if (quiz.expiryDate) {
+          const expiryStatus = calculateCountdown(quiz.expiryDate);
+          if (expiryStatus === 'ควิซนี้หมดเขตแล้ว') {
+            expiryDisplay = `<span class="status-badge expired">หมดเวลา</span><br>
+                            <small style="color: #777;">${quiz.expiryDate}</small>`;
+          } else {
+            expiryDisplay = `<span class="status-badge active">ยังไม่หมดเวลา</span><br>
+                            <small style="color: #777;">${quiz.expiryDate}</small>`;
+          }
+        } else {
+          expiryDisplay = '<span style="color: #777;">ไม่ระบุ</span>';
+        }
+        
+        // Format status
+        let statusDisplay = '';
+        if (quiz.status) {
+          let statusClass = '';
+          if (quiz.status.includes('อัพเดตล่าสุด')) {
+            statusClass = 'active';
+          } else if (quiz.status.includes('รออัพเดต') || quiz.status.includes('ปิดปรับปรุง')) {
+            statusClass = 'waiting';
+          }
+          
+          statusDisplay = `<span class="status-badge ${statusClass}">${quiz.status}</span>`;
+        } else {
+          statusDisplay = '<span style="color: #777;">ไม่ระบุ</span>';
+        }
+        
+        // Format link
+        let linkDisplay = '';
+        if (quiz.quizLink) {
+          linkDisplay = `<a href="${quiz.quizLink}" target="_blank" style="color: var(--primary-color); text-decoration: none;">
+                          <i class="fas fa-external-link-alt"></i> ดูลิงก์
+                         </a>`;
+        } else {
+          linkDisplay = '<span style="color: #777;">ไม่มีลิงก์</span>';
+        }
+        
+        row.innerHTML = `
+          <td>${quiz.quizName}</td>
+          <td>${expiryDisplay}</td>
+          <td>${statusDisplay}</td>
+          <td>${linkDisplay}</td>
+          <td>
+            <div class="quiz-actions">
+              <button class="quiz-action-button edit" onclick="showEditQuizModal(${index})">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="quiz-action-button delete" onclick="confirmDeleteQuiz(${index})">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+    
+    // Show the quiz modal for adding a new quiz
+    function showAddQuizModal() {
+      // Reset form
+      document.getElementById("quiz-form").reset();
+      document.getElementById("edit-quiz-id").value = "-1";
+      document.getElementById("edit-subject").value = selectedSubject;
+      
+      // Update modal title
+      document.getElementById("quiz-modal-title").textContent = "เพิ่มควิซใหม่";
+      
+      // Show modal
+      document.getElementById("quiz-modal").style.display = "flex";
+    }
+    
+    // Show the quiz modal for editing an existing quiz
+    function showEditQuizModal(quizIndex) {
+      // Set editing quiz index
+      editingQuizIndex = quizIndex;
+      
+      // Get quiz data
+      const quiz = allQuizzes[selectedSubject][quizIndex];
+      
+      // Set form values
+      document.getElementById("edit-quiz-id").value = quizIndex;
+      document.getElementById("edit-subject").value = selectedSubject;
+      document.getElementById("quiz-name").value = quiz.quizName || "";
+      document.getElementById("quiz-link").value = quiz.quizLink || "";
+      document.getElementById("quiz-description").value = quiz.quizDescription || "";
+      document.getElementById("quiz-status").value = quiz.status || "";
+      
+      // Format expiry date for datetime-local input
+      if (quiz.expiryDate) {
+        try {
+          const [datePart, timePart] = quiz.expiryDate.split(", ");
+          if (datePart) {
+            const [day, month, year] = datePart.split("/");
+            let formattedTime = timePart || "00:00";
+            if (formattedTime.split(":").length === 3) {
+              formattedTime = formattedTime.split(":").slice(0, 2).join(":");
+            }
+            
+            const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${formattedTime}`;
+            document.getElementById("quiz-expiry").value = formattedDate;
+          }
+        } catch (error) {
+          console.error("Error formatting date:", error);
+        }
+      } else {
+        document.getElementById("quiz-expiry").value = "";
+      }
+      
+      // Update modal title
+      document.getElementById("quiz-modal-title").textContent = "แก้ไขควิซ";
+      
+      // Show modal
+      document.getElementById("quiz-modal").style.display = "flex";
+    }
+    
+    // Hide the quiz modal
+    function hideQuizModal() {
+      document.getElementById("quiz-modal").style.display = "none";
+    }
+    
+    // Save quiz (add new or update existing)
+    async function saveQuiz() {
+      // Get form values
+      const quizIndex = document.getElementById("edit-quiz-id").value;
+      const subject = document.getElementById("edit-subject").value;
+      const quizName = document.getElementById("quiz-name").value;
+      const quizLink = document.getElementById("quiz-link").value;
+      const quizDescription = document.getElementById("quiz-description").value;
+      const quizStatus = document.getElementById("quiz-status").value;
+      
+      // Format expiry date
+      let expiryDate = "";
+      const expiryInput = document.getElementById("quiz-expiry").value;
+      if (expiryInput) {
+        try {
+          const [datePart, timePart] = expiryInput.split("T");
+          const [year, month, day] = datePart.split("-");
+          expiryDate = `${day}/${month}/${year}, ${timePart}`;
+        } catch (error) {
+          console.error("Error formatting date:", error);
+        }
+      }
+      
+      // Create or update quiz object
+      const quizData = {
+        quizName,
+        quizLink,
+        quizDescription,
+        expiryDate,
+        status: quizStatus
+      };
+      
+      // Determine if this is an add or update operation
+      const isAddOperation = quizIndex === "-1";
+      
+      if (isAddOperation) {
+        // Add new quiz
+        allQuizzes[subject].push(quizData);
+        showToast("เพิ่มควิซใหม่สำเร็จ", "success");
+      } else {
+        // Update existing quiz
+        allQuizzes[subject][parseInt(quizIndex)] = quizData;
+        showToast("อัพเดตควิซสำเร็จ", "success");
+      }
+      
+      // Save to Google Sheets (this is a mock implementation)
+      await saveQuizToGoogleSheets();
+      
+      // Hide modal
+      hideQuizModal();
+      
+      // Refresh quiz table
+      populateQuizTable(subject);
+      
+      // Update the main website if already displayed
+      if (document.getElementById('quiz-list').style.display !== 'none') {
+        if (selectedSubject === subject) {
+          showQuizzes(subject, allQuizzes[subject]);
+        }
+      }
+    }
+    
+    // Confirm delete quiz
+    function confirmDeleteQuiz(quizIndex) {
+      // Set quiz index to delete
+      editingQuizIndex = quizIndex;
+      
+      // Set confirm message
+      const quizName = allQuizzes[selectedSubject][quizIndex].quizName;
+      document.getElementById("confirm-message").textContent = `คุณแน่ใจหรือไม่ว่าต้องการลบควิซ "${quizName}"?`;
+      
+      // Set confirm button action
+      document.getElementById("confirm-delete-button").onclick = deleteQuiz;
+      
+      // Show confirm modal
+      document.getElementById("confirm-modal").style.display = "flex";
+    }
+    
+    // Hide confirm modal
+    function hideConfirmModal() {
+      document.getElementById("confirm-modal").style.display = "none";
+    }
+    
+    // Delete quiz
+    async function deleteQuiz() {
+      // Remove quiz from array
+      allQuizzes[selectedSubject].splice(editingQuizIndex, 1);
+      
+      // Save to Google Sheets (this is a mock implementation)
+      await saveQuizToGoogleSheets();
+      
+      // Hide confirm modal
+      hideConfirmModal();
+      
+      // Refresh quiz table
+      populateQuizTable(selectedSubject);
+      
+      // Show success toast
+      showToast("ลบควิซสำเร็จ", "success");
+      
+      // Update the main website if already displayed
+      if (document.getElementById('quiz-list').style.display !== 'none') {
+        if (selectedSubject === selectedSubject) {
+          showQuizzes(selectedSubject, allQuizzes[selectedSubject]);
+        }
+      }
+    }
+    
+    // Save quiz data to Google Sheets (mock implementation)
+    async function saveQuizToGoogleSheets() {
+      // In a real application, this would send the data to a server-side script
+      // that would update the Google Sheet.
+      // For this example, we'll just show a message.
+      
+      console.log("Quiz data saved (mock):", allQuizzes);
+      
+      // Simulate API delay
+      return new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Refresh quiz data from Google Sheets
+    async function refreshQuizData() {
+      showToast("กำลังโหลดข้อมูล...", "info");
+      await initializeSubjects();
+      
+      if (selectedSubject) {
+        populateQuizTable(selectedSubject);
+      }
+      
+      showToast("โหลดข้อมูลสำเร็จ", "success");
+    }
+    
+    // Show toast notification
+    function showToast(message, type = "info") {
+      const toastContainer = document.getElementById("toast-container");
+      
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      
+      let icon = "fa-info-circle";
+      if (type === "success") {
+        icon = "fa-check-circle";
+      } else if (type === "error") {
+        icon = "fa-exclamation-circle";
+      }
+      
+      toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+      
+      toastContainer.appendChild(toast);
+      
+      // Remove toast after 3 seconds
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
 
     // ดึงข้อมูลจาก Google Sheets
     async function fetchSubjects() {
@@ -1434,7 +1878,7 @@
     async function initializeSubjects() {
       const subjects = await fetchSubjects();
       const subjectList = document.getElementById('subject-list');
-      const subjectMap = {};
+      allQuizzes = {};
       
       // สร้างโครงสร้างข้อมูลรายวิชา
       subjects.forEach((row, index) => {
@@ -1443,27 +1887,39 @@
         const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
         
         if (subject && subject.trim() !== "") {
-          if (!subjectMap[subject]) {
-            subjectMap[subject] = [];
+          if (!allQuizzes[subject]) {
+            allQuizzes[subject] = [];
           }
           
-          subjectMap[subject].push({
-            quizName,
-            quizLink,
-            quizDescription,
-            expiryDate,
-            status
-          });
+          if (quizName) {
+            allQuizzes[subject].push({
+              quizName,
+              quizLink,
+              quizDescription,
+              expiryDate,
+              status
+            });
+          }
         }
       });
       
       // เตรียมข้อมูลการแจ้งเตือน
       prepareNotifications(subjects);
       
+      // ถ้าผู้ดูแลเข้าสู่ระบบแล้ว อัปเดตส่วนของผู้ดูแล
+      if (isAdminLoggedIn) {
+        initializeAdminSubjects();
+        
+        // ถ้ามีวิชาที่เลือกอยู่แล้ว ให้โหลดข้อมูลควิซใหม่
+        if (selectedSubject && allQuizzes[selectedSubject]) {
+          selectAdminSubject(selectedSubject);
+        }
+      }
+      
       // แสดงการ์ดรายวิชา
       subjectList.innerHTML = "";
-      Object.keys(subjectMap).forEach(subject => {
-        const quizzes = subjectMap[subject];
+      Object.keys(allQuizzes).forEach(subject => {
+        const quizzes = allQuizzes[subject];
         const subjectCard = document.createElement('div');
         subjectCard.className = 'subject-card';
         
@@ -1506,10 +1962,13 @@
       document.getElementById('quiz-list').style.display = 'block';
       document.getElementById('subject-title').innerText = `ควิซในวิชา ${subject}`;
       
+      // Update selected subject for admin panel link
+      selectedSubject = subject;
+      
       const quizContainer = document.getElementById('quiz-container');
       quizContainer.innerHTML = '';
       
-      quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status }) => {
+      quizzes.forEach(({ quizName, quizLink, quizDescription, expiryDate, status }, index) => {
         if (!quizName) return; // ข้ามควิซที่ไม่มีชื่อ
         
         const quizCard = document.createElement('div');
@@ -1576,6 +2035,25 @@
           quizCard.appendChild(waitingUpdate);
         }
         
+        // Add edit button for admins
+        if (isAdminLoggedIn) {
+          const adminActions = document.createElement('div');
+          adminActions.className = 'quiz-actions';
+          adminActions.style.marginTop = '10px';
+          
+          const editButton = document.createElement('button');
+          editButton.className = 'quiz-action-button edit';
+          editButton.innerHTML = '<i class="fas fa-edit"></i>';
+          editButton.title = 'แก้ไขควิซ';
+          editButton.onclick = (e) => {
+            e.stopPropagation();
+            showEditQuizModal(index);
+          };
+          
+          adminActions.appendChild(editButton);
+          quizCard.appendChild(adminActions);
+        }
+        
         quizContainer.appendChild(quizCard);
       });
       
@@ -1587,74 +2065,9 @@
       document.getElementById('quiz-list').style.display = 'none';
       document.getElementById('subjects').style.display = 'block';
     }
-
-    // ตั้งค่า event handlers
-    document.addEventListener("DOMContentLoaded", () => {
-      const popupOverlay = document.getElementById("popup-overlay");
-      const closePopup = document.getElementById("close-popup");
-      const startRedirect = document.getElementById("start-redirect");
-      const backButton = document.getElementById("back-button");
-      const notificationCenter = document.getElementById("notification-center");
-      const notificationTabs = document.querySelectorAll(".notification-tab");
-
-      // ตั้งค่าเวลาตามเวลาประเทศไทย (UTC+7)
-      const now = new Date();
-      const bangkokOffset = 7 * 60 * 60 * 1000; // ชดเชย 7 ชั่วโมงเป็นมิลลิวินาที
-      const bangkokTime = new Date(now.getTime() + bangkokOffset);
-
-      // กำหนดช่วงเวลาเปิด Popup
-      const startDate = new Date("2025-03-19T12:00:00+07:00");
-      const endDate = new Date("2025-03-19T23:59:59+07:00");
-
-      // แสดง Popup หากอยู่ในช่วงเวลา
-      if (bangkokTime >= startDate && bangkokTime <= endDate) {
-        popupOverlay.style.display = "flex";
-      } else {
-        popupOverlay.style.display = "none";
-      }
-
-      // ปิด Popup เมื่อกดปุ่ม
-      closePopup.addEventListener("click", () => {
-        popupOverlay.style.display = "none";
-      });
-
-      // เมื่อกดปุ่มเริ่ม Redirect
-      startRedirect.addEventListener("click", () => {
-        popupOverlay.style.display = "none";
-        
-        setTimeout(() => {
-          window.location.href = "https://doralaikon.online/allquestions/course/ธรรมชาติบำบัด/ข้อสอบปลายภาคธรรมชาติบำบัด"; // URL ของข้อสอบ
-        }, 1000);
-      });
-      
-      // ปุ่มย้อนกลับ
-      backButton.addEventListener("click", goBack);
-
-      // แท็บการแจ้งเตือน
-      notificationTabs.forEach(tab => {
-        tab.addEventListener("click", (e) => {
-          const tabType = e.currentTarget.getAttribute('data-tab');
-          switchNotificationTab(tabType);
-        });
-      });
-
-      // ปิดการแจ้งเตือนเมื่อคลิกนอกพื้นที่
-      document.addEventListener("click", (e) => {
-        const notificationToggle = document.getElementById("notification-toggle");
-        if (notificationCenter.classList.contains("active") && 
-            !notificationCenter.contains(e.target) && 
-            e.target !== notificationToggle && 
-            !notificationToggle.contains(e.target)) {
-          notificationCenter.classList.remove("active");
-        }
-      });
-    });
-
+    
     // อัปเดต countdown ทุกวินาที
     setInterval(updateCountdowns, 1000);
-    
-    // เริ่มต้นเว็บไซต์
-    initializeSubjects();
   </script>
 </body>
 </html>
