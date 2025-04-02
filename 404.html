@@ -1,104 +1,445 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Page Not Found</title>
     <link rel="icon" href="/image/logo-01.png">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #4FD1C5;
+            --secondary: #63B3ED;
+            --accent: #9F7AEA;
+            --background: #1A202C;
+            --text: #F7FAFC;
+            --card-bg: rgba(26, 32, 44, 0.7);
+            --error-color: #F56565;
+        }
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            cursor: none;
         }
-
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-            height: 100vh;
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            text-align: center;
-            padding: 2rem;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
         }
-
+        
+        /* Glassmorphism container */
         .container {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 3rem;
             width: 100%;
-            max-width: 480px;
-            margin: 0 auto;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 10;
+            animation: container-appear 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transform: translateY(20px);
+            opacity: 0;
         }
-
-        h1 {
-            font-size: 8vw;
-            font-weight: bold;
-            color: #e74c3c;
-            margin-bottom: 1rem;
+        
+        @keyframes container-appear {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
-
-        p {
-            font-size: 1.2rem;
-            color: #555;
-            margin-bottom: 2rem;
+        
+        /* Error Code Styling */
+        .error-code {
+            font-size: 9rem;
+            font-weight: 700;
+            line-height: 1;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px rgba(79, 209, 197, 0.3);
+            animation: text-glow 3s ease-in-out infinite alternate;
         }
-
-        a {
-            text-decoration: none;
-            background-color: #3498db;
-            color: #fff;
-            padding: 0.8rem 2rem;
-            border-radius: 30px;
+        
+        @keyframes text-glow {
+            0% {
+                text-shadow: 0 0 20px rgba(79, 209, 197, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 40px rgba(159, 122, 234, 0.6), 0 0 80px rgba(99, 179, 237, 0.3);
+            }
+        }
+        
+        .error-code::after {
+            content: "";
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            width: 70%;
+            height: 6px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            border-radius: 3px;
+            transform: translateX(-50%);
+            filter: blur(3px);
+        }
+        
+        /* Message styling */
+        .error-message {
+            color: rgba(247, 250, 252, 0.9);
+            font-size: 1.6rem;
+            font-weight: 400;
+            margin-bottom: 2.5rem;
+            line-height: 1.4;
+        }
+        
+        /* Button styling */
+        .home-button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #000;
+            font-weight: 600;
             font-size: 1.1rem;
-            transition: background-color 0.3s ease;
+            text-decoration: none;
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 25px -5px rgba(79, 209, 197, 0.5);
+            z-index: 1;
         }
-
-        a:hover {
-            background-color: #2980b9;
+        
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px -7px rgba(79, 209, 197, 0.7);
         }
-
-        /* Responsive Design */
+        
+        .home-button:active {
+            transform: translateY(1px);
+        }
+        
+        /* Background elements */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .gradient-bg {
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                rgba(26, 32, 44, 1) 0%, 
+                rgba(45, 55, 72, 1) 25%, 
+                rgba(44, 82, 130, 0.8) 50%, 
+                rgba(45, 55, 72, 1) 75%, 
+                rgba(26, 32, 44, 1) 100%);
+            opacity: 0.9;
+            animation: gradient-move 15s linear infinite;
+            z-index: -1;
+        }
+        
+        @keyframes gradient-move {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Grid lines */
+        .grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(79, 209, 197, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 209, 197, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -2;
+        }
+        
+        /* Floating elements */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .float-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.02);
+            box-shadow: 0 0 20px rgba(79, 209, 197, 0.2);
+            animation: float 20s infinite linear;
+            opacity: 0.6;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0.6;
+            }
+            25% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 0.6;
+            }
+            75% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) rotate(var(--r));
+                opacity: 0.6;
+            }
+        }
+        
+        /* Custom cursor */
+        .cursor {
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(79, 209, 197, 0.5);
+            border-radius: 50%;
+            position: fixed;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: width 0.3s, height 0.3s, border-color 0.3s;
+            z-index: 9999;
+            backdrop-filter: invert(0.3);
+            mix-blend-mode: exclusion;
+        }
+        
+        .cursor::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+        
+        /* Cursor active state */
+        .cursor.active {
+            width: 50px;
+            height: 50px;
+            border-color: var(--primary);
+        }
+        
+        /* Error icon */
+        .error-icon {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 2rem;
+            position: relative;
+            z-index: 1;
+            animation: icon-pulse 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes icon-pulse {
+            0% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(79, 209, 197, 0.3));
+            }
+            100% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 16px rgba(159, 122, 234, 0.6));
+            }
+        }
+        
+        /* Responsive styles */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 12vw;
+            .container {
+                padding: 2.5rem;
             }
-
-            p {
-                font-size: 1rem;
+            
+            .error-code {
+                font-size: 7rem;
             }
-
-            a {
-                font-size: 1rem;
-                padding: 0.7rem 1.8rem;
+            
+            .error-message {
+                font-size: 1.4rem;
+            }
+            
+            .cursor {
+                display: none;
+            }
+            
+            * {
+                cursor: auto !important;
+            }
+            
+            a, button {
+                cursor: pointer !important;
             }
         }
-
+        
         @media (max-width: 480px) {
-            h1 {
-                font-size: 14vw;
+            .container {
+                padding: 2rem;
             }
-
-            p {
+            
+            .error-code {
+                font-size: 5rem;
+            }
+            
+            .error-message {
+                font-size: 1.2rem;
+                margin-bottom: 2rem;
+            }
+            
+            .home-button {
+                padding: 0.8rem 1.8rem;
                 font-size: 1rem;
+            }
+            
+            .error-icon {
+                width: 90px;
+                height: 90px;
                 margin-bottom: 1.5rem;
-            }
-
-            a {
-                font-size: 1rem;
-                padding: 0.6rem 1.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>404</h1>
-        <p>Oops! The page you're looking for doesn't exist.</p>
-        <a href="/">Back to Home</a>
+    <div class="cursor"></div>
+    
+    <div class="background">
+        <div class="gradient-bg"></div>
+        <div class="grid"></div>
     </div>
+    
+    <div class="floating-elements">
+        <div class="float-element" style="width: 200px; height: 200px; top: 15%; left: 10%; --tx: 100px; --ty: 50px; --r: 180deg;"></div>
+        <div class="float-element" style="width: 150px; height: 150px; top: 65%; left: 85%; --tx: -80px; --ty: -70px; --r: -120deg;"></div>
+        <div class="float-element" style="width: 100px; height: 100px; top: 85%; left: 25%; --tx: 60px; --ty: -100px; --r: 90deg;"></div>
+        <div class="float-element" style="width: 120px; height: 120px; top: 25%; left: 80%; --tx: -100px; --ty: 80px; --r: -90deg;"></div>
+        <div class="float-element" style="width: 180px; height: 180px; top: 75%; left: 50%; --tx: -50px; --ty: -50px; --r: 45deg;"></div>
+    </div>
+    
+    <div class="container">
+        <div class="error-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="url(#icon-gradient)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#4FD1C5" />
+                        <stop offset="50%" stop-color="#63B3ED" />
+                        <stop offset="100%" stop-color="#9F7AEA" />
+                    </linearGradient>
+                </defs>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+            </svg>
+        </div>
+        
+        <h1 class="error-code">404</h1>
+        <p class="error-message">พบข้อผิดพลาด! ไม่พบหน้าที่คุณกำลังค้นหา</p>
+        <a href="/" class="home-button">กลับสู่หน้าหลัก</a>
+    </div>
+    
+    <script>
+        // Custom cursor
+        document.addEventListener('DOMContentLoaded', function() {
+            const cursor = document.querySelector('.cursor');
+            
+            document.addEventListener('mousemove', function(e) {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+            });
+            
+            // Add active class on hoverable elements
+            const hoverables = document.querySelectorAll('a, button');
+            
+            hoverables.forEach(hoverable => {
+                hoverable.addEventListener('mouseenter', () => {
+                    cursor.classList.add('active');
+                });
+                
+                hoverable.addEventListener('mouseleave', () => {
+                    cursor.classList.remove('active');
+                });
+                
+                // Handle clicks
+                hoverable.addEventListener('mousedown', () => {
+                    cursor.style.transform = 'translate(-50%, -50%) scale(0.9)';
+                });
+                
+                hoverable.addEventListener('mouseup', () => {
+                    cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                });
+            });
+            
+            // Create floating elements dynamically
+            function createFloatingElements() {
+                const floatingContainer = document.querySelector('.floating-elements');
+                
+                for (let i = 0; i < 10; i++) {
+                    const size = Math.random() * 100 + 20;
+                    const top = Math.random() * 100;
+                    const left = Math.random() * 100;
+                    const tx = (Math.random() - 0.5) * 300;
+                    const ty = (Math.random() - 0.5) * 300;
+                    const r = Math.random() * 360;
+                    const opacity = Math.random() * 0.4 + 0.1;
+                    const duration = Math.random() * 30 + 20;
+                    
+                    const element = document.createElement('div');
+                    element.className = 'float-element';
+                    element.style.width = `${size}px`;
+                    element.style.height = `${size}px`;
+                    element.style.top = `${top}%`;
+                    element.style.left = `${left}%`;
+                    element.style.setProperty('--tx', `${tx}px`);
+                    element.style.setProperty('--ty', `${ty}px`);
+                    element.style.setProperty('--r', `${r}deg`);
+                    element.style.opacity = opacity;
+                    element.style.animationDuration = `${duration}s`;
+                    
+                    floatingContainer.appendChild(element);
+                }
+            }
+            
+            // Remove predefined elements and create random ones
+            const predefinedElements = document.querySelectorAll('.floating-elements .float-element');
+            predefinedElements.forEach(el => el.remove());
+            createFloatingElements();
+        });
+    </script>
 </body>
 </html>
