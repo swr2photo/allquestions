@@ -61,6 +61,29 @@
             text-align: center;
             color: var(--white);
             position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.1) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: headerShine 6s linear infinite;
+        }
+        
+        @keyframes headerShine {
+            0% { transform: rotate(30deg) translateY(-100%); }
+            100% { transform: rotate(30deg) translateY(100%); }
         }
         
         .header h1 {
@@ -68,6 +91,26 @@
             font-weight: 700;
             margin-bottom: 10px;
             animation: slideDown 0.8s ease-out;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .header h1::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: var(--white);
+            animation: expandLine 1.5s ease-out forwards;
+            animation-delay: 1s;
+        }
+        
+        @keyframes expandLine {
+            0% { width: 0; }
+            100% { width: 80%; }
         }
         
         @keyframes slideDown {
@@ -124,6 +167,30 @@
             border: 1px solid rgba(0, 0, 0, 0.05);
             animation: popIn 0.5s ease-out forwards;
             opacity: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .timer-item::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to bottom right,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            transform: rotate(30deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: scale(0.5) rotate(30deg) translateY(-100%); }
+            100% { transform: scale(0.5) rotate(30deg) translateY(100%); }
         }
         
         .timer-item:nth-child(1) { animation-delay: 0.3s; }
@@ -140,6 +207,12 @@
             font-size: 1.8rem;
             font-weight: 700;
             color: var(--primary);
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .timer-item:hover .timer-value {
+            transform: scale(1.1);
         }
         
         .timer-label {
@@ -205,15 +278,88 @@
             color: var(--text);
             text-decoration: none;
             font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
         }
         
         .social-link:hover {
             background-color: var(--primary);
             color: var(--white);
-            transform: translateY(-3px);
+            transform: translateY(-3px) scale(1.1);
         }
         
-        /* ลักษณะเส้นตกแต่ง */
+        .social-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+        
+        .social-link:hover::before {
+            width: 100%;
+            height: 100%;
+            animation: socialPulse 1s infinite;
+        }
+        
+        @keyframes socialPulse {
+            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        
+        /* เพิ่มการเคลื่อนไหวให้ปุ่ม */
+        .back-button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            z-index: 1;
+        }
+        
+        .back-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, var(--secondary), var(--accent));
+            border-radius: 30px;
+            transition: all 0.5s ease;
+            opacity: 0;
+            z-index: -1;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.5);
+        }
+        
+        .back-button:hover::before {
+            opacity: 1;
+        }
+        
+        .back-button:active {
+            transform: translateY(2px);
+            transition: all 0.1s ease;
+        }
         .shapes {
             position: fixed;
             top: 0;
@@ -228,6 +374,8 @@
             position: absolute;
             opacity: 0.3;
             pointer-events: none;
+            filter: blur(2px);
+            transition: all 0.5s ease;
         }
         
         .shape-1 {
@@ -237,7 +385,7 @@
             height: 150px;
             background: var(--accent);
             border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 10s linear infinite alternate;
+            animation: morph 10s linear infinite alternate, moveShape1 20s ease infinite alternate;
         }
         
         .shape-2 {
@@ -247,7 +395,7 @@
             height: 180px;
             background: var(--primary);
             border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 8s linear infinite alternate-reverse;
+            animation: morph 8s linear infinite alternate-reverse, moveShape2 15s ease infinite alternate;
         }
         
         .shape-3 {
@@ -257,7 +405,7 @@
             height: 120px;
             background: var(--secondary);
             border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 12s linear infinite alternate;
+            animation: morph 12s linear infinite alternate, moveShape3 18s ease infinite alternate;
         }
         
         .shape-4 {
@@ -268,7 +416,7 @@
             background: var(--primary);
             opacity: 0.2;
             border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 15s linear infinite alternate-reverse;
+            animation: morph 15s linear infinite alternate-reverse, moveShape4 25s ease infinite alternate;
         }
         
         @keyframes morph {
@@ -281,6 +429,30 @@
             100% {
                 border-radius: 30% 70% 70% 30% / 70% 30% 70% 30%;
             }
+        }
+        
+        @keyframes moveShape1 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 25px); }
+            100% { transform: translate(20px, 50px); }
+        }
+        
+        @keyframes moveShape2 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, -20px); }
+            100% { transform: translate(-60px, -40px); }
+        }
+        
+        @keyframes moveShape3 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(-20px, 40px); }
+            100% { transform: translate(-40px, 10px); }
+        }
+        
+        @keyframes moveShape4 {
+            0% { transform: translate(0, 0); }
+            50% { transform: translate(30px, 30px); }
+            100% { transform: translate(60px, 0px); }
         }
         
         .tools {
@@ -300,26 +472,49 @@
             font-weight: 500;
         }
         
-        .progress-container {
-            width: 100%;
-            background-color: #e9ecef;
+        /* เพิ่มการเคลื่อนไหวสำหรับภาพประกอบ */
+        .maintenance-illustration {
+            width: 90%;
+            max-width: 280px;
+            margin: 0 auto 30px;
+            display: block;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* เพิ่มเอฟเฟกต์กระพริบให้กับแถบความคืบหน้า */
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
             border-radius: 20px;
-            height: 10px;
-            margin: 30px 0;
+            transition: width 1s ease;
+            position: relative;
             overflow: hidden;
         }
         
-        .progress-bar {
-            height: 100%;
-            width: 75%;
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            border-radius: 20px;
-            animation: progress 1.5s ease-in-out;
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                      transparent 0%, 
+                      rgba(255, 255, 255, 0.4) 50%, 
+                      transparent 100%);
+            animation: shimmer 2s infinite;
         }
         
-        @keyframes progress {
-            from { width: 0; }
-            to { width: 75%; }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         
         /* การเคลื่อนไหวแบบกระพริบของจุด */
@@ -506,40 +701,134 @@
                 <p>คุณสามารถติดตามความคืบหน้าการปรับปรุงเว็บไซต์ได้ทางช่องทางโซเชียลมีเดียของเรา</p>
                 
                 <div class="social-links">
-                    <a href="https://www.instagram.com/doralaikon_th/" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-line"></i></a>
                 </div>
             </div>
         </div>
     </div>
     
     <script>
-        // Simple countdown timer
-        function updateTimer() {
-            // Set the target date (2 days from now)
-            const now = new Date();
-            const target = new Date();
-            target.setDate(now.getDate() + 2);
-            target.setHours(now.getHours() + 12);
-            target.setMinutes(now.getMinutes() + 35);
+        // กำหนดวันที่สิ้นสุด (วันที่เว็บไซต์จะกลับมาให้บริการ)
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 2); // เพิ่มเวลาไปอีก 2 วัน
+        
+        // กำหนดเวลาเริ่มต้นของการนับถอยหลัง (วันปัจจุบัน)
+        const startDate = new Date();
+        
+        // คำนวณระยะเวลาทั้งหมดในมิลลิวินาที
+        const totalDuration = endDate.getTime() - startDate.getTime();
+        
+        // อ้างอิงถึงแถบความคืบหน้า
+        const progressBar = document.querySelector('.progress-bar');
+        
+        // ฟังก์ชันนับถอยหลังแบบเรียลไทม์
+        function updateCountdown() {
+            // ดึงเวลาปัจจุบัน
+            const now = new Date().getTime();
             
-            // Calculate time remaining
-            const difference = target - now;
+            // คำนวณระยะเวลาที่เหลือ
+            const timeRemaining = endDate.getTime() - now;
             
-            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            // คำนวณวัน ชั่วโมง นาที วินาที
+            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
             
-            // Update the DOM
-            document.getElementById('days').textContent = days;
-            document.getElementById('hours').textContent = hours;
-            document.getElementById('minutes').textContent = minutes;
-            document.getElementById('seconds').textContent = seconds;
+            // อัพเดตค่าในหน้าเว็บแบบมีเอฟเฟกต์
+            updateElementWithEffect('days', formatTime(days));
+            updateElementWithEffect('hours', formatTime(hours));
+            updateElementWithEffect('minutes', formatTime(minutes));
+            updateElementWithEffect('seconds', formatTime(seconds));
+            
+            // คำนวณเปอร์เซ็นต์ความคืบหน้า
+            const elapsedTime = totalDuration - timeRemaining;
+            const progressPercentage = Math.min(100, Math.max(0, (elapsedTime / totalDuration) * 100));
+            
+            // อัพเดตแถบความคืบหน้า
+            progressBar.style.width = (100 - progressPercentage) + '%';
+            
+            // ตรวจสอบว่านับถอยหลังจบหรือยัง
+            if (timeRemaining < 0) {
+                clearInterval(timerInterval);
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                progressBar.style.width = '0%';
+            }
         }
         
-        // Initial call and set interval
-        updateTimer();
-        setInterval(updateTimer, 1000);
+        // ฟังก์ชันอัพเดตค่าแบบมีเอฟเฟกต์
+        function updateElementWithEffect(id, newValue) {
+            const element = document.getElementById(id);
+            const currentValue = element.textContent;
+            
+            if (currentValue !== newValue) {
+                // สร้างเอฟเฟกต์การเปลี่ยนค่า
+                element.classList.add('value-changed');
+                
+                // ลบคลาสหลังจากเอฟเฟกต์จบ
+                setTimeout(() => {
+                    element.classList.remove('value-changed');
+                }, 300);
+                
+                // อัพเดตค่าใหม่
+                element.textContent = newValue;
+            }
+        }
+        
+        // ฟังก์ชันจัดรูปแบบเวลาให้แสดงเป็น 2 หลักเสมอ
+        function formatTime(time) {
+            return time < 10 ? `0${time}` : time;
+        }
+        
+        // อัพเดตการนับถอยหลังทุกๆ 1 วินาที
+        updateCountdown();
+        const timerInterval = setInterval(updateCountdown, 1000);
+        
+        // เพิ่มการเคลื่อนไหวสำหรับรูปทรงในพื้นหลัง
+        function animateShapes() {
+            const shapes = document.querySelectorAll('.shape');
+            
+            shapes.forEach(shape => {
+                shape.addEventListener('mouseover', () => {
+                    shape.style.transform = 'scale(1.2)';
+                    shape.style.opacity = '0.5';
+                });
+                
+                shape.addEventListener('mouseout', () => {
+                    shape.style.transform = 'scale(1)';
+                    shape.style.opacity = '0.3';
+                });
+            });
+        }
+        
+        // เรียกใช้ฟังก์ชันเมื่อโหลดเอกสารเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            animateShapes();
+        });
     </script>
+    
+    <style>
+        /* เพิ่ม CSS สำหรับเอฟเฟกต์การเปลี่ยนค่า */
+        .timer-value {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .value-changed {
+            animation: valueChange 0.3s ease-out;
+        }
+        
+        @keyframes valueChange {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+    </style>
 </body>
 </html>
