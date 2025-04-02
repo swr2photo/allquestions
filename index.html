@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>กำลังปรับปรุงเว็บไซต์</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --background: #f8f9fa;
+            --text: #2b2d42;
+            --text-light: #6c757d;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .maintenance-container {
+            max-width: 800px;
+            width: 100%;
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 1s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 30px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            animation: slideDown 0.8s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            font-weight: 300;
+            opacity: 0.9;
+            animation: slideDown 1s ease-out;
+        }
+        
+        .content {
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+        
+        .content p {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .maintenance-illustration {
+            width: 90%;
+            max-width: 280px;
+            margin: 0 auto 30px;
+            display: block;
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .timer-item {
+            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 15px 10px;
+            min-width: 70px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            animation: popIn 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .timer-item:nth-child(1) { animation-delay: 0.3s; }
+        .timer-item:nth-child(2) { animation-delay: 0.5s; }
+        .timer-item:nth-child(3) { animation-delay: 0.7s; }
+        .timer-item:nth-child(4) { animation-delay: 0.9s; }
+        
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .timer-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .timer-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+        
+        .back-button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            margin-top: 10px;
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .back-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .contact-info {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed #e9ecef;
+        }
+        
+        .contact-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--text);
+        }
+        
+        .contact-info p {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        .social-link:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            transform: translateY(-3px);
+        }
+        
+        /* ลักษณะเส้นตกแต่ง */
+        .shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .shape {
+            position: absolute;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        .shape-1 {
+            top: 20%;
+            left: -5%;
+            width: 150px;
+            height: 150px;
+            background: var(--accent);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 10s linear infinite alternate;
+        }
+        
+        .shape-2 {
+            bottom: -50px;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            background: var(--primary);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 8s linear infinite alternate-reverse;
+        }
+        
+        .shape-3 {
+            top: 60%;
+            right: 10%;
+            width: 120px;
+            height: 120px;
+            background: var(--secondary);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 12s linear infinite alternate;
+        }
+        
+        .shape-4 {
+            top: 10%;
+            right: 15%;
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            opacity: 0.2;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: morph 15s linear infinite alternate-reverse;
+        }
+        
+        @keyframes morph {
+            0% {
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+            50% {
+                border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
+            }
+            100% {
+                border-radius: 30% 70% 70% 30% / 70% 30% 70% 30%;
+            }
+        }
+        
+        .tools {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .tool {
+            padding: 5px 15px;
+            background-color: rgba(67, 97, 238, 0.1);
+            border-radius: 20px;
+            color: var(--primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            height: 10px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 75%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 20px;
+            animation: progress 1.5s ease-in-out;
+        }
+        
+        @keyframes progress {
+            from { width: 0; }
+            to { width: 75%; }
+        }
+        
+        /* การเคลื่อนไหวแบบกระพริบของจุด */
+        .blinking-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            animation: blink 1.4s infinite;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes blink {
+            0%, 100% { transform: scale(0.6); opacity: 0.4; }
+            50% { transform: scale(1); opacity: 1; }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content h2 {
+                font-size: 1.3rem;
+            }
+            
+            .content p {
+                font-size: 1rem;
+            }
+            
+            .timer {
+                gap: 10px;
+            }
+            
+            .timer-item {
+                min-width: 60px;
+                padding: 10px 5px;
+            }
+            
+            .timer-value {
+                font-size: 1.5rem;
+            }
+            
+            .shape-1, .shape-2 {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .shape-3, .shape-4 {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+            
+            .content {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .timer {
+                flex-wrap: wrap;
+                justify-content: space-around;
+            }
+            
+            .timer-item {
+                min-width: 65px;
+                margin-bottom: 10px;
+            }
+            
+            .tool {
+                font-size: 0.8rem;
+            }
+            
+            .social-links {
+                gap: 10px;
+            }
+            
+            .social-link {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+    
+    <div class="maintenance-container">
+        <div class="header">
+            <h1>กำลังปรับปรุงเว็บไซต์</h1>
+            <p>เพื่อประสบการณ์การใช้งานที่ดียิ่งขึ้น</p>
+        </div>
+        
+        <div class="content">
+            <svg class="maintenance-illustration" viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
+                <path d="M314.8 184.9l-220.8-80.8c-7-4-2.8-14.1 5.4-13l216.3-5.5c5.2.1 9.1 4.9 8.3 10.1l-1.9 82.1c-.6 6.7-9.4 9.7-14.2 5.2" fill="#4361ee"/>
+                <circle cx="124.9" cy="106.8" r="53.4" fill="#f72585" opacity=".2"/>
+                <path d="M149.3 199.1l-68-24.5m23.8-7.1l-52.7-18.9m36.9-9.5l-44.2-15.9m4.5 80.3l-25.4-9.1m156.8-5.9l-17.1-6.2" stroke="#ececec" stroke-width="3" stroke-linecap="round"/>
+                <path d="M380.5 108.2l-48.3 26.4c-2.5 1.4-4.2 4.1-4.2 7v40.4c0 2.9 1.7 5.6 4.2 7l48.3 26.4c2.5 1.4 5.9 1.4 8.4 0l48.3-26.4c2.5-1.4 4.2-4.1 4.2-7v-40.4c0-2.9-1.7-5.6-4.2-7l-48.3-26.4c-2.5-1.4-5.9-1.4-8.4 0z" fill="#4361ee"/>
+                <path d="M432.2 167.9l-51.7 28.3-51.7-28.3 51.7-28.3 51.7 28.3z" fill="#3a0ca3"/>
+                <path d="M390.2 224.7V168l-51.7-28.3v56.7l51.7 28.3z" fill="#f72585" opacity=".2"/>
+                <path d="M380.5 246.9c-2.1 0-4.3-.5-6.2-1.6l-48.3-26.4c-3.8-2.1-6.3-6.3-6.3-10.7v-40.4c0-4.4 2.5-8.6 6.3-10.7l48.3-26.4c3.8-2.1 8.6-2.1 12.4 0l48.3 26.4c3.8 2.1 6.3 6.3 6.3 10.7v40.4c0 4.4-2.5 8.6-6.3 10.7l-48.3 26.4c-1.9 1-4 1.6-6.2 1.6z" stroke="#f5f5f5" stroke-width="3" stroke-linecap="round"/>
+                <path d="M186.1 238.4c19.1 0 34.6-15.5 34.6-34.6s-15.5-34.6-34.6-34.6-34.6 15.5-34.6 34.6 15.5 34.6 34.6 34.6z" fill="#f5f5f5"/>
+                <path d="M174.9 188c0-3.9 2.7-6.2 7.4-6.2s7.4 2.3 7.4 6.2v.9h-4.5v-1.2c0-1.2-.8-1.9-2.7-1.9s-2.7.7-2.7 1.9c0 4 10.1 4.2 10.1 11.5 0 3.9-2.7 6.3-7.5 6.3s-7.5-2.4-7.5-6.3v-1.8h4.5v2.1c0 1.2.9 2 2.8 2s2.8-.7 2.8-2c0-3.9-10.1-4.1-10.1-11.4zm25.2-6h4.5v22.7h6.4v4h-10.9v-26.7z" fill="#4361ee"/>
+                <path d="M341.8 149.4c0-3.1 2.1-4.9 5.9-4.9s5.9 1.8 5.9 4.9v.7h-3.6v-1c0-.9-.7-1.5-2.1-1.5s-2.1.6-2.1 1.5c0 3.1 8 3.3 8 9 0 3.1-2.1 5-5.9 5s-5.9-1.9-5.9-5v-1.4h3.6v1.7c0 .9.7 1.5 2.2 1.5s2.2-.6 2.2-1.5c0-3.1-8-3.2-8-9zm20-4.8h3.6v18h5v3.1h-8.6v-21.1z" fill="#f5f5f5"/>
+                <path d="M195.5 59.3h-57.2c-3.4 0-6.1 2.7-6.1 6.1v30.4c0 3.4 2.7 6.1 6.1 6.1h57.2c3.4 0 6.1-2.7 6.1-6.1V65.4c0-3.4-2.7-6.1-6.1-6.1z" fill="#f5f5f5"/>
+                <path d="M262.9 278.4H129.3c-27 0-49-21.9-49-49V154c0-27 21.9-49 49-49h133.6c27 0 49 21.9 49 49v75.4c0 27-21.9 49-49 49z" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round" stroke-dasharray="12.53 12.53"/>
+            </svg>
+            
+            <h2>เรากำลังทำการปรับปรุงเว็บไซต์</h2>
+            <p>ขออภัยในความไม่สะดวก เรากำลังทำการปรับปรุงระบบเพื่อยกระดับประสบการณ์การใช้งานของคุณให้ดียิ่งขึ้น กรุณากลับมาใหม่อีกครั้งในเร็วๆ นี้</p>
+            
+            <div class="tools">
+                <div class="tool">เพิ่มฟีเจอร์ใหม่</div>
+                <div class="tool">ปรับปรุงประสิทธิภาพ</div>
+                <div class="tool">แก้ไขปัญหาบั๊ก</div>
+                <div class="tool">ยกระดับความปลอดภัย</div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-bar"></div>
+            </div>
+            
+            <p>เราคาดว่าจะแล้วเสร็จภายใน:</p>
+            
+            <div class="timer">
+                <div class="timer-item">
+                    <div class="timer-value" id="days">2</div>
+                    <div class="timer-label">วัน</div>
+                </div>
+                <div class="timer-item">
+                    <div class="timer-value" id="hours">12</div>
+                    <div class="timer-label">ชั่วโมง</div>
+                </div>
+                <div class="timer-item">
+                    <div class="timer-value" id="minutes">35</div>
+                    <div class="timer-label">นาที</div>
+                </div>
+                <div class="timer-item">
+                    <div class="timer-value" id="seconds">15</div>
+                    <div class="timer-label">วินาที</div>
+                </div>
+            </div>
+            
+            <div class="blinking-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            
+            <a href="mailto:contact@example.com" class="back-button">ติดต่อเรา</a>
+            
+            <div class="contact-info">
+                <h3>ติดตามความคืบหน้า</h3>
+                <p>คุณสามารถติดตามความคืบหน้าการปรับปรุงเว็บไซต์ได้ทางช่องทางโซเชียลมีเดียของเรา</p>
+                
+                <div class="social-links">
+                    <a href="https://www.instagram.com/doralaikon_th/" class="social-link"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Simple countdown timer
+        function updateTimer() {
+            // Set the target date (2 days from now)
+            const now = new Date();
+            const target = new Date();
+            target.setDate(now.getDate() + 2);
+            target.setHours(now.getHours() + 12);
+            target.setMinutes(now.getMinutes() + 35);
+            
+            // Calculate time remaining
+            const difference = target - now;
+            
+            const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+            
+            // Update the DOM
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
+        }
+        
+        // Initial call and set interval
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
