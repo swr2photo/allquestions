@@ -1,0 +1,2102 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เว็บใส่ลายน้ำแบบกำหนดเอง</title>
+    <!-- เพิ่ม Font Awesome สำหรับไอคอน -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- เพิ่ม Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --primary-hover: #2980b9;
+            --secondary-color: #2ecc71;
+            --secondary-hover: #27ae60;
+            --dark-color: #2c3e50;
+            --light-color: #ecf0f1;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --info-color: #3498db;
+            --success-color: #2ecc71;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Prompt', 'Segoe UI', Tahoma, sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .app-version {
+            font-size: 12px;
+            opacity: 0.7;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .upload-container {
+            border: 2px dashed #ccc;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            background-color: #f9f9f9;
+        }
+        
+        .upload-container:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+        
+        .upload-container.dragover {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-color: var(--primary-color);
+        }
+        
+        .upload-icon {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .upload-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        
+        .upload-formats {
+            font-size: 12px;
+            color: #777;
+            margin-top: 5px;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .control-group {
+            flex: 1;
+            min-width: 280px;
+        }
+        
+        .control-panel {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid #eee;
+        }
+        
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .panel-icon {
+            margin-right: 10px;
+            font-size: 20px;
+            color: var(--primary-color);
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: 500;
+            margin: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #555;
+        }
+        
+        input[type="text"], 
+        input[type="number"], 
+        input[type="range"], 
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus, 
+        input[type="number"]:focus, 
+        select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        input[type="color"] {
+            width: 50px;
+            height: 38px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .color-value {
+            flex: 1;
+        }
+        
+        .toggle-group {
+            display: flex;
+            background-color: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-option {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background-color: #eee;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+            border: none;
+            color: #555;
+        }
+        
+        .toggle-option.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 5px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+        
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: right;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .preview-container {
+            position: relative;
+            max-width: 100%;
+            overflow: hidden;
+            margin-bottom: 25px;
+            text-align: center;
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .preview-container img {
+            max-width: 100%;
+            max-height: 500px;
+            display: block;
+        }
+        
+        .no-image {
+            font-size: 18px;
+            color: #777;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .no-image i {
+            font-size: 48px;
+            color: #ccc;
+        }
+        
+        .watermark-type {
+            margin-bottom: 20px;
+        }
+        
+        .image-info {
+            font-size: 14px;
+            color: #555;
+            margin-top: 15px;
+            text-align: center;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        
+        .buttons-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: var(--transition);
+            min-width: 150px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+        
+        .btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-success {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-success:hover {
+            background-color: var(--secondary-hover);
+        }
+        
+        .watermark-image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        /* Toast Notification System */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast {
+            min-width: 250px;
+            margin-bottom: 10px;
+            background-color: white;
+            color: #333;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.3s, fadeOut 0.5s 4.5s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .toast-success {
+            border-left: 4px solid var(--success-color);
+        }
+        
+        .toast-error {
+            border-left: 4px solid var(--danger-color);
+        }
+        
+        .toast-info {
+            border-left: 4px solid var(--info-color);
+        }
+        
+        .toast-warning {
+            border-left: 4px solid var(--warning-color);
+        }
+        
+        .toast-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .toast-success .toast-icon {
+            color: var(--success-color);
+        }
+        
+        .toast-error .toast-icon {
+            color: var(--danger-color);
+        }
+        
+        .toast-info .toast-icon {
+            color: var(--info-color);
+        }
+        
+        .toast-warning .toast-icon {
+            color: var(--warning-color);
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+        
+        .toast-message {
+            font-size: 14px;
+        }
+        
+        .toast-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            width: 100%;
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            animation: progress 5s linear;
+        }
+        
+        .toast-success .toast-progress-bar {
+            background-color: var(--success-color);
+        }
+        
+        .toast-error .toast-progress-bar {
+            background-color: var(--danger-color);
+        }
+        
+        .toast-info .toast-progress-bar {
+            background-color: var(--info-color);
+        }
+        
+        .toast-warning .toast-progress-bar {
+            background-color: var(--warning-color);
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+        
+        @keyframes progress {
+            from {
+                width: 100%;
+            }
+            to {
+                width: 0%;
+            }
+        }
+        
+        /* Style for responsive design */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .buttons-container {
+                flex-direction: column;
+            }
+        }
+        
+        .watermark-preview-wrapper {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .btn-upload {
+            background-color: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .btn-upload:hover {
+            background-color: #e6e6e6;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #f7f7f7;
+            border-top: 1px solid #eee;
+            font-size: 13px;
+            color: #777;
+        }
+
+        /* เพิ่มสไตล์สำหรับรองรับหลายรูปภาพ */
+        .images-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .image-item {
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            position: relative;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s;
+            height: 180px;
+        }
+        
+        .image-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .image-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        
+        .image-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .image-action-btn {
+            background-color: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #333;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+        
+        .image-action-btn:hover {
+            background-color: white;
+            color: var(--primary-color);
+        }
+        
+        .image-action-btn.delete:hover {
+            color: var(--danger-color);
+        }
+        
+        .image-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        .image-progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0;
+            transition: width 0.3s;
+        }
+
+        .multi-download-btn {
+            margin-top: 15px;
+        }
+        
+        .active-image-indicator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 5px;
+            background-color: rgba(52, 152, 219, 0.8);
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* แสดงจำนวนรูปภาพที่อัปโหลด */
+        .upload-count {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Loader styles */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255,255,255,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            display: none;
+        }
+        
+        .loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ส่วนแสดงการเปรียบเทียบภาพก่อน-หลัง */
+        .comparison-slider {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            overflow: hidden;
+            margin: 20px 0;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .comparison-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .comparison-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .comparison-separator {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-color);
+            left: 50%;
+            transform: translateX(-50%);
+            cursor: ew-resize;
+            z-index: 10;
+        }
+        
+        .comparison-handle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            cursor: ew-resize;
+            z-index: 20;
+            box-shadow: 0 0 0 3px rgba(255,255,255,0.5);
+        }
+        
+        .comparison-label {
+            position: absolute;
+            bottom: 10px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .original-label {
+            left: 10px;
+        }
+        
+        .watermarked-label {
+            right: 10px;
+        }
+        
+        .before-image {
+            right: 50%;
+            clip-path: inset(0 0 0 0);
+        }
+        
+        .after-image {
+            left: 50%;
+            clip-path: inset(0 0 0 0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-image"></i> เว็บใส่ลายน้ำแบบกำหนดเอง</h1>
+            <p>ปรับแต่งลายน้ำแบบข้อความหรือรูปภาพได้อย่างง่ายดาย</p>
+            <div class="app-version">เวอร์ชัน 2.1</div>
+            <div class="upload-count" id="uploadCount">0 รูปภาพ</div>
+        </header>
+        
+        <div class="main-content">
+            <div class="upload-container" id="uploadContainer">
+                <div class="upload-icon">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                </div>
+                <p class="upload-text">ลากวางรูปภาพที่นี่ หรือ <span style="color: var(--primary-color); text-decoration: underline; cursor: pointer;">คลิกเพื่อเลือกไฟล์</span></p>
+                <p class="upload-formats">รองรับไฟล์: JPG, PNG, WEBP, GIF (สามารถอัปโหลดได้หลายรูปภาพ)</p>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;" multiple>
+            </div>
+            
+            <!-- แสดงรูปภาพที่อัปโหลดแล้ว -->
+            <div class="images-grid" id="imagesGrid" style="display: none;"></div>
+            
+            <div class="watermark-type">
+                <div class="panel-header">
+                    <i class="fas fa-paint-brush panel-icon"></i>
+                    <h3 class="panel-title">ประเภทลายน้ำ</h3>
+                </div>
+                <div class="toggle-group">
+                    <button id="textType" class="toggle-option active">
+                        <i class="fas fa-font"></i> ข้อความ
+                    </button>
+                    <button id="imageType" class="toggle-option">
+                        <i class="fas fa-image"></i> รูปภาพ
+                    </button>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <!-- ส่วนควบคุมลายน้ำข้อความ -->
+                <div class="control-group" id="textControls">
+                    <div class="control-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-font panel-icon"></i>
+                            <h3 class="panel-title">ตั้งค่าข้อความลายน้ำ</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="watermarkText">
+                                <i class="fas fa-keyboard"></i> ข้อความลายน้ำ
+                            </label>
+                            <input type="text" id="watermarkText" value="ลายน้ำของฉัน" placeholder="ป้อนข้อความลายน้ำ">
+                        </div>
+                        <div class="form-group">
+                            <label for="fontSize">
+                                <i class="fas fa-text-height"></i> ขนาดตัวอักษร
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="fontSize" min="10" max="100" value="30">
+                                <span class="slider-value" id="fontSizeValue">30px</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fontFamily">
+                                <i class="fas fa-font"></i> รูปแบบตัวอักษร
+                            </label>
+                            <select id="fontFamily">
+                                <option value="'Prompt', sans-serif" selected>Prompt</option>
+                                <option value="Arial, sans-serif">Arial</option>
+                                <option value="'Times New Roman', serif">Times New Roman</option>
+                                <option value="'Courier New', monospace">Courier New</option>
+                                <option value="Georgia, serif">Georgia</option>
+                                <option value="Verdana, sans-serif">Verdana</option>
+                                <option value="Tahoma, sans-serif">Tahoma</option>
+                                <option value="'Segoe UI', sans-serif">Segoe UI</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="textColor">
+                                <i class="fas fa-palette"></i> สีข้อความ
+                            </label>
+                            <div class="color-picker">
+                                <input type="color" id="textColor" value="#ffffff">
+                                <input type="text" id="textColorValue" class="color-value" value="#ffffff">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="opacity">
+                                <i class="fas fa-low-vision"></i> ความโปร่งใส
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="opacity" min="0" max="100" value="50">
+                                <span class="slider-value" id="opacityValue">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ส่วนควบคุมลายน้ำรูปภาพ -->
+                <div class="control-group" id="imageControls" style="display: none;">
+                    <div class="control-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-image panel-icon"></i>
+                            <h3 class="panel-title">ตั้งค่าลายน้ำรูปภาพ</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-upload"></i> อัปโหลดรูปภาพลายน้ำ
+                            </label>
+                            <div class="file-input-wrapper">
+                                <button class="btn-upload">
+                                    <i class="fas fa-upload"></i> เลือกรูปภาพลายน้ำ
+                                </button>
+                                <input type="file" id="watermarkImageInput" accept="image/*">
+                            </div>
+                            <div class="watermark-preview-wrapper">
+                                <div id="watermarkImagePreview">
+                                    <p><i class="fas fa-image"></i> ยังไม่ได้เลือกรูปภาพ</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="imageSize">
+                                <i class="fas fa-expand-arrows-alt"></i> ขนาดรูปภาพ
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="imageSize" min="10" max="100" value="30">
+                                <span class="slider-value" id="imageSizeValue">30%</span>
+                            </div>
+                        </div>
+                        <divclass="form-group">
+                            <label for="imageOpacity">
+                                <i class="fas fa-low-vision"></i> ความโปร่งใส
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="imageOpacity" min="0" max="100" value="50">
+                                <span class="slider-value" id="imageOpacityValue">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ส่วนควบคุมตำแหน่งและการแสดงผล -->
+                <div class="control-group">
+                    <div class="control-panel">
+                        <div class="panel-header">
+                            <i class="fas fa-arrows-alt panel-icon"></i>
+                            <h3 class="panel-title">ตำแหน่งและการแสดงผล</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="rotation">
+                                <i class="fas fa-sync-alt"></i> การหมุน
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="rotation" min="-180" max="180" value="-45">
+                                <span class="slider-value" id="rotationValue">-45°</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="positionX">
+                                <i class="fas fa-arrows-alt-h"></i> ตำแหน่งแนวนอน
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="positionX" min="0" max="100" value="50">
+                                <span class="slider-value" id="positionXValue">50%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="positionY">
+                                <i class="fas fa-arrows-alt-v"></i> ตำแหน่งแนวตั้ง
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="positionY" min="0" max="100" value="50">
+                                <span class="slider-value" id="positionYValue">50%</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="repeat">
+                                <i class="fas fa-th"></i> รูปแบบการแสดงผล
+                            </label>
+                            <select id="repeat">
+                                <option value="single">ลายน้ำเดี่ยว</option>
+                                <option value="repeat" selected>ลายน้ำทั้งหมด</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="spacing">
+                                <i class="fas fa-expand"></i> ระยะห่าง (สำหรับลายน้ำทั้งหมด)
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="spacing" min="50" max="300" value="150">
+                                <span class="slider-value" id="spacingValue">150px</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-container" id="previewContainer">
+                <div class="no-image" id="noImage">
+                    <i class="fas fa-images"></i>
+                    <span>โปรดอัปโหลดรูปภาพ</span>
+                </div>
+                <div id="comparisonSlider" class="comparison-slider" style="display: none;">
+                    <div class="comparison-item before-image">
+                        <img id="originalPreview" src="">
+                        <div class="comparison-label original-label">ต้นฉบับ</div>
+                    </div>
+                    <div class="comparison-item after-image">
+                        <img id="watermarkedPreview" src="">
+                        <div class="comparison-label watermarked-label">มีลายน้ำ</div>
+                    </div>
+                    <div class="comparison-separator"></div>
+                    <div class="comparison-handle">
+                        <i class="fas fa-arrows-alt-h"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="buttons-container">
+                <button id="downloadBtn" class="btn btn-success" disabled>
+                    <i class="fas fa-download"></i> ดาวน์โหลดรูปภาพปัจจุบัน
+                </button>
+                <button id="downloadAllBtn" class="btn btn-success" disabled>
+                    <i class="fas fa-download"></i> ดาวน์โหลดทั้งหมด
+                </button>
+                <button id="resetBtn" class="btn btn-secondary">
+                    <i class="fas fa-undo"></i> รีเซ็ตการตั้งค่า
+                </button>
+            </div>
+            
+            <div class="image-info" id="imageInfo"></div>
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2025 เว็บใส่ลายน้ำแบบกำหนดเอง - เครื่องมือออนไลน์ฟรี</p>
+        </div>
+    </div>
+    
+    <!-- โหลดเดอร์ -->
+    <div class="loader-container" id="loaderContainer">
+        <div class="loader"></div>
+    </div>
+    
+    <!-- ระบบแจ้งเตือน Toast -->
+    <div id="toast-container"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const fileInput = document.getElementById('fileInput');
+            const uploadContainer = document.getElementById('uploadContainer');
+            const previewContainer = document.getElementById('previewContainer');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadAllBtn = document.getElementById('downloadAllBtn');
+            const resetBtn = document.getElementById('resetBtn');
+            const imageInfoEl = document.getElementById('imageInfo');
+            const textType = document.getElementById('textType');
+            const imageType = document.getElementById('imageType');
+            const textControls = document.getElementById('textControls');
+            const imageControls = document.getElementById('imageControls');
+            const watermarkImageInput = document.getElementById('watermarkImageInput');
+            const watermarkImagePreview = document.getElementById('watermarkImagePreview');
+            const imagesGrid = document.getElementById('imagesGrid');
+            const uploadCountEl = document.getElementById('uploadCount');
+            const noImage = document.getElementById('noImage');
+            const comparisonSlider = document.getElementById('comparisonSlider');
+            const originalPreview = document.getElementById('originalPreview');
+            const watermarkedPreview = document.getElementById('watermarkedPreview');
+            const loaderContainer = document.getElementById('loaderContainer');
+            
+            // Text Watermark controls
+            const watermarkText = document.getElementById('watermarkText');
+            const fontSize = document.getElementById('fontSize');
+            const fontSizeValue = document.getElementById('fontSizeValue');
+            const fontFamily = document.getElementById('fontFamily');
+            const textColor = document.getElementById('textColor');
+            const textColorValue = document.getElementById('textColorValue');
+            const opacity = document.getElementById('opacity');
+            const opacityValue = document.getElementById('opacityValue');
+            
+            // Image Watermark controls
+            const imageSize = document.getElementById('imageSize');
+            const imageSizeValue = document.getElementById('imageSizeValue');
+            const imageOpacity = document.getElementById('imageOpacity');
+            const imageOpacityValue = document.getElementById('imageOpacityValue');
+            
+            // Position controls
+            const rotation = document.getElementById('rotation');
+            const rotationValue = document.getElementById('rotationValue');
+            const positionX = document.getElementById('positionX');
+            const positionXValue = document.getElementById('positionXValue');
+            const positionY = document.getElementById('positionY');
+            const positionYValue = document.getElementById('positionYValue');
+            const repeat = document.getElementById('repeat');
+            const spacing = document.getElementById('spacing');
+            const spacingValue = document.getElementById('spacingValue');
+            
+            // State
+            let uploadedImages = [];
+            let activeImageIndex = -1;
+            let watermarkImage = null;
+            let watermarkType = 'text';
+            let isProcessing = false;
+            
+            // Initialize
+            initializeEvents();
+            updateSliderValues();
+            
+            // ฟังก์ชัน: เริ่มต้นเหตุการณ์ (Event Listeners)
+            function initializeEvents() {
+                // อัปโหลดไฟล์
+                uploadContainer.addEventListener('click', () => fileInput.click());
+                fileInput.addEventListener('change', handleFileUpload);
+                
+                // Drag and Drop
+                setupDragAndDrop();
+                
+                // เลือกประเภทลายน้ำ
+                textType.addEventListener('click', () => switchWatermarkType('text'));
+                imageType.addEventListener('click', () => switchWatermarkType('image'));
+                
+                // อัปโหลดรูปภาพลายน้ำ
+                watermarkImageInput.addEventListener('change', handleWatermarkImageUpload);
+                
+                // Slider events
+                setupSliderEvents();
+                
+                // Color picker events
+                textColor.addEventListener('input', () => {
+                    textColorValue.value = textColor.value;
+                    updateWatermark();
+                });
+                
+                textColorValue.addEventListener('input', () => {
+                    // ตรวจสอบว่าเป็นรูปแบบสีที่ถูกต้อง
+                    if (/^#[0-9A-F]{6}$/i.test(textColorValue.value)) {
+                        textColor.value = textColorValue.value;
+                        updateWatermark();
+                    }
+                });
+                
+                // Text watermark input
+                watermarkText.addEventListener('input', debounce(updateWatermark, 300));
+                
+                // Font family change
+                fontFamily.addEventListener('change', updateWatermark);
+                
+                // Repeat pattern
+                repeat.addEventListener('change', updateWatermark);
+                
+                // Button clicks
+                downloadBtn.addEventListener('click', downloadCurrentImage);
+                downloadAllBtn.addEventListener('click', downloadAllImages);
+                resetBtn.addEventListener('click', resetSettings);
+                
+                // ตัวเปรียบเทียบรูปก่อน-หลัง
+                setupComparisonSlider();
+            }
+            
+            // ฟังก์ชัน: ตั้งค่า Drag and Drop
+            function setupDragAndDrop() {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    uploadContainer.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    uploadContainer.addEventListener(eventName, () => {
+                        uploadContainer.classList.add('dragover');
+                    }, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    uploadContainer.addEventListener(eventName, () => {
+                        uploadContainer.classList.remove('dragover');
+                    }, false);
+                });
+                
+                uploadContainer.addEventListener('drop', e => {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    handleFiles(files);
+                }, false);
+            }
+            
+            // ฟังก์ชัน: ตั้งค่า Slider Events
+            function setupSliderEvents() {
+                // Font size
+                fontSize.addEventListener('input', () => {
+                    fontSizeValue.textContent = `${fontSize.value}px`;
+                    updateWatermark();
+                });
+                
+                // Opacity
+                opacity.addEventListener('input', () => {
+                    opacityValue.textContent = `${opacity.value}%`;
+                    updateWatermark();
+                });
+                
+                // Image size
+                imageSize.addEventListener('input', () => {
+                    imageSizeValue.textContent = `${imageSize.value}%`;
+                    updateWatermark();
+                });
+                
+                // Image opacity
+                imageOpacity.addEventListener('input', () => {
+                    imageOpacityValue.textContent = `${imageOpacity.value}%`;
+                    updateWatermark();
+                });
+                
+                // Rotation
+                rotation.addEventListener('input', () => {
+                    rotationValue.textContent = `${rotation.value}°`;
+                    updateWatermark();
+                });
+                
+                // Position X
+                positionX.addEventListener('input', () => {
+                    positionXValue.textContent = `${positionX.value}%`;
+                    updateWatermark();
+                });
+                
+                // Position Y
+                positionY.addEventListener('input', () => {
+                    positionYValue.textContent = `${positionY.value}%`;
+                    updateWatermark();
+                });
+                
+                // Spacing
+                spacing.addEventListener('input', () => {
+                    spacingValue.textContent = `${spacing.value}px`;
+                    updateWatermark();
+                });
+            }
+            
+            // ฟังก์ชัน: ตั้งค่าตัวเปรียบเทียบรูปก่อน-หลัง
+            function setupComparisonSlider() {
+                const separator = comparisonSlider.querySelector('.comparison-separator');
+                const handle = comparisonSlider.querySelector('.comparison-handle');
+                const beforeImage = comparisonSlider.querySelector('.before-image');
+                const afterImage = comparisonSlider.querySelector('.after-image');
+                
+                let isDragging = false;
+                
+                const moveSlider = (e) => {
+                    if (!isDragging) return;
+                    
+                    const rect = comparisonSlider.getBoundingClientRect();
+                    let x = e.clientX - rect.left;
+                    const width = rect.width;
+                    
+                    // ป้องกันไม่ให้เลื่อนออกนอกขอบเขต
+                    if (x < 0) x = 0;
+                    if (x > width) x = width;
+                    
+                    const percent = (x / width) * 100;
+                    
+                    separator.style.left = `${percent}%`;
+                    handle.style.left = `${percent}%`;
+                    
+                    beforeImage.style.right = `${100 - percent}%`;
+                    afterImage.style.left = `${percent}%`;
+                };
+                
+                handle.addEventListener('mousedown', () => {
+                    isDragging = true;
+                });
+                
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+                
+                document.addEventListener('mousemove', moveSlider);
+                
+                comparisonSlider.addEventListener('touchstart', (e) => {
+                    isDragging = true;
+                    moveSlider(e.touches[0]);
+                });
+                
+                document.addEventListener('touchend', () => {
+                    isDragging = false;
+                });
+                
+                document.addEventListener('touchmove', (e) => {
+                    if (isDragging) {
+                        moveSlider(e.touches[0]);
+                    }
+                });
+            }
+            
+            // ฟังก์ชัน: อัปเดตค่า Slider
+            function updateSliderValues() {
+                fontSizeValue.textContent = `${fontSize.value}px`;
+                opacityValue.textContent = `${opacity.value}%`;
+                imageSizeValue.textContent = `${imageSize.value}%`;
+                imageOpacityValue.textContent = `${imageOpacity.value}%`;
+                rotationValue.textContent = `${rotation.value}°`;
+                positionXValue.textContent = `${positionX.value}%`;
+                positionYValue.textContent = `${positionY.value}%`;
+                spacingValue.textContent = `${spacing.value}px`;
+            }
+            
+            // ฟังก์ชัน: สลับประเภทลายน้ำ
+            function switchWatermarkType(type) {
+                watermarkType = type;
+                
+                if (type === 'text') {
+                    textType.classList.add('active');
+                    imageType.classList.remove('active');
+                    textControls.style.display = 'block';
+                    imageControls.style.display = 'none';
+                } else {
+                    textType.classList.remove('active');
+                    imageType.classList.add('active');
+                    textControls.style.display = 'none';
+                    imageControls.style.display = 'block';
+                }
+                
+                updateWatermark();
+            }
+            
+            // ฟังก์ชัน: จัดการไฟล์ที่อัปโหลด
+            function handleFileUpload(e) {
+                handleFiles(e.target.files);
+                fileInput.value = ''; // รีเซ็ตค่าเพื่อให้อัปโหลดไฟล์เดิมซ้ำได้
+            }
+            
+            // ฟังก์ชัน: จัดการรูปภาพลายน้ำที่อัปโหลด
+            function handleWatermarkImageUpload(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        watermarkImage = new Image();
+                        watermarkImage.onload = function() {
+                            updateWatermark();
+                        };
+                        watermarkImage.src = e.target.result;
+                        
+                        // แสดงตัวอย่างรูปภาพลายน้ำ
+                        watermarkImagePreview.innerHTML = `
+                            <img src="${e.target.result}" class="watermark-image-preview">
+                        `;
+                    };
+                    
+                    reader.readAsDataURL(file);
+                }
+            }
+            
+            // ฟังก์ชัน: จัดการไฟล์
+            function handleFiles(files) {
+                if (!files || files.length === 0) return;
+                
+                showLoader();
+                
+                // แปลง FileList เป็น Array
+                const filesArray = Array.from(files);
+                
+                // กรองเฉพาะไฟล์รูปภาพ
+                const imageFiles = filesArray.filter(file => file.type.startsWith('image/'));
+                
+                if (imageFiles.length === 0) {
+                    showToast('ข้อผิดพลาด', 'ไม่พบไฟล์รูปภาพที่รองรับ', 'error');
+                    hideLoader();
+                    return;
+                }
+                
+                // แสดง grid รูปภาพ
+                imagesGrid.style.display = 'grid';
+                
+                const promises = imageFiles.map(file => {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const imageObject = {
+                                    file: file,
+                                    original: img,
+                                    watermarked: null,
+                                    url: e.target.result,
+                                    watermarkedUrl: null,
+                                    name: file.name,
+                                    width: img.width,
+                                    height: img.height,
+                                    processed: false
+                                };
+                                
+                                uploadedImages.push(imageObject);
+                                addImageToGrid(imageObject, uploadedImages.length - 1);
+                                resolve();
+                            };
+                            img.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                });
+                
+                Promise.all(promises).then(() => {
+                    updateUploadCount();
+                    
+                    if (activeImageIndex === -1 && uploadedImages.length > 0) {
+                        setActiveImage(0);
+                    } else {
+                        updateWatermark();
+                    }
+                    
+                    hideLoader();
+                    showToast('สำเร็จ', `อัปโหลดรูปภาพสำเร็จ ${imageFiles.length} รูป`, 'success');
+                });
+            }
+            
+            // ฟังก์ชัน: เพิ่มรูปภาพลงใน Grid
+            function addImageToGrid(imageObject, index) {
+                const itemEl = document.createElement('div');
+                itemEl.className = 'image-item';
+                itemEl.innerHTML = `
+                    <img src="${imageObject.url}" class="image-thumbnail">
+                    <div class="image-actions">
+                        <button class="image-action-btn delete" title="ลบรูปภาพ">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="image-progress">
+                        <div class="image-progress-bar"></div>
+                    </div>
+                `;
+                
+                // เพิ่มตัวบ่งชี้รูปภาพที่กำลังใช้งาน
+                if (index === activeImageIndex) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'active-image-indicator';
+                    indicator.textContent = 'กำลังแก้ไข';
+                    itemEl.appendChild(indicator);
+                }
+                
+                // เหตุการณ์คลิกรูปภาพ
+                itemEl.querySelector('.image-thumbnail').addEventListener('click', () => {
+                    setActiveImage(index);
+                });
+                
+                // เหตุการณ์คลิกปุ่มลบ
+                itemEl.querySelector('.delete').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    deleteImage(index);
+                });
+                
+                // เพิ่ม data attribute เพื่อจดจำ index
+                itemEl.dataset.index = index;
+                
+                imagesGrid.appendChild(itemEl);
+            }
+            
+            // ฟังก์ชัน: ตั้งค่ารูปภาพที่กำลังใช้งาน
+            function setActiveImage(index) {
+                if (index < 0 || index >= uploadedImages.length) return;
+                
+                activeImageIndex = index;
+                
+                // อัปเดต UI - รีเซ็ตตัวบ่งชี้รูปภาพที่กำลังใช้งาน
+                const items = imagesGrid.querySelectorAll('.image-item');
+                items.forEach(item => {
+                    const indicator = item.querySelector('.active-image-indicator');
+                    if (indicator) indicator.remove();
+                });
+                
+                // เพิ่มตัวบ่งชี้รูปภาพที่กำลังใช้งาน
+                const activeItem = imagesGrid.querySelector(`.image-item[data-index="${index}"]`);
+                if (activeItem) {
+                    const indicator = document.createElement('div');
+                    indicator.className = 'active-image-indicator';
+                    indicator.textContent = 'กำลังแก้ไข';
+                    activeItem.appendChild(indicator);
+                }
+                
+                updateWatermark();
+                updateImageInfo();
+            }
+            
+            // ฟังก์ชัน: ลบรูปภาพ
+            function deleteImage(index) {
+                if (index < 0 || index >= uploadedImages.length) return;
+                
+                // ลบรูปภาพออกจาก array
+                uploadedImages.splice(index, 1);
+                
+                // ลบ element ออกจาก DOM
+                const items = imagesGrid.querySelectorAll('.image-item');
+                items[index].remove();
+                
+                // อัปเดต data-index ของ element ที่เหลือ
+                const remainingItems = imagesGrid.querySelectorAll('.image-item');
+                remainingItems.forEach((item, i) => {
+                    item.dataset.index = i;
+                });
+                
+                // อัปเดตจำนวนรูปภาพ
+                updateUploadCount();
+                
+                // จัดการกรณีลบรูปภาพที่กำลังใช้งาน
+                if (uploadedImages.length === 0) {
+                    activeImageIndex = -1;
+                    noImage.style.display = 'flex';
+                    comparisonSlider.style.display = 'none';
+                    downloadBtn.disabled = true;
+                    downloadAllBtn.disabled = true;
+                    imageInfoEl.textContent = '';
+                } else if (activeImageIndex === index) {
+                    // ตั้งค่ารูปภาพใหม่เป็นรูปภาพที่กำลังใช้งาน
+                    const newIndex = Math.min(index, uploadedImages.length - 1);
+                    setActiveImage(newIndex);
+                } else if (activeImageIndex > index) {
+                    // ปรับ index ลง 1 เนื่องจากรูปภาพที่ถูกลบอยู่ก่อนรูปภาพที่กำลังใช้งาน
+                    activeImageIndex--;
+                    setActiveImage(activeImageIndex);
+                }
+            }
+            
+            // ฟังก์ชัน: อัปเดตข้อมูลรูปภาพ
+            function updateImageInfo() {
+                if (activeImageIndex === -1 || uploadedImages.length === 0) {
+                    imageInfoEl.textContent = '';
+                    return;
+                }
+                
+                const img = uploadedImages[activeImageIndex];
+                imageInfoEl.innerHTML = `
+                    <strong>ชื่อไฟล์:</strong> ${img.name} | 
+                    <strong>ขนาด:</strong> ${img.width} x ${img.height} พิกเซล | 
+                    <strong>รูปภาพที่:</strong> ${activeImageIndex + 1} จาก ${uploadedImages.length}
+                `;
+            }
+            
+            // ฟังก์ชัน: อัปเดตจำนวนรูปภาพที่อัปโหลด
+            function updateUploadCount() {
+                uploadCountEl.textContent = `${uploadedImages.length} รูปภาพ`;
+                
+                // เปิดใช้งานปุ่มดาวน์โหลดทั้งหมดถ้ามีรูปภาพ
+                downloadAllBtn.disabled = uploadedImages.length === 0;
+            }
+            
+            // ฟังก์ชัน: อัปเดตลายน้ำ
+            function updateWatermark() {
+                if (isProcessing || activeImageIndex === -1 || uploadedImages.length === 0) return;
+                
+                isProcessing = true;
+                
+                // แสดงตัวโหลดใน progress bar
+                const activeItem = imagesGrid.querySelector(`.image-item[data-index="${activeImageIndex}"]`);
+                if (activeItem) {
+                    const progressBar = activeItem.querySelector('.image-progress-bar');
+                    progressBar.style.width = '30%';
+                }
+                
+                // รับค่าการตั้งค่าปัจจุบัน
+                const settings = getCurrentSettings();
+                
+                // ทำลายน้ำในรูปภาพที่กำลังใช้งาน
+                setTimeout(() => {
+                    applyWatermarkToImage(activeImageIndex, settings)
+                        .then(() => {
+                            // อัปเดต UI
+                            updatePreview();
+                            downloadBtn.disabled = false;
+                            
+                            // อัปเดต progress bar
+                            if (activeItem) {
+                                const progressBar = activeItem.querySelector('.image-progress-bar');
+                                progressBar.style.width = '100%';
+                                setTimeout(() => {
+                                    progressBar.style.width = '0';
+                                }, 500);
+                            }
+                            
+                            isProcessing = false;
+                        })
+                        .catch(error => {
+                            console.error('Error applying watermark:', error);
+                            showToast('ข้อผิดพลาด', 'ไม่สามารถใส่ลายน้ำได้', 'error');
+                            isProcessing = false;
+                        });
+                }, 50);
+            }
+            
+            // ฟังก์ชัน: รับค่าการตั้งค่าปัจจุบัน
+            function getCurrentSettings() {
+                return {
+                    watermarkType: watermarkType,
+                    text: watermarkText.value,
+                    fontSize: parseInt(fontSize.value),
+                    fontFamily: fontFamily.value,
+                    textColor: textColor.value,
+                    opacity: parseInt(opacity.value) / 100,
+                    watermarkImage: watermarkImage,
+                    imageSize: parseInt(imageSize.value) / 100,
+                    imageOpacity: parseInt(imageOpacity.value) / 100,
+                    rotation: parseInt(rotation.value),
+                    positionX: parseInt(positionX.value) / 100,
+                    positionY: parseInt(positionY.value) / 100,
+                    repeat: repeat.value,
+                    spacing: parseInt(spacing.value)
+                };
+            }
+            
+            // ฟังก์ชัน: ใส่ลายน้ำในรูปภาพ
+            async function applyWatermarkToImage(index, settings) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        const imageObject = uploadedImages[index];
+                        const img = imageObject.original;
+                        // สร้าง canvas
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        
+                        // กำหนดขนาด canvas ตามขนาดรูปภาพ
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        
+                        // วาดรูปภาพต้นฉบับลงใน canvas
+                        ctx.drawImage(img, 0, 0, img.width, img.height);
+                        
+                        // ใส่ลายน้ำตามประเภทที่เลือก
+                        if (settings.watermarkType === 'text' && settings.text.trim()) {
+                            applyTextWatermark(ctx, canvas.width, canvas.height, settings);
+                        } else if (settings.watermarkType === 'image' && settings.watermarkImage) {
+                            applyImageWatermark(ctx, canvas.width, canvas.height, settings);
+                        }
+                        
+                        // แปลง canvas เป็น dataURL
+                        const watermarkedDataUrl = canvas.toDataURL('image/png');
+                        
+                        // สร้างรูปภาพใหม่จาก dataURL
+                        const watermarkedImg = new Image();
+                        watermarkedImg.onload = function() {
+                            // บันทึกรูปภาพที่มีลายน้ำลงใน object
+                            imageObject.watermarked = watermarkedImg;
+                            imageObject.watermarkedUrl = watermarkedDataUrl;
+                            imageObject.processed = true;
+                            
+                            resolve();
+                        };
+                        watermarkedImg.onerror = function() {
+                            reject(new Error('Failed to create watermarked image'));
+                        };
+                        watermarkedImg.src = watermarkedDataUrl;
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            }
+            
+            // ฟังก์ชัน: ใส่ลายน้ำข้อความ
+            function applyTextWatermark(ctx, width, height, settings) {
+                const {
+                    text, fontSize, fontFamily, textColor, opacity,
+                    rotation, positionX, positionY, repeat, spacing
+                } = settings;
+                
+                // บันทึกสถานะ canvas ปัจจุบัน
+                ctx.save();
+                
+                // ตั้งค่าตัวอักษร
+                ctx.font = `${fontSize}px ${fontFamily}`;
+                ctx.fillStyle = textColor;
+                ctx.globalAlpha = opacity;
+                
+                // วัดขนาดข้อความ
+                const textWidth = ctx.measureText(text).width;
+                const textHeight = fontSize;
+                
+                if (repeat === 'single') {
+                    // คำนวณตำแหน่ง
+                    const x = width * positionX - textWidth / 2;
+                    const y = height * positionY + textHeight / 2;
+                    
+                    // หมุน
+                    ctx.translate(width * positionX, height * positionY);
+                    ctx.rotate(rotation * Math.PI / 180);
+                    ctx.translate(-width * positionX, -height * positionY);
+                    
+                    // วาดข้อความ
+                    ctx.fillText(text, x, y);
+                } else {
+                    // ใส่ลายน้ำทั่วทั้งรูปภาพ
+                    const spacingX = spacing;
+                    const spacingY = spacing;
+                    
+                    // คำนวณจำนวนแถวและคอลัมน์
+                    const cols = Math.ceil(width / spacingX) + 1;
+                    const rows = Math.ceil(height / spacingY) + 1;
+                    
+                    // วนลูปวาดข้อความ
+                    for (let row = -1; row < rows; row++) {
+                        for (let col = -1; col < cols; col++) {
+                            const x = col * spacingX;
+                            const y = row * spacingY + textHeight / 2;
+                            
+                            // หมุน
+                            ctx.save();
+                            ctx.translate(x + textWidth / 2, y);
+                            ctx.rotate(rotation * Math.PI / 180);
+                            ctx.translate(-(x + textWidth / 2), -y);
+                            
+                            // วาดข้อความ
+                            ctx.fillText(text, x, y);
+                            
+                            ctx.restore();
+                        }
+                    }
+                }
+                
+                // คืนค่าสถานะ canvas
+                ctx.restore();
+            }
+            
+            // ฟังก์ชัน: ใส่ลายน้ำรูปภาพ
+            function applyImageWatermark(ctx, width, height, settings) {
+                const {
+                    watermarkImage, imageSize, imageOpacity,
+                    rotation, positionX, positionY, repeat, spacing
+                } = settings;
+                
+                if (!watermarkImage) return;
+                
+                // บันทึกสถานะ canvas ปัจจุบัน
+                ctx.save();
+                
+                // ตั้งค่าความโปร่งใส
+                ctx.globalAlpha = imageOpacity;
+                
+                // คำนวณขนาดของลายน้ำ
+                const scaleFactor = imageSize;
+                const watermarkWidth = watermarkImage.width * scaleFactor;
+                const watermarkHeight = watermarkImage.height * scaleFactor;
+                
+                if (repeat === 'single') {
+                    // คำนวณตำแหน่ง
+                    const x = width * positionX - watermarkWidth / 2;
+                    const y = height * positionY - watermarkHeight / 2;
+                    
+                    // หมุน
+                    ctx.translate(width * positionX, height * positionY);
+                    ctx.rotate(rotation * Math.PI / 180);
+                    ctx.translate(-width * positionX, -height * positionY);
+                    
+                    // วาดรูปภาพลายน้ำ
+                    ctx.drawImage(
+                        watermarkImage,
+                        x, y,
+                        watermarkWidth, watermarkHeight
+                    );
+                } else {
+                    // ใส่ลายน้ำทั่วทั้งรูปภาพ
+                    const spacingX = spacing;
+                    const spacingY = spacing;
+                    
+                    // คำนวณจำนวนแถวและคอลัมน์
+                    const cols = Math.ceil(width / spacingX) + 1;
+                    const rows = Math.ceil(height / spacingY) + 1;
+                    
+                    // วนลูปวาดรูปภาพลายน้ำ
+                    for (let row = -1; row < rows; row++) {
+                        for (let col = -1; col < cols; col++) {
+                            const x = col * spacingX - watermarkWidth / 2;
+                            const y = row * spacingY - watermarkHeight / 2;
+                            
+                            // หมุน
+                            ctx.save();
+                            ctx.translate(x + watermarkWidth / 2, y + watermarkHeight / 2);
+                            ctx.rotate(rotation * Math.PI / 180);
+                            ctx.translate(-(x + watermarkWidth / 2), -(y + watermarkHeight / 2));
+                            
+                            // วาดรูปภาพลายน้ำ
+                            ctx.drawImage(
+                                watermarkImage,
+                                x, y,
+                                watermarkWidth, watermarkHeight
+                            );
+                            
+                            ctx.restore();
+                        }
+                    }
+                }
+                
+                // คืนค่าสถานะ canvas
+                ctx.restore();
+            }
+            
+            // ฟังก์ชัน: อัปเดตพรีวิว
+            function updatePreview() {
+                if (activeImageIndex === -1 || uploadedImages.length === 0) {
+                    noImage.style.display = 'flex';
+                    comparisonSlider.style.display = 'none';
+                    return;
+                }
+                
+                const imageObject = uploadedImages[activeImageIndex];
+                
+                // ซ่อนข้อความ "โปรดอัปโหลดรูปภาพ"
+                noImage.style.display = 'none';
+                
+                // แสดงตัวเปรียบเทียบภาพก่อน-หลัง
+                comparisonSlider.style.display = 'block';
+                
+                // ตั้งค่ารูปภาพต้นฉบับและรูปภาพที่มีลายน้ำ
+                originalPreview.src = imageObject.url;
+                watermarkedPreview.src = imageObject.watermarkedUrl;
+                
+                // รีเซ็ตตำแหน่งตัวเลื่อน
+                const separator = comparisonSlider.querySelector('.comparison-separator');
+                const handle = comparisonSlider.querySelector('.comparison-handle');
+                const beforeImage = comparisonSlider.querySelector('.before-image');
+                const afterImage = comparisonSlider.querySelector('.after-image');
+                
+                separator.style.left = '50%';
+                handle.style.left = '50%';
+                beforeImage.style.right = '50%';
+                afterImage.style.left = '50%';
+            }
+            
+            // ฟังก์ชัน: ดาวน์โหลดรูปภาพปัจจุบัน
+            function downloadCurrentImage() {
+                if (activeImageIndex === -1 || !uploadedImages[activeImageIndex].processed) return;
+                
+                const imageObject = uploadedImages[activeImageIndex];
+                
+                // สร้าง element a สำหรับดาวน์โหลด
+                const link = document.createElement('a');
+                link.href = imageObject.watermarkedUrl;
+                
+                // ตัดนามสกุลไฟล์ออกและเพิ่ม "_watermarked" ต่อท้ายชื่อไฟล์
+                const fileName = imageObject.name;
+                const dotIndex = fileName.lastIndexOf('.');
+                const name = fileName.substring(0, dotIndex);
+                const ext = fileName.substring(dotIndex);
+                
+                link.download = `${name}_watermarked${ext}`;
+                
+                // คลิกลิงก์เพื่อดาวน์โหลด
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showToast('สำเร็จ', 'ดาวน์โหลดรูปภาพสำเร็จ', 'success');
+            }
+            
+            // ฟังก์ชัน: ดาวน์โหลดทุกรูปภาพ
+            async function downloadAllImages() {
+                if (uploadedImages.length === 0) return;
+                
+                showLoader();
+                
+                // ตรวจสอบว่ามีรูปภาพที่ยังไม่ได้ประมวลผล
+                const unprocessedImages = uploadedImages.filter(img => !img.processed);
+                
+                // ประมวลผลรูปภาพที่ยังไม่ได้ประมวลผล
+                if (unprocessedImages.length > 0) {
+                    const settings = getCurrentSettings();
+                    
+                    try {
+                        for (let i = 0; i < unprocessedImages.length; i++) {
+                            const index = uploadedImages.indexOf(unprocessedImages[i]);
+                            
+                            // อัปเดต progress bar
+                            const item = imagesGrid.querySelector(`.image-item[data-index="${index}"]`);
+                            if (item) {
+                                const progressBar = item.querySelector('.image-progress-bar');
+                                progressBar.style.width = '100%';
+                            }
+                            
+                            await applyWatermarkToImage(index, settings);
+                            
+                            // อัปเดต progress bar
+                            if (item) {
+                                const progressBar = item.querySelector('.image-progress-bar');
+                                setTimeout(() => {
+                                    progressBar.style.width = '0';
+                                }, 300);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error processing images:', error);
+                        showToast('ข้อผิดพลาด', 'ไม่สามารถประมวลผลรูปภาพบางรูปได้', 'error');
+                        hideLoader();
+                        return;
+                    }
+                }
+                
+                // สร้าง ZIP ไฟล์
+                try {
+                    // ตรวจสอบว่ามี JSZip หรือไม่ ถ้าไม่มีให้โหลด
+                    if (typeof JSZip === 'undefined') {
+                        await loadJSZip();
+                    }
+                    
+                    const zip = new JSZip();
+                    
+                    // เพิ่มไฟล์ทั้งหมดลงใน ZIP
+                    for (let i = 0; i < uploadedImages.length; i++) {
+                        const img = uploadedImages[i];
+                        
+                        // เปลี่ยน data URL เป็น Blob
+                        const response = await fetch(img.watermarkedUrl);
+                        const blob = await response.blob();
+                        
+                        // ตัดนามสกุลไฟล์ออกและเพิ่ม "_watermarked" ต่อท้ายชื่อไฟล์
+                        const fileName = img.name;
+                        const dotIndex = fileName.lastIndexOf('.');
+                        const name = fileName.substring(0, dotIndex);
+                        const ext = fileName.substring(dotIndex);
+                        
+                        // เพิ่มไฟล์ลงใน ZIP
+                        zip.file(`${name}_watermarked${ext}`, blob);
+                    }
+                    
+                    // สร้าง ZIP ไฟล์
+                    const content = await zip.generateAsync({
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: {
+                            level: 6
+                        }
+                    });
+                    
+                    // ดาวน์โหลด ZIP ไฟล์
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = 'watermarked_images.zip';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showToast('สำเร็จ', 'ดาวน์โหลดรูปภาพทั้งหมดสำเร็จ', 'success');
+                } catch (error) {
+                    console.error('Error creating ZIP file:', error);
+                    showToast('ข้อผิดพลาด', 'ไม่สามารถสร้างไฟล์ ZIP ได้', 'error');
+                }
+                
+                hideLoader();
+            }
+            
+            // ฟังก์ชัน: โหลด JSZip library
+            async function loadJSZip() {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+            }
+            
+            // ฟังก์ชัน: รีเซ็ตการตั้งค่า
+            function resetSettings() {
+                // รีเซ็ตค่าตัวควบคุมกลับเป็นค่าเริ่มต้น
+                watermarkText.value = 'ลายน้ำของฉัน';
+                fontSize.value = 30;
+                fontFamily.value = "'Prompt', sans-serif";
+                textColor.value = '#ffffff';
+                textColorValue.value = '#ffffff';
+                opacity.value = 50;
+                imageSize.value = 30;
+                imageOpacity.value = 50;
+                rotation.value = -45;
+                positionX.value = 50;
+                positionY.value = 50;
+                repeat.value = 'repeat';
+                spacing.value = 150;
+                
+                // อัปเดตค่า slider
+                updateSliderValues();
+                
+                // อัปเดตลายน้ำ
+                updateWatermark();
+                
+                showToast('แจ้งเตือน', 'รีเซ็ตการตั้งค่าเรียบร้อย', 'info');
+            }
+            
+            // ฟังก์ชัน: แสดง Toast notification
+            function showToast(title, message, type) {
+                const toastContainer = document.getElementById('toast-container');
+                
+                const toast = document.createElement('div');
+                toast.className = `toast toast-${type}`;
+                
+                let icon;
+                switch (type) {
+                    case 'success':
+                        icon = 'check-circle';
+                        break;
+                    case 'error':
+                        icon = 'exclamation-circle';
+                        break;
+                    case 'warning':
+                        icon = 'exclamation-triangle';
+                        break;
+                    case 'info':
+                    default:
+                        icon = 'info-circle';
+                        break;
+                }
+                
+                toast.innerHTML = `
+                    <div class="toast-icon">
+                        <i class="fas fa-${icon}"></i>
+                    </div>
+                    <div class="toast-content">
+                        <div class="toast-title">${title}</div>
+                        <div class="toast-message">${message}</div>
+                    </div>
+                    <div class="toast-progress">
+                        <div class="toast-progress-bar"></div>
+                    </div>
+                `;
+                
+                toastContainer.appendChild(toast);
+                
+                // ลบ toast หลังจาก 5 วินาที
+                setTimeout(() => {
+                    toast.remove();
+                }, 5000);
+            }
+            
+            // ฟังก์ชัน: แสดงและซ่อน Loader
+            function showLoader() {
+                loaderContainer.style.display = 'flex';
+            }
+            
+            function hideLoader() {
+                loaderContainer.style.display = 'none';
+            }
+            
+            // ฟังก์ชัน: Debounce
+            function debounce(func, delay) {
+                let timeout;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+            
+            // ฟังก์ชัน: ประมวลผลรูปภาพแบบ batch
+            function processBatchImages() {
+                if (uploadedImages.length === 0) return;
+                
+                const settings = getCurrentSettings();
+                const unprocessedImages = uploadedImages.filter(img => !img.processed);
+                
+                if (unprocessedImages.length === 0) return;
+                
+                // ประมวลผลทีละรูปภาพ
+                let index = 0;
+                const processNext = () => {
+                    if (index >= unprocessedImages.length) return;
+                    
+                    const imageIndex = uploadedImages.indexOf(unprocessedImages[index]);
+                    
+                    // อัปเดต progress bar
+                    const item = imagesGrid.querySelector(`.image-item[data-index="${imageIndex}"]`);
+                    if (item) {
+                        const progressBar = item.querySelector('.image-progress-bar');
+                        progressBar.style.width = '100%';
+                    }
+                    
+                    applyWatermarkToImage(imageIndex, settings)
+                        .then(() => {
+                            // อัปเดต progress bar
+                            if (item) {
+                                const progressBar = item.querySelector('.image-progress-bar');
+                                progressBar.style.width = '0';
+                            }
+                            
+                            index++;
+                            setTimeout(processNext, 100);
+                        })
+                        .catch(error => {
+                            console.error('Error processing image:', error);
+                            index++;
+                            setTimeout(processNext, 100);
+                        });
+                };
+                
+                processNext();
+            }
+            
+            // ฟังก์ชัน: คำนวณขนาดไฟล์
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+            }
+        });
+    </script>
+</body>
+</html>
+                        
