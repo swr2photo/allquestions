@@ -3,26 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบจัดตารางเรียนอัตโนมัติ - PSU SIS (Secure)</title>
+    <title>ระบบจัดตารางเรียนอัตโนมัติ - PSU SIS (Fixed)</title>
     <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-    <meta name="csrf-token" content="">
-    
-    <!-- Security headers -->
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self';
-        script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdnjs.cloudflare.com;
-        style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com https://cdnjs.cloudflare.com;
-        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
-        img-src 'self' data: https:;
-        connect-src 'self' https://script.google.com https://script.googleusercontent.com;
-        frame-src 'none';
-        object-src 'none';
-        base-uri 'self';
-        form-action 'self';
-    ">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -34,52 +16,6 @@
         .font-thai { font-family: 'Prompt', sans-serif; }
         .schedule-container { min-width: 800px; }
         .course-block { min-height: 50px; }
-        
-        /* Enhanced Security Styles */
-        .secure-input {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .secure-input:focus {
-            border-color: rgba(59, 130, 246, 0.6);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
-        }
-        
-        .security-indicator {
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            font-size: 10px;
-            opacity: 0.7;
-        }
-        
-        /* Connection Status */
-        .connection-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-        
-        .status-connected {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
-        }
-        
-        .status-disconnected {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-        }
-        
-        .status-maintenance {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
         
         /* Modern Glassmorphism */
         .glass {
@@ -208,44 +144,64 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* Security Alert Styles */
-        .security-alert {
-            border-left: 4px solid #ef4444;
-            background: rgba(239, 68, 68, 0.1);
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
         }
         
-        /* Maintenance Mode Styles */
-        .maintenance-banner {
+        .status-connected {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+        
+        .status-disconnected {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+        
+        .status-offline {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: bold;
+        }
+        
+        /* Debug Panel */
+        .debug-panel {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 12px;
             z-index: 10000;
+            max-width: 300px;
         }
     </style>
 </head>
 <body class="min-h-screen font-thai gradient-primary">
-    <!-- Security Indicator -->
-    <div class="security-indicator glass px-2 py-1 rounded text-white text-xs">
-        <i class="fas fa-shield-alt mr-1"></i>
-        <span id="securityStatus">Secure Connection</span>
+    <!-- Debug Panel -->
+    <div id="debugPanel" class="debug-panel hidden">
+        <div class="font-bold mb-2">🔧 Debug Information</div>
+        <div id="debugInfo">
+            <div>Status: <span id="debugStatus">Initializing...</span></div>
+            <div>API URL: <span id="debugApiUrl">Not set</span></div>
+            <div>Last Error: <span id="debugLastError">None</span></div>
+            <div>Mode: <span id="debugMode">Online</span></div>
+        </div>
+        <button onclick="toggleOfflineMode()" class="mt-2 bg-blue-500 text-white px-2 py-1 rounded text-xs">
+            Toggle Offline Mode
+        </button>
     </div>
     
     <!-- Connection Status -->
     <div id="connectionStatus" class="connection-status px-4 py-2 rounded-xl text-xs font-semibold status-disconnected hidden">
         <i class="fas fa-wifi mr-2"></i>
-        <span id="connectionText">Connecting...</span>
-    </div>
-    
-    <!-- Maintenance Banner -->
-    <div id="maintenanceBanner" class="maintenance-banner hidden">
-        <i class="fas fa-tools mr-2"></i>
-        <span id="maintenanceMessage">ระบบอยู่ในช่วงการบำรุงรักษา</span>
+        <span id="connectionText">Checking connection...</span>
     </div>
     
     <!-- Loading Overlay -->
@@ -272,25 +228,9 @@
                     <h1 class="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">
                         <i class="fas fa-graduation-cap text-yellow-300 mr-3"></i>
                         ระบบจัดตารางเรียนอัตโนมัติ
-                        <span class="text-sm font-normal opacity-70 ml-2">v2.0.0 (Secure)</span>
+                        <span class="text-sm font-normal opacity-70 ml-2">v2.1.0 (Fixed)</span>
                     </h1>
                     <div class="flex items-center gap-4">
-                        <div id="adminStatus" class="hidden">
-                            <span class="text-xs bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-2 rounded-full neon-green font-semibold">
-                                <i class="fas fa-shield-check mr-2"></i>โหมดแอดมิน
-                            </span>
-                            <button onclick="logoutAdmin()" class="text-xs bg-gradient-to-r from-red-400 to-red-600 text-white px-4 py-2 rounded-xl hover:scale-105 transition-all ml-2">
-                                <i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ
-                            </button>
-                        </div>
-                        <div id="studentMode" class="">
-                            <span class="text-xs bg-gradient-to-r from-blue-400 to-blue-600 text-white px-4 py-2 rounded-full neon-blue font-semibold">
-                                <i class="fas fa-user-graduate mr-2"></i>โหมดนักศึกษา
-                            </span>
-                        </div>
-                        <button id="adminBtn" onclick="checkAdminSession()" class="text-xs glass text-white px-6 py-3 rounded-2xl hover:scale-105 transition-all backdrop-blur-sm border border-white border-opacity-20 font-semibold">
-                            <i class="fas fa-cog mr-2"></i>แอดมิน
-                        </button>
                         <div class="text-right text-sm text-white">
                             <div class="font-bold glass px-6 py-3 rounded-2xl backdrop-blur-sm border border-white border-opacity-20">
                                 <i class="fas fa-user-graduate mr-2"></i>
@@ -301,18 +241,10 @@
                                 คณะวิทยาศาสตร์ วิทยาลัยเทคโนโลยี
                             </div>
                         </div>
+                        <button onclick="toggleDebugPanel()" class="text-xs glass text-white px-4 py-2 rounded-xl hover:scale-105 transition-all">
+                            <i class="fas fa-bug mr-2"></i>Debug
+                        </button>
                     </div>
-                </div>
-            </div>
-
-            <!-- System Status Panel -->
-            <div id="systemStatusPanel" class="glass rounded-2xl p-4 mb-6 hidden">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <div class="w-3 h-3 rounded-full mr-3" id="systemStatusIndicator"></div>
-                        <span class="text-white font-semibold" id="systemStatusText">System Status</span>
-                    </div>
-                    <div class="text-xs text-white opacity-70" id="lastUpdateTime"></div>
                 </div>
             </div>
 
@@ -334,7 +266,7 @@
                                     type="text" 
                                     id="searchInput" 
                                     placeholder="พิมพ์รหัสวิชาหรือชื่อวิชา..."
-                                    class="w-full px-4 py-3 pl-12 secure-input text-white placeholder-white placeholder-opacity-70 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30 transition-all"
+                                    class="w-full px-4 py-3 pl-12 glass-dark text-white placeholder-white placeholder-opacity-70 rounded-2xl focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-30 transition-all"
                                     maxlength="100"
                                 >
                                 <i class="fas fa-search absolute left-4 top-3.5 text-white text-opacity-70"></i>
@@ -510,217 +442,153 @@
         </div>
     </div>
 
-    <!-- Enhanced Admin Login Modal -->
-    <div id="adminLoginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center backdrop-blur-sm">
-        <div class="glass rounded-3xl p-8 max-w-md w-full mx-4 shadow-glow">
-            <h3 class="text-xl font-bold text-white mb-6 text-center">
-                <div class="w-16 h-16 gradient-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                    <i class="fas fa-shield-alt text-white text-2xl"></i>
-                </div>
-                เข้าสู่ระบบแอดมิน (Secure)
-            </h3>
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2">
-                        <i class="fas fa-user mr-2"></i>ชื่อผู้ใช้
-                    </label>
-                    <input 
-                        type="text" 
-                        id="adminUsername" 
-                        class="w-full px-4 py-3 secure-input text-white rounded-xl focus:outline-none transition-all"
-                        autocomplete="username"
-                        maxlength="50"
-                    >
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-white mb-2">
-                        <i class="fas fa-lock mr-2"></i>รหัสผ่าน
-                    </label>
-                    <div class="relative">
-                        <input 
-                            type="password" 
-                            id="adminPassword" 
-                            class="w-full px-4 py-3 secure-input text-white rounded-xl focus:outline-none transition-all pr-12"
-                            autocomplete="current-password"
-                            maxlength="100"
-                        >
-                        <button 
-                            type="button" 
-                            onclick="togglePasswordVisibility()" 
-                            class="absolute right-3 top-3 text-white text-opacity-70 hover:text-opacity-100"
-                        >
-                            <i class="fas fa-eye" id="passwordToggleIcon"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Security Notice -->
-                <div class="security-alert rounded-xl p-3 text-sm text-white">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    <strong>การเตือนด้านความปลอดภัย:</strong> การเข้าสู่ระบบแอดมินจะถูกบันทึกและตรวจสอบ
-                </div>
-                
-                <div class="flex gap-3">
-                    <button onclick="closeAdminLogin()" class="flex-1 glass-dark text-white py-3 rounded-xl hover:bg-white hover:bg-opacity-10 transition-all">
-                        <i class="fas fa-times mr-2"></i>ยกเลิก
-                    </button>
-                    <button onclick="adminLogin()" class="flex-1 gradient-primary text-white py-3 rounded-xl hover:scale-105 transition-all neon-blue" id="loginButton">
-                        <i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Include all other modals from original file -->
-    <!-- ... (rest of modals remain the same) ... -->
-
-    <!-- Enhanced JavaScript with Security Features -->
     <script>
-        // Enhanced Security Configuration
-        const SECURITY_CONFIG = {
-            MAX_LOGIN_ATTEMPTS: 5,
-            LOGIN_TIMEOUT: 15 * 60 * 1000, // 15 minutes
-            SESSION_CHECK_INTERVAL: 5 * 60 * 1000, // 5 minutes
-            AUTO_LOGOUT_TIME: 30 * 60 * 1000, // 30 minutes
-            CSRF_TOKEN: generateCSRFToken(),
-            API_TIMEOUT: 30000, // 30 seconds
-            RATE_LIMIT_REQUESTS: 100,
-            RATE_LIMIT_WINDOW: 60000 // 1 minute
+        // ===== Configuration =====
+        const CONFIG = {
+            // อัพเดท URL นี้ด้วย Google Apps Script Web App URL ของคุณ
+            GAS_URL: 'https://script.google.com/macros/s/AKfycbwjbNn4Gxx488J2SblaAEYADcVOlPCjpetpztq97sWt5CqELjdWgY13cWQTd1XWkI_7/exec',
+            TIMEOUT: 30000,
+            RETRY_COUNT: 3,
+            RETRY_DELAY: 1000,
+            DEBUG_MODE: true
         };
 
-        // Global State Management
+        // ===== Global State =====
         const AppState = {
-            isAuthenticated: false,
-            sessionToken: null,
-            lastActivity: Date.now(),
-            connectionStatus: 'disconnected',
-            maintenanceMode: false,
-            loginAttempts: 0,
-            requestCount: 0,
-            requestWindow: Date.now()
+            isOnline: true,
+            isOfflineMode: false,
+            connectionStatus: 'checking',
+            lastError: null,
+            coursesDatabase: [],
+            selectedCourses: [],
+            currentView: 'table',
+            debugInfo: {
+                apiCalls: 0,
+                errors: 0,
+                lastApiCall: null
+            }
         };
 
-        // Replace with your actual Google Apps Script URL
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwjbNn4Gxx488J2SblaAEYADcVOlPCjpetpztq97sWt5CqELjdWgY13cWQTd1XWkI_7/exec';
-
-        // Enhanced API call function with security
-        async function callGoogleScript(functionName, parameters = {}) {
-            try {
-                // Rate limiting check
-                if (!checkRateLimit()) {
-                    throw new Error('Rate limit exceeded. Please try again later.');
+        // ===== Sample Data for Offline Mode =====
+        const SAMPLE_COURSES = [
+            {
+                code: '344-201',
+                name: 'ชุดวิชาการคำนวณทางวิทยาการคอมพิวเตอร์',
+                credits: 6,
+                type: 'required',
+                schedule: {
+                    day: 'จันทร์',
+                    startTime: '09:00',
+                    endTime: '12:00',
+                    room: 'NML1'
                 }
-
-                // Add security headers
-                const secureParameters = {
-                    ...parameters,
-                    csrf_token: SECURITY_CONFIG.CSRF_TOKEN,
-                    timestamp: Date.now(),
-                    sessionToken: AppState.sessionToken
-                };
-
-                showLoadingOverlay(true, `กำลัง${functionName}...`);
-
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), SECURITY_CONFIG.API_TIMEOUT);
-
-                const response = await fetch(GAS_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-Token': SECURITY_CONFIG.CSRF_TOKEN
-                    },
-                    body: JSON.stringify({
-                        function: functionName,
-                        parameters: secureParameters
-                    }),
-                    signal: controller.signal
-                });
-
-                clearTimeout(timeoutId);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            },
+            {
+                code: '344-221',
+                name: 'สถาปัตยกรรมและองค์ประกอบคอมพิวเตอร์',
+                credits: 2,
+                type: 'required',
+                schedule: {
+                    day: 'อังคาร',
+                    startTime: '10:00',
+                    endTime: '12:00',
+                    room: 'BSc0603'
                 }
-
-                const result = await response.json();
-                
-                // Update connection status
-                updateConnectionStatus('connected');
-                
-                // Update last activity
-                AppState.lastActivity = Date.now();
-
-                return result;
-
-            } catch (error) {
-                console.error('API Error:', error);
-                
-                if (error.name === 'AbortError') {
-                    updateConnectionStatus('timeout');
-                    throw new Error('Request timeout. Please check your connection.');
-                } else {
-                    updateConnectionStatus('error');
-                    throw error;
+            },
+            {
+                code: '344-222',
+                name: 'ระบบปฏิบัติการ',
+                credits: 2,
+                type: 'required',
+                schedule: {
+                    day: 'พุธ',
+                    startTime: '13:00',
+                    endTime: '15:00',
+                    room: 'BSc0603'
                 }
-            } finally {
-                showLoadingOverlay(false);
+            },
+            {
+                code: '344-223',
+                name: 'พื้นฐานทางความปลอดภัยคอมพิวเตอร์',
+                credits: 2,
+                type: 'required',
+                schedule: {
+                    day: 'พฤหัสบดี',
+                    startTime: '14:00',
+                    endTime: '16:00',
+                    room: 'BSc0603'
+                }
+            },
+            {
+                code: '315-201',
+                name: 'ชีวิตแห่งอนาคต',
+                credits: 2,
+                type: 'general',
+                schedule: {
+                    day: 'ศุกร์',
+                    startTime: '09:00',
+                    endTime: '11:00',
+                    room: 'NML1'
+                }
+            },
+            {
+                code: '322-102',
+                name: 'CALCULUS II',
+                credits: 3,
+                type: 'required',
+                schedule: {
+                    day: 'อังคาร',
+                    startTime: '09:00',
+                    endTime: '12:00',
+                    room: 'NML1'
+                }
+            },
+            {
+                code: '344-111',
+                name: 'MODULE: PROGRAMMING CONCEPTS A',
+                credits: 3,
+                type: 'required',
+                schedule: {
+                    day: 'พุธ',
+                    startTime: '10:00',
+                    endTime: '13:00',
+                    room: 'BSc0603(LAB)'
+                }
+            },
+            {
+                code: '460-001',
+                name: 'ONLINE COURSE',
+                credits: 2,
+                type: 'elective',
+                schedule: {
+                    day: 'ONLINE',
+                    startTime: 'FLEXIBLE',
+                    endTime: 'FLEXIBLE',
+                    room: 'ONLINE'
+                }
+            }
+        ];
+
+        // ===== Utility Functions =====
+        function debugLog(message, data = null) {
+            if (CONFIG.DEBUG_MODE) {
+                console.log(`🔧 [DEBUG] ${message}`, data || '');
+                updateDebugInfo();
             }
         }
 
-        // Enhanced security functions
-        function generateCSRFToken() {
-            const array = new Uint8Array(32);
-            crypto.getRandomValues(array);
-            return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        function updateDebugInfo() {
+            const debugStatus = document.getElementById('debugStatus');
+            const debugApiUrl = document.getElementById('debugApiUrl');
+            const debugLastError = document.getElementById('debugLastError');
+            const debugMode = document.getElementById('debugMode');
+            
+            if (debugStatus) debugStatus.textContent = AppState.connectionStatus;
+            if (debugApiUrl) debugApiUrl.textContent = CONFIG.GAS_URL ? 'Set' : 'Not set';
+            if (debugLastError) debugLastError.textContent = AppState.lastError || 'None';
+            if (debugMode) debugMode.textContent = AppState.isOfflineMode ? 'Offline' : 'Online';
         }
 
-        function checkRateLimit() {
-            const now = Date.now();
-            
-            if (now - AppState.requestWindow > SECURITY_CONFIG.RATE_LIMIT_WINDOW) {
-                AppState.requestCount = 0;
-                AppState.requestWindow = now;
-            }
-            
-            if (AppState.requestCount >= SECURITY_CONFIG.RATE_LIMIT_REQUESTS) {
-                showSecurityAlert('Rate limit exceeded', 'warning');
-                return false;
-            }
-            
-            AppState.requestCount++;
-            return true;
-        }
-
-        function sanitizeInput(input) {
-            if (typeof input !== 'string') return input;
-            
-            return input
-                .replace(/[<>\"'&]/g, '')
-                .trim()
-                .substring(0, 1000);
-        }
-
-        function validateInputSecurity(input, type) {
-            if (!input) return false;
-            
-            switch (type) {
-                case 'studentId':
-                    return /^\d{10}$/.test(input);
-                case 'courseCode':
-                    return /^[A-Z0-9-]{1,20}$/.test(input);
-                case 'email':
-                    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
-                case 'username':
-                    return /^[a-zA-Z0-9_]{3,50}$/.test(input);
-                default:
-                    return input.length <= 1000;
-            }
-        }
-
-        // Enhanced UI functions
         function showLoadingOverlay(show, message = 'กำลังโหลด...') {
             const overlay = document.getElementById('loadingOverlay');
             const messageEl = document.getElementById('loadingMessage');
@@ -733,615 +601,42 @@
             }
         }
 
-        function updateConnectionStatus(status) {
+        function updateConnectionStatus(status, message = '') {
             const statusEl = document.getElementById('connectionStatus');
             const textEl = document.getElementById('connectionText');
-            const securityStatus = document.getElementById('securityStatus');
             
             AppState.connectionStatus = status;
             
-            statusEl.classList.remove('status-connected', 'status-disconnected', 'status-maintenance', 'hidden');
+            statusEl.classList.remove('status-connected', 'status-disconnected', 'status-offline', 'hidden');
             
             switch (status) {
                 case 'connected':
                     statusEl.classList.add('status-connected');
                     textEl.innerHTML = '<i class="fas fa-check mr-2"></i>เชื่อมต่อแล้ว';
-                    securityStatus.textContent = 'Secure Connection';
                     setTimeout(() => statusEl.classList.add('hidden'), 3000);
                     break;
                 case 'disconnected':
                     statusEl.classList.add('status-disconnected');
                     textEl.innerHTML = '<i class="fas fa-times mr-2"></i>ไม่ได้เชื่อมต่อ';
-                    securityStatus.textContent = 'Connection Lost';
                     break;
-                case 'maintenance':
-                    statusEl.classList.add('status-maintenance');
-                    textEl.innerHTML = '<i class="fas fa-tools mr-2"></i>บำรุงรักษา';
-                    securityStatus.textContent = 'Maintenance Mode';
+                case 'offline':
+                    statusEl.classList.add('status-offline');
+                    textEl.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>โหมดออฟไลน์';
                     break;
-                case 'error':
+                case 'checking':
                     statusEl.classList.add('status-disconnected');
-                    textEl.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>เกิดข้อผิดพลาด';
-                    securityStatus.textContent = 'Connection Error';
-                    break;
-                case 'timeout':
-                    statusEl.classList.add('status-disconnected');
-                    textEl.innerHTML = '<i class="fas fa-clock mr-2"></i>หมดเวลา';
-                    securityStatus.textContent = 'Request Timeout';
+                    textEl.innerHTML = '<i class="fas fa-sync fa-spin mr-2"></i>กำลังตรวจสอบ...';
                     break;
             }
-        }
-
-        function showSecurityAlert(message, type = 'warning') {
-            const alert = document.createElement('div');
-            alert.className = `fixed top-20 right-4 z-50 glass rounded-2xl p-4 shadow-glow transition-all transform translate-x-full max-w-md security-alert`;
             
-            const colors = {
-                warning: 'border-yellow-400',
-                error: 'border-red-400',
-                info: 'border-blue-400'
-            };
-            
-            const icons = {
-                warning: 'fa-exclamation-triangle text-yellow-400',
-                error: 'fa-exclamation-circle text-red-400',
-                info: 'fa-info-circle text-blue-400'
-            };
-            
-            alert.classList.add(colors[type]);
-            
-            alert.innerHTML = `
-                <div class="flex items-start">
-                    <div class="flex-shrink-0">
-                        <i class="fas ${icons[type]} text-2xl mr-4"></i>
-                    </div>
-                    <div class="flex-1">
-                        <div class="text-white font-semibold mb-1">การแจ้งเตือนด้านความปลอดภัย</div>
-                        <div class="text-white text-opacity-90 text-sm">${message}</div>
-                    </div>
-                    <button onclick="this.parentElement.parentElement.remove()" class="text-white text-opacity-60 hover:text-white ml-4">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(alert);
-            
-            setTimeout(() => {
-                alert.classList.remove('translate-x-full');
-            }, 100);
-            
-            setTimeout(() => {
-                if (alert.parentElement) {
-                    alert.classList.add('translate-x-full');
-                    setTimeout(() => alert.remove(), 300);
-                }
-            }, 8000);
-        }
-
-        function togglePasswordVisibility() {
-            const passwordField = document.getElementById('adminPassword');
-            const toggleIcon = document.getElementById('passwordToggleIcon');
-            
-            if (passwordField.type === 'password') {
-                passwordField.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordField.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-
-        // Enhanced Admin Login with Security
-        async function adminLogin() {
-            const username = document.getElementById('adminUsername').value;
-            const password = document.getElementById('adminPassword').value;
-            const loginButton = document.getElementById('loginButton');
-            
-            // Input validation
-            if (!username || !password) {
-                showSecurityAlert('กรุณากรอกชื่อผู้ใช้และรหัสผ่าน', 'warning');
-                return;
+            if (message) {
+                textEl.innerHTML += ` - ${message}`;
             }
             
-            // Security validation
-            if (!validateInputSecurity(username, 'username')) {
-                showSecurityAlert('รูปแบบชื่อผู้ใช้ไม่ถูกต้อง', 'error');
-                return;
-            }
-            
-            // Check login attempts
-            if (AppState.loginAttempts >= SECURITY_CONFIG.MAX_LOGIN_ATTEMPTS) {
-                showSecurityAlert('คุณได้พยายามเข้าสู่ระบบเกินจำนวนที่กำหนด กรุณารอ 15 นาที', 'error');
-                return;
-            }
-            
-            // Disable button and show loading
-            loginButton.disabled = true;
-            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>กำลังตรวจสอบ...';
-            
-            try {
-                const result = await callGoogleScript('authenticateAdmin', {
-                    username: sanitizeInput(username),
-                    password: password // Don't sanitize password to preserve special characters
-                });
-                
-                if (result.success) {
-                    AppState.isAuthenticated = true;
-                    AppState.sessionToken = result.sessionToken;
-                    AppState.loginAttempts = 0;
-                    
-                    // Store session securely
-                    sessionStorage.setItem('adminSession', JSON.stringify({
-                        token: result.sessionToken,
-                        expires: result.expiresAt,
-                        timestamp: Date.now()
-                    }));
-                    
-                    updateAdminUI();
-                    closeAdminLogin();
-                    showSecurityAlert('เข้าสู่ระบบแอดมินสำเร็จ', 'info');
-                    
-                    // Start session monitoring
-                    startSessionMonitoring();
-                    
-                } else {
-                    AppState.loginAttempts++;
-                    showSecurityAlert(result.message || 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
-                    
-                    // Clear password field
-                    document.getElementById('adminPassword').value = '';
-                }
-                
-            } catch (error) {
-                AppState.loginAttempts++;
-                showSecurityAlert('เกิดข้อผิดพลาดในการเข้าสู่ระบบ', 'error');
-                console.error('Login error:', error);
-            } finally {
-                loginButton.disabled = false;
-                loginButton.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ';
-            }
+            updateDebugInfo();
         }
 
-        // Session monitoring
-        function startSessionMonitoring() {
-            setInterval(async () => {
-                if (AppState.isAuthenticated) {
-                    try {
-                        const result = await callGoogleScript('validateSession', {
-                            sessionToken: AppState.sessionToken
-                        });
-                        
-                        if (!result.success) {
-                            logoutAdmin();
-                            showSecurityAlert('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่', 'warning');
-                        }
-                    } catch (error) {
-                        console.error('Session validation error:', error);
-                    }
-                }
-            }, SECURITY_CONFIG.SESSION_CHECK_INTERVAL);
-        }
-
-        // Auto-logout on inactivity
-        function checkInactivity() {
-            if (AppState.isAuthenticated && 
-                Date.now() - AppState.lastActivity > SECURITY_CONFIG.AUTO_LOGOUT_TIME) {
-                logoutAdmin();
-                showSecurityAlert('ออกจากระบบอัตโนมัติเนื่องจากไม่มีการใช้งาน', 'info');
-            }
-        }
-
-        // Update activity timestamp on user interaction
-        function updateActivity() {
-            AppState.lastActivity = Date.now();
-        }
-
-        // Enhanced logout
-        async function logoutAdmin() {
-            if (AppState.isAuthenticated) {
-                try {
-                    await callGoogleScript('logoutAdmin', {
-                        sessionToken: AppState.sessionToken
-                    });
-                } catch (error) {
-                    console.error('Logout error:', error);
-                }
-            }
-            
-            AppState.isAuthenticated = false;
-            AppState.sessionToken = null;
-            sessionStorage.removeItem('adminSession');
-            updateAdminUI();
-            closeAdminPanel();
-        }
-
-        // Initialize security features
-        function initializeSecurity() {
-            // Activity monitoring
-            ['click', 'keypress', 'scroll', 'mousemove'].forEach(event => {
-                document.addEventListener(event, updateActivity, { passive: true });
-            });
-            
-            // Inactivity check
-            setInterval(checkInactivity, 60000); // Check every minute
-            
-            // Prevent right-click context menu in production
-            if (location.hostname !== 'localhost') {
-                document.addEventListener('contextmenu', e => e.preventDefault());
-            }
-            
-            // Prevent common developer tools shortcuts
-            document.addEventListener('keydown', e => {
-                if (e.key === 'F12' || 
-                    (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-                    (e.ctrlKey && e.shiftKey && e.key === 'C') ||
-                    (e.ctrlKey && e.key === 'U')) {
-                    if (location.hostname !== 'localhost') {
-                        e.preventDefault();
-                        showSecurityAlert('ฟีเจอร์นี้ถูกปิดใช้งานเพื่อความปลอดภัย', 'warning');
-                    }
-                }
-            });
-            
-            // Check for session on page load
-            checkExistingSession();
-        }
-
-        // Check for existing session
-        function checkExistingSession() {
-            const sessionData = sessionStorage.getItem('adminSession');
-            if (sessionData) {
-                try {
-                    const session = JSON.parse(sessionData);
-                    if (new Date(session.expires) > new Date()) {
-                        AppState.isAuthenticated = true;
-                        AppState.sessionToken = session.token;
-                        updateAdminUI();
-                        startSessionMonitoring();
-                    } else {
-                        sessionStorage.removeItem('adminSession');
-                    }
-                } catch (error) {
-                    sessionStorage.removeItem('adminSession');
-                }
-            }
-        }
-
-        // Initialize system on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeSecurity();
-            
-            // Show loading initially
-            showLoadingOverlay(true, 'กำลังเชื่อมต่อระบบ...');
-            
-            // Initialize the app
-            setTimeout(() => {
-                initializeApp();
-            }, 1000);
-        });
-
-        // Application State Management
-        let selectedCourses = [];
-        let coursesDatabase = [];
-        let currentView = 'table';
-        let currentCourse = null;
-        let editingCourseIndex = -1;
-        let selectedColor = { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-800' };
-        const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
-        const days = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
-
-        // Enhanced Course Management with Security
-        async function loadCoursesFromGAS() {
-            try {
-                showSkeletonLoading();
-                const result = await callGoogleScript('getAllCourses');
-                
-                if (result.success) {
-                    coursesDatabase.length = 0;
-                    result.data.forEach(course => {
-                        // Sanitize course data
-                        coursesDatabase.push({
-                            code: sanitizeInput(course.code),
-                            name: sanitizeInput(course.name),
-                            credits: parseInt(course.credits) || 0,
-                            type: sanitizeInput(course.type),
-                            schedule: {
-                                day: sanitizeInput(course.day),
-                                startTime: sanitizeInput(course.startTime),
-                                endTime: sanitizeInput(course.endTime),
-                                room: sanitizeInput(course.room)
-                            }
-                        });
-                    });
-                    
-                    displayCourses();
-                    showAdvancedNotification('โหลดข้อมูลรายวิชาเรียบร้อย', 'success');
-                } else {
-                    showAdvancedNotification('ไม่สามารถโหลดข้อมูลรายวิชาได้', 'error');
-                }
-            } catch (error) {
-                showAdvancedNotification('เกิดข้อผิดพลาดในการโหลดข้อมูล', 'error');
-                console.error('Load courses error:', error);
-            } finally {
-                hideSkeletonLoading();
-            }
-        }
-
-        async function saveScheduleToGAS() {
-            if (selectedCourses.length === 0) return;
-            
-            try {
-                const result = await callGoogleScript('saveStudentSchedule', {
-                    studentId: '6710210317',
-                    semester: document.getElementById('semesterSelect').value,
-                    courses: selectedCourses.map(course => ({
-                        courseCode: course.code,
-                        courseName: course.name,
-                        credits: course.credits,
-                        type: course.type,
-                        day: course.schedule.day,
-                        startTime: course.schedule.startTime,
-                        endTime: course.schedule.endTime,
-                        room: course.schedule.room,
-                        visible: course.visible !== false
-                    }))
-                });
-                
-                if (result.success) {
-                    showAdvancedNotification('บันทึกตารางเรียนเรียบร้อยแล้ว', 'success');
-                    
-                    // Show conflicts if any
-                    if (result.conflicts && result.conflicts.length > 0) {
-                        showAdvancedNotification(
-                            `พบความขัดแย้งเวลา ${result.conflicts.length} รายการ`, 
-                            'warning'
-                        );
-                    }
-                } else {
-                    showAdvancedNotification('ไม่สามารถบันทึกตารางเรียนได้', 'error');
-                }
-            } catch (error) {
-                showAdvancedNotification('เกิดข้อผิดพลาดในการบันทึก', 'error');
-                console.error('Save schedule error:', error);
-            }
-        }
-
-        async function loadScheduleFromGAS() {
-            try {
-                const result = await callGoogleScript('getStudentSchedule', {
-                    studentId: '6710210317',
-                    semester: document.getElementById('semesterSelect').value
-                });
-                
-                if (result.success && result.data.length > 0) {
-                    selectedCourses.length = 0;
-                    
-                    result.data.forEach(scheduleItem => {
-                        if (scheduleItem.courseCode) {
-                            const courseToAdd = {
-                                code: sanitizeInput(scheduleItem.courseCode),
-                                name: sanitizeInput(scheduleItem.courseName || ''),
-                                credits: parseInt(scheduleItem.credits) || 0,
-                                type: sanitizeInput(scheduleItem.type || 'elective'),
-                                schedule: {
-                                    day: sanitizeInput(scheduleItem.day || 'จันทร์'),
-                                    startTime: sanitizeInput(scheduleItem.startTime || '09:00'),
-                                    endTime: sanitizeInput(scheduleItem.endTime || '12:00'),
-                                    room: sanitizeInput(scheduleItem.room || 'TBA')
-                                },
-                                visible: scheduleItem.visible !== false,
-                                color: { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-800' }
-                            };
-                            selectedCourses.push(courseToAdd);
-                        }
-                    });
-                    
-                    updateScheduleDisplay();
-                    updateListView();
-                    updateStats();
-                    showAdvancedNotification('โหลดตารางเรียนเรียบร้อยแล้ว', 'info');
-                }
-            } catch (error) {
-                showAdvancedNotification('เกิดข้อผิดพลาดในการโหลดตารางเรียน', 'error');
-                console.error('Load schedule error:', error);
-            }
-        }
-
-        // Enhanced UI Functions with Security
-        function initializeApp() {
-            try {
-                initializeSchedule();
-                loadCoursesFromGAS();
-                loadScheduleFromGAS();
-                updateStats();
-                
-                // Auto-save every 2 minutes
-                setInterval(async () => {
-                    if (selectedCourses.length > 0) {
-                        try {
-                            await saveScheduleToGAS();
-                        } catch (error) {
-                            console.error('Auto-save failed:', error);
-                        }
-                    }
-                }, 120000);
-                
-                // Setup event listeners
-                setupEventListeners();
-                
-            } catch (error) {
-                console.error('App initialization error:', error);
-                showAdvancedNotification('เกิดข้อผิดพลาดในการเริ่มต้นระบบ', 'error');
-            }
-        }
-
-        function setupEventListeners() {
-            // Search functionality with debouncing
-            let searchTimeout;
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    const value = sanitizeInput(e.target.value);
-                    if (value !== e.target.value) {
-                        e.target.value = value;
-                        showSecurityAlert('อินพุตถูกทำความสะอาดเพื่อความปลอดภัย', 'info');
-                    }
-                    searchCourses();
-                }, 300);
-            });
-
-            // View toggle buttons
-            document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
-            document.getElementById('listViewBtn').addEventListener('click', () => switchView('list'));
-
-            // Filter buttons
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    document.querySelectorAll('.filter-btn').forEach(b => {
-                        b.classList.remove('gradient-primary', 'neon-blue');
-                        b.classList.add('glass-dark');
-                    });
-                    btn.classList.remove('glass-dark');
-                    btn.classList.add('gradient-primary', 'neon-blue');
-                    searchCourses();
-                });
-            });
-
-            // Semester selector
-            document.getElementById('semesterSelect').addEventListener('change', async (e) => {
-                const semester = e.target.value;
-                if (!/^\d{4}\/[1-3]$/.test(semester)) {
-                    showSecurityAlert('รูปแบบภาคเรียนไม่ถูกต้อง', 'error');
-                    return;
-                }
-                
-                showLoadingOverlay(true, 'กำลังโหลดข้อมูลภาคเรียน...');
-                try {
-                    await loadScheduleFromGAS();
-                } catch (error) {
-                    showAdvancedNotification('ไม่สามารถโหลดข้อมูลภาคเรียนได้', 'error');
-                } finally {
-                    showLoadingOverlay(false);
-                }
-            });
-
-            // Keyboard shortcuts
-            document.addEventListener('keydown', (e) => {
-                // Update activity
-                updateActivity();
-                
-                // Escape key closes modals
-                if (e.key === 'Escape') {
-                    closeAllModals();
-                }
-                
-                // Ctrl+S for save (prevent default browser save)
-                if (e.ctrlKey && e.key === 's') {
-                    e.preventDefault();
-                    if (selectedCourses.length > 0) {
-                        saveScheduleToGAS();
-                    }
-                }
-            });
-        }
-
-        function closeAllModals() {
-            const modals = ['adminLoginModal', 'adminPanelModal', 'timePickerModal', 'modalSystem'];
-            modals.forEach(modalId => {
-                const modal = document.getElementById(modalId);
-                if (modal && !modal.classList.contains('hidden')) {
-                    modal.classList.add('hidden');
-                }
-            });
-        }
-
-        // Course Management Functions
-        async function addCourse(course) {
-            // Validate course data
-            if (!course || !course.code) {
-                showSecurityAlert('ข้อมูลรายวิชาไม่ถูกต้อง', 'error');
-                return;
-            }
-
-            if (selectedCourses.find(c => c.code === course.code)) {
-                showAdvancedNotification(`วิชา ${course.code} อยู่ในตารางเรียนแล้ว`, 'warning');
-                return;
-            }
-
-            if (checkTimeConflict(course)) {
-                const confirmAdd = await showConfirmDialog(
-                    'พบความขัดแย้งเวลาเรียน',
-                    `วิชา ${course.code} มีเวลาเรียนซ้อนกับวิชาที่มีอยู่แล้ว ต้องการเพิ่มหรือไม่?`
-                );
-                if (!confirmAdd) return;
-            }
-
-            // Add course with security validation
-            const securedCourse = {
-                code: sanitizeInput(course.code),
-                name: sanitizeInput(course.name),
-                credits: parseInt(course.credits) || 0,
-                type: sanitizeInput(course.type),
-                schedule: {
-                    day: sanitizeInput(course.schedule.day),
-                    startTime: sanitizeInput(course.schedule.startTime),
-                    endTime: sanitizeInput(course.schedule.endTime),
-                    room: sanitizeInput(course.schedule.room)
-                },
-                color: { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-800' },
-                visible: true
-            };
-
-            selectedCourses.push(securedCourse);
-            
-            showLoadingOverlay(true, 'กำลังเพิ่มรายวิชา...');
-            setTimeout(() => {
-                updateScheduleDisplay();
-                updateListView();
-                updateStats();
-                showLoadingOverlay(false);
-                showAdvancedNotification(`เพิ่มวิชา ${course.code} เรียบร้อยแล้ว`, 'success');
-                
-                // Auto-save
-                saveScheduleToGAS().catch(error => {
-                    console.error('Auto-save after add course failed:', error);
-                });
-            }, 500);
-        }
-
-        function checkTimeConflict(newCourse) {
-            if (newCourse.schedule.day === 'ONLINE') return false;
-            
-            return selectedCourses.some(course => {
-                if (course.schedule.day === newCourse.schedule.day && course.visible) {
-                    const existingStart = timeToMinutes(course.schedule.startTime);
-                    const existingEnd = timeToMinutes(course.schedule.endTime);
-                    const newStart = timeToMinutes(newCourse.schedule.startTime);
-                    const newEnd = timeToMinutes(newCourse.schedule.endTime);
-                    
-                    return (newStart < existingEnd && newEnd > existingStart);
-                }
-                return false;
-            });
-        }
-
-        function timeToMinutes(timeStr) {
-            if (timeStr === 'FLEXIBLE') return 0;
-            try {
-                const [hours, minutes] = timeStr.split(':').map(Number);
-                return hours * 60 + minutes;
-            } catch (error) {
-                console.error('Invalid time format:', timeStr);
-                return 0;
-            }
-        }
-
-        // Enhanced notification system
-        function showAdvancedNotification(message, type = 'info', duration = 4000) {
+        function showNotification(message, type = 'info', duration = 4000) {
             const notification = document.createElement('div');
             notification.className = `fixed top-6 right-6 z-50 glass rounded-2xl p-6 shadow-glow transition-all transform translate-x-full max-w-md`;
             
@@ -1349,16 +644,14 @@
                 success: 'border-l-4 border-green-400 neon-green',
                 error: 'border-l-4 border-red-400 neon-red',
                 warning: 'border-l-4 border-yellow-400',
-                info: 'border-l-4 border-blue-400 neon-blue',
-                admin: 'border-l-4 border-purple-400 neon-purple'
+                info: 'border-l-4 border-blue-400 neon-blue'
             };
             
             const icons = {
                 success: 'fa-check-circle text-green-400',
                 error: 'fa-exclamation-circle text-red-400',
                 warning: 'fa-exclamation-triangle text-yellow-400',
-                info: 'fa-info-circle text-blue-400',
-                admin: 'fa-shield-alt text-purple-400'
+                info: 'fa-info-circle text-blue-400'
             };
             
             notification.innerHTML = `
@@ -1370,12 +663,11 @@
                         <div class="text-white font-semibold mb-1">
                             ${type === 'success' ? 'สำเร็จ' : 
                               type === 'error' ? 'ข้อผิดพลาด' :
-                              type === 'warning' ? 'คำเตือน' :
-                              type === 'admin' ? 'ระบบแอดมิน' : 'แจ้งเตือน'}
+                              type === 'warning' ? 'คำเตือน' : 'แจ้งเตือน'}
                         </div>
                         <div class="text-white text-opacity-90 text-sm">${message}</div>
                     </div>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white text-opacity-60 hover:text-white ml-4">
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-white text-opacity-60 hover:text-white ml-4">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -1395,47 +687,285 @@
             }, duration);
         }
 
-        // Enhanced dialog system
-        function showConfirmDialog(title, message) {
-            return new Promise((resolve) => {
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center backdrop-blur-sm';
+        // ===== API Functions =====
+        async function callGoogleScript(functionName, parameters = {}, retryCount = 0) {
+            try {
+                debugLog(`API Call: ${functionName}`, parameters);
+                AppState.debugInfo.apiCalls++;
+                AppState.debugInfo.lastApiCall = new Date().toISOString();
                 
-                modal.innerHTML = `
-                    <div class="glass rounded-3xl p-6 max-w-md w-full mx-4 shadow-glow transform transition-all scale-95">
-                        <h3 class="text-lg font-bold text-white mb-4 flex items-center">
-                            <div class="w-10 h-10 gradient-secondary rounded-xl flex items-center justify-center mr-3">
-                                <i class="fas fa-exclamation-triangle text-white"></i>
-                            </div>
-                            ${title}
-                        </h3>
-                        <p class="text-white text-opacity-80 mb-6">${message}</p>
-                        <div class="flex gap-3">
-                            <button onclick="resolveDialog(false)" class="flex-1 glass-dark text-white py-3 rounded-xl hover:bg-white hover:bg-opacity-10 transition-all">
-                                <i class="fas fa-times mr-2"></i>ยกเลิก
-                            </button>
-                            <button onclick="resolveDialog(true)" class="flex-1 gradient-secondary text-white py-3 rounded-xl hover:scale-105 transition-all neon-red">
-                                <i class="fas fa-check mr-2"></i>ยืนยัน
-                            </button>
-                        </div>
-                    </div>
-                `;
+                if (AppState.isOfflineMode) {
+                    throw new Error('Offline mode enabled');
+                }
+
+                if (!CONFIG.GAS_URL) {
+                    throw new Error('GAS_URL not configured');
+                }
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), CONFIG.TIMEOUT);
+
+                const response = await fetch(CONFIG.GAS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        function: functionName,
+                        parameters: parameters
+                    }),
+                    signal: controller.signal
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                updateConnectionStatus('connected');
+                AppState.lastError = null;
                 
-                document.body.appendChild(modal);
-                setTimeout(() => {
-                    modal.querySelector('.transform').classList.remove('scale-95');
-                    modal.querySelector('.transform').classList.add('scale-100');
-                }, 50);
+                debugLog(`API Success: ${functionName}`, result);
+                return result;
+
+            } catch (error) {
+                debugLog(`API Error: ${functionName}`, error);
+                AppState.debugInfo.errors++;
+                AppState.lastError = error.message;
                 
-                window.resolveDialog = (result) => {
-                    modal.remove();
-                    delete window.resolveDialog;
-                    resolve(result);
-                };
-            });
+                if (error.name === 'AbortError') {
+                    updateConnectionStatus('disconnected', 'Timeout');
+                } else {
+                    updateConnectionStatus('disconnected', error.message);
+                }
+
+                // Retry logic
+                if (retryCount < CONFIG.RETRY_COUNT) {
+                    debugLog(`Retrying API call: ${functionName} (${retryCount + 1}/${CONFIG.RETRY_COUNT})`);
+                    await new Promise(resolve => setTimeout(resolve, CONFIG.RETRY_DELAY));
+                    return callGoogleScript(functionName, parameters, retryCount + 1);
+                }
+
+                // If all retries failed, fall back to offline mode
+                if (!AppState.isOfflineMode) {
+                    showNotification(`ไม่สามารถเชื่อมต่อ API ได้ กำลังใช้โหมดออฟไลน์`, 'warning');
+                    AppState.isOfflineMode = true;
+                    updateConnectionStatus('offline');
+                }
+
+                throw error;
+            }
         }
 
-        // UI Management Functions
+        // ===== Offline Functions =====
+        function loadOfflineCourses() {
+            debugLog('Loading offline courses');
+            return {
+                success: true,
+                data: SAMPLE_COURSES,
+                count: SAMPLE_COURSES.length
+            };
+        }
+
+        function saveOfflineSchedule(schedule) {
+            debugLog('Saving offline schedule', schedule);
+            // Save to localStorage for offline persistence
+            const scheduleData = {
+                studentId: '6710210317',
+                semester: document.getElementById('semesterSelect').value,
+                courses: schedule,
+                savedAt: new Date().toISOString()
+            };
+            
+            try {
+                localStorage.setItem('psu_schedule_backup', JSON.stringify(scheduleData));
+                return { success: true, message: 'Saved offline' };
+            } catch (error) {
+                return { success: false, message: 'Failed to save offline' };
+            }
+        }
+
+        function loadOfflineSchedule() {
+            debugLog('Loading offline schedule');
+            try {
+                const saved = localStorage.getItem('psu_schedule_backup');
+                if (saved) {
+                    const scheduleData = JSON.parse(saved);
+                    return {
+                        success: true,
+                        data: scheduleData.courses || [],
+                        loadedFrom: 'offline'
+                    };
+                }
+            } catch (error) {
+                debugLog('Error loading offline schedule', error);
+            }
+            
+            return { success: true, data: [] };
+        }
+
+        function toggleOfflineMode() {
+            AppState.isOfflineMode = !AppState.isOfflineMode;
+            const mode = AppState.isOfflineMode ? 'offline' : 'connected';
+            updateConnectionStatus(mode);
+            
+            showNotification(
+                `เปลี่ยนเป็น${AppState.isOfflineMode ? 'โหมดออฟไลน์' : 'โหมดออนไลน์'}แล้ว`,
+                'info'
+            );
+            
+            // Reload courses with new mode
+            loadCoursesFromGAS();
+        }
+
+        function toggleDebugPanel() {
+            const panel = document.getElementById('debugPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        // ===== Main Course Functions =====
+        async function loadCoursesFromGAS() {
+            try {
+                showSkeletonLoading();
+                let result;
+                
+                if (AppState.isOfflineMode) {
+                    result = loadOfflineCourses();
+                } else {
+                    result = await callGoogleScript('getAllCourses');
+                }
+                
+                if (result.success) {
+                    AppState.coursesDatabase = result.data.map(course => ({
+                        code: course.code,
+                        name: course.name,
+                        credits: parseInt(course.credits) || 0,
+                        type: course.type,
+                        schedule: {
+                            day: course.day || course.schedule?.day,
+                            startTime: course.startTime || course.schedule?.startTime,
+                            endTime: course.endTime || course.schedule?.endTime,
+                            room: course.room || course.schedule?.room
+                        }
+                    }));
+                    
+                    displayCourses();
+                    const mode = AppState.isOfflineMode ? ' (โหมดออฟไลน์)' : '';
+                    showNotification(`โหลดข้อมูลรายวิชา ${result.data.length} รายการเรียบร้อย${mode}`, 'success');
+                } else {
+                    throw new Error(result.message || 'Failed to load courses');
+                }
+            } catch (error) {
+                debugLog('Load courses error', error);
+                showNotification('เกิดข้อผิดพลาดในการโหลดข้อมูลรายวิชา', 'error');
+                
+                // Try offline mode as fallback
+                if (!AppState.isOfflineMode) {
+                    debugLog('Falling back to offline mode');
+                    const offlineResult = loadOfflineCourses();
+                    if (offlineResult.success) {
+                        AppState.coursesDatabase = offlineResult.data;
+                        displayCourses();
+                        showNotification('ใช้ข้อมูลตัวอย่างแทน', 'info');
+                    }
+                }
+            } finally {
+                hideSkeletonLoading();
+            }
+        }
+
+        async function saveScheduleToGAS() {
+            if (AppState.selectedCourses.length === 0) return;
+            
+            try {
+                const scheduleData = AppState.selectedCourses.map(course => ({
+                    courseCode: course.code,
+                    courseName: course.name,
+                    credits: course.credits,
+                    type: course.type,
+                    day: course.schedule.day,
+                    startTime: course.schedule.startTime,
+                    endTime: course.schedule.endTime,
+                    room: course.schedule.room,
+                    visible: course.visible !== false
+                }));
+
+                let result;
+                
+                if (AppState.isOfflineMode) {
+                    result = saveOfflineSchedule(scheduleData);
+                } else {
+                    result = await callGoogleScript('saveStudentSchedule', {
+                        studentId: '6710210317',
+                        semester: document.getElementById('semesterSelect').value,
+                        courses: scheduleData
+                    });
+                }
+                
+                if (result.success) {
+                    const mode = AppState.isOfflineMode ? ' (ออฟไลน์)' : '';
+                    showNotification(`บันทึกตารางเรียนเรียบร้อยแล้ว${mode}`, 'success');
+                    
+                    if (result.conflicts && result.conflicts.length > 0) {
+                        showNotification(`พบความขัดแย้งเวลา ${result.conflicts.length} รายการ`, 'warning');
+                    }
+                } else {
+                    throw new Error(result.message || 'Failed to save schedule');
+                }
+            } catch (error) {
+                debugLog('Save schedule error', error);
+                showNotification('เกิดข้อผิดพลาดในการบันทึก', 'error');
+            }
+        }
+
+        async function loadScheduleFromGAS() {
+            try {
+                let result;
+                
+                if (AppState.isOfflineMode) {
+                    result = loadOfflineSchedule();
+                } else {
+                    result = await callGoogleScript('getStudentSchedule', {
+                        studentId: '6710210317',
+                        semester: document.getElementById('semesterSelect').value
+                    });
+                }
+                
+                if (result.success && result.data.length > 0) {
+                    AppState.selectedCourses = result.data.map(scheduleItem => ({
+                        code: scheduleItem.courseCode,
+                        name: scheduleItem.courseName || scheduleItem.name || '',
+                        credits: parseInt(scheduleItem.credits) || 0,
+                        type: scheduleItem.type || 'elective',
+                        schedule: {
+                            day: scheduleItem.day || 'จันทร์',
+                            startTime: scheduleItem.startTime || '09:00',
+                            endTime: scheduleItem.endTime || '12:00',
+                            room: scheduleItem.room || 'TBA'
+                        },
+                        visible: scheduleItem.visible !== false,
+                        color: { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-800' }
+                    }));
+                    
+                    updateScheduleDisplay();
+                    updateListView();
+                    updateStats();
+                    
+                    const mode = result.loadedFrom === 'offline' ? ' (จากข้อมูลออฟไลน์)' : '';
+                    showNotification(`โหลดตารางเรียนเรียบร้อยแล้ว${mode}`, 'info');
+                }
+            } catch (error) {
+                debugLog('Load schedule error', error);
+                showNotification('เกิดข้อผิดพลาดในการโหลดตารางเรียน', 'error');
+            }
+        }
+
+        // ===== UI Functions =====
+        const timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00'];
+        const days = ['จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์'];
+
         function initializeSchedule() {
             const scheduleBody = document.getElementById('scheduleBody');
             scheduleBody.innerHTML = '';
@@ -1476,8 +1006,8 @@
             return dayMap[day];
         }
 
-        function displayCourses(courses = coursesDatabase) {
-            renderCourseList(courses);
+        function displayCourses() {
+            renderCourseList(AppState.coursesDatabase);
         }
 
         function renderCourseList(courses) {
@@ -1531,16 +1061,46 @@
             return labels[type] || type;
         }
 
-        // Schedule Display Functions
+        function addCourse(course) {
+            if (AppState.selectedCourses.find(c => c.code === course.code)) {
+                showNotification(`วิชา ${course.code} อยู่ในตารางเรียนแล้ว`, 'warning');
+                return;
+            }
+
+            const securedCourse = {
+                code: course.code,
+                name: course.name,
+                credits: parseInt(course.credits) || 0,
+                type: course.type,
+                schedule: course.schedule,
+                color: { bg: 'bg-purple-200', border: 'border-purple-400', text: 'text-purple-800' },
+                visible: true
+            };
+
+            AppState.selectedCourses.push(securedCourse);
+            
+            updateScheduleDisplay();
+            updateListView();
+            updateStats();
+            showNotification(`เพิ่มวิชา ${course.code} เรียบร้อยแล้ว`, 'success');
+            
+            // Auto-save
+            saveScheduleToGAS().catch(error => {
+                debugLog('Auto-save failed', error);
+            });
+        }
+
         function updateScheduleDisplay() {
             document.querySelectorAll('.course-block').forEach(block => block.remove());
             
-            selectedCourses.forEach(course => {
+            AppState.selectedCourses.forEach(course => {
                 if (course.schedule.day === 'ONLINE' || !course.visible) return;
                 
                 const day = getDayCode(course.schedule.day);
                 const startTime = course.schedule.startTime;
                 const endTime = course.schedule.endTime;
+                
+                if (startTime === 'FLEXIBLE') return;
                 
                 const startHour = parseInt(startTime.split(':')[0]);
                 const endHour = parseInt(endTime.split(':')[0]);
@@ -1587,7 +1147,7 @@
                         </div>
                         
                         <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-all flex gap-1">
-                            <button class="w-7 h-7 gradient-secondary rounded-full text-xs hover:scale-110 transition-all text-white flex items-center justify-center" onclick="confirmRemoveCourse('${course.code}')" title="ลบ">
+                            <button class="w-7 h-7 gradient-secondary rounded-full text-xs hover:scale-110 transition-all text-white flex items-center justify-center" onclick="removeCourse('${course.code}')" title="ลบ">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -1599,12 +1159,6 @@
                         </div>
                     `;
                     
-                    courseBlock.addEventListener('click', (e) => {
-                        if (e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
-                            showCourseDetails(course);
-                        }
-                    });
-                    
                     slot.appendChild(courseBlock);
                 }
             });
@@ -1614,7 +1168,7 @@
             const listContainer = document.getElementById('courseListView');
             listContainer.innerHTML = '';
             
-            const visibleCourses = selectedCourses.filter(c => c.visible);
+            const visibleCourses = AppState.selectedCourses.filter(c => c.visible);
             
             if (visibleCourses.length === 0) {
                 listContainer.innerHTML = `
@@ -1625,10 +1179,34 @@
                 `;
                 return;
             }
+
+            visibleCourses.forEach(course => {
+                const courseItem = document.createElement('div');
+                courseItem.className = 'glass-dark rounded-2xl p-4 mb-3 hover-lift';
+                
+                courseItem.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="font-bold text-white text-sm mb-2">${course.code} - ${course.name}</div>
+                            <div class="text-white text-opacity-70 text-xs">
+                                <span class="mr-4"><i class="fas fa-coins mr-1"></i>${course.credits} หน่วยกิต</span>
+                                <span class="mr-4"><i class="fas fa-calendar mr-1"></i>${course.schedule.day}</span>
+                                <span class="mr-4"><i class="fas fa-clock mr-1"></i>${course.schedule.startTime}-${course.schedule.endTime}</span>
+                                <span><i class="fas fa-door-open mr-1"></i>${course.schedule.room}</span>
+                            </div>
+                        </div>
+                        <button onclick="removeCourse('${course.code}')" class="gradient-secondary text-white px-3 py-2 rounded-xl text-xs hover:scale-105 transition-all">
+                            <i class="fas fa-times mr-1"></i>ลบ
+                        </button>
+                    </div>
+                `;
+                
+                listContainer.appendChild(courseItem);
+            });
         }
 
         function updateStats() {
-            const visibleCourses = selectedCourses.filter(c => c.visible);
+            const visibleCourses = AppState.selectedCourses.filter(c => c.visible);
             const totalCredits = visibleCourses.reduce((sum, course) => sum + course.credits, 0);
             const totalCourses = visibleCourses.length;
             const conflictCount = countConflicts();
@@ -1639,73 +1217,51 @@
         }
 
         function countConflicts() {
-            const visibleCourses = selectedCourses.filter(c => c.visible);
+            const visibleCourses = AppState.selectedCourses.filter(c => c.visible);
             let conflicts = 0;
             
             for (let i = 0; i < visibleCourses.length; i++) {
                 for (let j = i + 1; j < visibleCourses.length; j++) {
                     if (visibleCourses[i].schedule.day === visibleCourses[j].schedule.day &&
                         visibleCourses[i].schedule.day !== 'ONLINE') {
-                        const start1 = timeToMinutes(visibleCourses[i].schedule.startTime);
-                        const end1 = timeToMinutes(visibleCourses[i].schedule.endTime);
-                        const start2 = timeToMinutes(visibleCourses[j].schedule.startTime);
-                        const end2 = timeToMinutes(visibleCourses[j].schedule.endTime);
-                        
-                        if (start1 < end2 && end1 > start2) {
-                            conflicts++;
-                        }
+                        conflicts++;
                     }
                 }
             }
             return conflicts;
         }
 
-        async function confirmRemoveCourse(courseCode) {
-            const course = selectedCourses.find(c => c.code === courseCode);
-            if (!course) return;
+        function removeCourse(courseCode) {
+            AppState.selectedCourses = AppState.selectedCourses.filter(c => c.code !== courseCode);
+            updateScheduleDisplay();
+            updateListView();
+            updateStats();
+            showNotification(`ลบวิชา ${courseCode} เรียบร้อยแล้ว`, 'success');
             
-            const confirmed = await showConfirmDialog(
-                'ยืนยันการลบ',
-                `ต้องการลบวิชา ${course.code} - ${course.name} หรือไม่?`
-            );
-            
-            if (confirmed) {
-                selectedCourses = selectedCourses.filter(c => c.code !== courseCode);
-                updateScheduleDisplay();
-                updateListView();
-                updateStats();
-                showAdvancedNotification(`ลบวิชา ${course.code} เรียบร้อยแล้ว`, 'success');
-                
-                // Auto-save
-                saveScheduleToGAS().catch(error => {
-                    console.error('Auto-save after remove course failed:', error);
-                });
-            }
+            // Auto-save
+            saveScheduleToGAS().catch(error => {
+                debugLog('Auto-save after remove failed', error);
+            });
         }
 
         function searchCourses() {
-            const searchTerm = sanitizeInput(document.getElementById('searchInput').value.toLowerCase());
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const activeFilter = document.querySelector('.filter-btn.gradient-primary').dataset.filter;
             
-            showSkeletonLoading();
-            
-            setTimeout(() => {
-                const filteredCourses = coursesDatabase.filter(course => {
-                    const matchesSearch = !searchTerm || 
-                        course.code.toLowerCase().includes(searchTerm) ||
-                        course.name.toLowerCase().includes(searchTerm);
-                    const matchesFilter = activeFilter === 'all' || course.type === activeFilter;
-                    
-                    return matchesSearch && matchesFilter;
-                });
+            const filteredCourses = AppState.coursesDatabase.filter(course => {
+                const matchesSearch = !searchTerm || 
+                    course.code.toLowerCase().includes(searchTerm) ||
+                    course.name.toLowerCase().includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || course.type === activeFilter;
                 
-                hideSkeletonLoading();
-                renderCourseList(filteredCourses);
-            }, 200);
+                return matchesSearch && matchesFilter;
+            });
+            
+            renderCourseList(filteredCourses);
         }
 
         function switchView(view) {
-            currentView = view;
+            AppState.currentView = view;
             const tableView = document.getElementById('tableView');
             const listView = document.getElementById('listView');
             const tableBtn = document.getElementById('tableViewBtn');
@@ -1729,62 +1285,31 @@
             }
         }
 
-        // Admin UI Management
-        function updateAdminUI() {
-            const adminStatus = document.getElementById('adminStatus');
-            const studentMode = document.getElementById('studentMode');
-            const adminBtn = document.getElementById('adminBtn');
+        // ===== Skeleton Loading Functions =====
+        function showSkeletonLoading() {
+            document.getElementById('courseListSkeleton').classList.remove('hidden');
+            document.getElementById('tableSkeleton').classList.remove('hidden');
+            document.getElementById('statsSkeleton').classList.remove('hidden');
             
-            if (AppState.isAuthenticated) {
-                adminStatus.classList.remove('hidden');
-                studentMode.classList.add('hidden');
-                adminBtn.innerHTML = '<i class="fas fa-cogs mr-2"></i>จัดการระบบ';
-                adminBtn.onclick = () => showAdminPanel();
-            } else {
-                adminStatus.classList.add('hidden');
-                studentMode.classList.remove('hidden');
-                adminBtn.innerHTML = '<i class="fas fa-shield-alt mr-2"></i>เข้าสู่ระบบแอดมิน';
-                adminBtn.onclick = () => showAdminLogin();
-            }
+            document.getElementById('scheduleContainer').classList.add('hidden');
+            document.getElementById('statsContent').classList.add('hidden');
         }
 
-        function showAdminLogin() {
-            document.getElementById('adminLoginModal').classList.remove('hidden');
+        function hideSkeletonLoading() {
+            document.getElementById('courseListSkeleton').classList.add('hidden');
+            document.getElementById('tableSkeleton').classList.add('hidden');
+            document.getElementById('statsSkeleton').classList.add('hidden');
+            
+            document.getElementById('scheduleContainer').classList.remove('hidden');
+            document.getElementById('statsContent').classList.remove('hidden');
         }
 
-        function closeAdminLogin() {
-            document.getElementById('adminLoginModal').classList.add('hidden');
-            document.getElementById('adminUsername').value = '';
-            document.getElementById('adminPassword').value = '';
-        }
-
-        function checkAdminSession() {
-            if (AppState.isAuthenticated) {
-                showAdminPanel();
-            } else {
-                showAdminLogin();
-            }
-        }
-
-        function showAdminPanel() {
-            if (!AppState.isAuthenticated) {
-                showSecurityAlert('คุณไม่มีสิทธิ์เข้าถึงแผงควบคุมแอดมิน', 'error');
-                return;
-            }
-            // Admin panel functionality would be implemented here
-            showAdvancedNotification('แผงควบคุมแอดมินจะพร้อมใช้งานในเร็วๆ นี้', 'info');
-        }
-
-        function closeAdminPanel() {
-            // Close admin panel functionality
-        }
-
-        // Export Functions
+        // ===== Export Functions =====
         async function exportPNG() {
             try {
                 const element = document.getElementById('scheduleContainer');
                 if (!element || element.classList.contains('hidden')) {
-                    showAdvancedNotification('กรุณาแสดงตารางเรียนก่อนส่งออก', 'warning');
+                    showNotification('กรุณาแสดงตารางเรียนก่อนส่งออก', 'warning');
                     return;
                 }
                 
@@ -1800,10 +1325,10 @@
                 link.href = canvas.toDataURL();
                 link.click();
                 
-                showAdvancedNotification('ส่งออกไฟล์ PNG เรียบร้อยแล้ว', 'success');
+                showNotification('ส่งออกไฟล์ PNG เรียบร้อยแล้ว', 'success');
             } catch (error) {
-                showAdvancedNotification('เกิดข้อผิดพลาดในการส่งออก PNG', 'error');
-                console.error('PNG export error:', error);
+                debugLog('PNG export error', error);
+                showNotification('เกิดข้อผิดพลาดในการส่งออก PNG', 'error');
             } finally {
                 showLoadingOverlay(false);
             }
@@ -1813,7 +1338,7 @@
             try {
                 const element = document.getElementById('scheduleContainer');
                 if (!element || element.classList.contains('hidden')) {
-                    showAdvancedNotification('กรุณาแสดงตารางเรียนก่อนส่งออก', 'warning');
+                    showNotification('กรุณาแสดงตารางเรียนก่อนส่งออก', 'warning');
                     return;
                 }
                 
@@ -1834,10 +1359,10 @@
                 pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
                 pdf.save(`ตารางเรียน_${document.getElementById('semesterSelect').value.replace('/', '_')}.pdf`);
                 
-                showAdvancedNotification('ส่งออกไฟล์ PDF เรียบร้อยแล้ว', 'success');
+                showNotification('ส่งออกไฟล์ PDF เรียบร้อยแล้ว', 'success');
             } catch (error) {
-                showAdvancedNotification('เกิดข้อผิดพลาดในการส่งออก PDF', 'error');
-                console.error('PDF export error:', error);
+                debugLog('PDF export error', error);
+                showNotification('เกิดข้อผิดพลาดในการส่งออก PDF', 'error');
             } finally {
                 showLoadingOverlay(false);
             }
@@ -1848,18 +1373,16 @@
                 const scheduleData = {
                     student: "วีรยุทธ แก้วขำ (6710210317)",
                     semester: document.getElementById('semesterSelect').value,
-                    courses: selectedCourses.filter(c => c.visible),
+                    courses: AppState.selectedCourses.filter(c => c.visible),
                     stats: {
-                        totalCredits: selectedCourses.filter(c => c.visible).reduce((sum, course) => sum + course.credits, 0),
-                        totalCourses: selectedCourses.filter(c => c.visible).length,
+                        totalCredits: AppState.selectedCourses.filter(c => c.visible).reduce((sum, course) => sum + course.credits, 0),
+                        totalCourses: AppState.selectedCourses.filter(c => c.visible).length,
                         conflicts: countConflicts()
                     },
                     exportDate: new Date().toISOString(),
-                    version: '2.0.0'
+                    version: '2.1.0',
+                    mode: AppState.isOfflineMode ? 'offline' : 'online'
                 };
-                
-                // Save to server first
-                await saveScheduleToGAS();
                 
                 const dataStr = JSON.stringify(scheduleData, null, 2);
                 const dataBlob = new Blob([dataStr], {type: 'application/json'});
@@ -1871,37 +1394,109 @@
                 link.click();
                 
                 URL.revokeObjectURL(url);
-                showAdvancedNotification('ส่งออกตารางเรียนเรียบร้อยแล้ว', 'success');
+                showNotification('ส่งออกตารางเรียนเรียบร้อยแล้ว', 'success');
             } catch (error) {
-                showAdvancedNotification('เกิดข้อผิดพลาดในการส่งออก', 'error');
-                console.error('Export error:', error);
+                debugLog('Export error', error);
+                showNotification('เกิดข้อผิดพลาดในการส่งออก', 'error');
             }
         }
 
-        // Skeleton Loading Functions
-        function showSkeletonLoading() {
-            document.getElementById('courseListSkeleton').classList.remove('hidden');
-            document.getElementById('tableSkeleton').classList.remove('hidden');
-            document.getElementById('statsSkeleton').classList.remove('hidden');
-            
-            document.getElementById('scheduleContainer').classList.add('hidden');
-            document.getElementById('statsContent').classList.add('hidden');
+        // ===== Event Listeners =====
+        function setupEventListeners() {
+            // Search functionality
+            let searchTimeout;
+            document.getElementById('searchInput').addEventListener('input', () => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(searchCourses, 300);
+            });
+
+            // View toggle buttons
+            document.getElementById('tableViewBtn').addEventListener('click', () => switchView('table'));
+            document.getElementById('listViewBtn').addEventListener('click', () => switchView('list'));
+
+            // Filter buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    document.querySelectorAll('.filter-btn').forEach(b => {
+                        b.classList.remove('gradient-primary', 'neon-blue');
+                        b.classList.add('glass-dark');
+                    });
+                    btn.classList.remove('glass-dark');
+                    btn.classList.add('gradient-primary', 'neon-blue');
+                    searchCourses();
+                });
+            });
+
+            // Semester selector
+            document.getElementById('semesterSelect').addEventListener('change', () => {
+                loadScheduleFromGAS();
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    // Close modals or panels
+                }
+                if (e.ctrlKey && e.key === 's') {
+                    e.preventDefault();
+                    if (AppState.selectedCourses.length > 0) {
+                        saveScheduleToGAS();
+                    }
+                }
+                if (e.ctrlKey && e.key === 'd') {
+                    e.preventDefault();
+                    toggleDebugPanel();
+                }
+            });
         }
 
-        function hideSkeletonLoading() {
-            document.getElementById('courseListSkeleton').classList.add('hidden');
-            document.getElementById('tableSkeleton').classList.add('hidden');
-            document.getElementById('statsSkeleton').classList.add('hidden');
-            
-            document.getElementById('scheduleContainer').classList.remove('hidden');
-            document.getElementById('statsContent').classList.remove('hidden');
+        // ===== Initialize App =====
+        async function initializeApp() {
+            try {
+                debugLog('Initializing app');
+                updateConnectionStatus('checking');
+                
+                initializeSchedule();
+                setupEventListeners();
+                
+                // Try to load courses
+                await loadCoursesFromGAS();
+                
+                // Try to load existing schedule
+                await loadScheduleFromGAS();
+                
+                updateStats();
+                
+                // Auto-save every 2 minutes
+                setInterval(async () => {
+                    if (AppState.selectedCourses.length > 0) {
+                        try {
+                            await saveScheduleToGAS();
+                        } catch (error) {
+                            debugLog('Auto-save failed', error);
+                        }
+                    }
+                }, 120000);
+                
+                debugLog('App initialized successfully');
+                
+            } catch (error) {
+                debugLog('App initialization error', error);
+                showNotification('เกิดข้อผิดพลาดในการเริ่มต้นระบบ', 'error');
+            }
         }
 
-        function showCourseDetails(course) {
-            // Course details modal functionality would be implemented here
-            showAdvancedNotification(`รายละเอียดวิชา ${course.code} - ${course.name}`, 'info');
-        }
-        
+        // ===== Start Application =====
+        document.addEventListener('DOMContentLoaded', () => {
+            showLoadingOverlay(true, 'กำลังเริ่มต้นระบบ...');
+            
+            setTimeout(() => {
+                initializeApp().finally(() => {
+                    showLoadingOverlay(false);
+                });
+            }, 1000);
+        });
     </script>
 </body>
 </html>
