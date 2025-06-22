@@ -1,608 +1,693 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Data Analysis </title>
+    <title>Data Analysis Quiz</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                        'bounce-soft': 'bounce 1s infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        /* Global Styles */
-        body {
-            font-family: 'Poppins', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-            color: #333;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-
-        h3 {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-            font-weight: 600;
-        }
-
-        /* Search Box Styles */
-        .search-container {
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .search-box {
-            width: 70%; /* ลดขนาดช่องค้นหา */
-            padding: 12px 15px;
-            font-size: 1.1rem;
-            border-radius: 20px;
-            border: 1px solid #ddd;
-            background-color: #f9f9f9;
-            box-sizing: border-box;
-            transition: all 0.3s ease;
-        }
-
-        .search-box:focus {
-            outline: none;
-            border-color: #0078d4;
-            box-shadow: 0 0 5px rgba(0, 120, 212, 0.3);
-        }
-
-        .search-btn, .clear-btn {
-            padding: 12px 20px;
-            border-radius: 20px;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .search-btn {
-            background-color: #0078d4;
-            color: white;
-            border: none;
-        }
-
-        .search-btn:hover {
-            background-color: #005bb5;
-        }
-
-        .clear-btn {
-            background-color: #f44336;
-            color: white;
-            border: none;
-            display: none; /* Hide clear button initially */
-        }
-
-        .clear-btn:hover {
-            background-color: #d32f2f;
-        }
-
-        .no-results {
-            text-align: center;
-            color: #d32f2f;
-            font-size: 1rem;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-
-        .question {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            background: #f9fafb;
-            padding: 20px;
-            margin-bottom: 15px;
-            border-radius: 10px;
-            border: 1px solid #e0e0e0;
-            transition: transform 0.3s ease-in-out, background-color 0.3s ease;
-        }
-
-        .question:hover {
-            transform: translateY(-5px);
-            background-color: #f0f8ff;
-        }
-
-        .question-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .question-number {
-            font-weight: bold;
-            color: #4a90e2;
-            font-size: 1.2rem;
-        }
-
-        .question-text {
-            font-size: 1.1rem;
-            color: #555;
-            margin: 0;
-        }
-
-        .answer-container {
-            font-size: 1rem;
-            color: #333;
-            padding: 8px 12px;
-            margin: 8px 0;
-            background-color: #f4f6f8;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .answer-container:hover {
-            background-color: #e0e0e0;
-        }
-
-        /* Correct Answer Highlight */
-        .correct {
-            background-color: #d4f8d4; /* Light green for correct answers */
-            color: #2e7d32;
-            font-weight: bold;
-            border-color: #6bc46d;
-        }
-
-        /* Disable Copy */
+        
+        /* Disable text selection */
         body {
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
         }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            h3 {
-                font-size: 1.8rem;
-            }
-
-            .search-container {
-                flex-direction: row;
-                gap: 10px;
-            }
-
-            .search-box {
-                width: 60%;
-            }
-
-            .search-btn, .clear-btn {
-                width: 40px;
-                height: 40px;
-                padding: 0;
-                font-size: 1.5rem;
-                display: inline-flex;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .search-btn i, .clear-btn i {
-                font-size: 1.2rem;
-            }
-
-            .search-btn-text, .clear-btn-text {
-                display: none;
-            }
-
-            /* Hide the clear button on mobile */
-            .clear-btn {
-                display: none;
-            }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        @media (max-width: 480px) {
-            h3 {
-                font-size: 1.5rem;
-            }
-
-            .search-container {
-                flex-direction: row;
-                gap: 10px;
-            }
-
-            .search-box {
-                width: 50%;
-            }
-
-            .search-btn, .clear-btn {
-                width: 35px;
-                height: 35px;
-                padding: 0;
-                font-size: 1rem;
-            }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-
-        /* Desktop Styles */
-        @media (min-width: 769px) {
-            .search-btn-text, .clear-btn-text {
-                display: inline-block;
-                margin-left: 8px;
-                font-size: 1rem;
-            }
-
-            .search-btn, .clear-btn {
-                font-size: 1.2rem;
-                padding: 12px 25px;
-            }
-
-            /* Adjust width of search box for desktop */
-            .search-box {
-                width: 50%; /* ลดขนาดช่องค้นหาในเดสก์ท็อป */
-            }
-
-            /* Hide the clear button on desktop */
-            .clear-btn {
-                display: none;
-            }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h3> Data Analysis </h3>
 
-        <!-- Search Box -->
-        <div class="search-container">
-            <input type="text" id="searchInput" class="search-box" placeholder="Search questions..." onkeyup="searchContent()">
-            <button class="search-btn" onclick="searchContent()">
-                <i class="fas fa-search"></i><span class="search-btn-text">Search</span>
-            </button>
-            <button class="clear-btn" onclick="clearSearch()">
-                <i class="fas fa-times"></i><span class="clear-btn-text">Clear</span>
-            </button>
+<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 min-h-screen font-sans">
+    
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-chart-line text-white text-lg"></i>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-900">Data Analysis Quiz</h1>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span id="question-count" class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                        <i class="fas fa-list-ol mr-1"></i>
+                        <span id="total-questions">8</span> ข้อ
+                    </span>
+                    <span id="search-count" class="text-sm text-primary bg-blue-100 px-3 py-1 rounded-full hidden">
+                        <i class="fas fa-search mr-1"></i>
+                        <span id="found-questions">0</span> พบ
+                    </span>
+                </div>
+            </div>
         </div>
+    </header>
 
-        <!-- Quiz Section -->
-        <div id="quizContainer">
-
-<div class="question">  
-        <div class="question-header">  
-            <span class="question-number">1.</span>  
-            <p class="question-text">ข้อใดคือระบบสารสนเทศเกี่ยวข้อมูลนักศึกษา</p>  
-        </div>  
-        <div class="answer-container correct">SIS</div>  
-        <div class="answer-container">KM</div>  
-        <div class="answer-container">DSS</div>  
-        <div class="answer-container">GIS</div>  
-    </div>
-
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">2.</span>
-        <p class="question-text">จากคำกล่าวที่ Data Analysis คือ ทักษะการวิเคราะห์ข้อมูลต่าง ๆ เพื่อหาข้อสรุปของข้อมูลนั้น เป็นการนำข้อมูลที่ได้มาเข้าสู่กระบวนการแสดงค่า หาความหมาย และสรุปผลที่ได้จากข้อมูล ถูกต้องหรือไม่</p>
-    </div>
-    <div class="answer-container correct">
-        True
-    </div>
-    <div class="answer-container">
-        False
-    </div>
-</div>
-
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">3.</span>
-        <p class="question-text">ข้อใดคือองค์ประกอบของ Information System</p>
-    </div>
-    <div class="answer-container correct">
-        ถูกทุกข้อ
-    </div>
-    <div class="answer-container">
-        People
-    </div>
-    <div class="answer-container">
-        Technology
-    </div>
-    <div class="answer-container">
-        Process
-    </div>
-</div>
-
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">4.</span>
-        <p class="question-text">Business Analyst ,มีหน้าที่ในการวิเคราะห์ข้อมูลใช่หรือไม่ </p>
-    </div>
-    <div class="answer-container correct">
-       True
-    </div>
-    <div class="answer-container">
-       False
-    </div>
-   </div>
-
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">5.</span>
-        <p class="question-text">การวิเคราะห์ข้อมูลที่มีความซับซ้อนที่ใช้ในระดับการทำงานของ Machine Learning หรือ Pattern Recognition คือข้อใด</p>
-    </div>
-    <div class="answer-container">
-        Diagnostic Analytics
-    </div>
-    <div class="answer-container">
-        Descriptive Analytics
-    </div>
-    <div class="answer-container correct">
-        Predictive Analytics
-    </div>
-    <div class="answer-container">
-        Prescriptive Analytics
-    </div>
-</div>
-
-  
-
-    </div>
-
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">6.</span>
-        <p class="question-text">จงจับคู่ผลลัพธ์จากการทำการวิเคราะห์ข้อมูล (Data Analysis) แต่ละประเภท ให้ถูกต้อง</p>
-    </div>
-
-    <div class="match-container">
-        <!-- คำถามด้านซ้าย -->
-        <div class="match-column left">
-            <div class="match-item">
-                Diagnosis analytics
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Search Section -->
+        <div class="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8 animate-fade-in">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex-1 relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="searchInput" 
+                        class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        placeholder="ค้นหาคำถาม, คำตอบ หรือหัวข้อที่สนใจ..."
+                        onkeyup="handleSearch()"
+                        onkeypress="handleEnterKey(event)"
+                    >
+                </div>
+                
+                <div class="flex gap-2">
+                    <button 
+                        onclick="searchContent()" 
+                        class="px-6 py-3 bg-gradient-to-r from-primary to-blue-600 text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center gap-2"
+                    >
+                        <i class="fas fa-search"></i>
+                        <span class="hidden sm:inline">ค้นหา</span>
+                    </button>
+                    
+                    <button 
+                        onclick="clearSearch()" 
+                        id="clearBtn"
+                        class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all font-medium hidden items-center gap-2"
+                    >
+                        <i class="fas fa-times"></i>
+                        <span class="hidden sm:inline">ล้าง</span>
+                    </button>
+                </div>
             </div>
-            <div class="match-item">
-                Prescriptive analytics
-            </div>
-            <div class="match-item">
-                Description analytics
-            </div>
-            <div class="match-item">
-                Predictive analytics
+            
+            <!-- Search Statistics -->
+            <div id="searchStats" class="mt-4 text-sm text-gray-600 hidden">
+                <i class="fas fa-info-circle text-blue-500"></i>
+                พบ <span id="foundCount" class="font-semibold text-primary">0</span> คำถามจากทั้งหมด <span class="font-semibold">8</span> คำถาม
             </div>
         </div>
 
-        <!-- คำตอบด้านขวา -->
-        <div class="match-column right">
-            <div class="match-item correct">
-               Why did it happen?
+        <!-- Quiz Container -->
+        <div id="quizContainer" class="space-y-6">
+            
+            <!-- Question 1 -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        1
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">ข้อใดคือระบบสารสนเทศเกี่ยวข้อมูลนักศึกษา</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-14">
+                    <div class="answer-option correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>SIS
+                    </div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">KM</div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">DSS</div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">GIS</div>
+                </div>
             </div>
-            <div class="match-item correct">
-                How to make it happen?
+
+            <!-- Question 2 -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        2
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">จากคำกล่าวที่ Data Analysis คือ ทักษะการวิเคราะห์ข้อมูลต่าง ๆ เพื่อหาข้อสรุปของข้อมูลนั้น เป็นการนำข้อมูลที่ได้มาเข้าสู่กระบวนการแสดงค่า หาความหมาย และสรุปผลที่ได้จากข้อมูล ถูกต้องหรือไม่</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-14">
+                    <div class="answer-option correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>True
+                    </div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">False</div>
+                </div>
             </div>
-            <div class="match-item correct">
-                What happened ?
+
+            <!-- Question 3 -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        3
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">ข้อใดคือองค์ประกอบของ Information System</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-14">
+                    <div class="answer-option correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>ถูกทุกข้อ
+                    </div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">People</div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">Technology</div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">Process</div>
+                </div>
             </div>
-            <div class="match-item correct">
-                What will happen ?
+
+            <!-- Question 4 -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        4
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">Business Analyst มีหน้าที่ในการวิเคราะห์ข้อมูลใช่หรือไม่</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-14">
+                    <div class="answer-option correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>True
+                    </div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">False</div>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-4">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        5
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">การวิเคราะห์ข้อมูลที่มีความซับซ้อนที่ใช้ในระดับการทำงานของ Machine Learning หรือ Pattern Recognition คือข้อใด</p>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 ml-14">
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">Diagnostic Analytics</div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">Descriptive Analytics</div>
+                    <div class="answer-option correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                        <i class="fas fa-check-circle text-green-600 mr-2"></i>Predictive Analytics
+                    </div>
+                    <div class="answer-option bg-gray-50 border border-gray-200 text-gray-700 px-4 py-3 rounded-lg">Prescriptive Analytics</div>
+                </div>
+            </div>
+
+            <!-- Question 6 - Matching -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        6
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">จงจับคู่ผลลัพธ์จากการทำการวิเคราะห์ข้อมูล (Data Analysis) แต่ละประเภท ให้ถูกต้อง</p>
+                    </div>
+                </div>
+                
+                <div class="ml-14">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-arrow-right text-primary mr-2"></i>ประเภทการวิเคราะห์
+                            </h4>
+                            <div class="match-item bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg font-medium">
+                                Diagnosis analytics
+                            </div>
+                            <div class="match-item bg-purple-50 border border-purple-200 text-purple-800 px-4 py-3 rounded-lg font-medium">
+                                Prescriptive analytics
+                            </div>
+                            <div class="match-item bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg font-medium">
+                                Description analytics
+                            </div>
+                            <div class="match-item bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg font-medium">
+                                Predictive analytics
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-bullseye text-success mr-2"></i>คำถามที่ตอบได้
+                            </h4>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>Why did it happen?
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>How to make it happen?
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>What happened?
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>What will happen?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 7 - Complexity Matching -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        7
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">จงจับคู่ระดับของการทำ Data Analysis จากระดับที่ซับซ้อนน้อยสุดไประดับที่ซับซ้อนมากสุด โดยให้ตัวเลข 1 แทนระดับที่ซับซ้อนน้อยที่สุด และให้เลข 4 แทนระดับที่ซับซ้อนมากที่สุด</p>
+                    </div>
+                </div>
+                
+                <div class="ml-14">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-layer-group text-primary mr-2"></i>ประเภทการวิเคราะห์
+                            </h4>
+                            <div class="match-item bg-orange-50 border border-orange-200 text-orange-800 px-4 py-3 rounded-lg font-medium">
+                                Predictive (ทำนาย)
+                            </div>
+                            <div class="match-item bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg font-medium">
+                                Descriptive (บรรยาย)
+                            </div>
+                            <div class="match-item bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg font-medium">
+                                Diagnostic (วินิจฉัย)
+                            </div>
+                            <div class="match-item bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg font-medium">
+                                Prescriptive (กำหนด)
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-sort-numeric-up text-success mr-2"></i>ระดับความซับซ้อน
+                            </h4>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-bold px-4 py-3 rounded-lg text-center text-xl">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>3
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-bold px-4 py-3 rounded-lg text-center text-xl">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>1
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-bold px-4 py-3 rounded-lg text-center text-xl">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>2
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-bold px-4 py-3 rounded-lg text-center text-xl">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>4
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question 8 - Application Matching -->
+            <div class="question bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-all animate-slide-up">
+                <div class="flex items-start gap-4 mb-6">
+                    <div class="w-10 h-10 bg-gradient-to-r from-primary to-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                        8
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-lg text-gray-800 font-medium">จงจับคู่ระหว่าง Application กับวิธีการวิเคราะห์ข้อมูลที่มีความซับซ้อนในระดับต่างๆทั้ง 4 ระดับ</p>
+                    </div>
+                </div>
+                
+                <div class="ml-14">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Left Column -->
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-cogs text-primary mr-2"></i>การประยุกต์ใช้
+                            </h4>
+                            <div class="match-item bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg font-medium">
+                                Risk Assessment / Fraud detection
+                            </div>
+                            <div class="match-item bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg font-medium">
+                                Visualization
+                            </div>
+                            <div class="match-item bg-purple-50 border border-purple-200 text-purple-800 px-4 py-3 rounded-lg font-medium">
+                                Discovering patterns on Customer behavior
+                            </div>
+                            <div class="match-item bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg font-medium">
+                                Creating Forecasts
+                            </div>
+                            <div class="match-item bg-gray-50 border border-gray-200 text-gray-800 px-4 py-3 rounded-lg font-medium">
+                                Report / Performance Monitoring
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="space-y-3">
+                            <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
+                                <i class="fas fa-chart-bar text-success mr-2"></i>ประเภทการวิเคราะห์
+                            </h4>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>Predictive Analytics
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>Diagnostic Analytics
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>Predictive Analytics
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>Predictive Analytics
+                            </div>
+                            <div class="match-item correct bg-green-50 border-2 border-green-200 text-green-800 font-semibold px-4 py-3 rounded-lg">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>Descriptive Analytics
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-     </div>
-    </div>
 
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">7.</span>
-        <p class="question-text">จงจับคู่ระดับของการทำ Data Analysis จากระดับที่ซับซ้อนน้อยสุดไประดับที่ซับซ้อนมากสุด โดยให้ตัวเลข 1 แทนระดับที่ซับซ้อนน้อยที่สุด และให้เลข 4 แทนระดับที่ซับซ้อนมากที่สุด</p>
-    </div>
-
-    <div class="match-container">
-        <!-- คำถามด้านซ้าย -->
-        <div class="match-column left">
-            <div class="match-item">
-                Predictive(ทำนาย)
-            </div>
-            <div class="match-item">
-                Descriptive(บรรยาย)
-            </div>
-            <div class="match-item">
-                Diagnostic(วินิจฉัย)
-            </div>
-            <div class="match-item">
-                Prescriptive(กำหนด)
-            </div>
-        </div>
-
-        <!-- คำตอบด้านขวา -->
-        <div class="match-column right">
-            <div class="match-item correct">
-                3
-            </div>
-            <div class="match-item correct">
-                1
-            </div>
-            <div class="match-item correct">
-                2
-            </div>
-            <div class="match-item correct">
-                4
-            </div>
-        </div>
-   </div>
-
-   </div>
-
-<div class="question">
-    <div class="question-header">
-        <span class="question-number">8.</span>
-        <p class="question-text">จงจับคู่ระหว่าง Application กับวิธีการวิเคระห์ข้อมูลที่มีความซับซ้อนในระดับต่างๆทั้ง 4 ระดับ</p>
-    </div>
-
-    <div class="match-container">
-        <!-- คำถามด้านซ้าย -->
-        <div class="match-column left">
-            <div class="match-item">
-                Risk Assessment / Fraud detection
-            </div>
-            <div class="match-item">
-                Visualization
-            </div>
-            <div class="match-item">
-                Discovering patterns on Customer behavior
-            </div>
-            <div class="match-item">
-                Creating Forecasts
-            </div>
-
-            <div class="match-item">
-                Report / Performance Monitoring
-            </div>
-
-        </div>
-
-        <!-- คำตอบด้านขวา -->
-        <div class="match-column right">
-            <div class="match-item correct">
-                Predictive Analytics
-            </div>
-            <div class="match-item correct">
-                Diagnostic Analytics
-            </div>
-            <div class="match-item correct">
-                Predictive Analytics
-            </div>
-            <div class="match-item correct">
-                Predictive Analytics
-            </div>
-
-            <div class="match-item correct">
-                Descriptive Analytics
-            </div>
-
-        </div>
-
-    </div>
-
-   </div>
-
-<style>
-
-/* Match Container */
-.match-container {
-    display: flex;
-    justify-content: space-between; /* จัดเรียงสองฝั่ง */
-    gap: 20px;
-    margin-top: 10px;
-}
-
-/* Match Column */
-.match-column {
-    flex: 1; /* ให้ขนาดคอลัมน์เท่ากัน */
-    display: flex;
-    flex-direction: column; /* ปรับให้เป็นแนวตั้งในจอเล็ก */
-    gap: 15px;
-}
-
-/* Match Item */
-.match-item {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-}
-
-/* Hover Effect */
-.match-item:hover {
-    background-color: #e8f4ff;
-    transform: scale(1.02);
-}
-
-/* Correct Answer */
-.match-item.correct {
-    background-color: #d4f8d4; /* สีเขียวอ่อน */
-    color: #2e7d32; /* สีเขียวเข้ม */
-    border-color: #6bc46d; /* เส้นขอบสีเขียว */
-}
-
-/* Responsive Design for Small Screens */
-@media (max-width: 768px) {
-    .match-container {
-        flex-direction: column; /* เปลี่ยนเป็นแนวตั้งในจอเล็ก */
-    }
-
-    .match-column {
-        flex: none; /* ให้คอลัมน์กลับมาเป็นขนาดอัตโนมัติ */
-    }
-
-    .match-item {
-        padding: 10px; /* ลดขนาด padding สำหรับจอเล็ก */
-    }
-}
-
-.match-item {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background-color: #f9f9f9;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    font-size: 1rem;
-    font-weight: bold;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.match-item.correct {
-    background-color: #d4f8d4;
-    color: #2e7d32;
-    border-color: #6bc46d;
-}
-
-</style>
-
-
-
-       
         <!-- No Results Message -->
-        <div id="noResults" class="no-results" style="display: none;">
-            No results found!
+        <div id="noResults" class="hidden text-center py-12">
+            <div class="bg-white rounded-xl shadow-md border border-gray-200 p-8">
+                <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">ไม่พบผลการค้นหา</h3>
+                <p class="text-gray-500 mb-4">ลองใช้คำค้นหาอื่น หรือตรวจสอบการสะกดคำให้ถูกต้อง</p>
+                <button onclick="clearSearch()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-redo mr-2"></i>ล้างการค้นหา
+                </button>
+            </div>
         </div>
-   
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="text-center text-gray-600">
+                <p class="mb-2">
+                    <i class="fas fa-chart-line text-primary mr-2"></i>
+                    Data Analysis Quiz System
+                </p>
+                <p class="text-sm">
+                    © 2025 Educational Purpose. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        function searchContent() {
-            const input = document.getElementById('searchInput').value.toLowerCase();
-            const questions = document.querySelectorAll('.question');
-            let hasResults = false;
+        let searchActive = false;
+        let totalQuestions = 8;
 
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateQuestionCount();
+            addScrollAnimation();
+        });
+
+        // Handle search input
+        function handleSearch() {
+            const input = document.getElementById('searchInput').value.trim();
+            const clearBtn = document.getElementById('clearBtn');
+            
+            if (input.length > 0) {
+                clearBtn.classList.remove('hidden');
+                clearBtn.classList.add('flex');
+            } else {
+                clearBtn.classList.add('hidden');
+                clearBtn.classList.remove('flex');
+                if (searchActive) {
+                    clearSearch();
+                }
+            }
+        }
+
+        // Handle Enter key press
+        function handleEnterKey(event) {
+            if (event.key === 'Enter') {
+                searchContent();
+            }
+        }
+
+        // Search content
+        function searchContent() {
+            const input = document.getElementById('searchInput').value.toLowerCase().trim();
+            const questions = document.querySelectorAll('.question');
+            const noResults = document.getElementById('noResults');
+            const searchStats = document.getElementById('searchStats');
+            const foundCount = document.getElementById('foundCount');
+            const searchCount = document.getElementById('search-count');
+            const foundQuestions = document.getElementById('found-questions');
+            
+            let hasResults = false;
+            let foundNumber = 0;
+
+            if (input === '') {
+                // Show all questions
+                questions.forEach(question => {
+                    question.style.display = 'block';
+                });
+                noResults.classList.add('hidden');
+                searchStats.classList.add('hidden');
+                searchCount.classList.add('hidden');
+                searchActive = false;
+                return;
+            }
+
+            searchActive = true;
+
+            // Search through questions
             questions.forEach(question => {
                 const text = question.textContent.toLowerCase();
                 if (text.includes(input)) {
                     question.style.display = 'block';
                     hasResults = true;
+                    foundNumber++;
+                    
+                    // Highlight search terms
+                    highlightSearchTerms(question, input);
                 } else {
                     question.style.display = 'none';
                 }
             });
 
-            document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
-
-            const clearBtn = document.querySelector('.clear-btn');
-            if (input.length > 0) {
-                clearBtn.style.display = 'inline-block';
+            // Update UI
+            if (hasResults) {
+                noResults.classList.add('hidden');
+                searchStats.classList.remove('hidden');
+                searchCount.classList.remove('hidden');
+                foundCount.textContent = foundNumber;
+                foundQuestions.textContent = foundNumber;
             } else {
-                clearBtn.style.display = 'none';
+                noResults.classList.remove('hidden');
+                searchStats.classList.add('hidden');
+                searchCount.classList.add('hidden');
+            }
+
+            // Smooth scroll to first result
+            if (hasResults) {
+                const firstResult = document.querySelector('.question[style*="display: block"]');
+                if (firstResult) {
+                    firstResult.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start',
+                        inline: 'nearest'
+                    });
+                }
             }
         }
 
+        // Clear search
         function clearSearch() {
-            document.getElementById('searchInput').value = '';
-            searchContent();
+            const searchInput = document.getElementById('searchInput');
+            const clearBtn = document.getElementById('clearBtn');
+            const questions = document.querySelectorAll('.question');
+            const noResults = document.getElementById('noResults');
+            const searchStats = document.getElementById('searchStats');
+            const searchCount = document.getElementById('search-count');
+
+            searchInput.value = '';
+            clearBtn.classList.add('hidden');
+            clearBtn.classList.remove('flex');
+            noResults.classList.add('hidden');
+            searchStats.classList.add('hidden');
+            searchCount.classList.add('hidden');
+            searchActive = false;
+
+            // Show all questions and remove highlights
+            questions.forEach(question => {
+                question.style.display = 'block';
+                removeHighlights(question);
+            });
+
+            // Focus back to search input
+            searchInput.focus();
         }
+
+        // Highlight search terms
+        function highlightSearchTerms(element, searchTerm) {
+            const textNodes = getTextNodes(element);
+            textNodes.forEach(node => {
+                const text = node.textContent;
+                const regex = new RegExp(`(${escapeRegExp(searchTerm)})`, 'gi');
+                if (regex.test(text)) {
+                    const highlightedText = text.replace(regex, '<mark class="bg-yellow-200 px-1 rounded">$1</mark>');
+                    const wrapper = document.createElement('span');
+                    wrapper.innerHTML = highlightedText;
+                    node.parentNode.replaceChild(wrapper, node);
+                }
+            });
+        }
+
+        // Remove highlights
+        function removeHighlights(element) {
+            const marks = element.querySelectorAll('mark');
+            marks.forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+        }
+
+        // Get text nodes
+        function getTextNodes(element) {
+            const textNodes = [];
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            let node;
+            while (node = walker.nextNode()) {
+                if (node.textContent.trim()) {
+                    textNodes.push(node);
+                }
+            }
+            return textNodes;
+        }
+
+        // Escape regex special characters
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Update question count
+        function updateQuestionCount() {
+            const questions = document.querySelectorAll('.question');
+            totalQuestions = questions.length;
+            document.getElementById('total-questions').textContent = totalQuestions;
+        }
+
+        // Add scroll animation
+        function addScrollAnimation() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.question').forEach(question => {
+                question.style.opacity = '0';
+                question.style.transform = 'translateY(20px)';
+                question.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(question);
+            });
+        }
+
+        // Add hover effects for answer options
+        document.addEventListener('DOMContentLoaded', function() {
+            const answerOptions = document.querySelectorAll('.answer-option:not(.correct)');
+            answerOptions.forEach(option => {
+                option.addEventListener('mouseenter', function() {
+                    this.classList.add('bg-blue-50', 'border-blue-200', 'text-blue-800');
+                    this.classList.remove('bg-gray-50', 'border-gray-200', 'text-gray-700');
+                });
+                
+                option.addEventListener('mouseleave', function() {
+                    this.classList.remove('bg-blue-50', 'border-blue-200', 'text-blue-800');
+                    this.classList.add('bg-gray-50', 'border-gray-200', 'text-gray-700');
+                });
+            });
+        });
+
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            
+            if (e.key === 'Escape') {
+                if (searchActive) {
+                    clearSearch();
+                }
+            }
+        });
     </script>
 </body>
 </html>
