@@ -3,821 +3,872 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PDF Viewer พร้อมแอนิเมชันการโหลดและ PIN</title>
-
-    <!-- เพิ่ม Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- เพิ่ม Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- เพิ่ม Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <title>PDF Viewer - Secure Document System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#8b5cf6',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'spin-slow': 'spin 2s linear infinite',
+                        'spin-reverse': 'spin-reverse 1.5s linear infinite',
+                        'pulse-soft': 'pulse 2s ease-in-out infinite',
+                        'bounce-in': 'bounceIn 0.6s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            background-color: #282828;
-            color: #ecf0f1;
-            font-family: 'Poppins', sans-serif;
-            overflow: hidden;
+        @keyframes spin-reverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
         }
-
-        #pdf-viewer {
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            background-color: #000;
-            visibility: hidden;
-            overflow: hidden;
+        
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
         }
-
-        canvas {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            border: none;
+        
+        @keyframes slideDown {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
-
-        #watermark {
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Disable text selection for security */
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4b5563;
+        }
+        
+        /* Watermark */
+        .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 6vw;
-            max-width: 100%;
-            color: rgba(192, 192, 192, 0.2);
+            font-size: clamp(24px, 5vw, 72px);
+            color: rgba(148, 163, 184, 0.15);
             pointer-events: none;
             white-space: nowrap;
+            z-index: 1;
         }
-
-        #loading-animation {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .ring {
-            border: 5px solid rgba(255, 255, 255, 0.3);
-            border-top: 5px solid #28a745;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1.5s linear infinite;
-        }
-
-        .ring:nth-child(2) {
-            width: 70px;
-            height: 70px;
-            animation: spinReverse 1.8s linear infinite;
-        }
-
-        .ring:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            animation: spin 2s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        @keyframes spinReverse {
-            0% { transform: rotate(360deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        #page-info {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 5px 15px;
-            border-radius: 30px;
-            color: #fff;
-            z-index: 10;
-            transition: opacity 0.3s ease;
-            visibility: hidden;
-        }
-
-        #page-input {
-            width: 40px;
-            text-align: center;
-            border-radius: 10px;
-            padding: 3px;
-            font-size: 14px;
-            border: 2px solid #28a745;
-            background-color: transparent;
-            color: #28a745;
-        }
-
-        #controls {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            justify-content: space-between;
-            padding: 5px;
-            width: 250px;
-            transition: opacity 0.3s ease;
-            visibility: hidden;
-        }
-
-        #prev-page, #next-page {
-            width: 100px;
-            height: 50px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-            border-radius: 10px;
-            font-size: 18px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: background-color 0.3s ease;
-        }
-
-        #prev-page:hover, #next-page:hover {
-            background-color: #218838;
-        }
-
-        #download-pdf {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 24px;
-            cursor: pointer;
-            visibility: hidden;
-            transition: opacity 0.3s ease;
-        }
-
-        #download-pdf.disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-
-        #download-pdf:hover:not(.disabled) {
-            background-color: #218838;
-        }
-
-        @media (min-width: 1024px) {
-            #download-pdf {
-                width: 80px;
-                height: 80px;
-                font-size: 32px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            #download-pdf {
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-        }
-
-        #pin-input-container {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.85);
-            padding: 20px;
-            border-radius: 10px;
-            color: white;
-            text-align: center;
-            z-index: 20;
-            width: 80%;
-            max-width: 400px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .pin-input {
-            margin: 0 5px;
-            padding: 10px;
-            font-size: 24px;
-            width: 50px;
-            text-align: center;
-            border-radius: 5px;
-            border: none;
-            background-color: #333;
-            color: white;
-        }
-
-        .pin-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: nowrap;
-        }
-
-        #submit-pin, #cancel-pin {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        #submit-pin:hover, #cancel-pin:hover {
-            background-color: #218838;
-        }
-
-        #cancel-pin {
-            background-color: #d9534f;
-        }
-
-        #cancel-pin:hover {
-            background-color: #c9302c;
-        }
-
-        .alert-message {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-50px);
-            background-color: rgba(50, 50, 50, 0.9);
-            color: #ffffff;
-            padding: 12px 20px;
-            border-radius: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-            z-index: 1000;
-            max-width: 90%;
-            text-align: center;
-            font-size: 16px;
-            opacity: 0;
-            animation: slideIn 0.5s ease-out forwards, fadeOut 3.5s ease-out 2.5s forwards;
-        }
-
-        @keyframes slideIn {
-            0% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-50px);
-            }
-            100% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-        }
-
-        .alert-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            pointer-events: none;
-        }
-
-        @media (max-width: 768px) {
-            .pin-input {
-                width: 40px;
-                font-size: 20px;
-            }
-
-            #pin-input-container h3 {
-                font-size: 18px;
-            }
-        }
-
-        /* Popup สำหรับการดาวน์โหลดไฟล์ */
-        .popup-overlay {
-            display: none; /* ซ่อนโดยค่าเริ่มต้น */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.9);
-            z-index: 1001;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .popup-content {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-
-        .popup-content h3 {
-            margin-bottom: 15px;
-        }
-
-        .popup-content select, .popup-content button {
-            margin: 10px;
+        
+        /* PDF Canvas */
+        #pdf-canvas {
+            position: relative;
+            z-index: 2;
         }
     </style>
 </head>
-<body>
 
-    <!-- ส่วนสำหรับแสดงข้อความแจ้งเตือน -->
-    <div id="alert-container" class="alert-stack"></div>
-
-    <!-- ข้อความแจ้งเตือนการโหลด -->
-    <div id="loading-animation">
-        <div class="ring"></div>
-        <div class="ring"></div>
-        <div class="ring"></div>
-    </div>
-
-    <!-- แสดงข้อมูลหน้าที่กำลังเปิดอยู่ -->
-    <div id="page-info">
-        หน้าที่: 
-        <input type="number" id="page-input" min="1" value="1" inputmode="numeric"> / 
-        <span id="page-count"></span>
-    </div>
-
-    <div id="pdf-viewer" class="container">
-        <canvas id="pdf-render"></canvas>
-        <div id="watermark">Doralaikon_TH</div>
-    </div>
-
-    <!-- ปุ่มควบคุมด้านล่าง -->
-    <div id="controls">
-        <button id="prev-page" class="btn"><i class="fas fa-arrow-left"></i></button>
-        <button id="next-page" class="btn"><i class="fas fa-arrow-right"></i></button>
-    </div>
-
-    <!-- ปุ่มดาวน์โหลด -->
-    <button id="download-pdf"><i class="fas fa-download"></i></button>
-
-    <!-- ส่วนกรอกเลข PIN ก่อนดาวน์โหลด -->
-    <div id="pin-input-container">
-        <h3>กรอกหมายเลข PIN เพื่อดาวน์โหลด PDF</h3>
-        <div class="pin-container">
-            <input type="tel" class="pin-input" maxlength="1" inputmode="numeric" id="pin1">
-            <input type="tel" class="pin-input" maxlength="1" inputmode="numeric" id="pin2">
-            <input type="tel" class="pin-input" maxlength="1" inputmode="numeric" id="pin3">
-            <input type="tel" class="pin-input" maxlength="1" inputmode="numeric" id="pin4">
-            <input type="tel" class="pin-input" maxlength="1" inputmode="numeric" id="pin5">
-            <input type="tel" class="pin-input" maxlength="1" inputmode="numeric" id="pin6">
-        </div>
-        <button id="submit-pin">ตกลง</button>
-        <button id="cancel-pin">ยกเลิก</button>
-    </div>
-
-    <!-- Popup สำหรับการดาวน์โหลดไฟล์ -->
-    <div id="download-popup" class="popup-overlay">
-        <div class="popup-content">
-            <h3>ดาวน์โหลดไฟล์</h3>
-            <p>เลือกประเภทไฟล์ที่ต้องการดาวน์โหลด:</p>
-            
-            <select id="file-type" class="form-select">
-                <option value="pdf">PDF</option>
-                <option value="png">PNG</option>
-                <option value="zip">ZIP</option> <!-- เพิ่มตัวเลือก ZIP -->
-            </select>
-            
-            <button id="download-file" class="btn btn-success">ดาวน์โหลด</button>
-            <button id="close-popup" class="btn btn-danger">ปิด</button>
+<body class="bg-gray-900 text-white font-sans min-h-screen overflow-hidden">
+    
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="text-center">
+            <div class="relative w-32 h-32 mx-auto mb-6">
+                <div class="absolute inset-0 border-4 border-gray-700 rounded-full"></div>
+                <div class="absolute inset-2 border-4 border-transparent border-t-primary rounded-full animate-spin"></div>
+                <div class="absolute inset-4 border-4 border-transparent border-t-secondary rounded-full animate-spin-reverse"></div>
+                <div class="absolute inset-6 border-4 border-transparent border-t-success rounded-full animate-spin-slow"></div>
+            </div>
+            <h2 class="text-xl font-semibold text-gray-300 mb-2">กำลังโหลดเอกสาร</h2>
+            <p class="text-gray-500">กรุณารอสักครู่...</p>
         </div>
     </div>
 
-    <!-- PDF.js จาก CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <!-- Main PDF Viewer -->
+    <div id="pdf-viewer" class="hidden w-full h-screen flex flex-col bg-black relative">
+        
+        <!-- Header Controls -->
+        <header id="header-controls" class="absolute top-0 left-0 right-0 z-30 bg-gradient-to-b from-black/80 to-transparent p-4 transition-all duration-300">
+            <div class="flex items-center justify-between">
+                <!-- Page Info -->
+                <div class="flex items-center space-x-4">
+                    <div class="bg-black/60 backdrop-blur-md rounded-full px-4 py-2 flex items-center space-x-2">
+                        <i class="fas fa-file-pdf text-red-400"></i>
+                        <span class="text-sm">หน้า</span>
+                        <input 
+                            type="number" 
+                            id="page-input" 
+                            class="w-16 bg-transparent text-center text-white border-none outline-none"
+                            min="1"
+                            value="1"
+                        >
+                        <span class="text-sm">/ <span id="total-pages">0</span></span>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex items-center space-x-2">
+                    <button id="fullscreen-btn" class="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white p-3 rounded-full transition-all">
+                        <i class="fas fa-expand text-lg"></i>
+                    </button>
+                    <button id="download-btn" class="bg-primary hover:bg-blue-600 text-white p-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fas fa-download text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- PDF Canvas Container -->
+        <div class="flex-1 flex items-center justify-center relative overflow-hidden">
+            <canvas id="pdf-canvas" class="max-w-full max-h-full shadow-2xl"></canvas>
+            <div class="watermark">Doralaikon_TH</div>
+        </div>
+
+        <!-- Bottom Controls -->
+        <footer id="bottom-controls" class="absolute bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-black/80 to-transparent p-4 transition-all duration-300">
+            <div class="flex items-center justify-center space-x-4">
+                <button id="prev-btn" class="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white px-6 py-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class="fas fa-chevron-left mr-2"></i>ก่อนหน้า
+                </button>
+                
+                <div class="bg-black/60 backdrop-blur-md rounded-full px-4 py-2 text-sm">
+                    <span id="current-page">1</span> / <span id="page-count">0</span>
+                </div>
+                
+                <button id="next-btn" class="bg-black/60 backdrop-blur-md hover:bg-black/80 text-white px-6 py-3 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    ถัดไป<i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- PIN Input Modal -->
+    <div id="pin-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-bounce-in">
+            <div class="p-6 border-b border-gray-700">
+                <h3 class="text-xl font-semibold text-center flex items-center justify-center">
+                    <i class="fas fa-lock text-yellow-400 mr-2"></i>
+                    ป้อนรหัส PIN
+                </h3>
+                <p class="text-gray-400 text-center mt-2">กรุณาป้อนรหัส 6 หลักเพื่อดาวน์โหลด</p>
+            </div>
+            
+            <div class="p-6">
+                <div class="flex justify-center space-x-3 mb-6">
+                    <input type="tel" class="pin-digit w-12 h-12 bg-gray-700 border border-gray-600 rounded-lg text-center text-lg font-bold focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all" maxlength="1">
+                    <input type="tel" class="pin-digit w-12 h-12 bg-gray-700 border border-gray-600 rounded-lg text-center text-lg font-bold focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all" maxlength="1">
+                    <input type="tel" class="pin-digit w-12 h-12 bg-gray-700 border border-gray-600 rounded-lg text-center text-lg font-bold focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all" maxlength="1">
+                    <input type="tel" class="pin-digit w-12 h-12 bg-gray-700 border border-gray-600 rounded-lg text-center text-lg font-bold focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all" maxlength="1">
+                    <input type="tel" class="pin-digit w-12 h-12 bg-gray-700 border border-gray-600 rounded-lg text-center text-lg font-bold focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all" maxlength="1">
+                    <input type="tel" class="pin-digit w-12 h-12 bg-gray-700 border border-gray-600 rounded-lg text-center text-lg font-bold focus:border-primary focus:ring-2 focus:ring-primary/50 outline-none transition-all" maxlength="1">
+                </div>
+                
+                <div id="pin-error" class="hidden text-red-400 text-sm text-center mb-4 flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <span id="pin-error-text">รหัส PIN ไม่ถูกต้อง</span>
+                </div>
+                
+                <div id="pin-lockout" class="hidden text-yellow-400 text-sm text-center mb-4 flex items-center justify-center">
+                    <i class="fas fa-clock mr-2"></i>
+                    <span>ถูกล็อกชั่วคราว: <span id="lockout-timer">30</span> วินาที</span>
+                </div>
+                
+                <div class="flex space-x-3">
+                    <button id="cancel-pin" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-all">
+                        ยกเลิก
+                    </button>
+                    <button id="submit-pin" class="flex-1 bg-primary hover:bg-blue-600 text-white py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                        ยืนยัน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Options Modal -->
+    <div id="download-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md animate-bounce-in">
+            <div class="p-6 border-b border-gray-700">
+                <h3 class="text-xl font-semibold text-center flex items-center justify-center">
+                    <i class="fas fa-download text-success mr-2"></i>
+                    เลือกรูปแบบดาวน์โหลด
+                </h3>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <button id="download-pdf" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-lg transition-all flex items-center justify-center">
+                    <i class="fas fa-file-pdf mr-3 text-xl"></i>
+                    <div class="text-left">
+                        <div class="font-medium">ดาวน์โหลด PDF</div>
+                        <div class="text-sm opacity-75">ไฟล์ต้นฉบับ</div>
+                    </div>
+                </button>
+                
+                <button id="download-images" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg transition-all flex items-center justify-center">
+                    <i class="fas fa-images mr-3 text-xl"></i>
+                    <div class="text-left">
+                        <div class="font-medium">ดาวน์โหลดเป็นรูปภาพ</div>
+                        <div class="text-sm opacity-75">แยกเป็นไฟล์ PNG แต่ละหน้า</div>
+                    </div>
+                </button>
+                
+                <button id="download-zip" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg transition-all flex items-center justify-center">
+                    <i class="fas fa-file-archive mr-3 text-xl"></i>
+                    <div class="text-left">
+                        <div class="font-medium">ดาวน์โหลด ZIP</div>
+                        <div class="text-sm opacity-75">PDF + รูปภาพทุกหน้า</div>
+                    </div>
+                </button>
+                
+                <button id="close-download" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg transition-all">
+                    ปิด
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 space-y-2 z-40">
+        <!-- Toast messages will appear here -->
+    </div>
+
+    <!-- Progress Bar for Downloads -->
+    <div id="download-progress" class="hidden fixed bottom-4 left-4 right-4 bg-gray-800 rounded-lg p-4 z-40">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-medium">กำลังดาวน์โหลด...</span>
+            <span id="progress-percent" class="text-sm text-gray-400">0%</span>
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-2">
+            <div id="progress-bar" class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
     <script>
-        const googleDriveLink = 'https://drive.google.com/file/d/15j1Ql-8zgw4WpIV7z_-rrQPuIrsJfUI3/view?usp=drivesdk';
-        const API_KEY = 'AIzaSyA2CX1AUhbrxEn-VadC2IgYBdHG_Fat2Ig';
-        const correctPin = '123456'; 
-        let pinAttemptCount = 0;
-        let fileName = 'file';  // ชื่อไฟล์พื้นฐาน
+        // Configuration
+        const CONFIG = {
+            GOOGLE_DRIVE_LINK: 'https://drive.google.com/file/d/15j1Ql-8zgw4WpIV7z_-rrQPuIrsJfUI3/view?usp=drivesdk',
+            API_KEY: 'AIzaSyA2CX1AUhbrxEn-VadC2IgYBdHG_Fat2Ig',
+            CORRECT_PIN: '123456',
+            MAX_PIN_ATTEMPTS: 5,
+            LOCKOUT_DURATION: 30, // seconds
+            PDF_SCALE: 2.0,
+            AUTO_HIDE_CONTROLS: 4000, // milliseconds
+        };
 
-        let pdfDoc = null,
-            pageNum = 1,
-            pageRendering = false,
-            pageNumPending = null,
-            canvas = document.getElementById('pdf-render'),
-            ctx = canvas.getContext('2d');
+        // Global state
+        let state = {
+            pdfDoc: null,
+            currentPage: 1,
+            totalPages: 0,
+            isRendering: false,
+            pendingPage: null,
+            fileName: 'document',
+            pdfUrl: null,
+            pinAttempts: 0,
+            isLocked: false,
+            controlsVisible: true,
+            hideControlsTimer: null,
+        };
 
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
+        // DOM elements
+        const elements = {
+            loadingScreen: document.getElementById('loading-screen'),
+            pdfViewer: document.getElementById('pdf-viewer'),
+            canvas: document.getElementById('pdf-canvas'),
+            pageInput: document.getElementById('page-input'),
+            totalPages: document.getElementById('total-pages'),
+            currentPage: document.getElementById('current-page'),
+            pageCount: document.getElementById('page-count'),
+            prevBtn: document.getElementById('prev-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            downloadBtn: document.getElementById('download-btn'),
+            fullscreenBtn: document.getElementById('fullscreen-btn'),
+            headerControls: document.getElementById('header-controls'),
+            bottomControls: document.getElementById('bottom-controls'),
+            pinModal: document.getElementById('pin-modal'),
+            downloadModal: document.getElementById('download-modal'),
+            pinDigits: document.querySelectorAll('.pin-digit'),
+            pinError: document.getElementById('pin-error'),
+            pinErrorText: document.getElementById('pin-error-text'),
+            pinLockout: document.getElementById('pin-lockout'),
+            lockoutTimer: document.getElementById('lockout-timer'),
+            submitPin: document.getElementById('submit-pin'),
+            cancelPin: document.getElementById('cancel-pin'),
+            toastContainer: document.getElementById('toast-container'),
+            downloadProgress: document.getElementById('download-progress'),
+            progressBar: document.getElementById('progress-bar'),
+            progressPercent: document.getElementById('progress-percent'),
+        };
 
-        const loadingMessage = document.getElementById('loading-animation');
-        const pageInput = document.getElementById('page-input');
-        const pageInfo = document.getElementById('page-info');
-        const prevPageButton = document.getElementById('prev-page');
-        const nextPageButton = document.getElementById('next-page');
-        const downloadPdfButton = document.getElementById('download-pdf');
-        const controls = document.getElementById('controls');
-        const pinInputContainer = document.getElementById('pin-input-container');
-        const pinInputs = document.querySelectorAll('.pin-input');
-        const submitPinButton = document.getElementById('submit-pin');
-        const cancelPinButton = document.getElementById('cancel-pin');
-        const alertContainer = document.getElementById('alert-container');
+        // Initialize PDF.js
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        let hideControlsTimeout;
-        let pdfUrl = null;
-        let pinLockTimeout = null;
+        // Initialize application
+        async function initApp() {
+            try {
+                showToast('กำลังโหลดเอกสาร...', 'info');
+                
+                const fileId = extractFileIdFromDriveLink(CONFIG.GOOGLE_DRIVE_LINK);
+                if (!fileId) {
+                    throw new Error('Invalid Google Drive link');
+                }
 
-        function extractFileID(inputLink) {
-            const fileIdMatch = inputLink.match(/\/d\/([a-zA-Z0-9_-]{25,})/);
-            if (fileIdMatch && fileIdMatch[1]) {
-                return fileIdMatch[1];
-            } else {
-                alert("ลิงก์ไม่ถูกต้อง กรุณาลองอีกครั้ง");
-                return null;
+                await loadPdfFromDrive(fileId);
+                setupEventListeners();
+                setupControlsAutoHide();
+                
+                showToast('โหลดเอกสารสำเร็จ', 'success');
+            } catch (error) {
+                console.error('Failed to initialize app:', error);
+                showToast('เกิดข้อผิดพลาดในการโหลดเอกสาร', 'error');
             }
         }
 
-        function getPdfFromDrive(fileId) {
-            const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${API_KEY}`;
-            return fetch(`https://www.googleapis.com/drive/v3/files/${fileId}?fields=name&key=${API_KEY}`)
-                .then(response => response.json())
-                .then(data => {
-                    fileName = data.name || 'file';  // อัปเดตชื่อไฟล์จาก Google Drive
-                    return fetch(url);
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`ไม่สามารถโหลดไฟล์ PDF ได้ (สถานะ: ${response.status})`);
-                    }
-                    return response.blob();
-                })
-                .then(blob => {
-                    pdfUrl = URL.createObjectURL(blob);
-                    return pdfUrl;
-                })
-                .catch(error => {
-                    alert(`เกิดข้อผิดพลาดในการโหลดไฟล์ PDF: ${error.message}`);
-                });
+        // Extract file ID from Google Drive link
+        function extractFileIdFromDriveLink(link) {
+            const regex = /\/d\/([a-zA-Z0-9_-]{25,})/;
+            const match = link.match(regex);
+            return match ? match[1] : null;
         }
 
-        function renderPage(num) {
-            pageRendering = true;
+        // Load PDF from Google Drive
+        async function loadPdfFromDrive(fileId) {
+            try {
+                // Get file metadata
+                const metadataUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?fields=name&key=${CONFIG.API_KEY}`;
+                const metadataResponse = await fetch(metadataUrl);
+                const metadata = await metadataResponse.json();
+                
+                if (metadata.name) {
+                    state.fileName = metadata.name.replace(/\.[^/.]+$/, ""); // Remove extension
+                }
 
-            pdfDoc.getPage(num).then(function(page) {
-                const scale = 2;
-                const viewport = page.getViewport({ scale: scale * window.devicePixelRatio });
+                // Get file content
+                const contentUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${CONFIG.API_KEY}`;
+                const contentResponse = await fetch(contentUrl);
+                
+                if (!contentResponse.ok) {
+                    throw new Error(`HTTP ${contentResponse.status}: ${contentResponse.statusText}`);
+                }
 
+                const blob = await contentResponse.blob();
+                state.pdfUrl = URL.createObjectURL(blob);
+
+                // Load PDF document
+                const loadingTask = pdfjsLib.getDocument({
+                    url: state.pdfUrl,
+                    rangeChunkSize: 65536,
+                    disableAutoFetch: false,
+                    disableStream: false
+                });
+
+                state.pdfDoc = await loadingTask.promise;
+                state.totalPages = state.pdfDoc.numPages;
+                
+                // Update UI
+                elements.totalPages.textContent = state.totalPages;
+                elements.pageCount.textContent = state.totalPages;
+                elements.pageInput.max = state.totalPages;
+
+                // Render first page
+                await renderPage(1);
+                
+                // Show PDF viewer
+                elements.loadingScreen.classList.add('hidden');
+                elements.pdfViewer.classList.remove('hidden');
+                
+            } catch (error) {
+                throw new Error(`Failed to load PDF: ${error.message}`);
+            }
+        }
+
+        // Render PDF page
+        async function renderPage(pageNum) {
+            if (state.isRendering) {
+                state.pendingPage = pageNum;
+                return;
+            }
+
+            state.isRendering = true;
+            
+            try {
+                const page = await state.pdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({ scale: CONFIG.PDF_SCALE });
+                
+                // Set canvas dimensions
+                const canvas = elements.canvas;
+                const ctx = canvas.getContext('2d');
+                
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
-
-                var renderContext = {
+                
+                // Render page
+                const renderContext = {
                     canvasContext: ctx,
                     viewport: viewport
                 };
-
-                var renderTask = page.render(renderContext);
-
-                renderTask.promise.then(function() {
-                    pageRendering = false;
-
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-
-                    loadingMessage.style.display = 'none'; 
-                    document.getElementById('pdf-viewer').style.visibility = 'visible';
-                    pageInfo.style.visibility = 'visible';
-                    controls.style.visibility = 'visible';
-                    downloadPdfButton.style.visibility = 'visible';
-                    pageInput.value = num;
-
-                    if (pdfDoc.numPages === 1) {
-                        prevPageButton.style.display = 'none';
-                        nextPageButton.style.display = 'none';
-                        pageInput.disabled = true;
-                    } else {
-                        prevPageButton.style.display = num === 1 ? 'none' : 'block';
-                        nextPageButton.style.display = num === pdfDoc.numPages ? 'none' : 'block';
-                    }
-                });
-
-                document.getElementById('page-count').textContent = pdfDoc.numPages;
-            });
-        }
-
-        function queueRenderPage(num) {
-            if (num < 1) {
-                num = 1;
-            }
-            if (num > pdfDoc.numPages) {
-                num = pdfDoc.numPages;
-            }
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
+                
+                await page.render(renderContext).promise;
+                
+                // Update state and UI
+                state.currentPage = pageNum;
+                elements.currentPage.textContent = pageNum;
+                elements.pageInput.value = pageNum;
+                
+                // Update button states
+                elements.prevBtn.disabled = pageNum === 1;
+                elements.nextBtn.disabled = pageNum === state.totalPages;
+                
+                // Handle single page documents
+                if (state.totalPages === 1) {
+                    elements.prevBtn.style.display = 'none';
+                    elements.nextBtn.style.display = 'none';
+                }
+                
+            } catch (error) {
+                console.error('Error rendering page:', error);
+                showToast('เกิดข้อผิดพลาดในการแสดงหน้า', 'error');
+            } finally {
+                state.isRendering = false;
+                
+                // Handle pending page
+                if (state.pendingPage !== null) {
+                    const pending = state.pendingPage;
+                    state.pendingPage = null;
+                    await renderPage(pending);
+                }
             }
         }
 
-        function onPrevPage() {
-            if (pageNum <= 1) {
-                return;
-            }
-            pageNum--;
-            queueRenderPage(pageNum);
-        }
-
-        function onNextPage() {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
-            pageNum++;
-            queueRenderPage(pageNum);
-        }
-
-        pageInput.addEventListener('change', function() {
-            pageNum = Number(pageInput.value);
-            queueRenderPage(pageNum);
-        });
-
-        const fileId = extractFileID(googleDriveLink);
-        if (fileId) {
-            getPdfFromDrive(fileId).then(pdfUrl => {
-                var pdfjsLib = window['pdfjs-dist/build/pdf'];
-                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.worker.min.js';
-
-                pdfjsLib.getDocument({ url: pdfUrl, rangeChunkSize: 65536 }).promise.then(function(pdfDoc_) {
-                    pdfDoc = pdfDoc_;
-                    renderPage(pageNum);
-                }).catch(error => {
-                    alert("เกิดข้อผิดพลาดในการโหลด PDF");
-                });
-            });
-        }
-
-        prevPageButton.addEventListener('click', onPrevPage);
-        nextPageButton.addEventListener('click', onNextPage);
-
-        function hideControls() {
-            if (
-                document.activeElement !== pageInput &&
-                document.activeElement !== document.querySelector('.pin-input') &&
-                pinInputContainer.style.display === 'none'
-            ) {
-                controls.style.visibility = 'hidden';
-                pageInfo.style.visibility = 'hidden';
-                downloadPdfButton.style.visibility = 'hidden';
-            }
-        }
-
-        function resetHideControlsTimeout() {
-            if (
-                document.activeElement === pageInput || 
-                document.activeElement === document.querySelector('.pin-input') ||
-                pinInputContainer.style.display === 'block'
-            ) {
-                return;
-            }
-
-            controls.style.visibility = 'visible';
-            pageInfo.style.visibility = 'visible';
-            downloadPdfButton.style.visibility = 'visible';
-            clearTimeout(hideControlsTimeout);
-            hideControlsTimeout = setTimeout(hideControls, 3000);
-        }
-
-        document.addEventListener('mousemove', resetHideControlsTimeout);
-        document.addEventListener('touchstart', resetHideControlsTimeout);
-
-        downloadPdfButton.addEventListener('click', () => {
-            if (!downloadPdfButton.classList.contains('disabled')) {
-                pinInputContainer.style.display = 'block';
-            }
-        });
-
-        cancelPinButton.addEventListener('click', () => {
-            pinInputContainer.style.display = 'none';
-            resetPinInputs();
-        });
-
-        function resetPinInputs() {
-            pinInputs.forEach(input => {
-                input.value = '';
-            });
-        }
-
-        function lockDownloadButton() {
-            let countdown = 30;
-            let interval = setInterval(() => {
-                if (countdown <= 0) {
-                    clearInterval(interval);
-                    downloadPdfButton.classList.remove('disabled');
-                    downloadPdfButton.innerHTML = '<i class="fas fa-download"></i>';
-                    pinAttemptCount = 0; // รีเซ็ตจำนวนครั้งที่กรอกผิด
+        // Setup event listeners
+        function setupEventListeners() {
+            // Navigation
+            elements.prevBtn.addEventListener('click', () => navigateToPage(state.currentPage - 1));
+            elements.nextBtn.addEventListener('click', () => navigateToPage(state.currentPage + 1));
+            
+            elements.pageInput.addEventListener('change', (e) => {
+                const pageNum = parseInt(e.target.value);
+                if (pageNum >= 1 && pageNum <= state.totalPages) {
+                    navigateToPage(pageNum);
                 } else {
-                    downloadPdfButton.innerHTML = countdown;
-                    countdown--;
+                    e.target.value = state.currentPage;
+                }
+            });
+
+            // Download
+            elements.downloadBtn.addEventListener('click', showPinModal);
+            
+            // PIN modal
+            elements.submitPin.addEventListener('click', handlePinSubmit);
+            elements.cancelPin.addEventListener('click', hidePinModal);
+            
+            // PIN input navigation
+            elements.pinDigits.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < elements.pinDigits.length - 1) {
+                        elements.pinDigits[index + 1].focus();
+                    }
+                });
+                
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                        elements.pinDigits[index - 1].focus();
+                    }
+                });
+            });
+
+            // Download options
+            document.getElementById('download-pdf').addEventListener('click', () => downloadFile('pdf'));
+            document.getElementById('download-images').addEventListener('click', () => downloadFile('images'));
+            document.getElementById('download-zip').addEventListener('click', () => downloadFile('zip'));
+            document.getElementById('close-download').addEventListener('click', hideDownloadModal);
+
+            // Fullscreen
+            elements.fullscreenBtn.addEventListener('click', toggleFullscreen);
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboard);
+            
+            // Mouse/touch events for control visibility
+            document.addEventListener('mousemove', showControls);
+            document.addEventListener('touchstart', showControls);
+        }
+
+        // Navigate to specific page
+        async function navigateToPage(pageNum) {
+            if (pageNum >= 1 && pageNum <= state.totalPages && pageNum !== state.currentPage) {
+                await renderPage(pageNum);
+            }
+        }
+
+        // Show PIN modal
+        function showPinModal() {
+            if (state.isLocked) {
+                showToast('ถูกล็อกชั่วคราว กรุณารอ', 'warning');
+                return;
+            }
+            
+            elements.pinModal.classList.remove('hidden');
+            elements.pinDigits[0].focus();
+            resetPinInputs();
+        }
+
+        // Hide PIN modal
+        function hidePinModal() {
+            elements.pinModal.classList.add('hidden');
+            resetPinInputs();
+        }
+
+        // Reset PIN inputs
+        function resetPinInputs() {
+            elements.pinDigits.forEach(input => input.value = '');
+            elements.pinError.classList.add('hidden');
+        }
+
+        // Handle PIN submission
+        function handlePinSubmit() {
+            const enteredPin = Array.from(elements.pinDigits).map(input => input.value).join('');
+            
+            if (enteredPin.length !== 6) {
+                showPinError('กรุณากรอก PIN ให้ครบ 6 หลัก');
+                return;
+            }
+
+            if (enteredPin === CONFIG.CORRECT_PIN) {
+                hidePinModal();
+                showDownloadModal();
+                state.pinAttempts = 0;
+            } else {
+                state.pinAttempts++;
+                
+                if (state.pinAttempts >= CONFIG.MAX_PIN_ATTEMPTS) {
+                    lockPinInput();
+                } else {
+                    const remaining = CONFIG.MAX_PIN_ATTEMPTS - state.pinAttempts;
+                    showPinError(`รหัส PIN ไม่ถูกต้อง (เหลือ ${remaining} ครั้ง)`);
+                }
+                
+                resetPinInputs();
+            }
+        }
+
+        // Show PIN error
+        function showPinError(message) {
+            elements.pinErrorText.textContent = message;
+            elements.pinError.classList.remove('hidden');
+        }
+
+        // Lock PIN input
+        function lockPinInput() {
+            state.isLocked = true;
+            elements.pinError.classList.add('hidden');
+            elements.pinLockout.classList.remove('hidden');
+            elements.submitPin.disabled = true;
+            
+            let countdown = CONFIG.LOCKOUT_DURATION;
+            elements.lockoutTimer.textContent = countdown;
+            
+            const timer = setInterval(() => {
+                countdown--;
+                elements.lockoutTimer.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(timer);
+                    state.isLocked = false;
+                    state.pinAttempts = 0;
+                    elements.pinLockout.classList.add('hidden');
+                    elements.submitPin.disabled = false;
+                    hidePinModal();
                 }
             }, 1000);
-
-            downloadPdfButton.classList.add('disabled');
         }
 
-        function checkAllPinsFilled() {
-            let allFilled = true;
-            pinInputs.forEach(input => {
-                if (input.value === '') {
-                    allFilled = false;
-                }
-            });
-            return allFilled;
+        // Show download modal
+        function showDownloadModal() {
+            elements.downloadModal.classList.remove('hidden');
         }
 
-        submitPinButton.addEventListener('click', () => {
-            if (!checkAllPinsFilled()) {
-                showAlert('กรุณากรอก PIN ให้ครบทุกช่อง');
-                return;
-            }
+        // Hide download modal
+        function hideDownloadModal() {
+            elements.downloadModal.classList.add('hidden');
+        }
 
-            let enteredPin = '';
-            pinInputs.forEach(input => {
-                enteredPin += input.value;
-            });
-
-            if (enteredPin === correctPin) {
-                // ซ่อนการกรอก PIN
-                pinInputContainer.style.display = 'none';
-                resetPinInputs();
-
-                // แสดง popup ดาวน์โหลดไฟล์
-                const downloadPopup = document.getElementById('download-popup');
-                downloadPopup.style.display = 'flex';
-
-            } else {
-                showAlert('รหัสไม่ถูกต้อง กรุณาลองใหม่');
-                pinAttemptCount++;
-                if (pinAttemptCount >= 5) {
-                    lockDownloadButton();
-                    pinInputContainer.style.display = 'none';
-                } else if (pinAttemptCount === 3) {
-                    showAlert('กรุณาระวัง! เหลืออีก 2 ครั้งก่อนจะถูกล็อก');
-                } else if (pinAttemptCount === 4) {
-                    showAlert('กรุณาระวัง! เหลืออีก 1 ครั้งก่อนจะถูกล็อก');
+        // Download file in specified format
+        async function downloadFile(format) {
+            hideDownloadModal();
+            showProgress();
+            
+            try {
+                switch (format) {
+                    case 'pdf':
+                        await downloadPdf();
+                        break;
+                    case 'images':
+                        await downloadImages();
+                        break;
+                    case 'zip':
+                        await downloadZip();
+                        break;
                 }
+                
+                showToast('ดาวน์โหลดสำเร็จ', 'success');
+            } catch (error) {
+                console.error('Download failed:', error);
+                showToast('เกิดข้อผิดพลาดในการดาวน์โหลด', 'error');
+            } finally {
+                hideProgress();
             }
-        });
+        }
 
-        document.getElementById('download-file').addEventListener('click', () => {
-            const fileType = document.getElementById('file-type').value; // ประเภทไฟล์ที่เลือก (pdf หรือ png หรือ zip)
+        // Download PDF
+        async function downloadPdf() {
+            const link = document.createElement('a');
+            link.href = state.pdfUrl;
+            link.download = `${state.fileName}.pdf`;
+            link.click();
+        }
 
-            if (fileType === 'zip') {
-                const zip = new JSZip();
-                const folder = zip.folder(fileName); // ชื่อไฟล์จาก Google Drive
+        // Download as images
+        async function downloadImages() {
+            for (let i = 1; i <= state.totalPages; i++) {
+                updateProgress((i / state.totalPages) * 100);
+                
+                const page = await state.pdfDoc.getPage(i);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const viewport = page.getViewport({ scale: 2 });
+                
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = `${state.fileName}_page${i}.png`;
+                link.click();
+                
+                // Small delay to prevent browser blocking
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+        }
 
-                // เพิ่ม PDF ลงในไฟล์ ZIP
-                folder.file(`${fileName}.pdf`, fetch(pdfUrl).then(res => res.blob()));
-
-                // เพิ่ม PNG สำหรับแต่ละหน้า PDF ลงในไฟล์ ZIP
-                const promises = [];
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    promises.push(
-                        pdfDoc.getPage(i).then(function(page) {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            const scale = 2;
-                            const viewport = page.getViewport({ scale: scale });
-                            canvas.width = viewport.width;
-                            canvas.height = viewport.height;
-                            const renderContext = {
-                                canvasContext: ctx,
-                                viewport: viewport
-                            };
-                            return page.render(renderContext).promise.then(() => {
-                                return canvas.toDataURL('image/png');
-                            });
-                        }).then(dataUrl => {
-                            return fetch(dataUrl).then(res => res.blob()).then(blob => {
-                                folder.file(`${fileName}_page${i}.png`, blob);
-                            });
-                        })
-                    );
-                }
-
-                Promise.all(promises).then(() => {
-                    zip.generateAsync({ type: 'blob' }).then(content => {
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = URL.createObjectURL(content);
-                        downloadLink.download = `${fileName}.zip`;
-                        downloadLink.click();
-                    });
+        // Download as ZIP
+        async function downloadZip() {
+            const zip = new JSZip();
+            const folder = zip.folder(state.fileName);
+            
+            // Add PDF to ZIP
+            const pdfBlob = await fetch(state.pdfUrl).then(res => res.blob());
+            folder.file(`${state.fileName}.pdf`, pdfBlob);
+            
+            // Add images to ZIP
+            for (let i = 1; i <= state.totalPages; i++) {
+                updateProgress((i / state.totalPages) * 80); // 80% for page rendering
+                
+                const page = await state.pdfDoc.getPage(i);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const viewport = page.getViewport({ scale: 2 });
+                
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                
+                await page.render({ canvasContext: ctx, viewport }).promise;
+                
+                const imageBlob = await new Promise(resolve => {
+                    canvas.toBlob(resolve, 'image/png');
                 });
-
-            } else if (fileType === 'pdf') {
-                const downloadLink = document.createElement('a');
-                downloadLink.href = pdfUrl;
-                downloadLink.download = `${fileName}.pdf`;
-                downloadLink.click();
-            } else if (fileType === 'png') {
-                for (let i = 1; i <= pdfDoc.numPages; i++) {
-                    (function(pageNum) {
-                        pdfDoc.getPage(pageNum).then(function(page) {
-                            const canvas = document.createElement('canvas');
-                            const ctx = canvas.getContext('2d');
-                            const scale = 2;
-                            const viewport = page.getViewport({ scale: scale });
-                            canvas.width = viewport.width;
-                            canvas.height = viewport.height;
-                            const renderContext = {
-                                canvasContext: ctx,
-                                viewport: viewport
-                            };
-                            page.render(renderContext).promise.then(function() {
-                                const downloadLink = document.createElement('a');
-                                downloadLink.href = canvas.toDataURL('image/png');
-                                downloadLink.download = `${fileName}_page${pageNum}.png`;
-                                downloadLink.click();
-                            });
-                        });
-                    })(i);
-                }
+                
+                folder.file(`page${i}.png`, imageBlob);
             }
+            
+            updateProgress(90);
+            
+            // Generate ZIP
+            const content = await zip.generateAsync({ type: 'blob' });
+            
+            updateProgress(100);
+            
+            // Download ZIP
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(content);
+            link.download = `${state.fileName}.zip`;
+            link.click();
+        }
 
-            // ปิด popup หลังการดาวน์โหลด
-            document.getElementById('download-popup').style.display = 'none';
-        });
+        // Show progress
+        function showProgress() {
+            elements.downloadProgress.classList.remove('hidden');
+            updateProgress(0);
+        }
 
-        // ปิด popup ดาวน์โหลดไฟล์เมื่อกดปุ่มปิด
-        document.getElementById('close-popup').addEventListener('click', () => {
-            const downloadPopup = document.getElementById('download-popup');
-            downloadPopup.style.display = 'none';
-        });
+        // Update progress
+        function updateProgress(percent) {
+            elements.progressBar.style.width = `${percent}%`;
+            elements.progressPercent.textContent = `${Math.round(percent)}%`;
+        }
 
-        function showAlert(message) {
-            const alertMessage = document.createElement('div');
-            alertMessage.classList.add('alert-message');
-            alertMessage.textContent = message;
+        // Hide progress
+        function hideProgress() {
+            elements.downloadProgress.classList.add('hidden');
+        }
 
-            alertContainer.appendChild(alertMessage);
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+                elements.fullscreenBtn.innerHTML = '<i class="fas fa-compress text-lg"></i>';
+            } else {
+                document.exitFullscreen();
+                elements.fullscreenBtn.innerHTML = '<i class="fas fa-expand text-lg"></i>';
+            }
+        }
 
+        // Handle keyboard shortcuts
+        function handleKeyboard(e) {
+            switch (e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    navigateToPage(state.currentPage - 1);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    navigateToPage(state.currentPage + 1);
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    navigateToPage(1);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    navigateToPage(state.totalPages);
+                    break;
+                case 'f':
+                case 'F11':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+                case 'Escape':
+                    if (elements.pinModal.classList.contains('hidden') === false) {
+                        hidePinModal();
+                    } else if (elements.downloadModal.classList.contains('hidden') === false) {
+                        hideDownloadModal();
+                    }
+                    break;
+            }
+        }
+
+        // Setup controls auto-hide
+        function setupControlsAutoHide() {
+            resetControlsTimer();
+        }
+
+        // Show controls
+        function showControls() {
+            if (!state.controlsVisible) {
+                elements.headerControls.classList.remove('opacity-0', 'pointer-events-none');
+                elements.bottomControls.classList.remove('opacity-0', 'pointer-events-none');
+                state.controlsVisible = true;
+            }
+            resetControlsTimer();
+        }
+
+        // Hide controls
+        function hideControls() {
+            if (elements.pinModal.classList.contains('hidden') && 
+                elements.downloadModal.classList.contains('hidden')) {
+                elements.headerControls.classList.add('opacity-0', 'pointer-events-none');
+                elements.bottomControls.classList.add('opacity-0', 'pointer-events-none');
+                state.controlsVisible = false;
+            }
+        }
+
+        // Reset controls timer
+        function resetControlsTimer() {
+            clearTimeout(state.hideControlsTimer);
+            state.hideControlsTimer = setTimeout(hideControls, CONFIG.AUTO_HIDE_CONTROLS);
+        }
+
+        // Show toast notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const icons = {
+                success: 'fa-check-circle text-green-400',
+                error: 'fa-exclamation-circle text-red-400',
+                warning: 'fa-exclamation-triangle text-yellow-400',
+                info: 'fa-info-circle text-blue-400'
+            };
+            
+            const colors = {
+                success: 'bg-green-900 border-green-700',
+                error: 'bg-red-900 border-red-700',
+                warning: 'bg-yellow-900 border-yellow-700',
+                info: 'bg-blue-900 border-blue-700'
+            };
+            
+            toast.className = `${colors[type]} border rounded-lg p-4 shadow-lg animate-slide-down flex items-center space-x-3`;
+            toast.innerHTML = `
+                <i class="fas ${icons[type]}"></i>
+                <span class="text-white">${message}</span>
+            `;
+            
+            elements.toastContainer.appendChild(toast);
+            
             setTimeout(() => {
-                alertMessage.remove();
+                toast.remove();
             }, 4000);
         }
 
-        pinInputs.forEach((input, index) => {
-            input.addEventListener('input', () => {
-                if (input.value.length === 1 && index < pinInputs.length - 1) {
-                    pinInputs[index + 1].focus();
-                }
-            });
-
-            input.addEventListener('keydown', (e) => {
-                if (e.key === 'Backspace' && input.value === '' && index > 0) {
-                    pinInputs[index - 1].focus();
-                }
-            });
-        });
-
-        hideControlsTimeout = setTimeout(hideControls, 3000);
+        // Initialize app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
-
-    <!-- เพิ่ม Bootstrap 5 JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
