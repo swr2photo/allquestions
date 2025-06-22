@@ -1,834 +1,1198 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>กำลังปรับปรุงเว็บไซต์</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4361ee;
-            --secondary: #3a0ca3;
-            --accent: #f72585;
-            --background: #f8f9fa;
-            --text: #2b2d42;
-            --text-light: #6c757d;
-            --white: #ffffff;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Prompt', sans-serif;
-            background-color: var(--background);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-        }
-        
-        .maintenance-container {
-            max-width: 800px;
-            width: 100%;
-            background-color: var(--white);
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            overflow: hidden;
-            position: relative;
-            z-index: 1;
-            animation: fadeIn 1s ease-out forwards;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            padding: 30px;
-            text-align: center;
-            color: var(--white);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.1) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            animation: headerShine 6s linear infinite;
-        }
-        
-        @keyframes headerShine {
-            0% { transform: rotate(30deg) translateY(-100%); }
-            100% { transform: rotate(30deg) translateY(100%); }
-        }
-        
-        .header h1 {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 10px;
-            animation: slideDown 0.8s ease-out;
-            position: relative;
-            display: inline-block;
-        }
-        
-        .header h1::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 3px;
-            background: var(--white);
-            animation: expandLine 1.5s ease-out forwards;
-            animation-delay: 1s;
-        }
-        
-        @keyframes expandLine {
-            0% { width: 0; }
-            100% { width: 80%; }
-        }
-        
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .header p {
-            font-size: 1.1rem;
-            font-weight: 300;
-            opacity: 0.9;
-            animation: slideDown 1s ease-out;
-        }
-        
-        .content {
-            padding: 40px 30px;
-            text-align: center;
-        }
-        
-        .content h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--text);
-        }
-        
-        .content p {
-            font-size: 1.1rem;
-            color: var(--text-light);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-        
-        .maintenance-illustration {
-            width: 90%;
-            max-width: 280px;
-            margin: 0 auto 30px;
-            display: block;
-        }
-        
-        .timer {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin: 30px 0;
-        }
-        
-        .timer-item {
-            background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
-            border-radius: 12px;
-            padding: 15px 10px;
-            min-width: 70px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            animation: popIn 0.5s ease-out forwards;
-            opacity: 0;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .timer-item::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.3) 50%,
-                rgba(255, 255, 255, 0) 100%
-            );
-            transform: rotate(30deg);
-            animation: shine 3s infinite;
-        }
-        
-        @keyframes shine {
-            0% { transform: scale(0.5) rotate(30deg) translateY(-100%); }
-            100% { transform: scale(0.5) rotate(30deg) translateY(100%); }
-        }
-        
-        .timer-item:nth-child(1) { animation-delay: 0.3s; }
-        .timer-item:nth-child(2) { animation-delay: 0.5s; }
-        .timer-item:nth-child(3) { animation-delay: 0.7s; }
-        .timer-item:nth-child(4) { animation-delay: 0.9s; }
-        
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.8); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .timer-value {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .timer-item:hover .timer-value {
-            transform: scale(1.1);
-        }
-        
-        .timer-label {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-top: 5px;
-        }
-        
-        .back-button {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: var(--white);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-decoration: none;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-        }
-        
-        .back-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
-        }
-        
-        .contact-info {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px dashed #e9ecef;
-        }
-        
-        .contact-info h3 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--text);
-        }
-        
-        .contact-info p {
-            font-size: 1rem;
-            margin-bottom: 10px;
-        }
-        
-        .social-links {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background-color: #e9ecef;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            color: var(--text);
-            text-decoration: none;
-            font-size: 1.2rem;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .social-link:hover {
-            background-color: var(--primary);
-            color: var(--white);
-            transform: translateY(-3px) scale(1.1);
-        }
-        
-        .social-link::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
-        }
-        
-        .social-link:hover::before {
-            width: 100%;
-            height: 100%;
-            animation: socialPulse 1s infinite;
-        }
-        
-        @keyframes socialPulse {
-            0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
-        }
-        
-        /* เพิ่มการเคลื่อนไหวให้ปุ่ม */
-        .back-button {
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            color: var(--white);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 30px;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-block;
-            text-decoration: none;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
-            position: relative;
-            overflow: hidden;
-            transform-style: preserve-3d;
-            z-index: 1;
-        }
-        
-        .back-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to right, var(--secondary), var(--accent));
-            border-radius: 30px;
-            transition: all 0.5s ease;
-            opacity: 0;
-            z-index: -1;
-        }
-        
-        .back-button:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 25px rgba(67, 97, 238, 0.5);
-        }
-        
-        .back-button:hover::before {
-            opacity: 1;
-        }
-        
-        .back-button:active {
-            transform: translateY(2px);
-            transition: all 0.1s ease;
-        }
-        .shapes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-        
-        .shape {
-            position: absolute;
-            opacity: 0.3;
-            pointer-events: none;
-            filter: blur(2px);
-            transition: all 0.5s ease;
-        }
-        
-        .shape-1 {
-            top: 20%;
-            left: -5%;
-            width: 150px;
-            height: 150px;
-            background: var(--accent);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 10s linear infinite alternate, moveShape1 20s ease infinite alternate;
-        }
-        
-        .shape-2 {
-            bottom: -50px;
-            right: -50px;
-            width: 180px;
-            height: 180px;
-            background: var(--primary);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 8s linear infinite alternate-reverse, moveShape2 15s ease infinite alternate;
-        }
-        
-        .shape-3 {
-            top: 60%;
-            right: 10%;
-            width: 120px;
-            height: 120px;
-            background: var(--secondary);
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 12s linear infinite alternate, moveShape3 18s ease infinite alternate;
-        }
-        
-        .shape-4 {
-            top: 10%;
-            right: 15%;
-            width: 100px;
-            height: 100px;
-            background: var(--primary);
-            opacity: 0.2;
-            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            animation: morph 15s linear infinite alternate-reverse, moveShape4 25s ease infinite alternate;
-        }
-        
-        @keyframes morph {
-            0% {
-                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-            }
-            50% {
-                border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
-            }
-            100% {
-                border-radius: 30% 70% 70% 30% / 70% 30% 70% 30%;
-            }
-        }
-        
-        @keyframes moveShape1 {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(50px, 25px); }
-            100% { transform: translate(20px, 50px); }
-        }
-        
-        @keyframes moveShape2 {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-30px, -20px); }
-            100% { transform: translate(-60px, -40px); }
-        }
-        
-        @keyframes moveShape3 {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(-20px, 40px); }
-            100% { transform: translate(-40px, 10px); }
-        }
-        
-        @keyframes moveShape4 {
-            0% { transform: translate(0, 0); }
-            50% { transform: translate(30px, 30px); }
-            100% { transform: translate(60px, 0px); }
-        }
-        
-        .tools {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .tool {
-            padding: 5px 15px;
-            background-color: rgba(67, 97, 238, 0.1);
-            border-radius: 20px;
-            color: var(--primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-        
-        /* เพิ่มการเคลื่อนไหวสำหรับภาพประกอบ */
-        .maintenance-illustration {
-            width: 90%;
-            max-width: 280px;
-            margin: 0 auto 30px;
-            display: block;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        /* เพิ่มเอฟเฟกต์กระพริบให้กับแถบความคืบหน้า */
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, var(--primary), var(--accent));
-            border-radius: 20px;
-            transition: width 1s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, 
-                      transparent 0%, 
-                      rgba(255, 255, 255, 0.4) 50%, 
-                      transparent 100%);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        /* การเคลื่อนไหวแบบกระพริบของจุด */
-        .blinking-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            animation: blink 1.4s infinite;
-        }
-        
-        .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes blink {
-            0%, 100% { transform: scale(0.6); opacity: 0.4; }
-            50% { transform: scale(1); opacity: 1; }
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .content h2 {
-                font-size: 1.3rem;
-            }
-            
-            .content p {
-                font-size: 1rem;
-            }
-            
-            .timer {
-                gap: 10px;
-            }
-            
-            .timer-item {
-                min-width: 60px;
-                padding: 10px 5px;
-            }
-            
-            .timer-value {
-                font-size: 1.5rem;
-            }
-            
-            .shape-1, .shape-2 {
-                width: 100px;
-                height: 100px;
-            }
-            
-            .shape-3, .shape-4 {
-                width: 80px;
-                height: 80px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header {
-                padding: 20px;
-            }
-            
-            .content {
-                padding: 30px 20px;
-            }
-            
-            .header h1 {
-                font-size: 1.6rem;
-            }
-            
-            .timer {
-                flex-wrap: wrap;
-                justify-content: space-around;
-            }
-            
-            .timer-item {
-                min-width: 65px;
-                margin-bottom: 10px;
-            }
-            
-            .tool {
-                font-size: 0.8rem;
-            }
-            
-            .social-links {
-                gap: 10px;
-            }
-            
-            .social-link {
-                width: 35px;
-                height: 35px;
-                font-size: 1rem;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Allquiz เว็บไซต์เฉลยคำตอบรายวิชาต่างๆ">
+  <title>Allquiz - Quiz Management System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#6366f1',
+            secondary: '#8b5cf6',
+            accent: '#06b6d4',
+            dark: '#1f2937',
+          },
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+            'slide-in-right': 'slideInRight 0.5s ease-out',
+            'pulse-soft': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'bounce-soft': 'bounce 1s infinite',
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    @keyframes slideInRight {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .notification-center {
+      transform: translateX(100%);
+      transition: transform 0.3s ease-in-out;
+    }
+    
+    .notification-center.active {
+      transform: translateX(0);
+    }
+  </style>
 </head>
-<body>
-    <div class="shapes">
-        <div class="shape shape-1"></div>
-        <div class="shape shape-2"></div>
-        <div class="shape shape-3"></div>
-        <div class="shape shape-4"></div>
-    </div>
-    
-    <div class="maintenance-container">
-        <div class="header">
-            <h1>กำลังปรับปรุงเว็บไซต์</h1>
-            <p>เพื่อประสบการณ์การใช้งานที่ดียิ่งขึ้น</p>
+
+<body class="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100 min-h-screen font-sans">
+  
+  <!-- Navigation -->
+  <nav class="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 bg-gradient-to-r from-primary to-secondary rounded-lg flex items-center justify-center">
+            <i class="fas fa-graduation-cap text-white text-lg"></i>
+          </div>
+          <h1 class="text-xl font-bold text-gray-900">Allquiz</h1>
         </div>
         
-        <div class="content">
-            <svg class="maintenance-illustration" viewBox="0 0 500 320" xmlns="http://www.w3.org/2000/svg">
-                <path d="M314.8 184.9l-220.8-80.8c-7-4-2.8-14.1 5.4-13l216.3-5.5c5.2.1 9.1 4.9 8.3 10.1l-1.9 82.1c-.6 6.7-9.4 9.7-14.2 5.2" fill="#4361ee"/>
-                <circle cx="124.9" cy="106.8" r="53.4" fill="#f72585" opacity=".2"/>
-                <path d="M149.3 199.1l-68-24.5m23.8-7.1l-52.7-18.9m36.9-9.5l-44.2-15.9m4.5 80.3l-25.4-9.1m156.8-5.9l-17.1-6.2" stroke="#ececec" stroke-width="3" stroke-linecap="round"/>
-                <path d="M380.5 108.2l-48.3 26.4c-2.5 1.4-4.2 4.1-4.2 7v40.4c0 2.9 1.7 5.6 4.2 7l48.3 26.4c2.5 1.4 5.9 1.4 8.4 0l48.3-26.4c2.5-1.4 4.2-4.1 4.2-7v-40.4c0-2.9-1.7-5.6-4.2-7l-48.3-26.4c-2.5-1.4-5.9-1.4-8.4 0z" fill="#4361ee"/>
-                <path d="M432.2 167.9l-51.7 28.3-51.7-28.3 51.7-28.3 51.7 28.3z" fill="#3a0ca3"/>
-                <path d="M390.2 224.7V168l-51.7-28.3v56.7l51.7 28.3z" fill="#f72585" opacity=".2"/>
-                <path d="M380.5 246.9c-2.1 0-4.3-.5-6.2-1.6l-48.3-26.4c-3.8-2.1-6.3-6.3-6.3-10.7v-40.4c0-4.4 2.5-8.6 6.3-10.7l48.3-26.4c3.8-2.1 8.6-2.1 12.4 0l48.3 26.4c3.8 2.1 6.3 6.3 6.3 10.7v40.4c0 4.4-2.5 8.6-6.3 10.7l-48.3 26.4c-1.9 1-4 1.6-6.2 1.6z" stroke="#f5f5f5" stroke-width="3" stroke-linecap="round"/>
-                <path d="M186.1 238.4c19.1 0 34.6-15.5 34.6-34.6s-15.5-34.6-34.6-34.6-34.6 15.5-34.6 34.6 15.5 34.6 34.6 34.6z" fill="#f5f5f5"/>
-                <path d="M174.9 188c0-3.9 2.7-6.2 7.4-6.2s7.4 2.3 7.4 6.2v.9h-4.5v-1.2c0-1.2-.8-1.9-2.7-1.9s-2.7.7-2.7 1.9c0 4 10.1 4.2 10.1 11.5 0 3.9-2.7 6.3-7.5 6.3s-7.5-2.4-7.5-6.3v-1.8h4.5v2.1c0 1.2.9 2 2.8 2s2.8-.7 2.8-2c0-3.9-10.1-4.1-10.1-11.4zm25.2-6h4.5v22.7h6.4v4h-10.9v-26.7z" fill="#4361ee"/>
-                <path d="M341.8 149.4c0-3.1 2.1-4.9 5.9-4.9s5.9 1.8 5.9 4.9v.7h-3.6v-1c0-.9-.7-1.5-2.1-1.5s-2.1.6-2.1 1.5c0 3.1 8 3.3 8 9 0 3.1-2.1 5-5.9 5s-5.9-1.9-5.9-5v-1.4h3.6v1.7c0 .9.7 1.5 2.2 1.5s2.2-.6 2.2-1.5c0-3.1-8-3.2-8-9zm20-4.8h3.6v18h5v3.1h-8.6v-21.1z" fill="#f5f5f5"/>
-                <path d="M195.5 59.3h-57.2c-3.4 0-6.1 2.7-6.1 6.1v30.4c0 3.4 2.7 6.1 6.1 6.1h57.2c3.4 0 6.1-2.7 6.1-6.1V65.4c0-3.4-2.7-6.1-6.1-6.1z" fill="#f5f5f5"/>
-                <path d="M262.9 278.4H129.3c-27 0-49-21.9-49-49V154c0-27 21.9-49 49-49h133.6c27 0 49 21.9 49 49v75.4c0 27-21.9 49-49 49z" fill="none" stroke="#e0e0e0" stroke-width="3" stroke-linecap="round" stroke-dasharray="12.53 12.53"/>
-            </svg>
-            
-            <h2>เรากำลังทำการปรับปรุงเว็บไซต์</h2>
-            <p>ขออภัยในความไม่สะดวก เรากำลังทำการปรับปรุงระบบเพื่อยกระดับประสบการณ์การใช้งานของคุณให้ดียิ่งขึ้น กรุณากลับมาใหม่อีกครั้งในเร็วๆ นี้</p>
-            
-            <div class="tools">
-                <div class="tool">เพิ่มฟีเจอร์ใหม่</div>
-                <div class="tool">ปรับปรุงประสิทธิภาพ</div>
-                <div class="tool">แก้ไขปัญหาบั๊ก</div>
-                <div class="tool">ยกระดับความปลอดภัย</div>
-            </div>
-            
-            <div class="progress-container">
-                <div class="progress-bar"></div>
-            </div>
-            
-            <p>เราคาดว่าจะแล้วเสร็จภายใน:</p>
-            
-            <div class="timer">
-                <div class="timer-item">
-                    <div class="timer-value" id="days">2</div>
-                    <div class="timer-label">วัน</div>
-                </div>
-                <div class="timer-item">
-                    <div class="timer-value" id="hours">12</div>
-                    <div class="timer-label">ชั่วโมง</div>
-                </div>
-                <div class="timer-item">
-                    <div class="timer-value" id="minutes">35</div>
-                    <div class="timer-label">นาที</div>
-                </div>
-                <div class="timer-item">
-                    <div class="timer-value" id="seconds">15</div>
-                    <div class="timer-label">วินาที</div>
-                </div>
-            </div>
-            
-            <div class="blinking-dots">
-                <div class="dot"></div>
-                <div class="dot"></div>
-                <div class="dot"></div>
-            </div>
-            
-            <a href="mailto:contact@example.com" class="back-button">ติดต่อเรา</a>
-            
-            <div class="contact-info">
-                <h3>ติดตามความคืบหน้า</h3>
-                <p>คุณสามารถติดตามความคืบหน้าการปรับปรุงเว็บไซต์ได้ทางช่องทางโซเชียลมีเดียของเรา</p>
-                
-                <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-line"></i></a>
-                </div>
-            </div>
+        <div class="flex items-center space-x-4">
+          <button class="text-gray-600 hover:text-primary transition-colors p-2 rounded-lg hover:bg-gray-100">
+            <i class="fas fa-home"></i>
+            <span class="ml-1 hidden sm:inline">หน้าหลัก</span>
+          </button>
+          
+          <button class="text-gray-600 hover:text-primary transition-colors p-2 rounded-lg hover:bg-gray-100">
+            <i class="fas fa-book"></i>
+            <span class="ml-1 hidden sm:inline">วิชาทั้งหมด</span>
+          </button>
+          
+          <button onclick="toggleNotificationCenter()" class="relative text-gray-600 hover:text-primary transition-colors p-2 rounded-lg hover:bg-gray-100">
+            <i class="fas fa-bell"></i>
+            <span id="notification-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+          </button>
+          
+          <button onclick="showAdminLogin()" class="relative text-gray-600 hover:text-primary transition-colors p-2 rounded-lg hover:bg-gray-100">
+            <i class="fas fa-lock"></i>
+            <span class="ml-1 hidden sm:inline">Admin</span>
+            <span id="admin-indicator" class="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full hidden">Online</span>
+          </button>
         </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Subjects Section -->
+    <section id="subjects" class="animate-fade-in">
+      <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-900 mb-2">เลือกวิชาที่ต้องการ</h2>
+        <p class="text-gray-600">เลือกวิชาเพื่อดูควิซและเฉลยที่มีอยู่</p>
+      </div>
+      
+      <div id="subject-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Subjects will be loaded here -->
+      </div>
+    </section>
+
+    <!-- Quiz List Section -->
+    <section id="quiz-list" class="hidden animate-slide-up">
+      <div class="flex items-center justify-between mb-6">
+        <h2 id="subject-title" class="text-3xl font-bold text-gray-900">ควิซในวิชา</h2>
+        <button id="back-button" onclick="goBack()" class="flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+          <i class="fas fa-arrow-left"></i>
+          <span>ย้อนกลับ</span>
+        </button>
+      </div>
+      
+      <div id="quiz-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Quizzes will be loaded here -->
+      </div>
+    </section>
+
+    <!-- Admin Panel -->
+    <section id="admin-panel" class="hidden animate-slide-up">
+      <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-4 text-white">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">ระบบจัดการควิซ</h2>
+            <div class="flex space-x-3">
+              <button onclick="refreshQuizData()" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm">
+                <i class="fas fa-sync-alt mr-1"></i>รีเฟรช
+              </button>
+              <button onclick="logoutAdmin()" class="px-3 py-1.5 bg-red-500/80 hover:bg-red-500 rounded-lg transition-colors text-sm">
+                <i class="fas fa-sign-out-alt mr-1"></i>ออกจากระบบ
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">เลือกวิชาที่ต้องการจัดการ</h3>
+          <div id="admin-subject-selector" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <!-- Admin subjects will be loaded here -->
+          </div>
+          
+          <div id="quiz-editor" class="hidden">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+              <h3 id="quiz-editor-subject" class="text-lg font-semibold text-gray-900">ควิซในวิชา</h3>
+              <button onclick="showAddQuizModal()" class="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all">
+                <i class="fas fa-plus mr-2"></i>เพิ่มควิซใหม่
+              </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50 border-b border-gray-200">
+                    <th class="text-left px-4 py-3 font-medium text-gray-700">ชื่อควิซ</th>
+                    <th class="text-left px-4 py-3 font-medium text-gray-700">วันหมดอายุ</th>
+                    <th class="text-left px-4 py-3 font-medium text-gray-700">สถานะ</th>
+                    <th class="text-left px-4 py-3 font-medium text-gray-700">ลิงก์</th>
+                    <th class="text-left px-4 py-3 font-medium text-gray-700">จัดการ</th>
+                  </tr>
+                </thead>
+                <tbody id="quiz-table-body">
+                  <!-- Quiz table rows will be loaded here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Notification Center -->
+  <div id="notification-center" class="notification-center fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 flex flex-col">
+    <div class="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+      <h3 class="text-lg font-semibold text-gray-900">การแจ้งเตือน</h3>
+      <button onclick="toggleNotificationCenter()" class="text-gray-500 hover:text-gray-700 transition-colors">
+        <i class="fas fa-times"></i>
+      </button>
     </div>
     
-    <script>
-        // กำหนดวันที่สิ้นสุด (วันที่เว็บไซต์จะกลับมาให้บริการ)
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() + 2); // เพิ่มเวลาไปอีก 2 วัน
-        
-        // กำหนดเวลาเริ่มต้นของการนับถอยหลัง (วันปัจจุบัน)
-        const startDate = new Date();
-        
-        // คำนวณระยะเวลาทั้งหมดในมิลลิวินาที
-        const totalDuration = endDate.getTime() - startDate.getTime();
-        
-        // อ้างอิงถึงแถบความคืบหน้า
-        const progressBar = document.querySelector('.progress-bar');
-        
-        // ฟังก์ชันนับถอยหลังแบบเรียลไทม์
-        function updateCountdown() {
-            // ดึงเวลาปัจจุบัน
-            const now = new Date().getTime();
+    <div class="flex border-b border-gray-200">
+      <button class="notification-tab flex-1 px-4 py-3 text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors active" data-tab="all">
+        ทั้งหมด
+      </button>
+      <button class="notification-tab flex-1 px-4 py-3 text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors" data-tab="expiry">
+        กำลังหมดเวลา
+      </button>
+      <button class="notification-tab flex-1 px-4 py-3 text-sm font-medium text-gray-600 hover:text-primary hover:bg-gray-50 transition-colors" data-tab="update">
+        อัพเดตล่าสุด
+      </button>
+    </div>
+    
+    <div id="notification-content" class="flex-1 overflow-y-auto p-4">
+      <!-- Notification content will be loaded here -->
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md animate-slide-up">
+      <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-semibold">เข้าสู่ระบบผู้ดูแล</h2>
+          <button onclick="hideAdminLogin()" class="text-white/70 hover:text-white transition-colors">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <form id="admin-login-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้</label>
+            <input type="text" id="admin-username" required 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                   placeholder="ชื่อผู้ใช้ผู้ดูแลระบบ">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+            <input type="password" id="admin-password" required 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                   placeholder="รหัสผ่าน">
+          </div>
+          
+          <button type="submit" class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg hover:shadow-lg transition-all font-medium">
+            <i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ
+          </button>
+          
+          <div id="login-error" class="hidden text-red-600 text-sm text-center bg-red-50 border border-red-200 rounded-lg p-3">
+            ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quiz Modal -->
+  <div id="quiz-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-slide-up">
+      <div class="bg-gradient-to-r from-primary to-secondary text-white p-6 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <h3 id="quiz-modal-title" class="text-xl font-semibold">เพิ่มควิซใหม่</h3>
+          <button onclick="hideQuizModal()" class="text-white/70 hover:text-white transition-colors">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <form id="quiz-form" class="space-y-4">
+          <input type="hidden" id="edit-quiz-id" value="">
+          <input type="hidden" id="edit-subject" value="">
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              ชื่อควิซ <span class="text-red-500">*</span>
+            </label>
+            <input type="text" id="quiz-name" required 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                   placeholder="ชื่อควิซ">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">ลิงก์เฉลย</label>
+            <input type="url" id="quiz-link" 
+                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                   placeholder="https://example.com/quiz-answers">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">คำอธิบาย</label>
+            <textarea id="quiz-description" rows="3" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                      placeholder="รายละเอียดเกี่ยวกับควิซนี้"></textarea>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุ</label>
+              <input type="datetime-local" id="quiz-expiry" 
+                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+            </div>
             
-            // คำนวณระยะเวลาที่เหลือ
-            const timeRemaining = endDate.getTime() - now;
-            
-            // คำนวณวัน ชั่วโมง นาที วินาที
-            const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-            
-            // อัพเดตค่าในหน้าเว็บแบบมีเอฟเฟกต์
-            updateElementWithEffect('days', formatTime(days));
-            updateElementWithEffect('hours', formatTime(hours));
-            updateElementWithEffect('minutes', formatTime(minutes));
-            updateElementWithEffect('seconds', formatTime(seconds));
-            
-            // คำนวณเปอร์เซ็นต์ความคืบหน้า
-            const elapsedTime = totalDuration - timeRemaining;
-            const progressPercentage = Math.min(100, Math.max(0, (elapsedTime / totalDuration) * 100));
-            
-            // อัพเดตแถบความคืบหน้า
-            progressBar.style.width = (100 - progressPercentage) + '%';
-            
-            // ตรวจสอบว่านับถอยหลังจบหรือยัง
-            if (timeRemaining < 0) {
-                clearInterval(timerInterval);
-                document.getElementById('days').textContent = '00';
-                document.getElementById('hours').textContent = '00';
-                document.getElementById('minutes').textContent = '00';
-                document.getElementById('seconds').textContent = '00';
-                progressBar.style.width = '0%';
-            }
-        }
-        
-        // ฟังก์ชันอัพเดตค่าแบบมีเอฟเฟกต์
-        function updateElementWithEffect(id, newValue) {
-            const element = document.getElementById(id);
-            const currentValue = element.textContent;
-            
-            if (currentValue !== newValue) {
-                // สร้างเอฟเฟกต์การเปลี่ยนค่า
-                element.classList.add('value-changed');
-                
-                // ลบคลาสหลังจากเอฟเฟกต์จบ
-                setTimeout(() => {
-                    element.classList.remove('value-changed');
-                }, 300);
-                
-                // อัพเดตค่าใหม่
-                element.textContent = newValue;
-            }
-        }
-        
-        // ฟังก์ชันจัดรูปแบบเวลาให้แสดงเป็น 2 หลักเสมอ
-        function formatTime(time) {
-            return time < 10 ? `0${time}` : time;
-        }
-        
-        // อัพเดตการนับถอยหลังทุกๆ 1 วินาที
-        updateCountdown();
-        const timerInterval = setInterval(updateCountdown, 1000);
-        
-        // เพิ่มการเคลื่อนไหวสำหรับรูปทรงในพื้นหลัง
-        function animateShapes() {
-            const shapes = document.querySelectorAll('.shape');
-            
-            shapes.forEach(shape => {
-                shape.addEventListener('mouseover', () => {
-                    shape.style.transform = 'scale(1.2)';
-                    shape.style.opacity = '0.5';
-                });
-                
-                shape.addEventListener('mouseout', () => {
-                    shape.style.transform = 'scale(1)';
-                    shape.style.opacity = '0.3';
-                });
-            });
-        }
-        
-        // เรียกใช้ฟังก์ชันเมื่อโหลดเอกสารเสร็จ
-        document.addEventListener('DOMContentLoaded', function() {
-            animateShapes();
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">สถานะ</label>
+              <select id="quiz-status" 
+                      class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <option value="">-- ไม่ระบุ --</option>
+                <option value="อัพเดตล่าสุด">อัพเดตล่าสุด</option>
+                <option value="รออัพเดต">รออัพเดต</option>
+                <option value="ปิดปรับปรุง">ปิดปรับปรุง</option>
+              </select>
+            </div>
+          </div>
+          
+          <button type="submit" class="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-lg hover:shadow-lg transition-all font-medium mt-6">
+            <i class="fas fa-save mr-2"></i>บันทึก
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirm-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md animate-slide-up">
+      <div class="bg-red-500 text-white p-6 rounded-t-xl">
+        <h3 class="text-lg font-semibold">ยืนยันการลบ</h3>
+      </div>
+      
+      <div class="p-6 text-center">
+        <p id="confirm-message" class="text-gray-600 mb-6">คุณแน่ใจหรือไม่ว่าต้องการลบรายการนี้?</p>
+        <div class="flex space-x-3">
+          <button onclick="hideConfirmModal()" class="flex-1 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors">
+            ยกเลิก
+          </button>
+          <button id="confirm-delete-button" class="flex-1 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors">
+            ลบ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="fixed bottom-4 right-4 space-y-2 z-40">
+    <!-- Toast notifications will appear here -->
+  </div>
+
+  <!-- Announcement Popup -->
+  <div id="popup-overlay" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md animate-slide-up">
+      <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-semibold">ธรรมชาติบำบัด - ประกาศสำคัญ</h3>
+          <button id="close-popup" class="text-white/70 hover:text-white transition-colors">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6 text-center">
+        <h2 class="text-xl font-bold text-gray-900 mb-4">ข้อสอบปลายภาค 20 คะแนน</h2>
+        <p class="text-gray-600 mb-4">
+          นักศึกษามีสิทธิเข้าระบบเพื่อทำข้อสอบได้ครั้งเดียว<br>
+          ครั้งที่สองจะไม่มีสิทธิทำข้อสอบ
+        </p>
+        <p class="text-sm text-gray-500 mb-6">Updated: 19 มีนาคม 2568</p>
+        <button id="start-redirect" class="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg hover:shadow-lg transition-all font-medium">
+          เปิดทำข้อสอบ
+        </button>
+        <p class="text-xs text-gray-500 mt-4">© doralaikon | PSU</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const CONFIG = {
+      SHEET_ID: "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc",
+      SHEET_RANGE: "Allquestions",
+      API_KEY: "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw",
+      ADMIN_CREDENTIALS: {
+        username: "admin",
+        password: "allquiz2025"
+      }
+    };
+
+    // Global state
+    let state = {
+      allSubjects: [],
+      allQuizzes: {},
+      selectedSubject: "",
+      editingQuizIndex: -1,
+      isAdminLoggedIn: false,
+      notifications: {
+        all: [],
+        expiry: [],
+        updates: [],
+      },
+      activeNotificationTab: 'all'
+    };
+
+    // Initialize app
+    document.addEventListener("DOMContentLoaded", async () => {
+      setupEventListeners();
+      checkAdminLoginStatus();
+      await initializeSubjects();
+      setupAnnouncement();
+    });
+
+    // Event listeners
+    function setupEventListeners() {
+      // Forms
+      document.getElementById("admin-login-form").addEventListener("submit", handleAdminLogin);
+      document.getElementById("quiz-form").addEventListener("submit", handleQuizSave);
+      
+      // Notification tabs
+      document.querySelectorAll(".notification-tab").forEach(tab => {
+        tab.addEventListener("click", (e) => {
+          switchNotificationTab(e.currentTarget.getAttribute('data-tab'));
         });
-    </script>
-    
-    <style>
-        /* เพิ่ม CSS สำหรับเอฟเฟกต์การเปลี่ยนค่า */
-        .timer-value {
-            position: relative;
-            display: inline-block;
+      });
+
+      // Close notification center when clicking outside
+      document.addEventListener("click", (e) => {
+        const notificationCenter = document.getElementById("notification-center");
+        const notificationToggle = e.target.closest('#notification-toggle');
+        
+        if (notificationCenter.classList.contains("active") && 
+            !notificationCenter.contains(e.target) && 
+            !notificationToggle) {
+          notificationCenter.classList.remove("active");
+        }
+      });
+    }
+
+    // Admin authentication
+    function checkAdminLoginStatus() {
+      if (sessionStorage.getItem("adminLoggedIn") === "true") {
+        state.isAdminLoggedIn = true;
+        updateAdminUI(true);
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const username = document.getElementById("admin-username").value;
+      const password = document.getElementById("admin-password").value;
+      
+      if (username === CONFIG.ADMIN_CREDENTIALS.username && 
+          password === CONFIG.ADMIN_CREDENTIALS.password) {
+        state.isAdminLoggedIn = true;
+        sessionStorage.setItem("adminLoggedIn", "true");
+        updateAdminUI(true);
+        hideAdminLogin();
+        initializeAdminSubjects();
+        showToast("เข้าสู่ระบบสำเร็จ", "success");
+      } else {
+        document.getElementById("login-error").classList.remove("hidden");
+        document.getElementById("admin-password").value = "";
+      }
+    }
+
+    function logoutAdmin() {
+      state.isAdminLoggedIn = false;
+      sessionStorage.removeItem("adminLoggedIn");
+      updateAdminUI(false);
+      document.getElementById("admin-username").value = "";
+      document.getElementById("admin-password").value = "";
+      showToast("ออกจากระบบสำเร็จ", "info");
+    }
+
+    function updateAdminUI(isLoggedIn) {
+      const indicator = document.getElementById("admin-indicator");
+      const panel = document.getElementById("admin-panel");
+      
+      if (isLoggedIn) {
+        indicator.classList.remove("hidden");
+        panel.classList.remove("hidden");
+      } else {
+        indicator.classList.add("hidden");
+        panel.classList.add("hidden");
+      }
+    }
+
+    // Modal functions
+    function showAdminLogin() {
+      if (state.isAdminLoggedIn) {
+        document.getElementById("admin-panel").scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      document.getElementById("admin-login-modal").classList.remove("hidden");
+      document.getElementById("login-error").classList.add("hidden");
+      document.getElementById("admin-username").focus();
+    }
+
+    function hideAdminLogin() {
+      document.getElementById("admin-login-modal").classList.add("hidden");
+    }
+
+    function showAddQuizModal() {
+      document.getElementById("quiz-form").reset();
+      document.getElementById("edit-quiz-id").value = "-1";
+      document.getElementById("edit-subject").value = state.selectedSubject;
+      document.getElementById("quiz-modal-title").textContent = "เพิ่มควิซใหม่";
+      document.getElementById("quiz-modal").classList.remove("hidden");
+    }
+
+    function showEditQuizModal(quizIndex) {
+      const quiz = state.allQuizzes[state.selectedSubject][quizIndex];
+      
+      document.getElementById("edit-quiz-id").value = quizIndex;
+      document.getElementById("edit-subject").value = state.selectedSubject;
+      document.getElementById("quiz-name").value = quiz.quizName || "";
+      document.getElementById("quiz-link").value = quiz.quizLink || "";
+      document.getElementById("quiz-description").value = quiz.quizDescription || "";
+      document.getElementById("quiz-status").value = quiz.status || "";
+      
+      // Format expiry date for datetime-local input
+      if (quiz.expiryDate) {
+        try {
+          const [datePart, timePart] = quiz.expiryDate.split(", ");
+          if (datePart) {
+            const [day, month, year] = datePart.split("/");
+            let formattedTime = timePart || "00:00";
+            if (formattedTime.split(":").length === 3) {
+              formattedTime = formattedTime.split(":").slice(0, 2).join(":");
+            }
+            
+            const formattedDate = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${formattedTime}`;
+            document.getElementById("quiz-expiry").value = formattedDate;
+          }
+        } catch (error) {
+          console.error("Error formatting date:", error);
+        }
+      }
+      
+      document.getElementById("quiz-modal-title").textContent = "แก้ไขควิซ";
+      document.getElementById("quiz-modal").classList.remove("hidden");
+    }
+
+    function hideQuizModal() {
+      document.getElementById("quiz-modal").classList.add("hidden");
+    }
+
+    function showConfirmModal(message, onConfirm) {
+      document.getElementById("confirm-message").textContent = message;
+      document.getElementById("confirm-delete-button").onclick = onConfirm;
+      document.getElementById("confirm-modal").classList.remove("hidden");
+    }
+
+    function hideConfirmModal() {
+      document.getElementById("confirm-modal").classList.add("hidden");
+    }
+
+    // Data fetching
+    async function fetchSubjects() {
+      const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${CONFIG.SHEET_RANGE}?key=${CONFIG.API_KEY}`;
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        return data.values || [];
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        showToast("เกิดข้อผิดพลาดในการโหลดข้อมูล", "error");
+        return [];
+      }
+    }
+
+    async function initializeSubjects() {
+      const subjects = await fetchSubjects();
+      state.allQuizzes = {};
+      
+      // Process data
+      subjects.forEach((row, index) => {
+        if (index === 0) return; // Skip header
+        
+        const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
+        
+        if (subject && subject.trim() !== "") {
+          if (!state.allQuizzes[subject]) {
+            state.allQuizzes[subject] = [];
+          }
+          
+          if (quizName) {
+            state.allQuizzes[subject].push({
+              quizName,
+              quizLink,
+              quizDescription,
+              expiryDate,
+              status
+            });
+          }
+        }
+      });
+      
+      prepareNotifications(subjects);
+      renderSubjects();
+      
+      if (state.isAdminLoggedIn) {
+        initializeAdminSubjects();
+      }
+    }
+
+    function renderSubjects() {
+      const subjectList = document.getElementById('subject-list');
+      subjectList.innerHTML = "";
+      
+      Object.keys(state.allQuizzes).forEach(subject => {
+        const quizzes = state.allQuizzes[subject];
+        const subjectCard = document.createElement('div');
+        
+        // Choose appropriate icon
+        let icon = 'fa-book';
+        const subjectLower = subject.toLowerCase();
+        if (subjectLower.includes('คอมพิวเตอร์') || subjectLower.includes('computer')) {
+          icon = 'fa-laptop-code';
+        } else if (subjectLower.includes('คณิตศาสตร์') || subjectLower.includes('math')) {
+          icon = 'fa-calculator';
+        } else if (subjectLower.includes('วิทยาศาสตร์') || subjectLower.includes('science')) {
+          icon = 'fa-flask';
+        } else if (subjectLower.includes('ภาษา') || subjectLower.includes('language')) {
+          icon = 'fa-language';
         }
         
-        .value-changed {
-            animation: valueChange 0.3s ease-out;
+        const availableQuizzes = quizzes.filter(quiz => quiz.quizName && quiz.quizLink).length;
+        const hasQuizzes = quizzes.some(quiz => quiz.quizName);
+        
+        subjectCard.className = `bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 cursor-pointer transform hover:-translate-y-1 border border-gray-200 ${hasQuizzes ? 'hover:border-primary' : ''}`;
+        
+        subjectCard.innerHTML = `
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas ${icon} text-white text-2xl"></i>
+            </div>
+            <h3 class="font-semibold text-gray-900 mb-2">${subject}</h3>
+            ${!hasQuizzes ? 
+              '<span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">รออัพเดต</span>' :
+              `<span class="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">${availableQuizzes} ควิซ</span>`
+            }
+          </div>
+        `;
+        
+        if (hasQuizzes) {
+          subjectCard.onclick = () => showQuizzes(subject, quizzes);
         }
         
-        @keyframes valueChange {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        subjectList.appendChild(subjectCard);
+      });
+    }
+
+    function showQuizzes(subject, quizzes) {
+      document.getElementById('subjects').classList.add('hidden');
+      document.getElementById('quiz-list').classList.remove('hidden');
+      document.getElementById('subject-title').textContent = `ควิซในวิชา ${subject}`;
+      
+      state.selectedSubject = subject;
+      
+      const quizContainer = document.getElementById('quiz-container');
+      quizContainer.innerHTML = '';
+      
+      quizzes.forEach((quiz, index) => {
+        if (!quiz.quizName) return;
+        
+        const quizCard = document.createElement('div');
+        quizCard.className = 'bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-6 border border-gray-200';
+        
+        // Choose icon based on status
+        let icon = 'fa-file-alt';
+        let iconColor = 'text-blue-500';
+        
+        if (quiz.status && quiz.status.toLowerCase().includes('อัพเดตล่าสุด')) {
+          icon = 'fa-sync-alt';
+          iconColor = 'text-green-500';
+        } else if (quiz.expiryDate && calculateCountdown(quiz.expiryDate) === 'ควิซนี้หมดเขตแล้ว') {
+          icon = 'fa-hourglass-end';
+          iconColor = 'text-red-500';
+        } else if (quiz.expiryDate) {
+          icon = 'fa-hourglass-half';
+          iconColor = 'text-yellow-500';
         }
-    </style>
+        
+        let statusBadge = '';
+        if (quiz.status) {
+          let statusClass = 'bg-gray-100 text-gray-800';
+          if (quiz.status.toLowerCase().includes('อัพเดตล่าสุด')) {
+            statusClass = 'bg-green-100 text-green-800';
+          } else if (quiz.status.toLowerCase().includes('รออัพเดต') || quiz.status.toLowerCase().includes('ปิดปรับปรุง')) {
+            statusClass = 'bg-yellow-100 text-yellow-800';
+          }
+          statusBadge = `<span class="inline-block px-2 py-1 ${statusClass} text-xs rounded-full mb-3">${quiz.status}</span>`;
+        } else if (quiz.expiryDate) {
+          const countdown = calculateCountdown(quiz.expiryDate);
+          if (countdown === 'ควิซนี้หมดเขตแล้ว') {
+            statusBadge = '<span class="inline-block px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full mb-3">หมดเวลาแล้ว</span>';
+          } else {
+            statusBadge = `<span class="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full mb-3"><i class="fas fa-clock mr-1"></i>${countdown}</span>`;
+          }
+        }
+        
+        quizCard.innerHTML = `
+          <div class="flex items-start space-x-3">
+            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+              <i class="fas ${icon} ${iconColor} text-lg"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-semibold text-gray-900 mb-2">${quiz.quizName}</h3>
+              ${statusBadge}
+              ${quiz.quizDescription ? `<p class="text-gray-600 text-sm mb-3">${quiz.quizDescription}</p>` : ''}
+              
+              <div class="flex items-center justify-between">
+                ${quiz.quizLink ? 
+                  `<a href="${quiz.quizLink}" target="_blank" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white text-sm rounded-lg hover:shadow-lg transition-all">
+                    <i class="fas fa-external-link-alt mr-2"></i>ดูเฉลย
+                  </a>` :
+                  '<span class="px-4 py-2 bg-gray-100 text-gray-600 text-sm rounded-lg">รออัพเดต</span>'
+                }
+                
+                ${state.isAdminLoggedIn ? 
+                  `<button onclick="showEditQuizModal(${index})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                    <i class="fas fa-edit"></i>
+                  </button>` : ''
+                }
+              </div>
+            </div>
+          </div>
+        `;
+        
+        quizContainer.appendChild(quizCard);
+      });
+      
+      // Auto-update countdowns
+      updateCountdowns();
+    }
+
+    function goBack() {
+      document.getElementById('quiz-list').classList.add('hidden');
+      document.getElementById('subjects').classList.remove('hidden');
+    }
+
+    // Admin functions
+    function initializeAdminSubjects() {
+      const adminSubjectSelector = document.getElementById("admin-subject-selector");
+      adminSubjectSelector.innerHTML = "";
+      
+      Object.keys(state.allQuizzes).forEach(subject => {
+        const subjectCard = document.createElement('div');
+        subjectCard.className = 'bg-white border-2 border-gray-200 rounded-lg p-4 cursor-pointer hover:border-primary transition-colors';
+        
+        let icon = 'fa-book';
+        const subjectLower = subject.toLowerCase();
+        if (subjectLower.includes('คอมพิวเตอร์')) icon = 'fa-laptop-code';
+        else if (subjectLower.includes('คณิตศาสตร์')) icon = 'fa-calculator';
+        else if (subjectLower.includes('วิทยาศาสตร์')) icon = 'fa-flask';
+        else if (subjectLower.includes('ภาษา')) icon = 'fa-language';
+        
+        subjectCard.innerHTML = `
+          <div class="text-center">
+            <i class="fas ${icon} text-primary text-2xl mb-2"></i>
+            <h4 class="font-medium text-gray-900">${subject}</h4>
+          </div>
+        `;
+        
+        subjectCard.onclick = () => selectAdminSubject(subject, subjectCard);
+        adminSubjectSelector.appendChild(subjectCard);
+      });
+    }
+
+    function selectAdminSubject(subject, selectedCard) {
+      // Update UI
+      document.querySelectorAll('#admin-subject-selector > div').forEach(card => {
+        card.className = card.className.replace('border-primary bg-blue-50', 'border-gray-200');
+      });
+      selectedCard.className = selectedCard.className.replace('border-gray-200', 'border-primary bg-blue-50');
+      
+      state.selectedSubject = subject;
+      document.getElementById("quiz-editor-subject").textContent = `ควิซในวิชา ${subject}`;
+      document.getElementById("quiz-editor").classList.remove("hidden");
+      populateQuizTable(subject);
+    }
+
+    function populateQuizTable(subject) {
+      const quizzes = state.allQuizzes[subject] || [];
+      const tableBody = document.getElementById("quiz-table-body");
+      tableBody.innerHTML = "";
+      
+      if (quizzes.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-8">
+              <i class="fas fa-info-circle text-gray-400 text-2xl mb-2"></i>
+              <p class="text-gray-500 mb-4">ยังไม่มีควิซในวิชานี้</p>
+              <button onclick="showAddQuizModal()" class="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all">
+                <i class="fas fa-plus mr-2"></i>เพิ่มควิซใหม่
+              </button>
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      quizzes.forEach((quiz, index) => {
+        const row = document.createElement("tr");
+        row.className = "border-b border-gray-200 hover:bg-gray-50 transition-colors";
+        
+        // Format expiry date
+        let expiryDisplay = '<span class="text-gray-500">ไม่ระบุ</span>';
+        if (quiz.expiryDate) {
+          const countdown = calculateCountdown(quiz.expiryDate);
+          if (countdown === 'ควิซนี้หมดเขตแล้ว') {
+            expiryDisplay = `<span class="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">หมดเวลา</span><br><small class="text-gray-500">${quiz.expiryDate}</small>`;
+          } else {
+            expiryDisplay = `<span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">ปกติ</span><br><small class="text-gray-500">${quiz.expiryDate}</small>`;
+          }
+        }
+        
+        // Format status
+        let statusDisplay = '<span class="text-gray-500">ไม่ระบุ</span>';
+        if (quiz.status) {
+          let statusClass = 'bg-gray-100 text-gray-800';
+          if (quiz.status.includes('อัพเดตล่าสุด')) {
+            statusClass = 'bg-green-100 text-green-800';
+          } else if (quiz.status.includes('รออัพเดต') || quiz.status.includes('ปิดปรับปรุง')) {
+            statusClass = 'bg-yellow-100 text-yellow-800';
+          }
+          statusDisplay = `<span class="px-2 py-1 ${statusClass} text-xs rounded-full">${quiz.status}</span>`;
+        }
+        
+        // Format link
+        let linkDisplay = '<span class="text-gray-500">ไม่มีลิงก์</span>';
+        if (quiz.quizLink) {
+          linkDisplay = `<a href="${quiz.quizLink}" target="_blank" class="text-primary hover:text-blue-700 transition-colors">
+                          <i class="fas fa-external-link-alt mr-1"></i>ดูลิงก์
+                         </a>`;
+        }
+        
+        row.innerHTML = `
+          <td class="px-4 py-3 font-medium text-gray-900">${quiz.quizName}</td>
+          <td class="px-4 py-3">${expiryDisplay}</td>
+          <td class="px-4 py-3">${statusDisplay}</td>
+          <td class="px-4 py-3">${linkDisplay}</td>
+          <td class="px-4 py-3">
+            <div class="flex space-x-2">
+              <button onclick="showEditQuizModal(${index})" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="confirmDeleteQuiz(${index})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    function handleQuizSave(e) {
+      e.preventDefault();
+      
+      const quizIndex = document.getElementById("edit-quiz-id").value;
+      const subject = document.getElementById("edit-subject").value;
+      const quizName = document.getElementById("quiz-name").value;
+      const quizLink = document.getElementById("quiz-link").value;
+      const quizDescription = document.getElementById("quiz-description").value;
+      const quizStatus = document.getElementById("quiz-status").value;
+      
+      // Format expiry date
+      let expiryDate = "";
+      const expiryInput = document.getElementById("quiz-expiry").value;
+      if (expiryInput) {
+        try {
+          const [datePart, timePart] = expiryInput.split("T");
+          const [year, month, day] = datePart.split("-");
+          expiryDate = `${day}/${month}/${year}, ${timePart}`;
+        } catch (error) {
+          console.error("Error formatting date:", error);
+        }
+      }
+      
+      const quizData = {
+        quizName,
+        quizLink,
+        quizDescription,
+        expiryDate,
+        status: quizStatus
+      };
+      
+      if (quizIndex === "-1") {
+        state.allQuizzes[subject].push(quizData);
+        showToast("เพิ่มควิซใหม่สำเร็จ", "success");
+      } else {
+        state.allQuizzes[subject][parseInt(quizIndex)] = quizData;
+        showToast("อัพเดตควิซสำเร็จ", "success");
+      }
+      
+      hideQuizModal();
+      populateQuizTable(subject);
+      
+      // Update main view if currently displaying this subject
+      if (document.getElementById('quiz-list').classList.contains('hidden') === false && state.selectedSubject === subject) {
+        showQuizzes(subject, state.allQuizzes[subject]);
+      }
+    }
+
+    function confirmDeleteQuiz(quizIndex) {
+      const quizName = state.allQuizzes[state.selectedSubject][quizIndex].quizName;
+      showConfirmModal(
+        `คุณแน่ใจหรือไม่ว่าต้องการลบควิซ "${quizName}"?`,
+        () => deleteQuiz(quizIndex)
+      );
+    }
+
+    function deleteQuiz(quizIndex) {
+      state.allQuizzes[state.selectedSubject].splice(quizIndex, 1);
+      hideConfirmModal();
+      populateQuizTable(state.selectedSubject);
+      showToast("ลบควิซสำเร็จ", "success");
+      
+      if (document.getElementById('quiz-list').classList.contains('hidden') === false) {
+        showQuizzes(state.selectedSubject, state.allQuizzes[state.selectedSubject]);
+      }
+    }
+
+    async function refreshQuizData() {
+      showToast("กำลังโหลดข้อมูล...", "info");
+      await initializeSubjects();
+      
+      if (state.selectedSubject) {
+        populateQuizTable(state.selectedSubject);
+      }
+      
+      showToast("โหลดข้อมูลสำเร็จ", "success");
+    }
+
+    // Notification functions
+    function toggleNotificationCenter() {
+      const notificationCenter = document.getElementById('notification-center');
+      notificationCenter.classList.toggle('active');
+    }
+
+    function switchNotificationTab(tab) {
+      state.activeNotificationTab = tab;
+      
+      document.querySelectorAll('.notification-tab').forEach(el => {
+        el.classList.remove('active', 'text-primary', 'border-b-2', 'border-primary');
+        el.classList.add('text-gray-600');
+      });
+      
+      const activeTab = document.querySelector(`.notification-tab[data-tab="${tab}"]`);
+      activeTab.classList.add('active', 'text-primary', 'border-b-2', 'border-primary');
+      activeTab.classList.remove('text-gray-600');
+      
+      updateNotificationContent();
+    }
+
+    function prepareNotifications(subjects) {
+      state.notifications = { all: [], expiry: [], updates: [] };
+      
+      subjects.forEach((row, index) => {
+        if (index === 0) return; // Skip header
+        
+        const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
+        
+        if (!subject || !quizName) return;
+        
+        // Check for expiry notifications
+        if (expiryDate) {
+          try {
+            const now = new Date().getTime();
+            const endDate = parseExpiryDate(expiryDate);
+            
+            if (endDate) {
+              const timeLeftInHours = (endDate - now) / (1000 * 60 * 60);
+              
+              if (timeLeftInHours > 0 && timeLeftInHours <= 24) {
+                const notification = {
+                  subject, quizName, quizLink,
+                  timeLeftInHours: Math.ceil(timeLeftInHours),
+                  type: 'expiry'
+                };
+                state.notifications.expiry.push(notification);
+                state.notifications.all.push(notification);
+              } else if (timeLeftInHours <= 0 && timeLeftInHours > -24) {
+                const notification = {
+                  subject, quizName, quizLink,
+                  isExpired: true,
+                  type: 'expiry'
+                };
+                state.notifications.expiry.push(notification);
+                state.notifications.all.push(notification);
+              }
+            }
+          } catch (error) {
+            console.warn(`Error parsing expiry date for quiz: ${quizName}`, error);
+          }
+        }
+        
+        // Check for updates
+        if (status && status.toLowerCase().includes("อัพเดตล่าสุด")) {
+          const notification = {
+            subject, quizName, quizLink,
+            updateStatus: status,
+            type: 'update'
+          };
+          state.notifications.updates.push(notification);
+          state.notifications.all.push(notification);
+        }
+      });
+      
+      // Update notification badge
+      const notificationBadge = document.getElementById('notification-badge');
+      if (state.notifications.all.length > 0) {
+        notificationBadge.textContent = state.notifications.all.length;
+        notificationBadge.classList.remove('hidden');
+      } else {
+        notificationBadge.classList.add('hidden');
+      }
+      
+      updateNotificationContent();
+    }
+
+    function updateNotificationContent() {
+      const notificationContent = document.getElementById('notification-content');
+      let notifications = [];
+      
+      switch (state.activeNotificationTab) {
+        case 'expiry':
+          notifications = state.notifications.expiry;
+          break;
+        case 'update':
+          notifications = state.notifications.updates;
+          break;
+        default:
+          notifications = state.notifications.all;
+          break;
+      }
+      
+      if (notifications.length === 0) {
+        notificationContent.innerHTML = `
+          <div class="text-center py-8">
+            <i class="far fa-bell-slash text-gray-400 text-3xl mb-3"></i>
+            <p class="text-gray-500">ไม่มีการแจ้งเตือน</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const html = notifications.map(notification => {
+        const isExpiry = notification.type === 'expiry';
+        const iconClass = isExpiry ? 'fa-exclamation-circle text-red-500' : 'fa-check-circle text-green-500';
+        
+        return `
+          <div class="bg-gray-50 rounded-lg p-4 mb-3 border-l-4 ${isExpiry ? 'border-red-500' : 'border-green-500'}">
+            <div class="flex items-start space-x-3">
+              <i class="fas ${iconClass} mt-1"></i>
+              <div class="flex-1">
+                <h4 class="font-medium text-gray-900">${notification.quizName}</h4>
+                <p class="text-sm text-gray-600 mt-1">วิชา: ${notification.subject}</p>
+                ${notification.timeLeftInHours ? `<p class="text-sm text-red-600 mt-1">เหลือเวลา: ${notification.timeLeftInHours} ชั่วโมง</p>` : ''}
+                ${notification.isExpired ? '<p class="text-sm text-red-600 mt-1">หมดเวลาแล้ว</p>' : ''}
+                ${notification.updateStatus ? `<p class="text-sm text-green-600 mt-1">${notification.updateStatus}</p>` : ''}
+                <a href="${notification.quizLink}" target="_blank" class="inline-flex items-center mt-2 text-primary hover:text-blue-700 text-sm">
+                  ดูรายละเอียด <i class="fas fa-external-link-alt ml-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      notificationContent.innerHTML = html;
+    }
+
+    // Utility functions
+    function calculateCountdown(expiryDate) {
+      if (!expiryDate || expiryDate.trim() === '') return '';
+
+      try {
+        const [date, time] = expiryDate.split(", ");
+        const [day, month, year] = date.split("/");
+        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}+07:00`;
+        
+        const endDate = new Date(formattedDate);
+        const timeLeft = endDate.getTime() - new Date().getTime();
+
+        if (timeLeft <= 0) return 'ควิซนี้หมดเขตแล้ว';
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (days > 0) return `${days} วัน${hours > 0 ? ` ${hours} ชม.` : ''}`;
+        if (hours > 0) return `${hours} ชม.${minutes > 0 ? ` ${minutes} นาที` : ''}`;
+        return `${minutes} นาที`;
+      } catch (error) {
+        console.error("Error calculating countdown:", error);
+        return '';
+      }
+    }
+
+    function parseExpiryDate(expiryDate) {
+      if (!expiryDate || expiryDate.trim() === '') return null;
+
+      try {
+        const [date, time] = expiryDate.split(", ");
+        const [day, month, year] = date.split("/");
+        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}+07:00`;
+        return new Date(formattedDate).getTime();
+      } catch (error) {
+        return null;
+      }
+    }
+
+    function updateCountdowns() {
+      document.querySelectorAll('.countdown').forEach(el => {
+        const expiryDate = el.getAttribute('data-expiry');
+        if (!expiryDate) return;
+
+        const countdown = calculateCountdown(expiryDate);
+        if (countdown === 'ควิซนี้หมดเขตแล้ว') {
+          el.className = 'px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full';
+          el.textContent = 'หมดเวลาแล้ว';
+        } else {
+          el.innerHTML = `<i class="fas fa-clock mr-1"></i>${countdown}`;
+        }
+      });
+    }
+
+    function showToast(message, type = "info") {
+      const toastContainer = document.getElementById("toast-container");
+      
+      const toast = document.createElement("div");
+      const typeClasses = {
+        success: "bg-green-50 border border-green-200 text-green-800",
+        error: "bg-red-50 border border-red-200 text-red-800",
+        info: "bg-blue-50 border border-blue-200 text-blue-800"
+      };
+      
+      const icons = {
+        success: "fa-check-circle",
+        error: "fa-exclamation-circle",
+        info: "fa-info-circle"
+      };
+      
+      toast.className = `${typeClasses[type]} px-4 py-3 rounded-lg shadow-lg animate-slide-in-right flex items-center space-x-2`;
+      toast.innerHTML = `<i class="fas ${icons[type]}"></i><span>${message}</span>`;
+      
+      toastContainer.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    function setupAnnouncement() {
+      const popupOverlay = document.getElementById("popup-overlay");
+      const closePopup = document.getElementById("close-popup");
+      const startRedirect = document.getElementById("start-redirect");
+      
+      const now = new Date();
+      const bangkokOffset = 7 * 60 * 60 * 1000;
+      const bangkokTime = new Date(now.getTime() + bangkokOffset);
+      const startDate = new Date("2025-03-19T12:00:00+07:00");
+      const endDate = new Date("2025-03-19T23:59:59+07:00");
+
+      if (bangkokTime >= startDate && bangkokTime <= endDate) {
+        popupOverlay.classList.remove("hidden");
+      }
+
+      closePopup.addEventListener("click", () => {
+        popupOverlay.classList.add("hidden");
+      });
+
+      startRedirect.addEventListener("click", () => {
+        popupOverlay.classList.add("hidden");
+        setTimeout(() => {
+          window.location.href = "https://doralaikon.online/allquestions/course/ธรรมชาติบำบัด/ข้อสอบปลายภาคธรรมชาติบำบัด";
+        }, 1000);
+      });
+    }
+
+    // Auto-update countdowns every minute
+    setInterval(updateCountdowns, 60000);
+  </script>
+
 </body>
 </html>
