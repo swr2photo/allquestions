@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Allquiz เว็บไซต์เฉลยคำตอบรายวิชาต่างๆ">
-  <title>Allquiz - Enhanced Admin System</title>
+  <meta name="description" content="Allquiz - Enhanced Real-time Quiz Management System">
+  <title>Allquiz - Real-time Enhanced System</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -30,11 +30,11 @@
             'sf': ['SF Pro Display', 'system-ui', 'sans-serif'],
           },
           animation: {
-            'island-expand': 'islandExpand 0.3s ease-out',
-            'blob': 'blob 7s infinite',
-            'float': 'float 6s ease-in-out infinite',
-            'slide-in': 'slideIn 0.3s ease-out',
-            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'pulse-ring': 'pulseRing 2s infinite',
+            'slide-up': 'slideUp 0.3s ease-out',
+            'scale-in': 'scaleIn 0.2s ease-out',
+            'notification-slide': 'notificationSlide 0.4s ease-out',
+            'realtime-glow': 'realtimeGlow 2s ease-in-out infinite alternate',
           }
         }
       }
@@ -42,26 +42,29 @@
   </script>
   
   <style>
-    @keyframes islandExpand {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+    @keyframes pulseRing {
+      0% { transform: scale(0.9); opacity: 1; }
+      100% { transform: scale(1.2); opacity: 0; }
     }
     
-    @keyframes slideIn {
-      from { transform: translateY(20px); opacity: 0; }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
     }
     
-    @keyframes blob {
-      0% { transform: translate(0px, 0px) scale(1); }
-      33% { transform: translate(30px, -50px) scale(1.1); }
-      66% { transform: translate(-20px, 20px) scale(0.9); }
-      100% { transform: translate(0px, 0px) scale(1); }
+    @keyframes scaleIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
     
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-20px); }
+    @keyframes notificationSlide {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes realtimeGlow {
+      from { box-shadow: 0 0 20px rgba(52, 199, 89, 0.5); }
+      to { box-shadow: 0 0 30px rgba(52, 199, 89, 0.8); }
     }
     
     .glass-morphism {
@@ -70,198 +73,282 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
-    .dynamic-island {
-      background: rgba(0, 0, 0, 0.85);
-      backdrop-filter: blur(20px);
-      border-radius: 25px;
+    .realtime-indicator {
+      position: relative;
     }
     
-    .ios-card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
+    .realtime-indicator::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 50%;
+      background: #34C759;
+      animation: pulse-ring 2s infinite;
+      z-index: -1;
     }
     
-    .maintenance-overlay {
+    .notification-toast {
+      animation: notification-slide 0.4s ease-out;
+    }
+    
+    .analytics-chart {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
     
-    ::-webkit-scrollbar {
-      width: 4px;
+    .quiz-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     }
     
-    ::-webkit-scrollbar-track {
-      background: transparent;
+    .loading-dots {
+      display: inline-block;
     }
     
-    ::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 10px;
+    .loading-dots::after {
+      content: '...';
+      animation: dots 1.5s infinite;
     }
     
-    body {
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-      -webkit-touch-callout: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    .update-indicator {
-      animation: pulse-slow 3s ease-in-out infinite;
+    @keyframes dots {
+      0%, 20% { content: '.'; }
+      40% { content: '..'; }
+      60%, 100% { content: '...'; }
     }
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen font-sf overflow-x-hidden">
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen font-sf">
   
-  <!-- Maintenance Mode Overlay -->
-  <div id="maintenance-overlay" class="hidden fixed inset-0 maintenance-overlay z-50 flex items-center justify-center">
-    <div class="text-center text-white p-8">
-      <div class="w-24 h-24 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-      <h1 class="text-4xl font-bold mb-4">เว็บไซต์กำลังปรับปรุง</h1>
-      <p class="text-xl mb-6" id="maintenance-message">ขออภัยในความไม่สะดวก เราจะกลับมาเร็วๆ นี้</p>
-      <div class="text-sm opacity-80">
-        <p>กรุณาติดตามข่าวสารผ่านช่องทางอื่น</p>
-        <p id="maintenance-eta" class="mt-2"></p>
-      </div>
-      
-      <!-- Admin Access -->
-      <div class="mt-8">
-        <button onclick="showMaintenanceAdminLogin()" class="text-white/60 hover:text-white text-sm transition-colors">
-          Admin Access
-        </button>
-      </div>
+  <!-- Real-time Status Bar -->
+  <div id="realtime-status" class="fixed top-0 left-0 right-0 bg-success text-white text-center py-2 text-sm z-50 realtime-glow">
+    <div class="flex items-center justify-center space-x-2">
+      <div class="w-3 h-3 bg-white rounded-full realtime-indicator"></div>
+      <span>ระบบเรียลไทม์เชื่อมต่อแล้ว</span>
+      <span id="last-sync-time" class="opacity-75"></span>
     </div>
   </div>
 
-  <!-- Background Elements -->
-  <div class="fixed inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute top-20 left-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-    <div class="absolute top-40 right-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-    <div class="absolute -bottom-8 left-40 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
-  </div>
-
-  <!-- Dynamic Island Navigation -->
-  <nav class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50">
-    <div class="dynamic-island px-6 py-3 flex items-center space-x-4 animate-island-expand">
+  <!-- Enhanced Navigation -->
+  <nav class="fixed top-12 left-1/2 transform -translate-x-1/2 z-40">
+    <div class="glass-morphism px-6 py-3 rounded-3xl flex items-center space-x-4">
       <div class="flex items-center space-x-2">
-        <div class="w-6 h-6 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center">
-          <i class="fas fa-graduation-cap text-white text-xs"></i>
+        <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+          <i class="fas fa-graduation-cap text-white"></i>
         </div>
-        <span class="text-white font-semibold text-sm">Allquiz</span>
-        <div id="site-status" class="hidden">
-          <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-        </div>
+        <span class="text-gray-800 font-semibold">Allquiz Enhanced</span>
       </div>
       
       <div class="flex items-center space-x-3">
-        <button onclick="toggleNotifications()" class="relative text-white/80 hover:text-white transition-colors p-1">
-          <i class="fas fa-bell text-sm"></i>
-          <span id="notification-badge" class="absolute -top-1 -right-1 w-3 h-3 bg-accent rounded-full hidden animate-pulse"></span>
+        <button onclick="toggleRealTimeNotifications()" class="relative p-2 rounded-lg hover:bg-white/20 transition-colors">
+          <i class="fas fa-bell text-gray-700"></i>
+          <span id="notification-count" class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
         </button>
         
-        <button onclick="showAdminPanel()" class="relative text-white/80 hover:text-white transition-colors p-1">
-          <i class="fas fa-shield-alt text-sm"></i>
-          <span id="admin-indicator" class="absolute -top-1 -right-1 w-2 h-2 bg-success rounded-full hidden"></span>
+        <button onclick="toggleAnalytics()" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
+          <i class="fas fa-chart-line text-gray-700"></i>
+        </button>
+        
+        <button onclick="showAdminPanel()" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
+          <i class="fas fa-cog text-gray-700"></i>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- Announcement Banner -->
-  <div id="announcement-banner" class="hidden fixed top-20 left-4 right-4 z-40">
-    <div class="glass-morphism rounded-2xl p-4 border border-white/30 shadow-xl animate-slide-in">
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 bg-accent rounded-full flex items-center justify-center flex-shrink-0">
-          <i class="fas fa-bullhorn text-white text-sm"></i>
-        </div>
-        <div class="flex-1">
-          <h4 class="font-semibold text-gray-800 mb-1" id="announcement-title">ประกาศสำคัญ</h4>
-          <p class="text-gray-600 text-sm" id="announcement-content">เนื้อหาประกาศ</p>
-          <span class="text-xs text-gray-500" id="announcement-time">เมื่อสักครู่</span>
-        </div>
-        <button onclick="dismissAnnouncement()" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <i class="fas fa-times"></i>
+  <!-- Real-time Notifications Panel -->
+  <div id="realtime-notifications" class="fixed top-20 right-4 w-80 max-h-96 overflow-y-auto z-40 space-y-2 hidden">
+    <div class="glass-morphism rounded-2xl p-4 border">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="font-semibold text-gray-800">การแจ้งเตือนแบบเรียลไทม์</h3>
+        <button onclick="clearAllNotifications()" class="text-xs text-gray-500 hover:text-gray-700">
+          ล้างทั้งหมด
         </button>
+      </div>
+      <div id="notification-list" class="space-y-2">
+        <p class="text-gray-500 text-sm text-center py-4">ไม่มีการแจ้งเตือน</p>
       </div>
     </div>
   </div>
 
-  <!-- Quiz Update Notification -->
-  <div id="quiz-update-notification" class="hidden fixed top-32 right-4 z-40">
-    <div class="ios-card rounded-2xl p-4 border shadow-xl animate-slide-in update-indicator">
-      <div class="flex items-start space-x-3">
-        <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-          <i class="fas fa-sync-alt text-white text-sm animate-spin"></i>
+  <!-- Analytics Panel -->
+  <div id="analytics-panel" class="fixed inset-4 bg-white rounded-3xl shadow-2xl z-50 hidden overflow-hidden">
+    <div class="analytics-chart text-white p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold">Analytics Dashboard</h2>
+          <p class="opacity-90">ข้อมูลการใช้งานแบบเรียลไทม์</p>
         </div>
-        <div class="flex-1">
-          <h4 class="font-semibold text-gray-800 mb-1">ควิซมีการอัพเดต!</h4>
-          <p class="text-gray-600 text-sm" id="quiz-update-details">มีควิซใหม่หรือควิซที่อัพเดต</p>
-          <span class="text-xs text-green-600" id="quiz-update-time">เมื่อสักครู่</span>
-        </div>
-        <button onclick="dismissQuizUpdate()" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <i class="fas fa-times"></i>
+        <button onclick="toggleAnalytics()" class="text-white/80 hover:text-white">
+          <i class="fas fa-times text-xl"></i>
         </button>
+      </div>
+    </div>
+    
+    <div class="p-6 overflow-y-auto" style="max-height: calc(100vh - 200px);">
+      <!-- Real-time Stats -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-blue-50 rounded-2xl p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl font-bold text-blue-600" id="realtime-users">0</div>
+              <div class="text-sm text-gray-600">ผู้ใช้ออนไลน์</div>
+            </div>
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-users text-blue-600"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-green-50 rounded-2xl p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl font-bold text-green-600" id="quiz-accessed-today">0</div>
+              <div class="text-sm text-gray-600">ควิซที่เข้าถึงวันนี้</div>
+            </div>
+            <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-eye text-green-600"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-purple-50 rounded-2xl p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl font-bold text-purple-600" id="updates-today">0</div>
+              <div class="text-sm text-gray-600">อัพเดตวันนี้</div>
+            </div>
+            <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-sync-alt text-purple-600"></i>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-orange-50 rounded-2xl p-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-2xl font-bold text-orange-600" id="avg-response-time">0ms</div>
+              <div class="text-sm text-gray-600">เวลาตอบสนองเฉลี่ย</div>
+            </div>
+            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+              <i class="fas fa-tachometer-alt text-orange-600"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activity Feed -->
+      <div class="bg-gray-50 rounded-2xl p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">กิจกรรมล่าสุด</h3>
+        <div id="activity-feed" class="space-y-3 max-h-60 overflow-y-auto">
+          <div class="flex items-center space-x-3 text-sm">
+            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+            <span class="text-gray-600">[เมื่อสักครู่] ระบบเริ่มต้นการทำงาน</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- Main Content -->
-  <div class="pt-24 pb-8 px-4" id="main-content">
+  <div class="pt-32 pb-8 px-4">
     <div class="max-w-7xl mx-auto">
       
-      <!-- Hero Section -->
-      <div class="text-center mb-12 animate-float">
-        <h1 class="text-4xl md:text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
-          Allquiz
+      <!-- Enhanced Hero Section -->
+      <div class="text-center mb-12">
+        <h1 class="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+          Allquiz Enhanced
         </h1>
-        <p class="text-gray-600 text-lg md:text-xl mb-8">ระบบเฉลยคำตอบที่ปลอดภัยและทันสมัย</p>
+        <p class="text-gray-600 text-xl mb-8">ระบบเฉลยคำตอบแบบเรียลไทม์พร้อมการวิเคราะห์ขั้นสูง</p>
         
-        <!-- Quick Stats -->
+        <!-- Real-time Stats -->
         <div class="flex justify-center space-x-8 mb-8">
           <div class="text-center">
-            <div class="text-2xl font-bold text-primary" id="total-subjects">0</div>
+            <div class="text-3xl font-bold text-primary" id="total-subjects">0</div>
             <div class="text-sm text-gray-500">วิชา</div>
+            <div class="w-8 h-1 bg-primary/20 rounded-full mx-auto mt-1">
+              <div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 75%"></div>
+            </div>
           </div>
           <div class="text-center">
-            <div class="text-2xl font-bold text-secondary" id="total-quizzes">0</div>
-            <div class="text-sm text-gray-500">ควิซ</div>
+            <div class="text-3xl font-bold text-secondary" id="total-quizzes">0</div>
+            <div class="text-sm text-gray-500">ควิซทั้งหมด</div>
+            <div class="w-8 h-1 bg-secondary/20 rounded-full mx-auto mt-1">
+              <div class="h-full bg-secondary rounded-full transition-all duration-500" style="width: 60%"></div>
+            </div>
           </div>
           <div class="text-center">
-            <div class="text-2xl font-bold text-success" id="active-quizzes">0</div>
+            <div class="text-3xl font-bold text-success" id="active-quizzes">0</div>
             <div class="text-sm text-gray-500">พร้อมใช้</div>
+            <div class="w-8 h-1 bg-success/20 rounded-full mx-auto mt-1">
+              <div class="h-full bg-success rounded-full transition-all duration-500" style="width: 90%"></div>
+            </div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-orange-500" id="expiring-soon">0</div>
+            <div class="text-sm text-gray-500">ใกล้หมดอายุ</div>
+            <div class="w-8 h-1 bg-orange-200 rounded-full mx-auto mt-1">
+              <div class="h-full bg-orange-500 rounded-full transition-all duration-500" style="width: 25%"></div>
+            </div>
           </div>
         </div>
 
-        <!-- Last Update Info -->
-        <div class="text-center mb-8">
-          <div class="inline-flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm">
-            <i class="fas fa-clock"></i>
-            <span>อัพเดตล่าสุด: <span id="last-update-time">กำลังโหลด...</span></span>
-          </div>
+        <!-- Connection Status -->
+        <div class="inline-flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm">
+          <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          <span>เชื่อมต่อแบบเรียลไทม์</span>
+          <span id="connection-status">•</span>
+          <span class="loading-dots" id="sync-indicator">ซิงค์ข้อมูล</span>
         </div>
       </div>
 
-      <!-- Search Section -->
+      <!-- Enhanced Search -->
       <div class="mb-8">
-        <div class="ios-card rounded-3xl p-6 shadow-xl border">
+        <div class="glass-morphism rounded-3xl p-6 border">
           <div class="relative">
             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             <input 
               type="text" 
               id="search-input"
-              placeholder="ค้นหาวิชาหรือควิซ..."
-              class="w-full pl-12 pr-4 py-4 bg-ios-gray rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary/50 text-gray-800"
+              placeholder="ค้นหาวิชาหรือควิซ... (รองรับการค้นหาแบบเรียลไทม์)"
+              class="w-full pl-12 pr-20 py-4 bg-white/50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary/50 text-gray-800"
             >
+            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
+              <span id="search-results-count" class="text-xs text-gray-500 hidden"></span>
+              <button onclick="toggleSearchFilters()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+                <i class="fas fa-filter"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Search Filters -->
+          <div id="search-filters" class="hidden mt-4 pt-4 border-t border-gray-200">
+            <div class="flex flex-wrap gap-2">
+              <button onclick="filterByStatus('all')" class="filter-btn active px-3 py-1 bg-primary text-white rounded-full text-sm">
+                ทั้งหมด
+              </button>
+              <button onclick="filterByStatus('active')" class="filter-btn px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
+                พร้อมใช้
+              </button>
+              <button onclick="filterByStatus('expired')" class="filter-btn px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
+                หมดอายุ
+              </button>
+              <button onclick="filterByStatus('updated')" class="filter-btn px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
+                อัพเดตล่าสุด
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- Subjects Grid -->
       <section id="subjects-section">
-        <h2 class="text-2xl font-bold text-gray-800 mb-6">เลือกวิชาที่ต้องการ</h2>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-3xl font-bold text-gray-800">เลือกวิชาที่ต้องการ</h2>
+          <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-500">อัพเดตล่าสุด:</span>
+            <span id="last-update-display" class="text-sm font-medium text-primary">เมื่อสักครู่</span>
+          </div>
+        </div>
         <div id="subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <!-- Subjects will be loaded here -->
         </div>
@@ -270,11 +357,21 @@
       <!-- Quiz List Section -->
       <section id="quiz-section" class="hidden">
         <div class="flex items-center justify-between mb-6">
-          <h2 id="quiz-section-title" class="text-2xl font-bold text-gray-800">ควิซในวิชา</h2>
-          <button onclick="goBackToSubjects()" class="ios-card px-4 py-2 rounded-xl flex items-center space-x-2 text-gray-600 hover:text-primary transition-colors">
-            <i class="fas fa-arrow-left"></i>
-            <span>กลับ</span>
-          </button>
+          <div>
+            <h2 id="quiz-section-title" class="text-3xl font-bold text-gray-800">ควิซในวิชา</h2>
+            <p class="text-gray-600 mt-1">อัพเดตแบบเรียลไทม์</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <button onclick="sortQuizzes('name')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm hover:bg-gray-200 transition-colors">
+              <i class="fas fa-sort-alpha-down mr-2"></i>เรียงตามชื่อ
+            </button>
+            <button onclick="sortQuizzes('date')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm hover:bg-gray-200 transition-colors">
+              <i class="fas fa-clock mr-2"></i>ล่าสุด
+            </button>
+            <button onclick="goBackToSubjects()" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
+              <i class="fas fa-arrow-left mr-2"></i>กลับ
+            </button>
+          </div>
         </div>
         <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <!-- Quizzes will be loaded here -->
@@ -283,42 +380,26 @@
     </div>
   </div>
 
-  <!-- Notifications Panel -->
-  <div id="notifications-panel" class="fixed top-0 right-0 h-full w-96 transform translate-x-full transition-transform duration-300 z-40">
-    <div class="h-full glass-morphism border-l border-white/30 p-6">
-      <div class="flex items-center justify-between mb-6">
-        <h3 class="text-lg font-semibold text-gray-800">การแจ้งเตือน</h3>
-        <button onclick="toggleNotifications()" class="text-gray-400 hover:text-gray-600 transition-colors">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      
-      <div class="space-y-3" id="notifications-list">
-        <!-- Notifications will be loaded here -->
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Panel -->
+  <!-- Enhanced Admin Panel -->
   <div id="admin-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="ios-card rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
       
       <!-- Admin Header -->
       <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <i class="fas fa-shield-alt text-white"></i>
+            <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
+              <i class="fas fa-shield-alt text-white text-xl"></i>
             </div>
             <div>
-              <h2 class="text-xl font-semibold">ระบบจัดการ Admin</h2>
-              <p class="text-gray-300 text-sm">Enhanced Control Panel</p>
+              <h2 class="text-2xl font-bold">Enhanced Admin Panel</h2>
+              <p class="text-gray-300">Real-time Management System</p>
             </div>
           </div>
-          <div class="flex items-center space-x-3">
-            <div id="sync-status" class="flex items-center space-x-2 text-sm text-gray-300">
-              <i class="fas fa-sync-alt" id="sync-icon"></i>
-              <span id="sync-text">Ready</span>
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 text-sm">
+              <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+              <span>Real-time Active</span>
             </div>
             <button onclick="closeAdminPanel()" class="text-white/70 hover:text-white transition-colors">
               <i class="fas fa-times text-xl"></i>
@@ -332,522 +413,305 @@
         
         <!-- Sidebar -->
         <div class="w-64 bg-gray-50 p-4 border-r">
-          <div id="admin-login-sidebar" class="text-center">
-            <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <i class="fas fa-lock text-primary text-xl"></i>
-            </div>
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">เข้าสู่ระบบ</h3>
-            
-            <form class="space-y-3" onsubmit="handleAdminLogin(event)">
-              <input 
-                type="text" 
-                id="admin-username" 
-                placeholder="ชื่อผู้ใช้"
-                class="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                required
-              >
-              <input 
-                type="password" 
-                id="admin-password" 
-                placeholder="รหัสผ่าน"
-                class="w-full px-3 py-2 bg-white rounded-lg border border-gray-300 outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                required
-              >
-              <button 
-                type="submit"
-                class="w-full bg-primary text-white py-2 rounded-lg hover:bg-blue-600 transition-all font-medium text-sm"
-              >
-                เข้าสู่ระบบ
-              </button>
-              
-              <div id="admin-error" class="hidden text-accent text-xs bg-red-50 border border-red-200 rounded-lg p-2">
-                ข้อมูลไม่ถูกต้อง
-              </div>
-            </form>
-          </div>
-
-          <!-- Admin Navigation -->
-          <nav id="admin-nav" class="hidden space-y-2">
-            <button onclick="switchAdminTab('dashboard')" class="admin-nav-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all bg-primary text-white">
-              <i class="fas fa-tachometer-alt mr-2"></i>Dashboard
+          <nav class="space-y-2">
+            <button onclick="switchAdminTab('realtime')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all bg-primary text-white">
+              <i class="fas fa-broadcast-tower mr-3"></i>Real-time Monitor
             </button>
-            <button onclick="switchAdminTab('announcements')" class="admin-nav-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
-              <i class="fas fa-bullhorn mr-2"></i>ประกาศ
+            <button onclick="switchAdminTab('analytics')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
+              <i class="fas fa-chart-bar mr-3"></i>Analytics
             </button>
-            <button onclick="switchAdminTab('quizzes')" class="admin-nav-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
-              <i class="fas fa-question-circle mr-2"></i>จัดการควิซ
+            <button onclick="switchAdminTab('notifications')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
+              <i class="fas fa-bell mr-3"></i>Notification System
             </button>
-            <button onclick="switchAdminTab('maintenance')" class="admin-nav-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
-              <i class="fas fa-wrench mr-2"></i>โหมดปรับปรุง
+            <button onclick="switchAdminTab('data')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
+              <i class="fas fa-database mr-3"></i>Data Management
             </button>
-            <button onclick="switchAdminTab('sheets')" class="admin-nav-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
-              <i class="fas fa-table mr-2"></i>Google Sheets
+            <button onclick="switchAdminTab('settings')" class="admin-nav-btn w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
+              <i class="fas fa-cog mr-3"></i>System Settings
             </button>
-            <button onclick="switchAdminTab('settings')" class="admin-nav-btn w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-all text-gray-600 hover:bg-gray-100">
-              <i class="fas fa-cog mr-2"></i>ตั้งค่า
-            </button>
-            
-            <div class="border-t pt-2 mt-4">
-              <button onclick="logoutAdmin()" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-all">
-                <i class="fas fa-sign-out-alt mr-2"></i>ออกจากระบบ
-              </button>
-            </div>
           </nav>
         </div>
 
         <!-- Main Content -->
         <div class="flex-1 p-6 overflow-y-auto">
           
-          <!-- Dashboard Tab -->
-          <div id="tab-dashboard" class="admin-tab-content">
-            <h3 class="text-xl font-semibold text-gray-800 mb-6">Dashboard</h3>
-            
-            <!-- Quick Actions -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <button onclick="refreshAllData()" class="bg-blue-50 hover:bg-blue-100 rounded-xl p-4 text-left transition-colors">
-                <i class="fas fa-sync-alt text-blue-600 text-xl mb-2"></i>
-                <div class="font-medium text-gray-800">รีเฟรชข้อมูล</div>
-                <div class="text-sm text-gray-600">ดึงข้อมูลล่าสุดจาก Google Sheets</div>
-              </button>
-              
-              <button onclick="createQuickAnnouncement()" class="bg-green-50 hover:bg-green-100 rounded-xl p-4 text-left transition-colors">
-                <i class="fas fa-bullhorn text-green-600 text-xl mb-2"></i>
-                <div class="font-medium text-gray-800">ประกาศด่วน</div>
-                <div class="text-sm text-gray-600">สร้างประกาศฉุกเฉิน</div>
-              </button>
-              
-              <button onclick="toggleMaintenanceQuick()" class="bg-yellow-50 hover:bg-yellow-100 rounded-xl p-4 text-left transition-colors">
-                <i class="fas fa-wrench text-yellow-600 text-xl mb-2"></i>
-                <div class="font-medium text-gray-800">โหมดปรับปรุง</div>
-                <div class="text-sm text-gray-600" id="maintenance-status-text">ปิดใช้งาน</div>
-              </button>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <div class="bg-blue-50 rounded-xl p-4">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <div class="text-2xl font-bold text-blue-600" id="dash-visitors">0</div>
-                    <div class="text-sm text-gray-600">ผู้เยี่ยมชมวันนี้</div>
-                  </div>
-                  <i class="fas fa-users text-blue-400 text-xl"></i>
-                </div>
-              </div>
-              
-              <div class="bg-green-50 rounded-xl p-4">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <div class="text-2xl font-bold text-green-600" id="dash-downloads">0</div>
-                    <div class="text-sm text-gray-600">ดาวน์โหลดวันนี้</div>
-                  </div>
-                  <i class="fas fa-download text-green-400 text-xl"></i>
-                </div>
-              </div>
-              
-              <div class="bg-purple-50 rounded-xl p-4">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <div class="text-2xl font-bold text-purple-600" id="dash-quiz-updates">0</div>
-                    <div class="text-sm text-gray-600">อัพเดตควิซ</div>
-                  </div>
-                  <i class="fas fa-sync-alt text-purple-400 text-xl"></i>
-                </div>
-              </div>
-              
-              <div class="bg-yellow-50 rounded-xl p-4">
-                <div class="flex items-center justify-between">
-                  <div>
-                    <div class="text-2xl font-bold text-yellow-600" id="dash-alerts">0</div>
-                    <div class="text-sm text-gray-600">แจ้งเตือนรอ</div>
-                  </div>
-                  <i class="fas fa-bell text-yellow-400 text-xl"></i>
-                </div>
-              </div>
-            </div>
-
-            <!-- System Status -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">สถานะระบบ</h4>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="flex items-center space-x-3">
-                  <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span class="text-sm text-gray-700">Google Sheets API</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                  <div class="w-3 h-3 bg-green-500 rounded-full" id="maintenance-status-dot"></div>
-                  <span class="text-sm text-gray-700" id="maintenance-status-label">เว็บไซต์ปกติ</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                  <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span class="text-sm text-gray-700">ระบบแจ้งเตือน</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Recent Quiz Updates -->
-            <div class="bg-white rounded-xl border p-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">ควิซที่อัพเดตล่าสุด</h4>
-              <div id="recent-quiz-updates" class="space-y-3">
-                <p class="text-gray-500 text-sm text-center py-4">ยังไม่มีการอัพเดตควิซ</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Announcements Tab -->
-          <div id="tab-announcements" class="admin-tab-content hidden">
-            <h3 class="text-xl font-semibold text-gray-800 mb-6">จัดการประกาศ</h3>
-            
-            <!-- Create Announcement -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">สร้างประกาศใหม่</h4>
-              <form class="space-y-4" onsubmit="createAnnouncement(event)">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <input 
-                    type="text" 
-                    id="announcement-title-input" 
-                    placeholder="หัวข้อประกาศ"
-                    class="px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50"
-                    required
-                  >
-                  <select id="announcement-type" class="px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50">
-                    <option value="info">ข้อมูลทั่วไป</option>
-                    <option value="warning">คำเตือน</option>
-                    <option value="urgent">เร่งด่วน</option>
-                    <option value="maintenance">ปรับปรุงระบบ</option>
-                  </select>
-                </div>
-                
-                <textarea 
-                  id="announcement-content-input" 
-                  placeholder="เนื้อหาประกาศ"
-                  rows="3"
-                  class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                  required
-                ></textarea>
-                
-                <div class="flex items-center space-x-4">
-                  <label class="flex items-center space-x-2">
-                    <input type="checkbox" id="save-to-sheets" checked class="w-4 h-4 text-primary rounded focus:ring-primary">
-                    <span class="text-sm text-gray-700">บันทึกลง Google Sheets</span>
-                  </label>
-                  <label class="flex items-center space-x-2">
-                    <input type="checkbox" id="auto-show" checked class="w-4 h-4 text-primary rounded focus:ring-primary">
-                    <span class="text-sm text-gray-700">แสดงทันที</span>
-                  </label>
-                </div>
-                
-                <div class="flex space-x-3">
-                  <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
-                    <i class="fas fa-bullhorn mr-2"></i>ประกาศ
-                  </button>
-                  <button type="button" onclick="previewAnnouncement()" class="px-6 py-3 bg-gray-500 text-white rounded-xl hover:bg-gray-600 transition-colors">
-                    <i class="fas fa-eye mr-2"></i>ดูตัวอย่าง
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Announcements List -->
-            <div class="bg-white rounded-xl border p-6">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="text-lg font-semibold text-gray-800">ประกาศทั้งหมด</h4>
-                <button onclick="syncAnnouncements()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
-                  <i class="fas fa-sync-alt mr-2"></i>ซิงค์กับ Sheets
-                </button>
-              </div>
-              <div id="announcements-list" class="space-y-3">
-                <p class="text-gray-500 text-center py-4">ยังไม่มีประกาศ</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Quiz Management Tab -->
-          <div id="tab-quizzes" class="admin-tab-content hidden">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-xl font-semibold text-gray-800">จัดการควิซ</h3>
-              <div class="flex space-x-2">
-                <button onclick="refreshQuizData()" class="px-4 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors">
-                  <i class="fas fa-sync-alt mr-2"></i>รีเฟรช
-                </button>
-                <button onclick="addNewQuiz()" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
-                  <i class="fas fa-plus mr-2"></i>เพิ่มควิซใหม่
-                </button>
-              </div>
-            </div>
-            
-            <!-- Quiz Update Tracker -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <div class="flex items-center justify-between mb-4">
-                <h4 class="text-lg font-semibold text-gray-800">ติดตามการอัพเดต</h4>
-                <div class="flex items-center space-x-2 text-sm text-gray-600">
-                  <i class="fas fa-clock"></i>
-                  <span>ตรวจสอบทุก 5 นาที</span>
-                </div>
-              </div>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-green-50 rounded-lg p-4">
-                  <div class="text-lg font-bold text-green-600" id="new-quizzes-count">0</div>
-                  <div class="text-sm text-gray-600">ควิซใหม่วันนี้</div>
-                </div>
-                <div class="bg-blue-50 rounded-lg p-4">
-                  <div class="text-lg font-bold text-blue-600" id="updated-quizzes-count">0</div>
-                  <div class="text-sm text-gray-600">ควิซที่อัพเดต</div>
-                </div>
-                <div class="bg-orange-50 rounded-lg p-4">
-                  <div class="text-lg font-bold text-orange-600" id="pending-quizzes-count">0</div>
-                  <div class="text-sm text-gray-600">รออัพเดต</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Quiz Table -->
-            <div class="bg-white rounded-xl border overflow-hidden">
-              <div class="overflow-x-auto">
-                <table class="w-full">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ชื่อควิซ</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วิชา</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สถานะ</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">อัพเดตล่าสุด</th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การจัดการ</th>
-                    </tr>
-                  </thead>
-                  <tbody id="quiz-table-body" class="bg-white divide-y divide-gray-200">
-                    <tr>
-                      <td colspan="5" class="px-6 py-4 text-center text-gray-500">ยังไม่มีข้อมูลควิซ</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- Maintenance Tab -->
-          <div id="tab-maintenance" class="admin-tab-content hidden">
-            <h3 class="text-xl font-semibold text-gray-800 mb-6">โหมดปรับปรุงเว็บไซต์</h3>
-            
-            <!-- Maintenance Control -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">ควบคุมโหมดปรับปรุง</h4>
-              <div class="space-y-4">
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div>
-                    <div class="font-medium text-gray-800">สถานะเว็บไซต์</div>
-                    <div class="text-sm text-gray-600" id="maintenance-current-status">เว็บไซต์เปิดใช้งานปกติ</div>
-                  </div>
-                  <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="maintenance-toggle" class="sr-only peer" onchange="toggleMaintenance()">
-                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                  </label>
-                </div>
-                
-                <div id="maintenance-options" class="hidden space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ข้อความแจ้งเตือน</label>
-                    <textarea 
-                      id="maintenance-message-input" 
-                      rows="3"
-                      placeholder="เว็บไซต์กำลังปรับปรุง กรุณารอสักครู่..."
-                      class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                    >เว็บไซต์กำลังปรับปรุง กรุณารอสักครู่...</textarea>
-                  </div>
-                  
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">เวลาโดยประมาณ (นาที)</label>
-                      <input 
-                        type="number" 
-                        id="maintenance-duration-input" 
-                        placeholder="30"
-                        value="30"
-                        min="1"
-                        class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                    </div>
-                    <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">แจ้งล่วงหน้า (นาที)</label>
-                      <input 
-                        type="number" 
-                        id="maintenance-warning-input" 
-                        placeholder="5"
-                        value="5"
-                        min="0"
-                        class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                    </div>
-                  </div>
-                  
-                  <div class="flex items-center space-x-4">
-                    <label class="flex items-center space-x-2">
-                      <input type="checkbox" id="allow-admin-access" checked class="w-4 h-4 text-primary rounded focus:ring-primary">
-                      <span class="text-sm text-gray-700">อนุญาตให้ Admin เข้าถึงได้</span>
-                    </label>
-                    <label class="flex items-center space-x-2">
-                      <input type="checkbox" id="auto-announcement" checked class="w-4 h-4 text-primary rounded focus:ring-primary">
-                      <span class="text-sm text-gray-700">ประกาศอัตโนมัติ</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Google Sheets Tab -->
-          <div id="tab-sheets" class="admin-tab-content hidden">
-            <h3 class="text-xl font-semibold text-gray-800 mb-6">Google Sheets Integration</h3>
+          <!-- Real-time Monitor Tab -->
+          <div id="tab-realtime" class="admin-tab-content">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Real-time System Monitor</h3>
             
             <!-- Connection Status -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">สถานะการเชื่อมต่อ</h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-green-50 rounded-2xl p-4 border border-green-200">
                 <div class="flex items-center space-x-3">
-                  <div class="w-4 h-4 bg-green-500 rounded-full"></div>
-                  <span class="text-sm text-gray-700">Main Data Sheet</span>
-                  <span class="text-xs text-green-600">Connected</span>
+                  <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-wifi text-green-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-800">WebSocket Connection</div>
+                    <div class="text-sm text-green-600">Connected & Active</div>
+                  </div>
                 </div>
+              </div>
+              
+              <div class="bg-blue-50 rounded-2xl p-4 border border-blue-200">
                 <div class="flex items-center space-x-3">
-                  <div class="w-4 h-4 bg-green-500 rounded-full"></div>
-                  <span class="text-sm text-gray-700">Announcements Sheet</span>
-                  <span class="text-xs text-green-600">Connected</span>
+                  <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-sync-alt text-blue-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-800">Auto Sync</div>
+                    <div class="text-sm text-blue-600">Every 30 seconds</div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bg-purple-50 rounded-2xl p-4 border border-purple-200">
+                <div class="flex items-center space-x-3">
+                  <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                    <i class="fas fa-bell text-purple-600 text-xl"></i>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-gray-800">Push Notifications</div>
+                    <div class="text-sm text-purple-600">Enabled</div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Data Sync Control -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">การซิงค์ข้อมูล</h4>
+            <!-- Live Activity Log -->
+            <div class="bg-white rounded-2xl border p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="text-lg font-semibold text-gray-800">Live Activity Log</h4>
+                <button onclick="clearActivityLog()" class="text-sm text-gray-500 hover:text-gray-700">
+                  Clear Log
+                </button>
+              </div>
+              <div id="live-activity-log" class="space-y-2 max-h-80 overflow-y-auto">
+                <div class="flex items-center space-x-3 text-sm bg-gray-50 rounded-lg p-3">
+                  <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span class="text-gray-600">[เมื่อสักครู่] Real-time system initialized</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytics Tab -->
+          <div id="tab-analytics" class="admin-tab-content hidden">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Advanced Analytics</h3>
+            
+            <!-- Performance Metrics -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-2xl font-bold" id="total-page-views">0</div>
+                    <div class="text-blue-100 text-sm">Total Page Views</div>
+                  </div>
+                  <i class="fas fa-eye text-blue-200 text-2xl"></i>
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-2xl font-bold" id="quiz-completion-rate">0%</div>
+                    <div class="text-green-100 text-sm">Completion Rate</div>
+                  </div>
+                  <i class="fas fa-check-circle text-green-200 text-2xl"></i>
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-2xl font-bold" id="avg-session-time">0m</div>
+                    <div class="text-purple-100 text-sm">Avg Session Time</div>
+                  </div>
+                  <i class="fas fa-clock text-purple-200 text-2xl"></i>
+                </div>
+              </div>
+              
+              <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-2xl font-bold" id="error-rate">0%</div>
+                    <div class="text-orange-100 text-sm">Error Rate</div>
+                  </div>
+                  <i class="fas fa-exclamation-triangle text-orange-200 text-2xl"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quiz Performance Chart -->
+            <div class="bg-white rounded-2xl border p-6 mb-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Quiz Access Patterns</h4>
+              <div class="h-64 bg-gray-50 rounded-xl flex items-center justify-center">
+                <div class="text-center">
+                  <i class="fas fa-chart-line text-gray-400 text-4xl mb-2"></i>
+                  <p class="text-gray-500">Chart will be rendered here</p>
+                  <p class="text-sm text-gray-400">Real-time data visualization</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification System Tab -->
+          <div id="tab-notifications" class="admin-tab-content hidden">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Notification Management</h3>
+            
+            <!-- Notification Settings -->
+            <div class="bg-white rounded-2xl border p-6 mb-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Notification Settings</h4>
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <div>
-                    <div class="font-medium text-gray-800">Auto Sync</div>
-                    <div class="text-sm text-gray-600">ซิงค์ข้อมูลอัตโนมัติทุก 5 นาที</div>
+                    <div class="font-medium text-gray-800">Real-time Quiz Updates</div>
+                    <div class="text-sm text-gray-600">แจ้งเตือนทันทีเมื่อมีควิซใหม่หรืออัพเดต</div>
                   </div>
                   <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="auto-sync" checked class="sr-only peer" onchange="toggleAutoSync()">
+                    <input type="checkbox" id="quiz-notifications" checked class="sr-only peer">
                     <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
                 </div>
                 
-                <div class="flex space-x-3">
-                  <button onclick="manualSync()" class="px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
-                    <i class="fas fa-sync-alt mr-2"></i>ซิงค์ตอนนี้
-                  </button>
-                  <button onclick="testConnection()" class="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors">
-                    <i class="fas fa-check mr-2"></i>ทดสอบการเชื่อมต่อ
-                  </button>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-gray-800">Expiry Warnings</div>
+                    <div class="text-sm text-gray-600">แจ้งเตือนก่อนควิซหมดอายุ</div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="expiry-notifications" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="font-medium text-gray-800">System Status Updates</div>
+                    <div class="text-sm text-gray-600">แจ้งเตือนเมื่อระบบมีปัญหาหรือปรับปรุง</div>
+                  </div>
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="system-notifications" checked class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
                 </div>
               </div>
             </div>
 
-            <!-- Sheet Configuration -->
-            <div class="bg-white rounded-xl border p-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">การตั้งค่า Sheets</h4>
-              <form class="space-y-4" onsubmit="saveSheetConfig(event)">
+            <!-- Send Test Notification -->
+            <div class="bg-white rounded-2xl border p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Send Test Notification</h4>
+              <form onsubmit="sendTestNotification(event)" class="space-y-4">
                 <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Sheet ID</label>
-                  <input 
-                    type="text" 
-                    id="sheets-config-id" 
-                    value="1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc"
-                    class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50"
-                    required
-                  >
+                  <input type="text" id="test-notification-title" placeholder="หัวข้อการแจ้งเตือน" 
+                         class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50">
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Quiz Data Range</label>
-                    <input 
-                      type="text" 
-                      id="quiz-range" 
-                      value="Allquestions"
-                      class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50"
-                      required
-                    >
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Announcements Range</label>
-                    <input 
-                      type="text" 
-                      id="announcements-range" 
-                      value="Announcements"
-                      class="w-full px-4 py-3 bg-ios-gray rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50"
-                      required
-                    >
-                  </div>
+                <div>
+                  <textarea id="test-notification-message" placeholder="ข้อความแจ้งเตือน" rows="3"
+                            class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
                 </div>
-                
-                <button type="submit" class="px-6 py-3 bg-success text-white rounded-xl hover:bg-green-600 transition-colors">
-                  <i class="fas fa-save mr-2"></i>บันทึกการตั้งค่า
-                </button>
+                <div class="flex space-x-3">
+                  <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
+                    <i class="fas fa-paper-plane mr-2"></i>ส่งทดสอบ
+                  </button>
+                  <button type="button" onclick="sendQuickNotification()" class="px-6 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 transition-colors">
+                    <i class="fas fa-bolt mr-2"></i>ส่งด่วน
+                  </button>
+                </div>
               </form>
+            </div>
+          </div>
+
+          <!-- Data Management Tab -->
+          <div id="tab-data" class="admin-tab-content hidden">
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">Data Management</h3>
+            
+            <!-- Data Sync Status -->
+            <div class="bg-white rounded-2xl border p-6 mb-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Google Sheets Integration</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="bg-green-50 rounded-xl p-4">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                    <div>
+                      <div class="font-medium text-gray-800">Connection Status</div>
+                      <div class="text-sm text-green-600">Connected & Syncing</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="bg-blue-50 rounded-xl p-4">
+                  <div class="flex items-center space-x-3">
+                    <i class="fas fa-sync-alt text-blue-500 text-xl"></i>
+                    <div>
+                      <div class="font-medium text-gray-800">Last Sync</div>
+                      <div class="text-sm text-blue-600" id="last-data-sync">เมื่อสักครู่</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Manual Data Operations -->
+            <div class="bg-white rounded-2xl border p-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Manual Operations</h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button onclick="forceDataSync()" class="p-4 bg-blue-50 hover:bg-blue-100 rounded-xl text-left transition-colors">
+                  <i class="fas fa-sync-alt text-blue-600 text-xl mb-2"></i>
+                  <div class="font-medium text-gray-800">Force Sync</div>
+                  <div class="text-sm text-gray-600">ซิงค์ข้อมูลทันที</div>
+                </button>
+                
+                <button onclick="clearDataCache()" class="p-4 bg-orange-50 hover:bg-orange-100 rounded-xl text-left transition-colors">
+                  <i class="fas fa-trash text-orange-600 text-xl mb-2"></i>
+                  <div class="font-medium text-gray-800">Clear Cache</div>
+                  <div class="text-sm text-gray-600">ล้างข้อมูลแคช</div>
+                </button>
+                
+                <button onclick="exportData()" class="p-4 bg-green-50 hover:bg-green-100 rounded-xl text-left transition-colors">
+                  <i class="fas fa-download text-green-600 text-xl mb-2"></i>
+                  <div class="font-medium text-gray-800">Export Data</div>
+                  <div class="text-sm text-gray-600">ส่งออกข้อมูล</div>
+                </button>
+              </div>
             </div>
           </div>
 
           <!-- Settings Tab -->
           <div id="tab-settings" class="admin-tab-content hidden">
-            <h3 class="text-xl font-semibold text-gray-800 mb-6">ตั้งค่าระบบ</h3>
+            <h3 class="text-2xl font-bold text-gray-800 mb-6">System Settings</h3>
             
-            <!-- General Settings -->
-            <div class="bg-white rounded-xl border p-6 mb-6">
-              <h4 class="text-lg font-semibold text-gray-800 mb-4">ตั้งค่าทั่วไป</h4>
-              <form class="space-y-4" onsubmit="saveAllSettings(event)">
+            <!-- Real-time Settings -->
+            <div class="bg-white rounded-2xl border p-6 mb-6">
+              <h4 class="text-lg font-semibold text-gray-800 mb-4">Real-time Configuration</h4>
+              <form class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อเว็บไซต์</label>
-                    <input type="text" id="site-name" value="Allquiz" class="w-full px-4 py-2 bg-ios-gray rounded-lg border-none outline-none focus:ring-2 focus:ring-primary/50">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Sync Interval (seconds)</label>
+                    <input type="number" id="sync-interval" value="30" min="10" max="300" 
+                           class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">คำอธิบายเว็บไซต์</label>
-                    <input type="text" id="site-description" value="ระบบเฉลยคำตอบที่ปลอดภัยและทันสมัย" class="w-full px-4 py-2 bg-ios-gray rounded-lg border-none outline-none focus:ring-2 focus:ring-primary/50">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Max Notifications</label>
+                    <input type="number" id="max-notifications" value="100" min="10" max="500" 
+                           class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50">
                   </div>
                 </div>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">ช่วงเวลาตรวจสอบการอัพเดต (นาที)</label>
-                    <input type="number" id="update-interval" value="5" min="1" max="60" class="w-full px-4 py-2 bg-ios-gray rounded-lg border-none outline-none focus:ring-2 focus:ring-primary/50">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Connection Timeout (ms)</label>
+                    <input type="number" id="connection-timeout" value="5000" min="1000" max="30000" 
+                           class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนการแจ้งเตือนสูงสุด</label>
-                    <input type="number" id="max-notifications" value="50" min="10" max="200" class="w-full px-4 py-2 bg-ios-gray rounded-lg border-none outline-none focus:ring-2 focus:ring-primary/50">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Retry Attempts</label>
+                    <input type="number" id="retry-attempts" value="3" min="1" max="10" 
+                           class="w-full px-4 py-3 bg-gray-50 rounded-xl border-none outline-none focus:ring-2 focus:ring-primary/50">
                   </div>
                 </div>
-
-                <!-- Notification Settings -->
-                <div class="space-y-4">
-                  <h5 class="text-md font-semibold text-gray-800">การตั้งค่าการแจ้งเตือน</h5>
-                  <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <div class="font-medium text-gray-800">แจ้งเตือนการอัพเดตควิซ</div>
-                        <div class="text-sm text-gray-600">แจ้งเตือนเมื่อมีควิซใหม่หรืออัพเดต</div>
-                      </div>
-                      <input type="checkbox" id="quiz-update-notifications" checked class="w-5 h-5 text-primary rounded focus:ring-primary">
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <div class="font-medium text-gray-800">แจ้งเตือนประกาศใหม่</div>
-                        <div class="text-sm text-gray-600">แจ้งเตือนเมื่อมีประกาศใหม่</div>
-                      </div>
-                      <input type="checkbox" id="announcement-notifications" checked class="w-5 h-5 text-primary rounded focus:ring-primary">
-                    </div>
-                    
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <div class="font-medium text-gray-800">แจ้งเตือนก่อนปรับปรุงระบบ</div>
-                        <div class="text-sm text-gray-600">แจ้งเตือนผู้ใช้ก่อนเข้าสู่โหมดปรับปรุง</div>
-                      </div>
-                      <input type="checkbox" id="maintenance-notifications" checked class="w-5 h-5 text-primary rounded focus:ring-primary">
-                    </div>
-                  </div>
-                </div>
-
-                <button type="submit" class="px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
-                  <i class="fas fa-save mr-2"></i>บันทึกการตั้งค่าทั้งหมด
+                
+                <button type="button" onclick="saveSystemSettings()" class="px-6 py-3 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
+                  <i class="fas fa-save mr-2"></i>Save Settings
                 </button>
               </form>
             </div>
@@ -857,431 +721,559 @@
     </div>
   </div>
 
-  <!-- Toast Container -->
+  <!-- Enhanced Toast Container -->
   <div id="toast-container" class="fixed bottom-6 right-6 space-y-3 z-50">
     <!-- Toast notifications will appear here -->
   </div>
 
-  <!-- Loading Overlay -->
-  <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-40">
-    <div class="text-center">
-      <div class="w-16 h-16 border-4 border-gray-200 border-t-primary rounded-full animate-spin mx-auto mb-4"></div>
-      <p class="text-gray-600">กำลังโหลด...</p>
-    </div>
-  </div>
-
   <script>
-    // Configuration
+    // Enhanced Configuration
     const CONFIG = {
       SHEET_ID: "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc",
       QUIZ_RANGE: "Allquestions",
-      ANNOUNCEMENTS_RANGE: "Announcements",
       API_KEY: "AIzaSyB4AyLjp-qzWqGm9uoKBeF2G8XUwk-eWPw",
-      ADMIN_CREDENTIALS: {
-        username: "admin",
-        password: "allquiz2025"
-      },
-      UPDATE_INTERVAL: 300000, // 5 minutes
-      MAX_NOTIFICATIONS: 50
+      REALTIME_SYNC_INTERVAL: 30000, // 30 seconds
+      NOTIFICATION_TIMEOUT: 5000,
+      MAX_NOTIFICATIONS: 100,
+      CONNECTION_TIMEOUT: 5000,
+      RETRY_ATTEMPTS: 3
     };
 
-    // Global State
+    // Enhanced Global State
     let state = {
       subjects: {},
       currentSubject: null,
-      isAdminLoggedIn: false,
       notifications: [],
-      announcements: [],
+      isConnected: false,
+      lastSync: null,
       searchResults: null,
-      lastUpdateCheck: null,
-      lastDataHash: null,
-      quizUpdates: [],
-      maintenanceMode: false,
-      autoSyncEnabled: true,
-      updateInterval: null,
-      recentQuizUpdates: []
+      currentFilter: 'all',
+      sortOrder: 'name',
+      analytics: {
+        pageViews: 0,
+        quizAccesses: 0,
+        totalUsers: 0,
+        averageSessionTime: 0,
+        errorCount: 0
+      },
+      realTimeData: {
+        activeUsers: 0,
+        recentActivities: [],
+        connectionStatus: 'connected'
+      }
     };
 
-    // Google Sheets API Functions
+    // Real-time System
+    class RealTimeSystem {
+      constructor() {
+        this.syncInterval = null;
+        this.connected = false;
+        this.retryCount = 0;
+      }
+
+      async initialize() {
+        try {
+          await this.connect();
+          this.startPeriodicSync();
+          this.updateConnectionStatus(true);
+          this.logActivity('System', 'Real-time system initialized successfully');
+        } catch (error) {
+          console.error('Failed to initialize real-time system:', error);
+          this.updateConnectionStatus(false);
+          this.scheduleRetry();
+        }
+      }
+
+      async connect() {
+        // Simulate WebSocket connection for demo
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.connected = true;
+            this.retryCount = 0;
+            resolve();
+          }, 1000);
+        });
+      }
+
+      startPeriodicSync() {
+        if (this.syncInterval) {
+          clearInterval(this.syncInterval);
+        }
+
+        this.syncInterval = setInterval(async () => {
+          try {
+            await this.syncData();
+            this.updateLastSyncTime();
+          } catch (error) {
+            console.error('Sync failed:', error);
+            this.handleSyncError(error);
+          }
+        }, CONFIG.REALTIME_SYNC_INTERVAL);
+      }
+
+      async syncData() {
+        const startTime = performance.now();
+        
+        try {
+          const data = await SheetsAPI.readData();
+          const processingTime = performance.now() - startTime;
+          
+          // Check for changes
+          const newHash = this.generateDataHash(data);
+          if (state.lastDataHash && state.lastDataHash !== newHash) {
+            const changes = this.detectChanges(state.lastData, data);
+            this.processDataChanges(changes);
+          }
+          
+          state.lastData = data;
+          state.lastDataHash = newHash;
+          
+          // Update processing stats
+          document.getElementById('avg-response-time').textContent = Math.round(processingTime) + 'ms';
+          
+          await this.updateSubjectData(data);
+          this.logActivity('Sync', `Data synchronized (${Math.round(processingTime)}ms)`);
+          
+        } catch (error) {
+          throw new Error(`Sync failed: ${error.message}`);
+        }
+      }
+
+      generateDataHash(data) {
+        return btoa(JSON.stringify(data)).substr(0, 16);
+      }
+
+      detectChanges(oldData, newData) {
+        const changes = {
+          added: [],
+          modified: [],
+          removed: []
+        };
+
+        if (!oldData) return changes;
+
+        // Simple change detection - in real app would be more sophisticated
+        if (newData.length > oldData.length) {
+          changes.added = newData.slice(oldData.length);
+        }
+
+        return changes;
+      }
+
+      processDataChanges(changes) {
+        if (changes.added.length > 0) {
+          this.notifyNewQuizzes(changes.added);
+        }
+        if (changes.modified.length > 0) {
+          this.notifyQuizUpdates(changes.modified);
+        }
+      }
+
+      notifyNewQuizzes(newQuizzes) {
+        newQuizzes.forEach(quiz => {
+          if (quiz[1]) { // Has quiz name
+            this.addNotification({
+              type: 'quiz-new',
+              title: 'ควิซใหม่!',
+              message: `มีควิซใหม่: ${quiz[1]}`,
+              timestamp: new Date(),
+              icon: 'fa-plus-circle',
+              color: 'green'
+            });
+          }
+        });
+      }
+
+      notifyQuizUpdates(updatedQuizzes) {
+        updatedQuizzes.forEach(quiz => {
+          this.addNotification({
+            type: 'quiz-update',
+            title: 'ควิซอัพเดต',
+            message: `ควิซ ${quiz[1]} มีการอัพเดต`,
+            timestamp: new Date(),
+            icon: 'fa-sync-alt',
+            color: 'blue'
+          });
+        });
+      }
+
+      async updateSubjectData(rawData) {
+        state.subjects = {};
+        let totalQuizzes = 0;
+        let activeQuizzes = 0;
+        let expiringSoon = 0;
+
+        rawData.slice(1).forEach(row => {
+          const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
+          
+          if (subject && subject.trim()) {
+            if (!state.subjects[subject]) {
+              state.subjects[subject] = [];
+            }
+            
+            if (quizName) {
+              const quiz = { 
+                id: Date.now() + Math.random(),
+                quizName, 
+                quizLink, 
+                quizDescription, 
+                expiryDate, 
+                status,
+                subject,
+                lastUpdated: new Date().toLocaleString('th-TH')
+              };
+              
+              state.subjects[subject].push(quiz);
+              totalQuizzes++;
+              
+              if (quizLink && !this.isExpired(expiryDate)) {
+                activeQuizzes++;
+              }
+              
+              if (this.isExpiringSoon(expiryDate)) {
+                expiringSoon++;
+              }
+            }
+          }
+        });
+
+        // Update stats with animation
+        this.animateCounter('total-subjects', Object.keys(state.subjects).length);
+        this.animateCounter('total-quizzes', totalQuizzes);
+        this.animateCounter('active-quizzes', activeQuizzes);
+        this.animateCounter('expiring-soon', expiringSoon);
+
+        renderSubjects();
+      }
+
+      animateCounter(elementId, targetValue) {
+        const element = document.getElementById(elementId);
+        const currentValue = parseInt(element.textContent) || 0;
+        const increment = Math.ceil((targetValue - currentValue) / 10);
+        
+        if (currentValue !== targetValue) {
+          element.textContent = Math.min(currentValue + increment, targetValue);
+          if (currentValue + increment < targetValue) {
+            setTimeout(() => this.animateCounter(elementId, targetValue), 50);
+          }
+        }
+      }
+
+      isExpired(expiryDate) {
+        if (!expiryDate) return false;
+        try {
+          const [date, time] = expiryDate.split(", ");
+          const [day, month, year] = date.split("/");
+          const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
+          return new Date(formattedDate).getTime() < Date.now();
+        } catch {
+          return false;
+        }
+      }
+
+      isExpiringSoon(expiryDate, daysThreshold = 7) {
+        if (!expiryDate) return false;
+        try {
+          const [date, time] = expiryDate.split(", ");
+          const [day, month, year] = date.split("/");
+          const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
+          const timeLeft = new Date(formattedDate).getTime() - Date.now();
+          const daysLeft = timeLeft / (1000 * 60 * 60 * 24);
+          return daysLeft > 0 && daysLeft <= daysThreshold;
+        } catch {
+          return false;
+        }
+      }
+
+      updateConnectionStatus(connected) {
+        this.connected = connected;
+        state.isConnected = connected;
+        
+        const statusBar = document.getElementById('realtime-status');
+        if (connected) {
+          statusBar.className = 'fixed top-0 left-0 right-0 bg-success text-white text-center py-2 text-sm z-50 realtime-glow';
+          statusBar.innerHTML = `
+            <div class="flex items-center justify-center space-x-2">
+              <div class="w-3 h-3 bg-white rounded-full realtime-indicator"></div>
+              <span>ระบบเรียลไทม์เชื่อมต่อแล้ว</span>
+              <span id="last-sync-time" class="opacity-75"></span>
+            </div>
+          `;
+        } else {
+          statusBar.className = 'fixed top-0 left-0 right-0 bg-red-500 text-white text-center py-2 text-sm z-50';
+          statusBar.innerHTML = `
+            <div class="flex items-center justify-center space-x-2">
+              <div class="w-3 h-3 bg-white rounded-full"></div>
+              <span>การเชื่อมต่อขาดหาย - กำลังลองใหม่...</span>
+            </div>
+          `;
+        }
+      }
+
+      updateLastSyncTime() {
+        const now = new Date();
+        state.lastSync = now;
+        const timeString = now.toLocaleTimeString('th-TH');
+        
+        const elements = document.querySelectorAll('#last-sync-time, #last-update-display');
+        elements.forEach(el => {
+          if (el) el.textContent = `อัพเดต: ${timeString}`;
+        });
+      }
+
+      scheduleRetry() {
+        if (this.retryCount < CONFIG.RETRY_ATTEMPTS) {
+          this.retryCount++;
+          const delay = Math.pow(2, this.retryCount) * 1000; // Exponential backoff
+          
+          setTimeout(async () => {
+            try {
+              await this.initialize();
+            } catch (error) {
+              this.scheduleRetry();
+            }
+          }, delay);
+        }
+      }
+
+      handleSyncError(error) {
+        state.analytics.errorCount++;
+        this.logActivity('Error', `Sync error: ${error.message}`);
+        
+        if (!this.connected) {
+          this.updateConnectionStatus(false);
+          this.scheduleRetry();
+        }
+      }
+
+      addNotification(notification) {
+        notification.id = Date.now() + Math.random();
+        state.notifications.unshift(notification);
+        
+        // Limit notifications
+        if (state.notifications.length > CONFIG.MAX_NOTIFICATIONS) {
+          state.notifications = state.notifications.slice(0, CONFIG.MAX_NOTIFICATIONS);
+        }
+        
+        this.showNotificationToast(notification);
+        this.updateNotificationUI();
+        this.logActivity('Notification', notification.message);
+      }
+
+      showNotificationToast(notification) {
+        const toast = document.createElement('div');
+        toast.className = `notification-toast flex items-center space-x-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-lg max-w-sm`;
+        
+        const colorClasses = {
+          green: 'text-green-500',
+          blue: 'text-blue-500',
+          orange: 'text-orange-500',
+          red: 'text-red-500'
+        };
+        
+        toast.innerHTML = `
+          <div class="w-10 h-10 bg-${notification.color}-50 rounded-xl flex items-center justify-center">
+            <i class="fas ${notification.icon} ${colorClasses[notification.color]} text-lg"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-gray-800 text-sm">${notification.title}</div>
+            <div class="text-gray-600 text-xs">${notification.message}</div>
+          </div>
+          <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times text-sm"></i>
+          </button>
+        `;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        setTimeout(() => {
+          if (toast.parentElement) {
+            toast.remove();
+          }
+        }, CONFIG.NOTIFICATION_TIMEOUT);
+      }
+
+      updateNotificationUI() {
+        const badge = document.getElementById('notification-count');
+        const count = state.notifications.length;
+        
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+
+      logActivity(category, message) {
+        const activity = {
+          timestamp: new Date().toLocaleTimeString('th-TH'),
+          category,
+          message
+        };
+        
+        state.realTimeData.recentActivities.unshift(activity);
+        
+        // Limit activities
+        if (state.realTimeData.recentActivities.length > 50) {
+          state.realTimeData.recentActivities = state.realTimeData.recentActivities.slice(0, 50);
+        }
+        
+        this.updateActivityLog();
+      }
+
+      updateActivityLog() {
+        const logs = [
+          document.getElementById('live-activity-log'),
+          document.getElementById('activity-feed')
+        ];
+        
+        logs.forEach(log => {
+          if (!log) return;
+          
+          log.innerHTML = '';
+          
+          state.realTimeData.recentActivities.slice(0, 10).forEach(activity => {
+            const item = document.createElement('div');
+            item.className = 'flex items-center space-x-3 text-sm bg-gray-50 rounded-lg p-3';
+            
+            const categoryColors = {
+              'System': 'text-green-500',
+              'Sync': 'text-blue-500',
+              'Error': 'text-red-500',
+              'Notification': 'text-purple-500',
+              'User': 'text-orange-500'
+            };
+            
+            item.innerHTML = `
+              <div class="w-2 h-2 ${categoryColors[activity.category] || 'bg-gray-500'} rounded-full"></div>
+              <span class="text-gray-600">[${activity.timestamp}] ${activity.message}</span>
+            `;
+            
+            log.appendChild(item);
+          });
+        });
+      }
+
+      disconnect() {
+        if (this.syncInterval) {
+          clearInterval(this.syncInterval);
+          this.syncInterval = null;
+        }
+        this.connected = false;
+        this.updateConnectionStatus(false);
+        this.logActivity('System', 'Real-time system disconnected');
+      }
+    }
+
+    // Google Sheets API (Enhanced)
     const SheetsAPI = {
       async readData(range = CONFIG.QUIZ_RANGE) {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${range}?key=${CONFIG.API_KEY}`;
+        
         try {
+          const startTime = performance.now();
           const response = await fetch(url);
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+          }
+          
           const data = await response.json();
+          const responseTime = performance.now() - startTime;
+          
+          // Update analytics
+          state.analytics.pageViews++;
+          
           return data.values || [];
         } catch (error) {
-          console.error('Error reading from sheets:', error);
-          throw error;
-        }
-      },
-
-      async appendData(range, values) {
-        try {
-          // For demo purposes, we'll just simulate success
-          console.log('Would append to sheets:', range, values);
-          return { success: true };
-        } catch (error) {
-          console.error('Error appending to sheets:', error);
+          state.analytics.errorCount++;
           throw error;
         }
       }
     };
 
-    // Maintenance Mode Functions
-    const MaintenanceMode = {
-      enable(options = {}) {
-        state.maintenanceMode = true;
-        
-        const overlay = document.getElementById('maintenance-overlay');
-        const messageElement = document.getElementById('maintenance-message');
-        const message = options.message || 'เว็บไซต์กำลังปรับปรุง กรุณารอสักครู่...';
-        const duration = options.duration || 30;
-        
-        messageElement.textContent = message;
-        
-        if (duration > 0) {
-          const etaElement = document.getElementById('maintenance-eta');
-          const eta = new Date(Date.now() + duration * 60000);
-          etaElement.textContent = `คาดว่าจะกลับมาใช้งานได้ประมาณ ${eta.toLocaleTimeString('th-TH')}`;
-        }
-        
-        overlay.classList.remove('hidden');
-        
-        if (!state.isAdminLoggedIn || !options.allowAdminAccess) {
-          document.getElementById('main-content').style.display = 'none';
-        }
-        
-        this.updateStatusIndicators();
-        localStorage.setItem('maintenanceMode', 'true');
-        logActivity('admin', 'Maintenance mode enabled');
-        
-        if (options.autoAnnouncement) {
-          this.createMaintenanceAnnouncement(message, duration);
-        }
-      },
+    // Initialize Real-time System
+    const realTimeSystem = new RealTimeSystem();
 
-      disable() {
-        state.maintenanceMode = false;
-        
-        document.getElementById('maintenance-overlay').classList.add('hidden');
-        document.getElementById('main-content').style.display = 'block';
-        
-        this.updateStatusIndicators();
-        localStorage.setItem('maintenanceMode', 'false');
-        logActivity('admin', 'Maintenance mode disabled');
-        showToast('เว็บไซต์กลับมาใช้งานปกติแล้ว', 'success');
-      },
-
-      updateStatusIndicators() {
-        const statusDot = document.getElementById('maintenance-status-dot');
-        const statusLabel = document.getElementById('maintenance-status-label');
-        const statusText = document.getElementById('maintenance-status-text');
-        const currentStatus = document.getElementById('maintenance-current-status');
-        
-        if (state.maintenanceMode) {
-          statusDot.className = 'w-3 h-3 bg-red-500 rounded-full';
-          statusLabel.textContent = 'เว็บไซต์ปรับปรุง';
-          statusText.textContent = 'เปิดใช้งาน';
-          currentStatus.textContent = 'เว็บไซต์อยู่ในโหมดปรับปรุง';
-        } else {
-          statusDot.className = 'w-3 h-3 bg-green-500 rounded-full';
-          statusLabel.textContent = 'เว็บไซต์ปกติ';
-          statusText.textContent = 'ปิดใช้งาน';
-          currentStatus.textContent = 'เว็บไซต์เปิดใช้งานปกติ';
-        }
-      },
-
-      createMaintenanceAnnouncement(message, duration) {
-        const announcement = {
-          id: Date.now(),
-          title: 'แจ้งปรับปรุงระบบ',
-          content: message,
-          type: 'maintenance',
-          timestamp: new Date().toLocaleString('th-TH'),
-          active: true,
-          duration: duration
-        };
-        
-        state.announcements.unshift(announcement);
-        saveAnnouncements();
-        showActiveAnnouncement(announcement);
-      }
-    };
-
-    // Quiz Monitor
-    const QuizMonitor = {
-      async checkForUpdates() {
-        if (!state.autoSyncEnabled) return;
-        
-        try {
-          updateSyncStatus('syncing', 'Checking for updates...');
-          
-          const newData = await SheetsAPI.readData();
-          const newHash = this.generateDataHash(newData);
-          
-          if (state.lastDataHash && state.lastDataHash !== newHash) {
-            const updates = this.compareData(state.lastData, newData);
-            this.processUpdates(updates);
-          }
-          
-          state.lastDataHash = newHash;
-          state.lastData = newData;
-          state.lastUpdateCheck = new Date();
-          
-          await processSubjectData(newData);
-          renderSubjects();
-          updateStats();
-          
-          updateSyncStatus('success', 'Up to date');
-          document.getElementById('last-update-time').textContent = new Date().toLocaleTimeString('th-TH');
-          
-        } catch (error) {
-          console.error('Update check failed:', error);
-          updateSyncStatus('error', 'Sync failed');
-          logActivity('error', 'Failed to check for updates', error.message);
-        }
-      },
-
-      generateDataHash(data) {
-        return btoa(JSON.stringify(data)).substr(0, 20);
-      },
-
-      compareData(oldData, newData) {
-        const updates = {
-          new: [],
-          modified: [],
-          deleted: []
-        };
-        
-        if (!oldData || oldData.length < newData.length) {
-          updates.new = newData.slice(oldData ? oldData.length : 0);
-        }
-        
-        return updates;
-      },
-
-      processUpdates(updates) {
-        let totalUpdates = updates.new.length + updates.modified.length;
-        
-        if (totalUpdates > 0) {
-          this.showQuizUpdateNotification(totalUpdates, updates);
-          this.updateQuizStats(updates);
-          logActivity('info', `Found ${totalUpdates} quiz updates`);
-        }
-      },
-
-      showQuizUpdateNotification(count, updates) {
-        const notification = document.getElementById('quiz-update-notification');
-        const details = document.getElementById('quiz-update-details');
-        const time = document.getElementById('quiz-update-time');
-        
-        let message = '';
-        if (updates.new.length > 0) {
-          message += `${updates.new.length} ควิซใหม่`;
-        }
-        if (updates.modified.length > 0) {
-          if (message) message += ', ';
-          message += `${updates.modified.length} ควิซอัพเดต`;
-        }
-        
-        details.textContent = message;
-        time.textContent = 'เมื่อสักครู่';
-        
-        notification.classList.remove('hidden');
-        
-        setTimeout(() => {
-          notification.classList.add('hidden');
-        }, 10000);
-        
-        state.recentQuizUpdates.unshift({
-          timestamp: new Date().toLocaleString('th-TH'),
-          message: message,
-          count: count
-        });
-        
-        if (state.recentQuizUpdates.length > 10) {
-          state.recentQuizUpdates = state.recentQuizUpdates.slice(0, 10);
-        }
-        
-        this.updateRecentQuizUpdates();
-      },
-
-      updateQuizStats(updates) {
-        document.getElementById('new-quizzes-count').textContent = updates.new.length;
-        document.getElementById('updated-quizzes-count').textContent = updates.modified.length;
-        document.getElementById('dash-quiz-updates').textContent = updates.new.length + updates.modified.length;
-      },
-
-      updateRecentQuizUpdates() {
-        const container = document.getElementById('recent-quiz-updates');
-        container.innerHTML = '';
-        
-        if (state.recentQuizUpdates.length === 0) {
-          container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">ยังไม่มีการอัพเดตควิซ</p>';
-          return;
-        }
-        
-        state.recentQuizUpdates.forEach(update => {
-          const item = document.createElement('div');
-          item.className = 'flex items-center space-x-3 p-3 bg-green-50 rounded-lg';
-          item.innerHTML = `
-            <i class="fas fa-sync-alt text-green-500"></i>
-            <div class="flex-1">
-              <div class="text-sm font-medium text-gray-800">${update.message}</div>
-              <div class="text-xs text-gray-500">${update.timestamp}</div>
-            </div>
-            <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">${update.count}</span>
-          `;
-          container.appendChild(item);
-        });
-      }
-    };
-
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', async () => {
-      await initializeApp();
-      setupEventListeners();
-      startUpdateMonitoring();
-    });
-
-    function setupEventListeners() {
-      // Search
-      document.getElementById('search-input').addEventListener('input', handleSearch);
-      
-      // Keyboard shortcuts
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'F12' || 
-            (e.ctrlKey && e.shiftKey && e.key === 'I') ||
-            (e.ctrlKey && e.key === 'u')) {
-          e.preventDefault();
-          return false;
-        }
-      });
-
-      // Disable right-click
-      document.addEventListener('contextmenu', (e) => {
-        e.preventDefault();
-        return false;
-      });
-    }
-
-    async function initializeApp() {
-      try {
-        // Check maintenance mode
-        const savedMaintenance = localStorage.getItem('maintenanceMode');
-        if (savedMaintenance === 'true') {
-          state.maintenanceMode = true;
-          MaintenanceMode.enable();
-        }
-        
-        await loadSubjects();
-        loadAnnouncements();
-        updateStats();
-        
-        state.lastUpdateCheck = new Date();
-        document.getElementById('site-status').classList.remove('hidden');
-        
-        hideLoading();
-        logActivity('info', 'Application initialized');
-        
-      } catch (error) {
-        console.error('Failed to initialize app:', error);
-        showToast('เกิดข้อผิดพลาดในการโหลดข้อมูล', 'error');
-        hideLoading();
-      }
-    }
-
-    async function loadSubjects() {
-      try {
-        const data = await SheetsAPI.readData();
-        if (data.length > 0) {
-          state.lastData = data;
-          state.lastDataHash = QuizMonitor.generateDataHash(data);
-          await processSubjectData(data);
-          renderSubjects();
-        }
-      } catch (error) {
-        throw new Error('Failed to fetch data from Google Sheets');
-      }
-    }
-
-    async function processSubjectData(rawData) {
-      state.subjects = {};
-      let totalQuizzes = 0;
-      let activeQuizzes = 0;
-
-      rawData.slice(1).forEach(row => {
-        const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
-        
-        if (subject && subject.trim()) {
-          if (!state.subjects[subject]) {
-            state.subjects[subject] = [];
-          }
-          
-          if (quizName) {
-            const quiz = { 
-              id: Date.now() + Math.random(),
-              quizName, 
-              quizLink, 
-              quizDescription, 
-              expiryDate, 
-              status,
-              subject,
-              lastUpdated: new Date().toLocaleString('th-TH')
-            };
-            state.subjects[subject].push(quiz);
-            totalQuizzes++;
-            
-            if (quizLink && !isExpired(expiryDate)) {
-              activeQuizzes++;
-            }
-          }
-        }
-      });
-
-      document.getElementById('total-subjects').textContent = Object.keys(state.subjects).length;
-      document.getElementById('total-quizzes').textContent = totalQuizzes;
-      document.getElementById('active-quizzes').textContent = activeQuizzes;
-    }
-
+    // Enhanced UI Functions
     function renderSubjects() {
       const grid = document.getElementById('subjects-grid');
       grid.innerHTML = '';
 
-      Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-        const card = createSubjectCard(subject, quizzes);
+      const subjects = state.searchResults || state.subjects;
+
+      if (Object.keys(subjects).length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <i class="fas fa-book-open text-gray-400 text-6xl mb-4"></i>
+            <h3 class="text-2xl font-bold text-gray-600 mb-2">ไม่มีข้อมูลวิชา</h3>
+            <p class="text-gray-500">กำลังโหลดข้อมูลจาก Google Sheets...</p>
+          </div>
+        `;
+        return;
+      }
+
+      Object.entries(subjects).forEach(([subject, quizzes], index) => {
+        const card = createEnhancedSubjectCard(subject, quizzes, index);
         grid.appendChild(card);
       });
     }
 
-    function createSubjectCard(subject, quizzes) {
-      const availableQuizzes = quizzes.filter(q => q.quizName && q.quizLink && !isExpired(q.expiryDate)).length;
+    function createEnhancedSubjectCard(subject, quizzes, index) {
+      const availableQuizzes = quizzes.filter(q => q.quizName && q.quizLink && !realTimeSystem.isExpired(q.expiryDate)).length;
+      const expiringSoon = quizzes.filter(q => realTimeSystem.isExpiringSoon(q.expiryDate)).length;
       const hasQuizzes = quizzes.some(q => q.quizName);
       
       const card = document.createElement('div');
-      card.className = `ios-card rounded-3xl p-6 shadow-lg border cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate-slide-in ${hasQuizzes ? 'hover:shadow-primary/20' : ''}`;
+      card.className = `quiz-card glass-morphism rounded-3xl p-6 border cursor-pointer transition-all duration-300 ${hasQuizzes ? 'hover:shadow-2xl' : 'opacity-75'}`;
+      card.style.animationDelay = `${index * 100}ms`;
       
       const icon = getSubjectIcon(subject);
       
-      card.innerHTML = `
-        <div class="text-center">
-          <div class="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <i class="fas ${icon} text-white text-2xl"></i>
+      let statusIndicator = '';
+      if (expiringSoon > 0) {
+        statusIndicator = `
+          <div class="absolute top-4 right-4 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
+          <div class="absolute top-2 right-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
+            ${expiringSoon} ใกล้หมดอายุ
           </div>
-          <h3 class="font-semibold text-gray-800 mb-2 text-lg">${subject}</h3>
-          ${!hasQuizzes ? 
-            '<span class="inline-block px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full">รออัพเดต</span>' :
-            `<span class="inline-block px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">${availableQuizzes} ควิซพร้อมใช้</span>`
-          }
+        `;
+      }
+      
+      card.innerHTML = `
+        <div class="relative">
+          ${statusIndicator}
+          <div class="text-center">
+            <div class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <i class="fas ${icon} text-white text-3xl"></i>
+            </div>
+            <h3 class="font-bold text-gray-800 mb-3 text-xl">${subject}</h3>
+            ${!hasQuizzes ? 
+              '<div class="inline-block px-4 py-2 bg-yellow-100 text-yellow-800 text-sm rounded-2xl font-medium">รออัพเดต</div>' :
+              `<div class="space-y-2">
+                <div class="inline-block px-4 py-2 bg-green-100 text-green-800 text-sm rounded-2xl font-medium">
+                  ${availableQuizzes} ควิซพร้อมใช้
+                </div>
+                ${expiringSoon > 0 ? 
+                  `<div class="inline-block px-4 py-2 bg-orange-100 text-orange-800 text-sm rounded-2xl font-medium">
+                    ${expiringSoon} ใกล้หมดอายุ
+                  </div>` : ''
+                }
+              </div>`
+            }
+            <div class="mt-4 text-xs text-gray-500">
+              อัพเดตล่าสุด: ${state.lastSync ? state.lastSync.toLocaleTimeString('th-TH') : 'กำลังโหลด...'}
+            </div>
+          </div>
         </div>
       `;
       
       if (hasQuizzes) {
         card.addEventListener('click', () => {
           showQuizzes(subject);
-          logActivity('info', `Viewed quizzes for subject: ${subject}`);
+          state.analytics.quizAccesses++;
+          realTimeSystem.logActivity('User', `Viewed quizzes for subject: ${subject}`);
         });
       }
       
@@ -1294,6 +1286,11 @@
         'คณิตศาสตร์': 'fa-calculator',
         'วิทยาศาสตร์': 'fa-flask',
         'ภาษา': 'fa-language',
+        'ประวัติศาสตร์': 'fa-landmark',
+        'ภูมิศาสตร์': 'fa-globe',
+        'ฟิสิกส์': 'fa-atom',
+        'เคมี': 'fa-vial',
+        'ชีววิทยา': 'fa-dna',
         'default': 'fa-book'
       };
       
@@ -1320,60 +1317,76 @@
       const grid = document.getElementById('quiz-grid');
       grid.innerHTML = '';
 
-      quizzes.forEach((quiz, index) => {
+      // Sort quizzes
+      const sortedQuizzes = [...quizzes].sort((a, b) => {
+        if (state.sortOrder === 'name') {
+          return (a.quizName || '').localeCompare(b.quizName || '');
+        } else {
+          return new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0);
+        }
+      });
+
+      sortedQuizzes.forEach((quiz, index) => {
         if (!quiz.quizName) return;
         
-        const card = createQuizCard(quiz, index);
+        const card = createEnhancedQuizCard(quiz, index);
         grid.appendChild(card);
       });
     }
 
-    function createQuizCard(quiz, index) {
-      const isExpiredQuiz = isExpired(quiz.expiryDate);
+    function createEnhancedQuizCard(quiz, index) {
+      const isExpiredQuiz = realTimeSystem.isExpired(quiz.expiryDate);
+      const isExpiringSoon = realTimeSystem.isExpiringSoon(quiz.expiryDate);
       const countdown = quiz.expiryDate ? calculateCountdown(quiz.expiryDate) : null;
       
       const card = document.createElement('div');
-      card.className = 'ios-card rounded-3xl p-6 shadow-lg border transition-all duration-300 hover:shadow-xl animate-slide-in';
+      card.className = 'quiz-card glass-morphism rounded-3xl p-6 border transition-all duration-300 hover:shadow-2xl animate-slide-up';
+      card.style.animationDelay = `${index * 100}ms`;
       
       let statusBadge = '';
-      if (quiz.status) {
+      let statusIndicator = '';
+      
+      if (isExpiredQuiz) {
+        statusBadge = '<div class="inline-block px-4 py-2 bg-red-100 text-red-800 text-sm rounded-2xl font-medium mb-3">หมดอายุแล้ว</div>';
+        statusIndicator = '<div class="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full"></div>';
+      } else if (isExpiringSoon) {
+        statusBadge = `<div class="inline-block px-4 py-2 bg-orange-100 text-orange-800 text-sm rounded-2xl font-medium mb-3"><i class="fas fa-clock mr-1"></i>${countdown}</div>`;
+        statusIndicator = '<div class="absolute top-4 right-4 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>';
+      } else if (quiz.status) {
         const statusColors = {
           'อัพเดตล่าสุด': 'bg-green-100 text-green-800',
           'รออัพเดต': 'bg-yellow-100 text-yellow-800',
           'ปิดปรับปรุง': 'bg-red-100 text-red-800'
         };
         const colorClass = statusColors[quiz.status] || 'bg-gray-100 text-gray-800';
-        statusBadge = `<span class="inline-block px-3 py-1 ${colorClass} text-sm rounded-full mb-3">${quiz.status}</span>`;
-      } else if (countdown) {
-        statusBadge = isExpiredQuiz ? 
-          '<span class="inline-block px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full mb-3">หมดเวลา</span>' :
-          `<span class="inline-block px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full mb-3"><i class="fas fa-clock mr-1"></i>${countdown}</span>`;
+        statusBadge = `<div class="inline-block px-4 py-2 ${colorClass} text-sm rounded-2xl font-medium mb-3">${quiz.status}</div>`;
       }
       
       card.innerHTML = `
-        <div class="flex items-start space-x-4">
-          <div class="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="fas fa-file-alt text-gray-600 text-lg"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="font-semibold text-gray-800 mb-2 text-lg leading-tight">${quiz.quizName}</h3>
-            ${statusBadge}
-            ${quiz.quizDescription ? `<p class="text-gray-600 text-sm mb-4 leading-relaxed">${quiz.quizDescription}</p>` : ''}
-            ${quiz.lastUpdated ? `<p class="text-xs text-gray-500 mb-3">อัพเดต: ${quiz.lastUpdated}</p>` : ''}
-            
-            <div class="flex items-center justify-between">
-              ${quiz.quizLink && !isExpiredQuiz ? 
-                `<a href="${quiz.quizLink}" target="_blank" onclick="logQuizAccess('${quiz.quizName}')" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white text-sm rounded-xl hover:shadow-lg transition-all">
-                  <i class="fas fa-external-link-alt mr-2"></i>ดูเฉลย
-                </a>` :
-                '<span class="px-4 py-2 bg-gray-100 text-gray-600 text-sm rounded-xl">ไม่พร้อมใช้งาน</span>'
-              }
+        <div class="relative">
+          ${statusIndicator}
+          <div class="flex items-start space-x-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <i class="fas fa-file-alt text-gray-600 text-2xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-gray-800 mb-2 text-lg leading-tight">${quiz.quizName}</h3>
+              ${statusBadge}
+              ${quiz.quizDescription ? `<p class="text-gray-600 text-sm mb-4 leading-relaxed">${quiz.quizDescription}</p>` : ''}
               
-              ${state.isAdminLoggedIn ? 
-                `<button onclick="editQuiz('${quiz.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                  <i class="fas fa-edit"></i>
-                </button>` : ''
-              }
+              <div class="flex items-center justify-between mt-4">
+                ${quiz.quizLink && !isExpiredQuiz ? 
+                  `<button onclick="accessQuiz('${quiz.quizLink}', '${quiz.quizName}')" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white text-sm rounded-2xl hover:shadow-lg transition-all font-medium">
+                    <i class="fas fa-external-link-alt mr-2"></i>ดูเฉลย
+                  </button>` :
+                  '<span class="px-6 py-3 bg-gray-100 text-gray-600 text-sm rounded-2xl font-medium">ไม่พร้อมใช้งาน</span>'
+                }
+                
+                <div class="text-right">
+                  <div class="text-xs text-gray-500">อัพเดต: ${quiz.lastUpdated || 'ไม่ระบุ'}</div>
+                  ${countdown && !isExpiredQuiz ? `<div class="text-xs text-orange-600 font-medium">${countdown}</div>` : ''}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1382,107 +1395,206 @@
       return card;
     }
 
+    function accessQuiz(link, name) {
+      state.analytics.quizAccesses++;
+      realTimeSystem.logActivity('User', `Accessed quiz: ${name}`);
+      
+      // Add access notification
+      realTimeSystem.addNotification({
+        type: 'quiz-access',
+        title: 'เข้าถึงควิซ',
+        message: `เปิดดูเฉลย: ${name}`,
+        timestamp: new Date(),
+        icon: 'fa-external-link-alt',
+        color: 'blue'
+      });
+      
+      window.open(link, '_blank');
+    }
+
+    function calculateCountdown(expiryDate) {
+      if (!expiryDate) return '';
+      try {
+        const [date, time] = expiryDate.split(", ");
+        const [day, month, year] = date.split("/");
+        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
+        const timeLeft = new Date(formattedDate).getTime() - Date.now();
+        
+        if (timeLeft <= 0) return 'หมดเวลา';
+        
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (days > 7) return `${days} วัน`;
+        if (days > 0) return `${days} วัน ${hours} ชม.`;
+        if (hours > 0) return `${hours} ชม. ${minutes} นาที`;
+        return `${minutes} นาที`;
+      } catch {
+        return '';
+      }
+    }
+
+    // Search and Filter Functions
+    function handleSearch() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      
+      if (!query) {
+        state.searchResults = null;
+        document.getElementById('search-results-count').classList.add('hidden');
+        renderSubjects();
+        return;
+      }
+
+      const results = {};
+      let totalResults = 0;
+      
+      Object.entries(state.subjects).forEach(([subject, quizzes]) => {
+        const matchingQuizzes = quizzes.filter(quiz => {
+          if (state.currentFilter !== 'all') {
+            if (state.currentFilter === 'active' && realTimeSystem.isExpired(quiz.expiryDate)) return false;
+            if (state.currentFilter === 'expired' && !realTimeSystem.isExpired(quiz.expiryDate)) return false;
+            if (state.currentFilter === 'updated' && quiz.status !== 'อัพเดตล่าสุด') return false;
+          }
+          
+          return subject.toLowerCase().includes(query) ||
+                 (quiz.quizName && quiz.quizName.toLowerCase().includes(query)) ||
+                 (quiz.quizDescription && quiz.quizDescription.toLowerCase().includes(query));
+        });
+        
+        if (matchingQuizzes.length > 0 || subject.toLowerCase().includes(query)) {
+          results[subject] = quizzes;
+          totalResults += matchingQuizzes.length;
+        }
+      });
+
+      state.searchResults = results;
+      
+      const countElement = document.getElementById('search-results-count');
+      countElement.textContent = `${totalResults} ผลลัพธ์`;
+      countElement.classList.remove('hidden');
+      
+      renderSubjects();
+      realTimeSystem.logActivity('User', `Search: "${query}" (${totalResults} results)`);
+    }
+
+    function toggleSearchFilters() {
+      const filters = document.getElementById('search-filters');
+      filters.classList.toggle('hidden');
+    }
+
+    function filterByStatus(status) {
+      state.currentFilter = status;
+      
+      // Update filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-primary', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+      });
+      
+      event.target.classList.remove('bg-gray-200', 'text-gray-700');
+      event.target.classList.add('bg-primary', 'text-white');
+      
+      handleSearch();
+    }
+
+    function sortQuizzes(order) {
+      state.sortOrder = order;
+      if (state.currentSubject) {
+        renderQuizzes(state.subjects[state.currentSubject]);
+      }
+    }
+
     function goBackToSubjects() {
       document.getElementById('quiz-section').classList.add('hidden');
       document.getElementById('subjects-section').classList.remove('hidden');
       state.currentSubject = null;
     }
 
-    function handleSearch() {
-      const query = document.getElementById('search-input').value.toLowerCase().trim();
+    // Notification Functions
+    function toggleRealTimeNotifications() {
+      const panel = document.getElementById('realtime-notifications');
+      panel.classList.toggle('hidden');
       
-      if (!query) {
-        state.searchResults = null;
-        renderSubjects();
-        return;
+      if (!panel.classList.contains('hidden')) {
+        updateNotificationList();
       }
-
-      const results = {};
-      Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-        const matchingQuizzes = quizzes.filter(quiz => 
-          subject.toLowerCase().includes(query) ||
-          (quiz.quizName && quiz.quizName.toLowerCase().includes(query)) ||
-          (quiz.quizDescription && quiz.quizDescription.toLowerCase().includes(query))
-        );
-        
-        if (matchingQuizzes.length > 0 || subject.toLowerCase().includes(query)) {
-          results[subject] = quizzes;
-        }
-      });
-
-      state.searchResults = results;
-      renderSearchResults(results);
-      logActivity('info', `Search performed: ${query}`);
     }
 
-    function renderSearchResults(results) {
-      const grid = document.getElementById('subjects-grid');
-      grid.innerHTML = '';
-
-      if (Object.keys(results).length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full text-center py-12">
-            <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
-            <h3 class="text-xl font-semibold text-gray-600 mb-2">ไม่พบผลการค้นหา</h3>
-            <p class="text-gray-500">ลองใช้คำค้นหาอื่นหรือตรวจสอบการสะกดคำ</p>
-          </div>
-        `;
+    function updateNotificationList() {
+      const list = document.getElementById('notification-list');
+      list.innerHTML = '';
+      
+      if (state.notifications.length === 0) {
+        list.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">ไม่มีการแจ้งเตือน</p>';
         return;
       }
-
-      Object.entries(results).forEach(([subject, quizzes]) => {
-        const card = createSubjectCard(subject, quizzes);
-        grid.appendChild(card);
+      
+      state.notifications.slice(0, 10).forEach(notification => {
+        const item = document.createElement('div');
+        item.className = 'flex items-start space-x-3 p-3 bg-gray-50 rounded-xl';
+        
+        const colorClasses = {
+          green: 'text-green-500 bg-green-50',
+          blue: 'text-blue-500 bg-blue-50',
+          orange: 'text-orange-500 bg-orange-50',
+          red: 'text-red-500 bg-red-50'
+        };
+        
+        item.innerHTML = `
+          <div class="w-8 h-8 ${colorClasses[notification.color]} rounded-lg flex items-center justify-center">
+            <i class="fas ${notification.icon} text-sm"></i>
+          </div>
+          <div class="flex-1">
+            <div class="font-medium text-gray-800 text-sm">${notification.title}</div>
+            <div class="text-gray-600 text-xs">${notification.message}</div>
+            <div class="text-gray-500 text-xs mt-1">${notification.timestamp.toLocaleTimeString('th-TH')}</div>
+          </div>
+        `;
+        
+        list.appendChild(item);
       });
+    }
+
+    function clearAllNotifications() {
+      state.notifications = [];
+      realTimeSystem.updateNotificationUI();
+      updateNotificationList();
+    }
+
+    // Analytics Functions
+    function toggleAnalytics() {
+      const panel = document.getElementById('analytics-panel');
+      panel.classList.toggle('hidden');
+      
+      if (!panel.classList.contains('hidden')) {
+        updateAnalyticsData();
+      }
+    }
+
+    function updateAnalyticsData() {
+      // Simulate real-time data
+      state.realTimeData.activeUsers = Math.floor(Math.random() * 20) + 5;
+      
+      document.getElementById('realtime-users').textContent = state.realTimeData.activeUsers;
+      document.getElementById('quiz-accessed-today').textContent = state.analytics.quizAccesses;
+      document.getElementById('updates-today').textContent = Math.floor(Math.random() * 10) + 1;
+      
+      // Update analytics metrics
+      document.getElementById('total-page-views').textContent = state.analytics.pageViews;
+      document.getElementById('quiz-completion-rate').textContent = Math.floor(Math.random() * 30) + 70 + '%';
+      document.getElementById('avg-session-time').textContent = Math.floor(Math.random() * 10) + 5 + 'm';
+      document.getElementById('error-rate').textContent = (state.analytics.errorCount / Math.max(state.analytics.pageViews, 1) * 100).toFixed(1) + '%';
     }
 
     // Admin Functions
     function showAdminPanel() {
       document.getElementById('admin-modal').classList.remove('hidden');
+      switchAdminTab('realtime');
     }
 
     function closeAdminPanel() {
       document.getElementById('admin-modal').classList.add('hidden');
-    }
-
-    function handleAdminLogin(event) {
-      event.preventDefault();
-      
-      const username = document.getElementById('admin-username').value;
-      const password = document.getElementById('admin-password').value;
-      
-      if (username === CONFIG.ADMIN_CREDENTIALS.username && 
-          password === CONFIG.ADMIN_CREDENTIALS.password) {
-        
-        state.isAdminLoggedIn = true;
-        
-        document.getElementById('admin-login-sidebar').classList.add('hidden');
-        document.getElementById('admin-nav').classList.remove('hidden');
-        document.getElementById('admin-indicator').classList.remove('hidden');
-        
-        showToast('เข้าสู่ระบบสำเร็จ', 'success');
-        switchAdminTab('dashboard');
-        loadAdminData();
-        logActivity('admin', 'Admin login successful');
-      } else {
-        document.getElementById('admin-error').classList.remove('hidden');
-        document.getElementById('admin-password').value = '';
-      }
-    }
-
-    function logoutAdmin() {
-      logActivity('admin', 'Admin logout');
-      state.isAdminLoggedIn = false;
-      
-      document.getElementById('admin-login-sidebar').classList.remove('hidden');
-      document.getElementById('admin-nav').classList.add('hidden');
-      document.getElementById('admin-indicator').classList.add('hidden');
-      
-      document.getElementById('admin-username').value = '';
-      document.getElementById('admin-password').value = '';
-      document.getElementById('admin-error').classList.add('hidden');
-      
-      showToast('ออกจากระบบสำเร็จ', 'info');
     }
 
     function switchAdminTab(tabName) {
@@ -1503,592 +1615,106 @@
         content.classList.add('hidden');
       });
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-
+      
       // Load tab-specific data
-      switch(tabName) {
-        case 'dashboard':
-          updateDashboardStats();
-          break;
-        case 'announcements':
-          renderAnnouncementsList();
-          break;
-        case 'quizzes':
-          loadQuizTable();
-          break;
-        case 'maintenance':
-          MaintenanceMode.updateStatusIndicators();
-          break;
+      if (tabName === 'analytics') {
+        updateAnalyticsData();
       }
     }
 
-    function loadAdminData() {
-      updateDashboardStats();
-      QuizMonitor.updateRecentQuizUpdates();
-      loadQuizTable();
-      renderAnnouncementsList();
-      MaintenanceMode.updateStatusIndicators();
+    // Admin Functions
+    function clearActivityLog() {
+      state.realTimeData.recentActivities = [];
+      realTimeSystem.updateActivityLog();
     }
 
-    function updateDashboardStats() {
-      document.getElementById('dash-visitors').textContent = Math.floor(Math.random() * 500) + 100;
-      document.getElementById('dash-downloads').textContent = Math.floor(Math.random() * 100) + 50;
-      document.getElementById('dash-alerts').textContent = state.notifications.length;
-    }
-
-    function loadQuizTable() {
-      const tbody = document.getElementById('quiz-table-body');
-      tbody.innerHTML = '';
-      
-      if (Object.keys(state.subjects).length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">ยังไม่มีข้อมูลควิซ</td></tr>';
-        return;
-      }
-      
-      Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-        quizzes.forEach(quiz => {
-          if (!quiz.quizName) return;
-          
-          const row = document.createElement('tr');
-          row.className = 'hover:bg-gray-50';
-          
-          const statusColor = {
-            'อัพเดตล่าสุด': 'bg-green-100 text-green-800',
-            'รออัพเดต': 'bg-yellow-100 text-yellow-800',
-            'ปิดปรับปรุง': 'bg-red-100 text-red-800'
-          }[quiz.status] || 'bg-gray-100 text-gray-800';
-          
-          row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">${quiz.quizName}</div>
-              <div class="text-sm text-gray-500">${quiz.quizDescription || 'ไม่มีคำอธิบาย'}</div>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${subject}</td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusColor}">
-                ${quiz.status || 'ไม่ระบุ'}
-              </span>
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-              ${quiz.lastUpdated || 'ไม่ระบุ'}
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <div class="flex space-x-2">
-                <button onclick="editQuiz('${quiz.id}')" class="text-indigo-600 hover:text-indigo-900">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="deleteQuiz('${quiz.id}', '${subject}')" class="text-red-600 hover:text-red-900">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            </td>
-          `;
-          
-          tbody.appendChild(row);
-        });
-      });
-    }
-
-    // Announcement Functions
-    function createAnnouncement(event) {
+    function sendTestNotification(event) {
       event.preventDefault();
       
-      const title = document.getElementById('announcement-title-input').value.trim();
-      const content = document.getElementById('announcement-content-input').value.trim();
-      const type = document.getElementById('announcement-type').value;
-      const saveToSheets = document.getElementById('save-to-sheets').checked;
-      const autoShow = document.getElementById('auto-show').checked;
+      const title = document.getElementById('test-notification-title').value;
+      const message = document.getElementById('test-notification-message').value;
       
-      const announcement = {
-        id: Date.now(),
-        title,
-        content,
-        type,
-        timestamp: new Date().toLocaleString('th-TH'),
-        active: true
-      };
-
-      state.announcements.unshift(announcement);
-      saveAnnouncements();
-      
-      if (saveToSheets) {
-        SheetsAPI.appendData(CONFIG.ANNOUNCEMENTS_RANGE, [[
-          announcement.id,
-          announcement.title,
-          announcement.content,
-          announcement.type,
-          announcement.timestamp,
-          'TRUE'
-        ]]).catch(error => {
-          showToast('บันทึกลง Google Sheets ล้มเหลว', 'warning');
-        });
-      }
-      
-      if (autoShow) {
-        showActiveAnnouncement(announcement);
-      }
-      
-      renderAnnouncementsList();
-      
-      // Clear form
-      document.getElementById('announcement-title-input').value = '';
-      document.getElementById('announcement-content-input').value = '';
-      
-      logActivity('admin', `Created announcement: ${title}`);
-      showToast('สร้างประกาศสำเร็จ', 'success');
-    }
-
-    function createQuickAnnouncement() {
-      const title = prompt('หัวข้อประกาศ:');
-      const content = prompt('เนื้อหาประกาศ:');
-      
-      if (title && content) {
-        const announcement = {
-          id: Date.now(),
-          title,
-          content,
-          type: 'urgent',
-          timestamp: new Date().toLocaleString('th-TH'),
-          active: true
-        };
-
-        state.announcements.unshift(announcement);
-        saveAnnouncements();
-        showActiveAnnouncement(announcement);
-        renderAnnouncementsList();
-        
-        logActivity('admin', `Created quick announcement: ${title}`);
-        showToast('ประกาศด่วนสำเร็จ', 'success');
-      }
-    }
-
-    function previewAnnouncement() {
-      const title = document.getElementById('announcement-title-input').value.trim();
-      const content = document.getElementById('announcement-content-input').value.trim();
-      
-      if (!title || !content) {
-        showToast('กรุณากรอกข้อมูลก่อนดูตัวอย่าง', 'warning');
-        return;
-      }
-      
-      const announcement = { title, content, timestamp: 'ตัวอย่าง' };
-      showActiveAnnouncement(announcement);
-      
-      setTimeout(() => {
-        dismissAnnouncement();
-      }, 5000);
-    }
-
-    function renderAnnouncementsList() {
-      const list = document.getElementById('announcements-list');
-      list.innerHTML = '';
-
-      if (state.announcements.length === 0) {
-        list.innerHTML = '<p class="text-gray-500 text-center py-4">ยังไม่มีประกาศ</p>';
-        return;
-      }
-
-      state.announcements.forEach(announcement => {
-        const item = document.createElement('div');
-        item.className = 'bg-ios-gray rounded-xl p-4';
-        
-        const typeColors = {
-          info: 'text-blue-600',
-          warning: 'text-yellow-600',
-          urgent: 'text-red-600',
-          maintenance: 'text-purple-600'
-        };
-        
-        item.innerHTML = `
-          <div class="flex items-start justify-between">
-            <div class="flex-1">
-              <h5 class="font-medium text-gray-800">${announcement.title}</h5>
-              <p class="text-gray-600 text-sm mt-1">${announcement.content}</p>
-              <div class="flex items-center space-x-2 mt-2">
-                <span class="text-xs ${typeColors[announcement.type]} px-2 py-1 bg-white rounded-full">${announcement.type}</span>
-                <span class="text-xs text-gray-500">${announcement.timestamp}</span>
-              </div>
-            </div>
-            <div class="flex space-x-2 ml-2">
-              <button onclick="toggleAnnouncement(${announcement.id})" class="text-gray-400 hover:text-blue-600 transition-colors">
-                <i class="fas ${announcement.active ? 'fa-eye-slash' : 'fa-eye'} text-sm"></i>
-              </button>
-              <button onclick="deleteAnnouncement(${announcement.id})" class="text-gray-400 hover:text-red-600 transition-colors">
-                <i class="fas fa-trash text-sm"></i>
-              </button>
-            </div>
-          </div>
-        `;
-        
-        list.appendChild(item);
-      });
-    }
-
-    function toggleAnnouncement(id) {
-      const announcement = state.announcements.find(a => a.id === id);
-      if (announcement) {
-        announcement.active = !announcement.active;
-        saveAnnouncements();
-        renderAnnouncementsList();
-        logActivity('admin', `Toggled announcement: ${announcement.title}`);
-      }
-    }
-
-    function deleteAnnouncement(id) {
-      state.announcements = state.announcements.filter(a => a.id !== id);
-      saveAnnouncements();
-      renderAnnouncementsList();
-      logActivity('admin', 'Deleted announcement');
-      showToast('ลบประกาศแล้ว', 'success');
-    }
-
-    function showActiveAnnouncement(announcement) {
-      const banner = document.getElementById('announcement-banner');
-      const title = document.getElementById('announcement-title');
-      const content = document.getElementById('announcement-content');
-      const time = document.getElementById('announcement-time');
-      
-      title.textContent = announcement.title;
-      content.textContent = announcement.content;
-      time.textContent = announcement.timestamp;
-      
-      banner.classList.remove('hidden');
-      
-      if (announcement.type !== 'urgent' && announcement.type !== 'maintenance') {
-        setTimeout(() => {
-          banner.classList.add('hidden');
-        }, 10000);
-      }
-    }
-
-    function dismissAnnouncement() {
-      document.getElementById('announcement-banner').classList.add('hidden');
-    }
-
-    function loadAnnouncements() {
-      const saved = localStorage.getItem('announcements');
-      if (saved) {
-        state.announcements = JSON.parse(saved);
-        
-        const latest = state.announcements.find(a => a.active);
-        if (latest) {
-          showActiveAnnouncement(latest);
-        }
-      }
-    }
-
-    function saveAnnouncements() {
-      localStorage.setItem('announcements', JSON.stringify(state.announcements));
-    }
-
-    // Maintenance Functions
-    function toggleMaintenance() {
-      const toggle = document.getElementById('maintenance-toggle');
-      const options = document.getElementById('maintenance-options');
-      
-      if (toggle.checked) {
-        options.classList.remove('hidden');
-        const message = document.getElementById('maintenance-message-input').value || 'เว็บไซต์กำลังปรับปรุง กรุณารอสักครู่...';
-        const duration = parseInt(document.getElementById('maintenance-duration-input').value) || 30;
-        const autoAnnouncement = document.getElementById('auto-announcement').checked;
-        const allowAdminAccess = document.getElementById('allow-admin-access').checked;
-        
-        MaintenanceMode.enable({
+      if (title && message) {
+        realTimeSystem.addNotification({
+          type: 'test',
+          title: title,
           message: message,
-          duration: duration,
-          autoAnnouncement: autoAnnouncement,
-          allowAdminAccess: allowAdminAccess
+          timestamp: new Date(),
+          icon: 'fa-bell',
+          color: 'blue'
         });
-      } else {
-        options.classList.add('hidden');
-        MaintenanceMode.disable();
-      }
-    }
-
-    function toggleMaintenanceQuick() {
-      if (state.maintenanceMode) {
-        MaintenanceMode.disable();
-        document.getElementById('maintenance-toggle').checked = false;
-        document.getElementById('maintenance-options').classList.add('hidden');
-      } else {
-        MaintenanceMode.enable({ 
-          autoAnnouncement: true,
-          allowAdminAccess: true
-        });
-        document.getElementById('maintenance-toggle').checked = true;
-        document.getElementById('maintenance-options').classList.remove('hidden');
-      }
-    }
-
-    function showMaintenanceAdminLogin() {
-      const username = prompt('Admin Username:');
-      const password = prompt('Admin Password:');
-      
-      if (username === CONFIG.ADMIN_CREDENTIALS.username && 
-          password === CONFIG.ADMIN_CREDENTIALS.password) {
-        document.getElementById('maintenance-overlay').classList.add('hidden');
-        document.getElementById('main-content').style.display = 'block';
-        state.isAdminLoggedIn = true;
-        showToast('Admin access granted', 'success');
-      } else {
-        showToast('Invalid credentials', 'error');
-      }
-    }
-
-    // Data Management Functions
-    async function refreshAllData() {
-      updateSyncStatus('syncing', 'Refreshing all data...');
-      try {
-        await QuizMonitor.checkForUpdates();
-        updateStats();
-        showToast('รีเฟรชข้อมูลสำเร็จ', 'success');
-        logActivity('admin', 'Manual data refresh completed');
-      } catch (error) {
-        showToast('รีเฟรชข้อมูลล้มเหลว', 'error');
-        logActivity('error', 'Manual data refresh failed', error.message);
-      }
-    }
-
-    async function refreshQuizData() {
-      await QuizMonitor.checkForUpdates();
-      loadQuizTable();
-    }
-
-    function manualSync() {
-      QuizMonitor.checkForUpdates();
-    }
-
-    async function testConnection() {
-      try {
-        updateSyncStatus('syncing', 'Testing connection...');
-        await SheetsAPI.readData();
-        updateSyncStatus('success', 'Connection OK');
-        showToast('การเชื่อมต่อปกติ', 'success');
-      } catch (error) {
-        updateSyncStatus('error', 'Connection failed');
-        showToast('การเชื่อมต่อล้มเหลว', 'error');
-      }
-    }
-
-    function toggleAutoSync() {
-      const enabled = document.getElementById('auto-sync').checked;
-      state.autoSyncEnabled = enabled;
-      
-      if (enabled) {
-        startUpdateMonitoring();
-        showToast('เปิดการซิงค์อัตโนมัติ', 'info');
-      } else {
-        stopUpdateMonitoring();
-        showToast('ปิดการซิงค์อัตโนมัติ', 'info');
-      }
-    }
-
-    function saveSheetConfig(event) {
-      event.preventDefault();
-      
-      CONFIG.SHEET_ID = document.getElementById('sheets-config-id').value;
-      CONFIG.QUIZ_RANGE = document.getElementById('quiz-range').value;
-      CONFIG.ANNOUNCEMENTS_RANGE = document.getElementById('announcements-range').value;
-      
-      localStorage.setItem('sheetConfig', JSON.stringify({
-        sheetId: CONFIG.SHEET_ID,
-        quizRange: CONFIG.QUIZ_RANGE,
-        announcementsRange: CONFIG.ANNOUNCEMENTS_RANGE
-      }));
-      
-      showToast('บันทึกการตั้งค่า Sheets สำเร็จ', 'success');
-      logActivity('admin', 'Sheet configuration updated');
-    }
-
-    function saveAllSettings(event) {
-      event.preventDefault();
-      
-      const settings = {
-        siteName: document.getElementById('site-name').value,
-        siteDescription: document.getElementById('site-description').value,
-        updateInterval: parseInt(document.getElementById('update-interval').value) * 60000,
-        maxNotifications: parseInt(document.getElementById('max-notifications').value),
-        quizUpdateNotifications: document.getElementById('quiz-update-notifications').checked,
-        announcementNotifications: document.getElementById('announcement-notifications').checked,
-        maintenanceNotifications: document.getElementById('maintenance-notifications').checked
-      };
-      
-      CONFIG.UPDATE_INTERVAL = settings.updateInterval;
-      CONFIG.MAX_NOTIFICATIONS = settings.maxNotifications;
-      
-      localStorage.setItem('enhancedSettings', JSON.stringify(settings));
-      
-      if (state.autoSyncEnabled) {
-        startUpdateMonitoring();
-      }
-      
-      showToast('บันทึกการตั้งค่าทั้งหมดสำเร็จ', 'success');
-      logActivity('admin', 'All settings saved');
-    }
-
-    function syncAnnouncements() {
-      showToast('ซิงค์ประกาศสำเร็จ (demo)', 'success');
-    }
-
-    // Update Monitoring
-    function startUpdateMonitoring() {
-      if (state.updateInterval) {
-        clearInterval(state.updateInterval);
-      }
-      
-      if (state.autoSyncEnabled) {
-        state.updateInterval = setInterval(() => {
-          QuizMonitor.checkForUpdates();
-        }, CONFIG.UPDATE_INTERVAL);
         
-        QuizMonitor.checkForUpdates();
-      }
-    }
-
-    function stopUpdateMonitoring() {
-      if (state.updateInterval) {
-        clearInterval(state.updateInterval);
-        state.updateInterval = null;
-      }
-    }
-
-    // Notifications
-    function toggleNotifications() {
-      const panel = document.getElementById('notifications-panel');
-      panel.classList.toggle('translate-x-full');
-      
-      if (!panel.classList.contains('translate-x-full')) {
-        loadNotifications();
-      }
-    }
-
-    function loadNotifications() {
-      const list = document.getElementById('notifications-list');
-      list.innerHTML = '';
-      
-      const recentUpdates = state.recentQuizUpdates.slice(0, 5);
-      
-      if (recentUpdates.length === 0) {
-        list.innerHTML = `
-          <div class="text-center py-8">
-            <i class="fas fa-bell-slash text-gray-400 text-2xl mb-2"></i>
-            <p class="text-gray-500">ไม่มีการแจ้งเตือน</p>
-          </div>
-        `;
-        return;
-      }
-      
-      recentUpdates.forEach(update => {
-        const item = document.createElement('div');
-        item.className = 'ios-card rounded-xl p-4 border animate-slide-in';
+        document.getElementById('test-notification-title').value = '';
+        document.getElementById('test-notification-message').value = '';
         
-        item.innerHTML = `
-          <div class="flex items-start space-x-3">
-            <i class="fas fa-sync-alt text-green-500 mt-1"></i>
-            <div class="flex-1">
-              <p class="text-gray-800 text-sm">ควิซมีการอัพเดต: ${update.message}</p>
-              <span class="text-xs text-gray-500">${update.timestamp}</span>
-            </div>
-          </div>
-        `;
-        
-        list.appendChild(item);
+        showToast('ส่งการแจ้งเตือนทดสอบแล้ว', 'success');
+      }
+    }
+
+    function sendQuickNotification() {
+      realTimeSystem.addNotification({
+        type: 'quick',
+        title: 'การแจ้งเตือนด่วน',
+        message: 'นี่คือการแจ้งเตือนด่วนจากระบบ',
+        timestamp: new Date(),
+        icon: 'fa-bolt',
+        color: 'orange'
       });
       
-      const badge = document.getElementById('notification-badge');
-      if (recentUpdates.length > 0) {
-        badge.classList.remove('hidden');
-      }
+      showToast('ส่งการแจ้งเตือนด่วนแล้ว', 'success');
     }
 
-    function dismissQuizUpdate() {
-      document.getElementById('quiz-update-notification').classList.add('hidden');
+    function forceDataSync() {
+      realTimeSystem.syncData().then(() => {
+        showToast('ซิงค์ข้อมูลเสร็จสิ้น', 'success');
+      }).catch(error => {
+        showToast('การซิงค์ล้มเหลว', 'error');
+      });
+    }
+
+    function clearDataCache() {
+      // Clear local storage and reset state
+      localStorage.clear();
+      state.subjects = {};
+      state.searchResults = null;
+      renderSubjects();
+      showToast('ล้างแคชเสร็จสิ้น', 'success');
+    }
+
+    function exportData() {
+      const data = {
+        subjects: state.subjects,
+        analytics: state.analytics,
+        notifications: state.notifications,
+        exportDate: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `allquiz-data-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      
+      showToast('ส่งออกข้อมูลเสร็จสิ้น', 'success');
+    }
+
+    function saveSystemSettings() {
+      CONFIG.REALTIME_SYNC_INTERVAL = parseInt(document.getElementById('sync-interval').value) * 1000;
+      CONFIG.MAX_NOTIFICATIONS = parseInt(document.getElementById('max-notifications').value);
+      CONFIG.CONNECTION_TIMEOUT = parseInt(document.getElementById('connection-timeout').value);
+      CONFIG.RETRY_ATTEMPTS = parseInt(document.getElementById('retry-attempts').value);
+      
+      // Restart real-time system with new settings
+      realTimeSystem.disconnect();
+      setTimeout(() => {
+        realTimeSystem.initialize();
+      }, 1000);
+      
+      showToast('บันทึกการตั้งค่าเสร็จสิ้น', 'success');
     }
 
     // Utility Functions
-    function updateSyncStatus(status, message) {
-      const icon = document.getElementById('sync-icon');
-      const text = document.getElementById('sync-text');
-      
-      icon.className = 'fas fa-sync-alt';
-      
-      switch(status) {
-        case 'syncing':
-          icon.classList.add('animate-spin');
-          text.textContent = message;
-          break;
-        case 'success':
-          icon.classList.remove('animate-spin');
-          text.textContent = message;
-          break;
-        case 'error':
-          icon.classList.remove('animate-spin');
-          icon.className = 'fas fa-exclamation-triangle';
-          text.textContent = message;
-          break;
-      }
-    }
-
-    function isExpired(expiryDate) {
-      if (!expiryDate) return false;
-      try {
-        const [date, time] = expiryDate.split(", ");
-        const [day, month, year] = date.split("/");
-        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
-        return new Date(formattedDate).getTime() < Date.now();
-      } catch {
-        return false;
-      }
-    }
-
-    function calculateCountdown(expiryDate) {
-      if (!expiryDate) return '';
-      try {
-        const [date, time] = expiryDate.split(", ");
-        const [day, month, year] = date.split("/");
-        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
-        const timeLeft = new Date(formattedDate).getTime() - Date.now();
-        
-        if (timeLeft <= 0) return 'หมดเวลา';
-        
-        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        
-        if (days > 0) return `${days} วัน`;
-        if (hours > 0) return `${hours} ชม.`;
-        return 'น้อยกว่า 1 ชม.';
-      } catch {
-        return '';
-      }
-    }
-
-    function updateStats() {
-      const subjects = Object.keys(state.subjects).length;
-      const totalQuizzes = Object.values(state.subjects).reduce((acc, quizzes) => acc + quizzes.length, 0);
-      const activeQuizzes = Object.values(state.subjects)
-        .flat()
-        .filter(quiz => quiz.quizLink && !isExpired(quiz.expiryDate)).length;
-
-      document.getElementById('total-subjects').textContent = subjects;
-      document.getElementById('total-quizzes').textContent = totalQuizzes;
-      document.getElementById('active-quizzes').textContent = activeQuizzes;
-    }
-
-    function logQuizAccess(quizName) {
-      logActivity('info', `Quiz accessed: ${quizName}`);
-    }
-
-    function logActivity(level, message, details = '') {
-      const entry = {
-        timestamp: new Date().toLocaleString('th-TH'),
-        level,
-        message,
-        details,
-        ip: 'Client IP'
-      };
-      
-      console.log(`[${level.toUpperCase()}] ${message}`, details);
-    }
-
     function showToast(message, type = 'info') {
       const toast = document.createElement('div');
       const colors = {
@@ -2099,7 +1725,12 @@
       };
       
       toast.className = `${colors[type]} text-white px-6 py-4 rounded-2xl shadow-lg transform translate-x-full transition-transform duration-300`;
-      toast.textContent = message;
+      toast.innerHTML = `
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : type === 'warning' ? 'exclamation' : 'info'}-circle"></i>
+          <span>${message}</span>
+        </div>
+      `;
       
       document.getElementById('toast-container').appendChild(toast);
       
@@ -2113,74 +1744,65 @@
       }, 3000);
     }
 
-    function hideLoading() {
-      document.getElementById('loading-overlay').classList.add('hidden');
-    }
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Initialize search
+      const searchInput = document.getElementById('search-input');
+      searchInput.addEventListener('input', handleSearch);
+      
+      // Initialize real-time system
+      await realTimeSystem.initialize();
+      
+      // Update analytics periodically
+      setInterval(updateAnalyticsData, 5000);
+      
+      // Simulate some initial activity
+      setTimeout(() => {
+        realTimeSystem.addNotification({
+          type: 'system',
+          title: 'ระบบเริ่มต้นการทำงาน',
+          message: 'ระบบเรียลไทม์พร้อมใช้งานแล้ว',
+          timestamp: new Date(),
+          icon: 'fa-check-circle',
+          color: 'green'
+        });
+      }, 2000);
+    });
 
-    // Placeholder functions for future implementation
-    function addNewQuiz() {
-      showToast('ฟีเจอร์เพิ่มควิซใหม่จะพัฒนาในอนาคต', 'info');
-    }
-
-    function editQuiz(id) {
-      showToast('ฟีเจอร์แก้ไขควิซจะพัฒนาในอนาคต', 'info');
-    }
-
-    function deleteQuiz(id, subject) {
-      if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบควิซนี้?')) {
-        showToast('ฟีเจอร์ลบควิซจะพัฒนาในอนาคต', 'info');
-      }
-    }
-
-    // Load saved configuration on startup
-    function loadSavedConfig() {
-      const sheetConfig = localStorage.getItem('sheetConfig');
-      if (sheetConfig) {
-        const config = JSON.parse(sheetConfig);
-        CONFIG.SHEET_ID = config.sheetId;
-        CONFIG.QUIZ_RANGE = config.quizRange;
-        CONFIG.ANNOUNCEMENTS_RANGE = config.announcementsRange;
-        
-        // Update form fields if they exist
-        setTimeout(() => {
-          const sheetIdField = document.getElementById('sheets-config-id');
-          const quizRangeField = document.getElementById('quiz-range');
-          const announcementsRangeField = document.getElementById('announcements-range');
-          
-          if (sheetIdField) sheetIdField.value = config.sheetId;
-          if (quizRangeField) quizRangeField.value = config.quizRange;
-          if (announcementsRangeField) announcementsRangeField.value = config.announcementsRange;
-        }, 1000);
+    // Add CSS animation classes
+    const style = document.createElement('style');
+    style.textContent = `
+      .animate-slide-up {
+        animation: slideUp 0.5s ease-out forwards;
       }
       
-      const enhancedSettings = localStorage.getItem('enhancedSettings');
-      if (enhancedSettings) {
-        const settings = JSON.parse(enhancedSettings);
-        CONFIG.UPDATE_INTERVAL = settings.updateInterval || 300000;
-        CONFIG.MAX_NOTIFICATIONS = settings.maxNotifications || 50;
-        
-        // Update form fields if they exist
-        setTimeout(() => {
-          const siteNameField = document.getElementById('site-name');
-          const siteDescField = document.getElementById('site-description');
-          const updateIntervalField = document.getElementById('update-interval');
-          const maxNotificationsField = document.getElementById('max-notifications');
-          
-          if (siteNameField) siteNameField.value = settings.siteName || 'Allquiz';
-          if (siteDescField) siteDescField.value = settings.siteDescription || 'ระบบเฉลยคำตอบที่ปลอดภัยและทันสมัย';
-          if (updateIntervalField) updateIntervalField.value = (settings.updateInterval || 300000) / 60000;
-          if (maxNotificationsField) maxNotificationsField.value = settings.maxNotifications || 50;
-        }, 1000);
+      .animate-scale-in {
+        animation: scaleIn 0.3s ease-out forwards;
       }
-    }
-
-    // Initialize saved config
-    loadSavedConfig();
-
-    // Initialize maintenance mode state
-    setTimeout(() => {
-      MaintenanceMode.updateStatusIndicators();
-    }, 500);
+      
+      @keyframes slideUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    `;
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
