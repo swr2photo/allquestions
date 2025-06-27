@@ -2,13 +2,13 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Allquiz - Enhanced Real-time Quiz Management System">
-  <title>Allquiz - Enhanced Admin System</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Allquiz - Cross-Platform Quiz Management System">
+  <title>Allquiz - Enhanced Cross-Platform System</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
   <script>
     tailwind.config = {
@@ -27,14 +27,13 @@
             }
           },
           fontFamily: {
-            'sf': ['SF Pro Display', 'system-ui', 'sans-serif'],
+            'inter': ['Inter', 'system-ui', 'sans-serif'],
           },
           animation: {
             'pulse-ring': 'pulseRing 2s infinite',
             'slide-up': 'slideUp 0.3s ease-out',
             'scale-in': 'scaleIn 0.2s ease-out',
             'notification-slide': 'notificationSlide 0.4s ease-out',
-            'realtime-glow': 'realtimeGlow 2s ease-in-out infinite alternate',
             'skeleton': 'skeleton 1.5s ease-in-out infinite alternate',
           }
         }
@@ -43,6 +42,18 @@
   </script>
   
   <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    input, textarea {
+      -webkit-user-select: text;
+      user-select: text;
+    }
+    
     @keyframes pulseRing {
       0% { transform: scale(0.9); opacity: 1; }
       100% { transform: scale(1.2); opacity: 0; }
@@ -62,11 +73,6 @@
       from { transform: translateX(100%); opacity: 0; }
       to { transform: translateX(0); opacity: 1; }
     }
-    
-    @keyframes realtimeGlow {
-      from { box-shadow: 0 0 20px rgba(52, 199, 89, 0.5); }
-      to { box-shadow: 0 0 30px rgba(52, 199, 89, 0.8); }
-    }
 
     @keyframes skeleton {
       from { background-color: #e5e7eb; }
@@ -74,9 +80,16 @@
     }
     
     .glass-morphism {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    @supports not (backdrop-filter: blur(20px)) {
+      .glass-morphism {
+        background: rgba(255, 255, 255, 0.95);
+      }
     }
     
     .realtime-indicator {
@@ -97,8 +110,8 @@
       animation: notification-slide 0.4s ease-out;
     }
     
-    .analytics-chart {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .quiz-card {
+      transition: all 0.3s ease;
     }
     
     .quiz-card:hover {
@@ -106,8 +119,14 @@
       box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     }
     
-    .loading-dots {
-      display: inline-block;
+    @media (hover: none) {
+      .quiz-card:hover {
+        transform: none;
+      }
+      
+      .quiz-card:active {
+        transform: scale(0.98);
+      }
     }
     
     .loading-dots::after {
@@ -121,20 +140,8 @@
       60%, 100% { content: '...'; }
     }
 
-    .animate-slide-up {
-      animation: slideUp 0.5s ease-out forwards;
-    }
-    
-    .animate-scale-in {
-      animation: scaleIn 0.3s ease-out forwards;
-    }
-
     .skeleton {
       animation: skeleton 1.5s ease-in-out infinite alternate;
-    }
-
-    .form-group {
-      margin-bottom: 1rem;
     }
 
     .form-input {
@@ -145,6 +152,8 @@
       outline: none;
       transition: all 0.2s;
       background: #f9fafb;
+      -webkit-appearance: none;
+      appearance: none;
     }
 
     .form-input:focus {
@@ -163,6 +172,11 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      touch-action: manipulation;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
     }
 
     .btn-primary {
@@ -172,7 +186,6 @@
 
     .btn-primary:hover {
       background: #0056cc;
-      transform: translateY(-1px);
     }
 
     .btn-success {
@@ -180,26 +193,14 @@
       color: white;
     }
 
-    .btn-success:hover {
-      background: #28a745;
-    }
-
     .btn-danger {
       background: #FF3B30;
       color: white;
     }
 
-    .btn-danger:hover {
-      background: #dc3545;
-    }
-
     .btn-secondary {
       background: #6c757d;
       color: white;
-    }
-
-    .btn-secondary:hover {
-      background: #5a6268;
     }
 
     .btn-sm {
@@ -212,11 +213,13 @@
       inset: 0;
       background: rgba(0, 0, 0, 0.5);
       backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       z-index: 60;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 1rem;
+      overflow-y: auto;
     }
 
     .modal-content {
@@ -227,6 +230,23 @@
       overflow-y: auto;
       width: 100%;
       max-width: 600px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    @media (max-width: 640px) {
+      .modal-content {
+        max-width: 100%;
+        margin: 0.5rem;
+      }
+      
+      .btn {
+        padding: 0.625rem 1.25rem;
+        font-size: 0.875rem;
+      }
+      
+      .glass-morphism {
+        padding: 1rem;
+      }
     }
 
     .table {
@@ -246,10 +266,9 @@
       background: #f9fafb;
       font-weight: 600;
       color: #374151;
-    }
-
-    .table tr:hover {
-      background: #f9fafb;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     .badge {
@@ -257,6 +276,7 @@
       border-radius: 9999px;
       font-size: 0.75rem;
       font-weight: 500;
+      white-space: nowrap;
     }
 
     .badge-success {
@@ -274,455 +294,243 @@
       color: #991b1b;
     }
 
-    .fast-load {
-      transition: all 0.15s ease-out;
+    /* Touch-friendly scrolling */
+    .scroll-container {
+      -webkit-overflow-scrolling: touch;
+      overflow-x: auto;
+      scrollbar-width: thin;
     }
 
-    .admin-only {
-      transition: all 0.3s ease;
-    }
-
-    .admin-only:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .admin-edit-btn {
-      transition: all 0.2s ease;
-      opacity: 0.7;
-    }
-
-    .admin-edit-btn:hover {
-      opacity: 1;
-      transform: scale(1.1);
-    }
-
-    .auth-required::after {
-      content: " 🔒";
-      opacity: 0.5;
-    }
-
-    /* Login modal styles */
-    .modal-overlay {
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .modal-content {
-      animation: slideDown 0.3s ease-out;
-    }
-
-    @keyframes slideDown {
-      from { 
-        transform: translateY(-50px);
-        opacity: 0;
+    /* Hide scrollbar on mobile */
+    @media (max-width: 768px) {
+      .scroll-container::-webkit-scrollbar {
+        display: none;
       }
-      to { 
-        transform: translateY(0);
-        opacity: 1;
+      
+      .scroll-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
       }
     }
 
-    /* Notification specific styles */
-    .notification-item {
-      transition: all 0.3s ease;
-    }
-
-    .notification-item:hover {
-      transform: translateX(-5px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .notification-toast {
-      animation: slideInRight 0.3s ease-out forwards;
-    }
-
-    @keyframes slideInRight {
-      from {
-        transform: translateX(100%);
-        opacity: 0;
+    /* Mobile-first navigation */
+    @media (max-width: 768px) {
+      .nav-mobile {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        z-index: 50;
+        padding: 0.5rem;
+        display: flex;
+        justify-content: space-around;
       }
-      to {
-        transform: translateX(0);
-        opacity: 1;
+      
+      .nav-desktop {
+        display: none;
       }
     }
 
-    .notification-priority-urgent {
-      animation: urgentPulse 1s infinite;
-    }
-
-    @keyframes urgentPulse {
-      0%, 100% { 
-        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-      }
-      50% { 
-        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    @media (min-width: 769px) {
+      .nav-mobile {
+        display: none;
       }
     }
 
-    .notification-badge {
-      animation: bounceIn 0.6s;
-    }
-
-    @keyframes bounceIn {
-      0% {
-        transform: scale(0);
-      }
-      50% {
-        transform: scale(1.25);
-      }
-      100% {
-        transform: scale(1);
-      }
-    }
-
-    /* Sound wave animation for notifications */
-    .sound-wave {
-      display: inline-block;
-      animation: soundWave 1s ease-in-out infinite;
-    }
-
-    @keyframes soundWave {
-      0%, 100% {
-        transform: scaleY(1);
-      }
-      50% {
-        transform: scaleY(1.5);
-      }
-    }
-
-    /* Notification panel styles */
-    #realtime-notifications {
-      backdrop-filter: blur(10px);
-    }
-
-    #realtime-notifications .glass-morphism {
-      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
-    }
-
-    /* Button hover effects for notifications */
-    .notification-action-btn {
-      transition: all 0.2s ease;
-    }
-
-    .notification-action-btn:hover {
-      transform: scale(1.1);
-    }
-
-    /* Settings modal specific styles */
-    #notification-settings-modal .modal-content {
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-
-    /* Toggle switch custom styles */
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 44px;
-      height: 24px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-slider {
+    /* Improve accessibility */
+    .sr-only {
       position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: 0.4s;
-      border-radius: 24px;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
     }
 
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.4s;
-      border-radius: 50%;
+    /* Focus styles for keyboard navigation */
+    :focus-visible {
+      outline: 2px solid #007AFF;
+      outline-offset: 2px;
     }
 
-    input:checked + .toggle-slider {
-      background-color: #007AFF;
-    }
-
-    input:checked + .toggle-slider:before {
-      transform: translateX(20px);
-    }
-
-    /* Notification count badge pulse */
-    #notification-count.new-notification {
-      animation: badgePulse 2s ease-in-out infinite;
-    }
-
-    @keyframes badgePulse {
-      0% {
-        transform: scale(1);
-        background-color: #FF3B30;
-      }
-      50% {
-        transform: scale(1.1);
-        background-color: #FF6B60;
-      }
-      100% {
-        transform: scale(1);
-        background-color: #FF3B30;
+    /* Reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
       }
     }
   </style>
 </head>
 
-<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen font-sf">
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen font-inter">
   
   <!-- Real-time Status Bar -->
-  <div id="realtime-status" class="fixed top-0 left-0 right-0 bg-success text-white text-center py-2 text-sm z-50 realtime-glow">
+  <div id="realtime-status" class="fixed top-0 left-0 right-0 bg-success text-white text-center py-2 text-sm z-50">
     <div class="flex items-center justify-center space-x-2">
       <div class="w-3 h-3 bg-white rounded-full realtime-indicator"></div>
-      <span>ระบบพร้อมใช้งาน - โหลดเร็ว</span>
+      <span>ระบบพร้อมใช้งาน</span>
       <span id="last-sync-time" class="opacity-75"></span>
     </div>
   </div>
 
-  <!-- Enhanced Navigation -->
-  <nav class="fixed top-12 left-1/2 transform -translate-x-1/2 z-40">
+  <!-- Desktop Navigation -->
+  <nav class="nav-desktop fixed top-12 left-1/2 transform -translate-x-1/2 z-40">
     <div class="glass-morphism px-6 py-3 rounded-3xl flex items-center space-x-4">
       <div class="flex items-center space-x-2">
         <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
           <i class="fas fa-graduation-cap text-white"></i>
         </div>
-        <span class="text-gray-800 font-semibold">Allquiz Enhanced</span>
+        <span class="text-gray-800 font-semibold">Allquiz</span>
       </div>
       
       <div class="flex items-center space-x-3">
-        <button onclick="window.toggleRealTimeNotifications()" class="relative p-2 rounded-lg hover:bg-white/20 transition-colors">
+        <button onclick="showNotifications()" class="relative p-2 rounded-lg hover:bg-white/20 transition-colors">
           <i class="fas fa-bell text-gray-700"></i>
           <span id="notification-count" class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
         </button>
         
-        <button onclick="window.toggleAnalytics()" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
-          <i class="fas fa-chart-line text-gray-700"></i>
+        <button onclick="showQuizManager()" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
+          <i class="fas fa-edit text-primary"></i>
         </button>
         
-        <button onclick="window.showAdminPanel()" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
+        <button onclick="showAdminPanel()" class="p-2 rounded-lg hover:bg-white/20 transition-colors">
           <i class="fas fa-cog text-gray-700"></i>
-        </button>
-
-        <button onclick="window.showQuizManager()" class="p-2 rounded-lg hover:bg-white/20 transition-colors bg-primary/10">
-          <i class="fas fa-edit text-primary"></i>
         </button>
       </div>
     </div>
+  </nav>
+
+  <!-- Mobile Navigation -->
+  <nav class="nav-mobile">
+    <button onclick="showHome()" class="p-3 rounded-lg text-gray-600">
+      <i class="fas fa-home text-xl"></i>
+    </button>
+    <button onclick="showQuizManager()" class="p-3 rounded-lg text-gray-600">
+      <i class="fas fa-plus-circle text-xl"></i>
+    </button>
+    <button onclick="showNotifications()" class="p-3 rounded-lg text-gray-600 relative">
+      <i class="fas fa-bell text-xl"></i>
+      <span id="notification-count-mobile" class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-white text-xs rounded-full flex items-center justify-center hidden">0</span>
+    </button>
+    <button onclick="showAdminPanel()" class="p-3 rounded-lg text-gray-600">
+      <i class="fas fa-cog text-xl"></i>
+    </button>
   </nav>
 
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm z-40 flex items-center justify-center hidden">
     <div class="text-center">
       <div class="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-      <p class="text-gray-600 font-medium">กำลังโหลดข้อมูล...</p>
-      <p class="text-gray-500 text-sm">ใช้ Cache เพื่อโหลดเร็วขึ้น</p>
+      <p class="text-gray-600 font-medium">กำลังโหลดข้อมูล<span class="loading-dots"></span></p>
     </div>
   </div>
 
   <!-- Main Content -->
-  <div class="pt-32 pb-8 px-4">
+  <div class="pt-32 pb-24 md:pb-8 px-4">
     <div class="max-w-7xl mx-auto">
       
-      <!-- Enhanced Hero Section -->
-      <div class="text-center mb-12">
-        <h1 class="text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+      <!-- Hero Section -->
+      <div class="text-center mb-8 md:mb-12">
+        <h1 class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
           Allquiz Enhanced
         </h1>
-        <p class="text-gray-600 text-xl mb-8">ระบบเฉลยคำตอบแบบเรียลไทม์พร้อมการจัดการข้อมูล</p>
+        <p class="text-gray-600 text-lg md:text-xl mb-6 md:mb-8">ระบบเฉลยคำตอบแบบเรียลไทม์</p>
         
         <!-- Performance Stats -->
-        <div class="flex justify-center space-x-8 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 md:mb-8">
           <div class="text-center">
-            <div class="text-3xl font-bold text-primary" id="total-subjects">0</div>
+            <div class="text-2xl md:text-3xl font-bold text-primary" id="total-subjects">0</div>
             <div class="text-sm text-gray-500">วิชา</div>
-            <div class="w-8 h-1 bg-primary/20 rounded-full mx-auto mt-1">
-              <div class="h-full bg-primary rounded-full transition-all duration-500" style="width: 75%"></div>
-            </div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-secondary" id="total-quizzes">0</div>
+            <div class="text-2xl md:text-3xl font-bold text-secondary" id="total-quizzes">0</div>
             <div class="text-sm text-gray-500">ควิซทั้งหมด</div>
-            <div class="w-8 h-1 bg-secondary/20 rounded-full mx-auto mt-1">
-              <div class="h-full bg-secondary rounded-full transition-all duration-500" style="width: 60%"></div>
-            </div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-success" id="active-quizzes">0</div>
+            <div class="text-2xl md:text-3xl font-bold text-success" id="active-quizzes">0</div>
             <div class="text-sm text-gray-500">พร้อมใช้</div>
-            <div class="w-8 h-1 bg-success/20 rounded-full mx-auto mt-1">
-              <div class="h-full bg-success rounded-full transition-all duration-500" style="width: 90%"></div>
-            </div>
           </div>
           <div class="text-center">
-            <div class="text-3xl font-bold text-orange-500" id="load-time">0ms</div>
+            <div class="text-2xl md:text-3xl font-bold text-orange-500" id="load-time">0ms</div>
             <div class="text-sm text-gray-500">เวลาโหลด</div>
-            <div class="w-8 h-1 bg-orange-200 rounded-full mx-auto mt-1">
-              <div class="h-full bg-orange-500 rounded-full transition-all duration-500" style="width: 85%"></div>
-            </div>
           </div>
-        </div>
-
-        <!-- Connection Status -->
-        <div class="inline-flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm">
-          <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-          <span>โหลดแบบ Cache</span>
-          <span id="cache-status">•</span>
-          <span id="sync-indicator">พร้อมใช้งาน</span>
         </div>
       </div>
 
       <!-- Quick Actions -->
-      <div class="mb-8">
-        <div class="glass-morphism rounded-3xl p-6 border">
-          <div class="flex flex-wrap gap-3 justify-center">
-            <button onclick="window.showQuizManagerWithAuth()" class="btn btn-primary admin-only">
+      <div class="mb-6 md:mb-8">
+        <div class="glass-morphism rounded-3xl p-4 md:p-6 border">
+          <div class="flex flex-wrap gap-2 md:gap-3 justify-center">
+            <button onclick="showQuizManager()" class="btn btn-primary btn-sm md:btn">
               <i class="fas fa-plus"></i>
-              เพิ่มควิซใหม่
+              <span class="hidden sm:inline">เพิ่มควิซ</span>
             </button>
-            <button onclick="window.showBulkImportWithAuth()" class="btn btn-success admin-only">
-              <i class="fas fa-upload"></i>
-              นำเข้าข้อมูล
-            </button>
-            <button onclick="window.exportAllData()" class="btn btn-secondary">
+            <button onclick="exportData()" class="btn btn-secondary btn-sm md:btn">
               <i class="fas fa-download"></i>
-              ส่งออกข้อมูล
+              <span class="hidden sm:inline">ส่งออก</span>
             </button>
-            <button onclick="window.refreshCache()" class="btn btn-warning">
+            <button onclick="refreshData()" class="btn btn-warning btn-sm md:btn">
               <i class="fas fa-sync-alt"></i>
-              รีเฟรชข้อมูล
+              <span class="hidden sm:inline">รีเฟรช</span>
             </button>
-            <button onclick="window.showAdminLoginModal()" class="btn" id="auth-button" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
+            <button onclick="showAdminLogin()" class="btn btn-sm md:btn" id="auth-button" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
               <i class="fas fa-sign-in-alt"></i>
-              เข้าสู่ระบบแอดมิน
+              <span class="hidden sm:inline">เข้าสู่ระบบ</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Enhanced Search -->
-      <div class="mb-8">
-        <div class="glass-morphism rounded-3xl p-6 border">
+      <!-- Search -->
+      <div class="mb-6 md:mb-8">
+        <div class="glass-morphism rounded-3xl p-4 md:p-6 border">
           <div class="relative">
             <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
             <input 
               type="text" 
               id="search-input"
-              placeholder="ค้นหาวิชาหรือควิซ... (ค้นหาทันที - ไม่ต้องรอโหลด)"
-              class="w-full pl-12 pr-20 py-4 bg-white/50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary/50 text-gray-800"
+              placeholder="ค้นหาวิชาหรือควิซ..."
+              class="w-full pl-12 pr-4 py-3 md:py-4 bg-white/50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-primary/50 text-gray-800"
+              oninput="handleSearch()"
             >
-            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center space-x-2">
-              <span id="search-results-count" class="text-xs text-gray-500 hidden"></span>
-              <button onclick="window.toggleSearchFilters()" class="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
-                <i class="fas fa-filter"></i>
-              </button>
-            </div>
-          </div>
-          
-          <!-- Search Filters -->
-          <div id="search-filters" class="hidden mt-4 pt-4 border-t border-gray-200">
-            <div class="flex flex-wrap gap-2">
-              <button onclick="window.filterByStatus('all')" class="filter-btn active px-3 py-1 bg-primary text-white rounded-full text-sm">
-                ทั้งหมด
-              </button>
-              <button onclick="window.filterByStatus('active')" class="filter-btn px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
-                พร้อมใช้
-              </button>
-              <button onclick="window.filterByStatus('expired')" class="filter-btn px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
-                หมดอายุ
-              </button>
-              <button onclick="window.filterByStatus('updated')" class="filter-btn px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
-                อัพเดตล่าสุด
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
       <!-- Subjects Grid -->
       <section id="subjects-section">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-3xl font-bold text-gray-800">เลือกวิชาที่ต้องการ</h2>
-          <div class="flex items-center space-x-2">
-            <span class="text-sm text-gray-500">โหลดจาก Cache:</span>
-            <span id="last-update-display" class="text-sm font-medium text-primary">ทันที</span>
-          </div>
-        </div>
-        <div id="subjects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <h2 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 md:mb-6">เลือกวิชา</h2>
+        <div id="subjects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           <!-- Skeleton Loaders -->
           <div class="skeleton-card glass-morphism rounded-3xl p-6 border">
-            <div class="text-center">
-              <div class="w-20 h-20 skeleton rounded-3xl mx-auto mb-4"></div>
-              <div class="h-6 skeleton rounded mb-3 mx-auto w-3/4"></div>
-              <div class="h-4 skeleton rounded mx-auto w-1/2"></div>
-            </div>
+            <div class="w-20 h-20 skeleton rounded-3xl mx-auto mb-4"></div>
+            <div class="h-6 skeleton rounded mb-3 mx-auto w-3/4"></div>
+            <div class="h-4 skeleton rounded mx-auto w-1/2"></div>
           </div>
           <div class="skeleton-card glass-morphism rounded-3xl p-6 border">
-            <div class="text-center">
-              <div class="w-20 h-20 skeleton rounded-3xl mx-auto mb-4"></div>
-              <div class="h-6 skeleton rounded mb-3 mx-auto w-3/4"></div>
-              <div class="h-4 skeleton rounded mx-auto w-1/2"></div>
-            </div>
-          </div>
-          <div class="skeleton-card glass-morphism rounded-3xl p-6 border">
-            <div class="text-center">
-              <div class="w-20 h-20 skeleton rounded-3xl mx-auto mb-4"></div>
-              <div class="h-6 skeleton rounded mb-3 mx-auto w-3/4"></div>
-              <div class="h-4 skeleton rounded mx-auto w-1/2"></div>
-            </div>
-          </div>
-          <div class="skeleton-card glass-morphism rounded-3xl p-6 border">
-            <div class="text-center">
-              <div class="w-20 h-20 skeleton rounded-3xl mx-auto mb-4"></div>
-              <div class="h-6 skeleton rounded mb-3 mx-auto w-3/4"></div>
-              <div class="h-4 skeleton rounded mx-auto w-1/2"></div>
-            </div>
+            <div class="w-20 h-20 skeleton rounded-3xl mx-auto mb-4"></div>
+            <div class="h-6 skeleton rounded mb-3 mx-auto w-3/4"></div>
+            <div class="h-4 skeleton rounded mx-auto w-1/2"></div>
           </div>
         </div>
       </section>
 
       <!-- Quiz List Section -->
       <section id="quiz-section" class="hidden">
-        <div class="flex items-center justify-between mb-6">
-          <div>
-            <h2 id="quiz-section-title" class="text-3xl font-bold text-gray-800">ควิซในวิชา</h2>
-            <p class="text-gray-600 mt-1">จัดการและแก้ไขได้ทันที (ต้องเข้าสู่ระบบแอดมิน)</p>
-          </div>
-          <div class="flex items-center space-x-3">
-            <button onclick="window.addQuizToSubjectWithAuth()" class="btn btn-primary admin-only" style="display: none;">
-              <i class="fas fa-plus"></i>เพิ่มควิซ
-            </button>
-            <button onclick="window.sortQuizzes('name')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm hover:bg-gray-200 transition-colors">
-              <i class="fas fa-sort-alpha-down mr-2"></i>เรียงตามชื่อ
-            </button>
-            <button onclick="window.sortQuizzes('date')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm hover:bg-gray-200 transition-colors">
-              <i class="fas fa-clock mr-2"></i>ล่าสุด
-            </button>
-            <button onclick="window.goBackToSubjects()" class="px-4 py-2 bg-primary text-white rounded-xl hover:bg-blue-600 transition-colors">
-              <i class="fas fa-arrow-left mr-2"></i>กลับ
-            </button>
-          </div>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4 md:mb-6 gap-4">
+          <h2 id="quiz-section-title" class="text-2xl md:text-3xl font-bold text-gray-800">ควิซในวิชา</h2>
+          <button onclick="goBackToSubjects()" class="btn btn-primary btn-sm md:btn">
+            <i class="fas fa-arrow-left"></i>กลับ
+          </button>
         </div>
-        <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div id="quiz-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           <!-- Quizzes will be loaded here -->
         </div>
       </section>
@@ -732,297 +540,195 @@
   <!-- Quiz Manager Modal -->
   <div id="quiz-manager-modal" class="modal-overlay hidden">
     <div class="modal-content">
-      <div class="p-6 border-b">
+      <div class="p-4 md:p-6 border-b">
         <div class="flex items-center justify-between">
-          <h3 class="text-2xl font-bold text-gray-800">จัดการควิซ</h3>
-          <button onclick="window.closeQuizManager()" class="text-gray-400 hover:text-gray-600">
+          <h3 class="text-xl md:text-2xl font-bold text-gray-800">จัดการควิซ</h3>
+          <button onclick="closeQuizManager()" class="text-gray-400 hover:text-gray-600 p-2">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
       </div>
       
-      <div class="p-6">
-        <!-- Add/Edit Form -->
-        <form id="quiz-form" onsubmit="window.saveQuiz(event)">
-          <input type="hidden" id="quiz-id" />
-          <input type="hidden" id="quiz-action" value="add" />
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-group">
+      <div class="p-4 md:p-6">
+        <form id="quiz-form" onsubmit="saveQuiz(event)">
+          <div class="space-y-4">
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">วิชา</label>
               <select id="quiz-subject" class="form-input" required>
                 <option value="">เลือกวิชา</option>
               </select>
             </div>
             
-            <div class="form-group">
+            <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อควิซ</label>
               <input type="text" id="quiz-name" class="form-input" placeholder="ชื่อควิซ" required />
             </div>
-          </div>
-          
-          <div class="form-group">
-            <label class="block text-sm font-medium text-gray-700 mb-2">ลิงก์ควิซ</label>
-            <input type="url" id="quiz-link" class="form-input" placeholder="https://..." required />
-          </div>
-          
-          <div class="form-group">
-            <label class="block text-sm font-medium text-gray-700 mb-2">คำอธิบาย</label>
-            <textarea id="quiz-description" class="form-input" rows="3" placeholder="คำอธิบายควิซ (ไม่บังคับ)"></textarea>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="form-group">
-              <label class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุ</label>
-              <input type="datetime-local" id="quiz-expiry" class="form-input" />
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ลิงก์ควิซ</label>
+              <input type="url" id="quiz-link" class="form-input" placeholder="https://..." required />
             </div>
             
-            <div class="form-group">
-              <label class="block text-sm font-medium text-gray-700 mb-2">สถานะ</label>
-              <select id="quiz-status" class="form-input">
-                <option value="อัพเดตล่าสุด">อัพเดตล่าสุด</option>
-                <option value="รออัพเดต">รออัพเดต</option>
-                <option value="ปิดปรับปรุง">ปิดปรับปรุง</option>
-              </select>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">คำอธิบาย</label>
+              <textarea id="quiz-description" class="form-input" rows="3" placeholder="คำอธิบายควิซ (ไม่บังคับ)"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">วันหมดอายุ</label>
+                <input type="datetime-local" id="quiz-expiry" class="form-input" />
+              </div>
+              
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">สถานะ</label>
+                <select id="quiz-status" class="form-input">
+                  <option value="อัพเดตล่าสุด">อัพเดตล่าสุด</option>
+                  <option value="รออัพเดต">รออัพเดต</option>
+                  <option value="ปิดปรับปรุง">ปิดปรับปรุง</option>
+                </select>
+              </div>
             </div>
           </div>
           
           <div class="flex justify-end space-x-3 mt-6">
-            <button type="button" onclick="window.closeQuizManager()" class="btn btn-secondary">
+            <button type="button" onclick="closeQuizManager()" class="btn btn-secondary">
               ยกเลิก
             </button>
             <button type="submit" class="btn btn-primary">
               <i class="fas fa-save"></i>
-              <span id="save-btn-text">บันทึกควิซ</span>
+              บันทึก
             </button>
           </div>
         </form>
-        
-        <!-- Quiz List -->
-        <div class="mt-8 pt-6 border-t">
-          <div class="flex items-center justify-between mb-4">
-            <h4 class="text-lg font-semibold">ควิซทั้งหมด</h4>
-            <div class="flex space-x-2">
-              <button onclick="window.exportQuizData()" class="btn btn-secondary btn-sm">
-                <i class="fas fa-download"></i>
-                ส่งออก
-              </button>
-              <button onclick="window.refreshQuizList()" class="btn btn-primary btn-sm">
-                <i class="fas fa-sync-alt"></i>
-                รีเฟรช
-              </button>
-            </div>
-          </div>
-          
-          <div class="overflow-x-auto">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th>วิชา</th>
-                  <th>ชื่อควิซ</th>
-                  <th>สถานะ</th>
-                  <th>หมดอายุ</th>
-                  <th>จัดการ</th>
-                </tr>
-              </thead>
-              <tbody id="quiz-table-body">
-                <tr>
-                  <td colspan="5" class="text-center text-gray-500 py-8">
-                    <i class="fas fa-search text-2xl mb-2"></i>
-                    <p>ไม่มีข้อมูลควิซ</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- Bulk Import Modal -->
-  <div id="bulk-import-modal" class="modal-overlay hidden">
-    <div class="modal-content">
-      <div class="p-6 border-b">
-        <div class="flex items-center justify-between">
-          <h3 class="text-2xl font-bold text-gray-800">นำเข้าข้อมูลจำนวนมาก</h3>
-          <button onclick="window.closeBulkImport()" class="text-gray-400 hover:text-gray-600">
-            <i class="fas fa-times text-xl"></i>
-          </button>
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-md">
+      <div class="p-4 md:p-6 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-3xl">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-shield-alt text-3xl"></i>
+          </div>
+          <h3 class="text-xl md:text-2xl font-bold">Admin Login</h3>
+          <p class="text-blue-100 mt-1">เข้าสู่ระบบเพื่อจัดการข้อมูล</p>
         </div>
       </div>
       
-      <div class="p-6">
-        <div class="mb-6">
-          <h4 class="text-lg font-semibold mb-2">วิธีการนำเข้า</h4>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button onclick="window.showCsvImport()" class="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary transition-colors text-center">
-              <i class="fas fa-file-csv text-3xl text-gray-400 mb-2"></i>
-              <p class="font-medium">CSV ไฟล์</p>
-              <p class="text-sm text-gray-500">นำเข้าจากไฟล์ CSV</p>
-            </button>
+      <div class="p-4 md:p-6">
+        <form onsubmit="adminLogin(event)">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ชื่อผู้ใช้</label>
+              <input type="text" id="admin-username" class="form-input" placeholder="admin" required>
+            </div>
             
-            <button onclick="window.showJsonImport()" class="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary transition-colors text-center">
-              <i class="fas fa-code text-3xl text-gray-400 mb-2"></i>
-              <p class="font-medium">JSON ข้อมูล</p>
-              <p class="text-sm text-gray-500">นำเข้าแบบ JSON</p>
-            </button>
-            
-            <button onclick="window.showManualBulk()" class="p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-primary transition-colors text-center">
-              <i class="fas fa-keyboard text-3xl text-gray-400 mb-2"></i>
-              <p class="font-medium">ป้อนข้อมูล</p>
-              <p class="text-sm text-gray-500">พิมพ์หลายรายการ</p>
-            </button>
-          </div>
-        </div>
-        
-        <!-- CSV Import -->
-        <div id="csv-import-section" class="hidden">
-          <h4 class="text-lg font-semibold mb-2">นำเข้าไฟล์ CSV</h4>
-          <div class="mb-4">
-            <input type="file" id="csv-file" accept=".csv" class="form-input" />
-            <p class="text-sm text-gray-500 mt-1">
-              รูปแบบ: Subject, QuizName, QuizLink, Description, ExpiryDate, Status
-            </p>
-          </div>
-          <button onclick="window.importCsvFile()" class="btn btn-primary">
-            <i class="fas fa-upload"></i>
-            นำเข้าข้อมูล
-          </button>
-        </div>
-        
-        <!-- Manual Bulk Entry -->
-        <div id="manual-bulk-section" class="hidden">
-          <h4 class="text-lg font-semibold mb-2">ป้อนข้อมูลหลายรายการ</h4>
-          <textarea id="bulk-text" class="form-input" rows="10" placeholder="วิชาคณิตศาสตร์|ควิซที่ 1|https://example.com|คำอธิบาย|2024-12-31 23:59|อัพเดตล่าสุด
-วิชาฟิสิกส์|ควิซที่ 2|https://example.com|คำอธิบาย|2024-12-31 23:59|อัพเดตล่าสุด
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">รหัสผ่าน</label>
+              <input type="password" id="admin-password" class="form-input" placeholder="••••••••" required>
+            </div>
 
-แต่ละบรรทัด = 1 ควิซ
-แยกด้วย | (แท่งตั้ง)"></textarea>
-          <div class="flex justify-between items-center mt-4">
-            <p class="text-sm text-gray-500">แยกข้อมูลด้วย | (แท่งตั้ง) - แต่ละบรรทัดคือ 1 ควิซ</p>
-            <button onclick="window.importBulkText()" class="btn btn-primary">
-              <i class="fas fa-plus"></i>
-              เพิ่มทั้งหมด
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p class="text-xs text-blue-600">
+                <strong>ข้อมูลทดสอบ:</strong><br>
+                ชื่อผู้ใช้: admin<br>
+                รหัสผ่าน: admin123
+              </p>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center mt-6">
+            <button type="button" onclick="closeAdminLogin()" class="btn btn-secondary">
+              ยกเลิก
+            </button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-sign-in-alt"></i>
+              เข้าสู่ระบบ
             </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   </div>
 
   <!-- Admin Panel -->
-  <div id="admin-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
-      <div class="bg-gradient-to-r from-gray-800 to-gray-900 text-white p-6">
+  <div id="admin-panel-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-4xl">
+      <div class="p-4 md:p-6 bg-gradient-to-r from-gray-800 to-gray-900 text-white">
         <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <div class="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center">
-              <i class="fas fa-shield-alt text-white text-xl"></i>
-            </div>
-            <div>
-              <h2 class="text-2xl font-bold">Admin Panel</h2>
-              <p class="text-gray-300">ระบบจัดการขั้นสูง</p>
-            </div>
-          </div>
-          <button onclick="window.closeAdminPanel()" class="text-white/70 hover:text-white transition-colors">
+          <h2 class="text-xl md:text-2xl font-bold">Admin Panel</h2>
+          <button onclick="closeAdminPanel()" class="text-white/70 hover:text-white p-2">
             <i class="fas fa-times text-xl"></i>
           </button>
         </div>
       </div>
 
-      <div class="p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Performance Stats -->
+      <div class="p-4 md:p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
           <div class="bg-blue-50 rounded-2xl p-4">
-            <h3 class="font-semibold text-gray-800 mb-3">ประสิทธิภาพระบบ</h3>
-            <div class="space-y-2">
+            <h3 class="font-semibold text-gray-800 mb-3">ประสิทธิภาพ</h3>
+            <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-sm text-gray-600">เวลาโหลด:</span>
-                <span class="text-sm font-medium" id="admin-load-time">< 100ms</span>
+                <span>เวลาโหลด:</span>
+                <span id="admin-load-time">< 100ms</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-sm text-gray-600">ขนาด Cache:</span>
-                <span class="text-sm font-medium" id="cache-size">0 KB</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">ควิซในระบบ:</span>
-                <span class="text-sm font-medium" id="admin-total-quizzes">0</span>
+                <span>ควิซทั้งหมด:</span>
+                <span id="admin-total-quizzes">0</span>
               </div>
             </div>
           </div>
           
-          <!-- Quick Actions -->
           <div class="bg-green-50 rounded-2xl p-4">
-            <h3 class="font-semibold text-gray-800 mb-3">การดำเนินการด่วน</h3>
+            <h3 class="font-semibold text-gray-800 mb-3">การดำเนินการ</h3>
             <div class="space-y-2">
-              <button onclick="window.clearAllCache()" class="w-full btn btn-secondary btn-sm">
-                <i class="fas fa-trash"></i>
-                ล้าง Cache
+              <button onclick="clearCache()" class="w-full btn btn-secondary btn-sm">
+                <i class="fas fa-trash"></i>ล้างแคช
               </button>
-              <button onclick="window.backupData()" class="w-full btn btn-primary btn-sm">
-                <i class="fas fa-save"></i>
-                สำรองข้อมูล
-              </button>
-              <button onclick="window.resetSystem()" class="w-full btn btn-danger btn-sm">
-                <i class="fas fa-refresh"></i>
-                รีเซ็ตระบบ
+              <button onclick="backupData()" class="w-full btn btn-primary btn-sm">
+                <i class="fas fa-save"></i>สำรองข้อมูล
               </button>
             </div>
           </div>
           
-          <!-- System Info -->
           <div class="bg-purple-50 rounded-2xl p-4">
             <h3 class="font-semibold text-gray-800 mb-3">ข้อมูลระบบ</h3>
-            <div class="space-y-2">
+            <div class="space-y-2 text-sm">
               <div class="flex justify-between">
-                <span class="text-sm text-gray-600">เวอร์ชัน:</span>
-                <span class="text-sm font-medium">2.0.0</span>
+                <span>เวอร์ชัน:</span>
+                <span>2.0.0</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-sm text-gray-600">อัพเดตล่าสุด:</span>
-                <span class="text-sm font-medium" id="last-admin-update">เมื่อสักครู่</span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">โหมด:</span>
-                <span class="text-sm font-medium text-green-600">ออนไลน์</span>
+                <span>สถานะ:</span>
+                <span class="text-green-600">ออนไลน์</span>
               </div>
             </div>
           </div>
         </div>
-        
-        <!-- System Health -->
-        <div class="mt-6 bg-gray-50 rounded-2xl p-4">
-          <h3 class="font-semibold text-gray-800 mb-3">สถานะระบบ</h3>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="text-center">
-              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-database text-green-600"></i>
-              </div>
-              <p class="text-sm font-medium text-gray-800">การจัดเก็บ</p>
-              <p class="text-xs text-green-600">ปกติ</p>
-            </div>
-            <div class="text-center">
-              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-tachometer-alt text-green-600"></i>
-              </div>
-              <p class="text-sm font-medium text-gray-800">ประสิทธิภาพ</p>
-              <p class="text-xs text-green-600">เยี่ยม</p>
-            </div>
-            <div class="text-center">
-              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-shield-alt text-green-600"></i>
-              </div>
-              <p class="text-sm font-medium text-gray-800">ความปลอดภัย</p>
-              <p class="text-xs text-green-600">ปลอดภัย</p>
-            </div>
-            <div class="text-center">
-              <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                <i class="fas fa-sync-alt text-green-600"></i>
-              </div>
-              <p class="text-sm font-medium text-gray-800">ซิงค์ข้อมูล</p>
-              <p class="text-xs text-green-600">พร้อม</p>
-            </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notifications Panel -->
+  <div id="notifications-panel" class="modal-overlay hidden">
+    <div class="modal-content max-w-md">
+      <div class="p-4 md:p-6 border-b">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl md:text-2xl font-bold text-gray-800">การแจ้งเตือน</h3>
+          <button onclick="closeNotifications()" class="text-gray-400 hover:text-gray-600 p-2">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-4 md:p-6">
+        <div id="notification-list" class="space-y-3">
+          <div class="text-center text-gray-500 py-8">
+            <i class="fas fa-bell-slash text-3xl mb-2 opacity-50"></i>
+            <p class="text-sm">ไม่มีการแจ้งเตือน</p>
           </div>
         </div>
       </div>
@@ -1030,1289 +736,71 @@
   </div>
 
   <!-- Toast Container -->
-  <div id="toast-container" class="fixed bottom-6 right-6 space-y-3 z-50">
+  <div id="toast-container" class="fixed bottom-20 md:bottom-6 right-4 md:right-6 space-y-3 z-50">
     <!-- Toast notifications will appear here -->
   </div>
 
-  <!-- Admin Login Modal -->
-  <div id="admin-login-modal" class="modal-overlay hidden">
-    <div class="modal-content max-w-md">
-      <div class="p-6 border-b bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-3xl">
-        <div class="text-center">
-          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fas fa-shield-alt text-3xl"></i>
-          </div>
-          <h3 class="text-2xl font-bold">Admin Login</h3>
-          <p class="text-blue-100 mt-1">เข้าสู่ระบบเพื่อจัดการข้อมูล</p>
-        </div>
-      </div>
-      
-      <div class="p-6">
-        <form id="admin-login-form" onsubmit="window.adminLogin(event)">
-          <div class="space-y-4">
-            <div class="form-group">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <i class="fas fa-user mr-2"></i>ชื่อผู้ใช้
-              </label>
-              <input 
-                type="text" 
-                id="admin-username" 
-                class="form-input" 
-                placeholder="admin" 
-                required 
-                autocomplete="username"
-              />
-            </div>
-            
-            <div class="form-group">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                <i class="fas fa-lock mr-2"></i>รหัสผ่าน
-              </label>
-              <div class="relative">
-                <input 
-                  type="password" 
-                  id="admin-password" 
-                  class="form-input pr-12" 
-                  placeholder="••••••••" 
-                  required 
-                  autocomplete="current-password"
-                />
-                <button 
-                  type="button" 
-                  onclick="window.togglePasswordVisibility()" 
-                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <i id="password-toggle-icon" class="fas fa-eye"></i>
-                </button>
-              </div>
-            </div>
-
-            <!-- Login Attempts Warning -->
-            <div id="login-warning" class="hidden bg-red-50 border border-red-200 rounded-lg p-3">
-              <div class="flex items-center">
-                <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
-                <span class="text-red-700 text-sm" id="warning-text"></span>
-              </div>
-            </div>
-
-            <!-- Demo Credentials -->
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-              <div class="text-xs text-blue-600">
-                <strong>ข้อมูลทดสอบ:</strong><br>
-                ชื่อผู้ใช้: admin<br>
-                รหัสผ่าน: admin123
-              </div>
-            </div>
-          </div>
-          
-          <div class="flex justify-between items-center mt-6">
-            <button 
-              type="button" 
-              onclick="window.closeAdminLogin()" 
-              class="btn btn-secondary"
-            >
-              ยกเลิก
-            </button>
-            <button 
-              type="submit" 
-              class="btn btn-primary"
-              id="login-submit-btn"
-            >
-              <i class="fas fa-sign-in-alt mr-2"></i>
-              เข้าสู่ระบบ
-            </button>
-          </div>
-        </form>
-        
-        <!-- Alternative Login Options -->
-        <div class="mt-6 pt-4 border-t border-gray-200">
-          <div class="text-center">
-            <p class="text-sm text-gray-600 mb-3">หรือเข้าด้วยวิธีอื่น</p>
-            <button 
-              onclick="window.guestModeLogin()" 
-              class="text-blue-600 hover:text-blue-800 text-sm underline"
-            >
-              เข้าใช้แบบผู้เยี่ยมชม (ดูข้อมูลอย่างเดียว)
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Notification Settings Modal -->
-  <div id="notification-settings-modal" class="modal-overlay hidden">
-    <div class="modal-content max-w-md">
-      <div class="p-6 border-b bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-3xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3">
-              <i class="fas fa-bell text-xl"></i>
-            </div>
-            <div>
-              <h3 class="text-xl font-bold">ตั้งค่าการแจ้งเตือน</h3>
-              <p class="text-purple-100 text-sm">จัดการการแจ้งเตือนของคุณ</p>
-            </div>
-          </div>
-          <button onclick="window.closeNotificationSettings()" class="text-white/70 hover:text-white">
-            <i class="fas fa-times text-xl"></i>
-          </button>
-        </div>
-      </div>
-      
-      <div class="p-6">
-        <div class="space-y-4">
-          <!-- General Settings -->
-          <div class="space-y-3">
-            <h4 class="font-semibold text-gray-800 border-b pb-2">การตั้งค่าทั่วไป</h4>
-            
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">เปิดการแจ้งเตือน</div>
-                <div class="text-sm text-gray-600">รับการแจ้งเตือนทั้งหมด</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="enable-notifications" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">เสียงแจ้งเตือน</div>
-                <div class="text-sm text-gray-600">เล่นเสียงเมื่อมีการแจ้งเตือน</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="notification-sound" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">การแจ้งเตือนเดสก์ท็อป</div>
-                <div class="text-sm text-gray-600">แจ้งเตือนผ่านเบราว์เซอร์</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="desktop-notifications" class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-          </div>
-
-          <!-- Notification Types -->
-          <div class="space-y-3">
-            <h4 class="font-semibold text-gray-800 border-b pb-2">ประเภทการแจ้งเตือน</h4>
-            
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">ควิซใหม่</div>
-                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อมีควิซใหม่</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="new-quiz-notifications" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">ควิซหมดอายุ</div>
-                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อควิซใกล้หมดอายุ</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="expiry-notifications" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">การอัพเดตระบบ</div>
-                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อระบบมีการเปลี่ยนแปลง</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="system-notifications" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-
-            <div class="flex items-center justify-between">
-              <div>
-                <div class="font-medium text-gray-800">ข้อผิดพลาดระบบ</div>
-                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อเกิดข้อผิดพลาด</div>
-              </div>
-              <label class="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" id="error-notifications" checked class="sr-only peer">
-                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
-            </div>
-          </div>
-
-          <!-- Advanced Settings -->
-          <div class="space-y-3">
-            <h4 class="font-semibold text-gray-800 border-b pb-2">การตั้งค่าขั้นสูง</h4>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนการแจ้งเตือนสูงสุด</label>
-              <select id="max-notifications" class="form-input">
-                <option value="50">50 รายการ</option>
-                <option value="100" selected>100 รายการ</option>
-                <option value="200">200 รายการ</option>
-                <option value="500">500 รายการ</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">ระยะเวลาแสดงการแจ้งเตือน</label>
-              <select id="notification-duration" class="form-input">
-                <option value="3000">3 วินาที</option>
-                <option value="5000" selected>5 วินาที</option>
-                <option value="10000">10 วินาที</option>
-                <option value="0">ไม่หายไปอัตโนมัติ</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        
-        <div class="flex justify-between items-center mt-6 pt-4 border-t">
-          <button onclick="window.resetNotificationSettings()" class="text-gray-500 hover:text-gray-700 text-sm">
-            รีเซ็ตค่าเริ่มต้น
-          </button>
-          <div class="flex space-x-3">
-            <button onclick="window.closeNotificationSettings()" class="btn btn-secondary">
-              ยกเลิก
-            </button>
-            <button onclick="window.saveNotificationSettings()" class="btn btn-primary">
-              <i class="fas fa-save mr-2"></i>
-              บันทึก
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admin Status Bar -->
-  <div id="admin-status-bar" class="fixed top-0 right-4 mt-16 bg-white shadow-lg rounded-2xl px-4 py-2 z-40 hidden">
-    <div class="flex items-center space-x-3">
-      <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-      <span class="text-sm font-medium text-gray-700">Admin Mode</span>
-      <span class="text-xs text-gray-500" id="admin-session-time">00:00</span>
-      <button onclick="window.adminLogout()" class="text-red-500 hover:text-red-700 ml-2">
-        <i class="fas fa-sign-out-alt"></i>
-      </button>
-    </div>
-  </div>
-
   <script>
-    // Enhanced Configuration for Fast Loading
+    // Global state management (no localStorage/sessionStorage)
+    const appState = {
+      subjects: {},
+      currentSubject: null,
+      notifications: [],
+      isAuthenticated: false,
+      userRole: 'guest',
+      loadTime: 0,
+      searchResults: null,
+      cache: {}
+    };
+
+    // Configuration
     const CONFIG = {
       SHEET_ID: "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc",
       QUIZ_RANGE: "Allquestions",
       API_KEY: "AIzaSyDpvXNmtRybEEu9JXzKOWF3F61-3tM5SCE",
-      REALTIME_SYNC_INTERVAL: 30000,
-      NOTIFICATION_TIMEOUT: 5000,
-      MAX_NOTIFICATIONS: 100,
-      CONNECTION_TIMEOUT: 5000,
-      CACHE_DURATION: 5 * 60 * 1000, // 5 minutes cache
-      FAST_LOAD: true,
-      AUTO_SAVE: true,
-      DEBOUNCE_DELAY: 300
+      CACHE_DURATION: 5 * 60 * 1000
     };
 
-    // Global State with Authentication
-    let state = {
-      subjects: {},
-      currentSubject: null,
-      notifications: [],
-      isConnected: true,
-      lastSync: null,
-      searchResults: null,
-      currentFilter: 'all',
-      sortOrder: 'name',
-      cacheEnabled: true,
-      loadTime: 0,
-      // Authentication state
-      isAuthenticated: false,
-      userRole: 'guest', // guest, admin
-      loginAttempts: 0,
-      sessionTimeout: null,
-      analytics: {
-        pageViews: 0,
-        quizAccesses: 0,
-        totalUsers: 0,
-        errorCount: 0
-      }
-    };
-
-    // Fast Cache System
-    class FastCache {
+    // In-memory cache system
+    class MemoryCache {
       constructor() {
-        this.prefix = 'allquiz_';
-        this.enabled = true;
+        this.data = {};
       }
 
-      set(key, data, ttl = CONFIG.CACHE_DURATION) {
-        if (!this.enabled) return;
-        
-        try {
-          const item = {
-            data: data,
-            timestamp: Date.now(),
-            ttl: ttl
-          };
-          const storageData = JSON.stringify(item);
-          document.getElementById('cache-size').textContent = Math.round(storageData.length / 1024) + ' KB';
-          
-          // Use variable instead of localStorage
-          window[this.prefix + key] = item;
-        } catch (error) {
-          console.warn('Cache set failed:', error);
-        }
+      set(key, value, ttl = CONFIG.CACHE_DURATION) {
+        this.data[key] = {
+          value: value,
+          expiry: Date.now() + ttl
+        };
       }
 
       get(key) {
-        if (!this.enabled) return null;
-        
-        try {
-          const item = window[this.prefix + key];
-          if (!item) return null;
-          
-          if (Date.now() - item.timestamp > item.ttl) {
-            this.delete(key);
-            return null;
-          }
-          
-          return item.data;
-        } catch (error) {
-          console.warn('Cache get failed:', error);
+        const item = this.data[key];
+        if (!item) return null;
+        if (Date.now() > item.expiry) {
+          delete this.data[key];
           return null;
         }
-      }
-
-      delete(key) {
-        try {
-          delete window[this.prefix + key];
-        } catch (error) {
-          console.warn('Cache delete failed:', error);
-        }
+        return item.value;
       }
 
       clear() {
-        try {
-          Object.keys(window).forEach(key => {
-            if (key.startsWith(this.prefix)) {
-              delete window[key];
-            }
-          });
-          showToast('ล้าง Cache เสร็จสิ้น', 'success');
-        } catch (error) {
-          console.warn('Cache clear failed:', error);
-        }
-      }
-
-      size() {
-        try {
-          let size = 0;
-          Object.keys(window).forEach(key => {
-            if (key.startsWith(this.prefix)) {
-              size += JSON.stringify(window[key]).length;
-            }
-          });
-          return Math.round(size / 1024);
-        } catch (error) {
-          return 0;
-        }
+        this.data = {};
       }
     }
 
-    const cache = new FastCache();
+    const cache = new MemoryCache();
 
-    // Authentication System
-    class AuthSystem {
-      constructor() {
-        this.credentials = {
-          admin: { password: 'admin123', role: 'admin' },
-          demo: { password: 'demo', role: 'admin' },
-          guest: { password: '', role: 'guest' }
-        };
-        this.maxAttempts = 3;
-        this.lockoutTime = 5 * 60 * 1000; // 5 minutes
-        this.sessionDuration = 2 * 60 * 60 * 1000; // 2 hours
-      }
-
-      authenticate(username, password) {
-        // Check if account is locked
-        if (this.isAccountLocked()) {
-          return {
-            success: false,
-            message: 'บัญชีถูกล็อค กรุณารอ 5 นาที',
-            remainingTime: this.getRemainingLockTime()
-          };
-        }
-
-        // Validate credentials
-        const user = this.credentials[username.toLowerCase()];
-        if (!user || user.password !== password) {
-          state.loginAttempts++;
-          
-          if (state.loginAttempts >= this.maxAttempts) {
-            this.lockAccount();
-            return {
-              success: false,
-              message: 'รหัสผ่านผิด 3 ครั้ง บัญชีถูกล็อค 5 นาที',
-              locked: true
-            };
-          }
-
-          return {
-            success: false,
-            message: `รหัสผ่านผิด (เหลือ ${this.maxAttempts - state.loginAttempts} ครั้ง)`,
-            attemptsLeft: this.maxAttempts - state.loginAttempts
-          };
-        }
-
-        // Successful login
-        this.setSession(username, user.role);
-        return {
-          success: true,
-          message: 'เข้าสู่ระบบสำเร็จ',
-          role: user.role
-        };
-      }
-
-      setSession(username, role) {
-        state.isAuthenticated = true;
-        state.userRole = role;
-        state.loginAttempts = 0;
-        
-        // Set session timeout
-        if (state.sessionTimeout) {
-          clearTimeout(state.sessionTimeout);
-        }
-        
-        state.sessionTimeout = setTimeout(() => {
-          this.logout('หมดเวลาเซสชัน กรุณาเข้าสู่ระบบใหม่');
-        }, this.sessionDuration);
-
-        this.updateUI();
-        this.startSessionTimer();
-        
-        // Send notification
-        notificationSystem.addNotification({
-          type: 'auth',
-          title: '🔓 เข้าสู่ระบบสำเร็จ',
-          message: `ยินดีต้อนรับ ${username} (${role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้เยี่ยมชม'})`,
-          icon: 'fa-sign-in-alt',
-          color: 'green',
-          priority: 'normal'
-        });
-      }
-
-      logout(message = 'ออกจากระบบเรียบร้อย') {
-        const wasAuthenticated = state.isAuthenticated;
-        
-        state.isAuthenticated = false;
-        state.userRole = 'guest';
-        
-        if (state.sessionTimeout) {
-          clearTimeout(state.sessionTimeout);
-          state.sessionTimeout = null;
-        }
-
-        this.updateUI();
-        this.stopSessionTimer();
-        showToast(message, 'info');
-        
-        // Send notification only if was actually logged in
-        if (wasAuthenticated) {
-          notificationSystem.addNotification({
-            type: 'auth',
-            title: '🔒 ออกจากระบบ',
-            message: message,
-            icon: 'fa-sign-out-alt',
-            color: 'gray',
-            priority: 'normal'
-          });
-        }
-      }
-
-      isAccountLocked() {
-        const lockTime = window.accountLockTime;
-        return lockTime && (Date.now() - lockTime) < this.lockoutTime;
-      }
-
-      lockAccount() {
-        window.accountLockTime = Date.now();
-      }
-
-      getRemainingLockTime() {
-        const lockTime = window.accountLockTime;
-        if (!lockTime) return 0;
-        
-        const elapsed = Date.now() - lockTime;
-        const remaining = this.lockoutTime - elapsed;
-        return Math.max(0, Math.ceil(remaining / 1000));
-      }
-
-      updateUI() {
-        const statusBar = document.getElementById('admin-status-bar');
-        const adminButtons = document.querySelectorAll('.admin-only');
-        
-        if (state.isAuthenticated && state.userRole === 'admin') {
-          statusBar.classList.remove('hidden');
-          adminButtons.forEach(btn => {
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            btn.disabled = false;
-          });
-          this.updateAdminButtons(true);
-        } else {
-          statusBar.classList.add('hidden');
-          adminButtons.forEach(btn => {
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            btn.disabled = true;
-          });
-          this.updateAdminButtons(false);
-        }
-      }
-
-      updateAdminButtons(enabled) {
-        // Update navigation buttons
-        const editButtons = document.querySelectorAll('[onclick*="showQuizManager"], [onclick*="showBulkImport"], [onclick*="editQuiz"], [onclick*="deleteQuiz"]');
-        editButtons.forEach(btn => {
-          if (enabled) {
-            btn.classList.remove('hidden');
-            btn.disabled = false;
-          } else {
-            btn.style.display = 'none';
-          }
-        });
-
-        // Update quick action buttons
-        const quickActions = document.querySelector('.glass-morphism .flex');
-        if (quickActions) {
-          const buttons = quickActions.querySelectorAll('button');
-          buttons.forEach((btn, index) => {
-            if (index > 1) { // Keep export and refresh for all users
-              btn.style.display = enabled ? 'inline-flex' : 'none';
-            }
-          });
-        }
-      }
-
-      startSessionTimer() {
-        this.sessionStartTime = Date.now();
-        this.sessionTimer = setInterval(() => {
-          const elapsed = Date.now() - this.sessionStartTime;
-          const minutes = Math.floor(elapsed / 60000);
-          const seconds = Math.floor((elapsed % 60000) / 1000);
-          
-          const timeElement = document.getElementById('admin-session-time');
-          if (timeElement) {
-            timeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-          }
-        }, 1000);
-      }
-
-      stopSessionTimer() {
-        if (this.sessionTimer) {
-          clearInterval(this.sessionTimer);
-          this.sessionTimer = null;
-        }
-      }
-
-      requireAuth(action = 'ใช้ฟีเจอร์นี้') {
-        if (!state.isAuthenticated || state.userRole !== 'admin') {
-          showToast(`กรุณาเข้าสู่ระบบแอดมินเพื่อ${action}`, 'warning');
-          this.showLoginModal();
-          return false;
-        }
-        return true;
-      }
-
-      showLoginModal() {
-        document.getElementById('admin-login-modal').classList.remove('hidden');
-        document.getElementById('admin-username').focus();
-      }
-
-      closeLoginModal() {
-        document.getElementById('admin-login-modal').classList.add('hidden');
-        document.getElementById('admin-login-form').reset();
-        document.getElementById('login-warning').classList.add('hidden');
-      }
-    }
-
-    const authSystem = new AuthSystem();
-
-    // Enhanced Notification System
-    class NotificationSystem {
-      constructor() {
-        this.notifications = [];
-        this.settings = {
-          enabled: true,
-          sound: true,
-          desktop: false,
-          maxNotifications: 100,
-          duration: 5000,
-          types: {
-            newQuiz: true,
-            expiry: true,
-            system: true,
-            error: true
-          }
-        };
-        this.unreadCount = 0;
-        this.loadSettings();
-        this.requestDesktopPermission();
-      }
-
-      loadSettings() {
-        try {
-          const saved = window.notificationSettings;
-          if (saved) {
-            this.settings = { ...this.settings, ...saved };
-          }
-        } catch (error) {
-          console.warn('Failed to load notification settings:', error);
-        }
-      }
-
-      saveSettings() {
-        try {
-          window.notificationSettings = this.settings;
-          this.updateSettingsUI();
-        } catch (error) {
-          console.warn('Failed to save notification settings:', error);
-        }
-      }
-
-      updateSettingsUI() {
-        document.getElementById('enable-notifications').checked = this.settings.enabled;
-        document.getElementById('notification-sound').checked = this.settings.sound;
-        document.getElementById('desktop-notifications').checked = this.settings.desktop;
-        document.getElementById('new-quiz-notifications').checked = this.settings.types.newQuiz;
-        document.getElementById('expiry-notifications').checked = this.settings.types.expiry;
-        document.getElementById('system-notifications').checked = this.settings.types.system;
-        document.getElementById('error-notifications').checked = this.settings.types.error;
-        document.getElementById('max-notifications').value = this.settings.maxNotifications;
-        document.getElementById('notification-duration').value = this.settings.duration;
-        
-        const toggleText = document.getElementById('notification-toggle-text');
-        if (toggleText) {
-          toggleText.textContent = this.settings.enabled ? 'ปิด' : 'เปิด';
-        }
-      }
-
-      async requestDesktopPermission() {
-        if ('Notification' in window && Notification.permission === 'default') {
-          try {
-            const permission = await Notification.requestPermission();
-            this.settings.desktop = permission === 'granted';
-          } catch (error) {
-            console.warn('Desktop notification permission denied:', error);
-          }
-        }
-      }
-
-      addNotification(notification) {
-        if (!this.settings.enabled) return;
-
-        const id = Date.now() + Math.random();
-        const newNotification = {
-          id,
-          ...notification,
-          timestamp: new Date(),
-          read: false,
-          priority: notification.priority || 'normal' // low, normal, high, urgent
-        };
-
-        // Check if this type is enabled
-        if (!this.isTypeEnabled(notification.type)) return;
-
-        this.notifications.unshift(newNotification);
-        this.unreadCount++;
-
-        // Limit notifications
-        if (this.notifications.length > this.settings.maxNotifications) {
-          this.notifications = this.notifications.slice(0, this.settings.maxNotifications);
-        }
-
-        this.updateNotificationUI();
-        this.showToastNotification(newNotification);
-        
-        if (this.settings.sound) {
-          this.playNotificationSound(newNotification.priority);
-        }
-
-        if (this.settings.desktop && Notification.permission === 'granted') {
-          this.showDesktopNotification(newNotification);
-        }
-
-        // Auto-expire based on priority
-        const expireTime = this.getExpireTime(newNotification.priority);
-        if (expireTime > 0) {
-          setTimeout(() => {
-            this.removeNotification(id);
-          }, expireTime);
-        }
-
-        // Store in memory
-        this.saveNotificationsToMemory();
-      }
-
-      isTypeEnabled(type) {
-        const typeMap = {
-          'quiz-new': 'newQuiz',
-          'quiz-update': 'newQuiz',
-          'quiz-expiry': 'expiry',
-          'system': 'system',
-          'error': 'error',
-          'auth': 'system',
-          'success': 'system',
-          'warning': 'system'
-        };
-        
-        const settingKey = typeMap[type] || 'system';
-        return this.settings.types[settingKey];
-      }
-
-      getExpireTime(priority) {
-        switch (priority) {
-          case 'urgent': return 30000; // 30 seconds
-          case 'high': return 15000; // 15 seconds
-          case 'normal': return 10000; // 10 seconds
-          case 'low': return 5000; // 5 seconds
-          default: return this.settings.duration;
-        }
-      }
-
-      showToastNotification(notification) {
-        const toast = document.createElement('div');
-        toast.className = `notification-toast flex items-center space-x-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-lg max-w-sm ${this.getPriorityClass(notification.priority)}`;
-        
-        const iconColor = this.getIconColor(notification.color || notification.type);
-        
-        toast.innerHTML = `
-          <div class="w-10 h-10 bg-${notification.color || 'blue'}-50 rounded-xl flex items-center justify-center flex-shrink-0">
-            <i class="fas ${notification.icon || 'fa-bell'} ${iconColor} text-lg"></i>
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium text-gray-800 text-sm">${notification.title}</div>
-            <div class="text-gray-600 text-xs">${notification.message}</div>
-            <div class="text-gray-500 text-xs mt-1">${this.formatTime(notification.timestamp)}</div>
-          </div>
-          <div class="flex flex-col space-y-1">
-            <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
-              <i class="fas fa-times text-sm"></i>
-            </button>
-            ${notification.action ? `<button onclick="${notification.action}" class="text-blue-600 hover:text-blue-800 text-xs">
-              <i class="fas fa-external-link-alt"></i>
-            </button>` : ''}
-          </div>
-        `;
-        
-        document.getElementById('toast-container').appendChild(toast);
-        
-        const expireTime = this.settings.duration;
-        if (expireTime > 0) {
-          setTimeout(() => {
-            if (toast.parentElement) {
-              toast.style.transform = 'translateX(100%)';
-              setTimeout(() => toast.remove(), 300);
-            }
-          }, expireTime);
-        }
-      }
-
-      showDesktopNotification(notification) {
-        try {
-          const desktopNotification = new Notification(notification.title, {
-            body: notification.message,
-            icon: '/favicon.ico',
-            tag: notification.id,
-            silent: !this.settings.sound
-          });
-
-          desktopNotification.onclick = () => {
-            window.focus();
-            this.markAsRead(notification.id);
-            if (notification.action) {
-              eval(notification.action);
-            }
-          };
-
-          setTimeout(() => {
-            desktopNotification.close();
-          }, 10000);
-
-        } catch (error) {
-          console.warn('Desktop notification failed:', error);
-        }
-      }
-
-      playNotificationSound(priority = 'normal') {
-        try {
-          // Create audio context for different priority sounds
-          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-
-          oscillator.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-
-          // Different frequencies for different priorities
-          const frequencies = {
-            urgent: [800, 600, 800, 600],
-            high: [600, 800],
-            normal: [400],
-            low: [300]
-          };
-
-          const freq = frequencies[priority] || frequencies.normal;
-          let index = 0;
-
-          const playTone = () => {
-            if (index < freq.length) {
-              oscillator.frequency.value = freq[index];
-              gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-              gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-              
-              index++;
-              if (index < freq.length) {
-                setTimeout(playTone, 200);
-              }
-            }
-          };
-
-          oscillator.start();
-          playTone();
-          
-          setTimeout(() => {
-            oscillator.stop();
-          }, freq.length * 200);
-
-        } catch (error) {
-          console.warn('Sound notification failed:', error);
-        }
-      }
-
-      getPriorityClass(priority) {
-        switch (priority) {
-          case 'urgent': return 'border-red-300 bg-red-50';
-          case 'high': return 'border-orange-300 bg-orange-50';
-          case 'normal': return 'border-blue-300 bg-blue-50';
-          case 'low': return 'border-gray-300 bg-gray-50';
-          default: return 'border-gray-200';
-        }
-      }
-
-      getIconColor(color) {
-        const colors = {
-          red: 'text-red-500',
-          orange: 'text-orange-500',
-          yellow: 'text-yellow-500',
-          green: 'text-green-500',
-          blue: 'text-blue-500',
-          purple: 'text-purple-500',
-          gray: 'text-gray-500'
-        };
-        return colors[color] || 'text-blue-500';
-      }
-
-      formatTime(timestamp) {
-        const now = new Date();
-        const diff = now - timestamp;
-        
-        if (diff < 60000) return 'เมื่อสักครู่';
-        if (diff < 3600000) return `${Math.floor(diff / 60000)} นาทีที่แล้ว`;
-        if (diff < 86400000) return `${Math.floor(diff / 3600000)} ชั่วโมงที่แล้ว`;
-        return timestamp.toLocaleDateString('th-TH');
-      }
-
-      updateNotificationUI() {
-        const badge = document.getElementById('notification-count');
-        
-        if (this.unreadCount > 0) {
-          badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
-          badge.classList.remove('hidden');
-        } else {
-          badge.classList.add('hidden');
-        }
-
-        this.updateNotificationList();
-      }
-
-      updateNotificationList() {
-        const list = document.getElementById('notification-list');
-        list.innerHTML = '';
-        
-        if (this.notifications.length === 0) {
-          list.innerHTML = `
-            <div class="text-center text-gray-500 py-8">
-              <i class="fas fa-bell-slash text-3xl mb-2 opacity-50"></i>
-              <p class="text-sm">ไม่มีการแจ้งเตือน</p>
-            </div>
-          `;
-          return;
-        }
-        
-        this.notifications.slice(0, 20).forEach(notification => {
-          const item = document.createElement('div');
-          item.className = `notification-item flex items-start space-x-3 p-3 rounded-xl cursor-pointer transition-all ${
-            notification.read ? 'bg-gray-50 opacity-75' : 'bg-white hover:bg-blue-50 border border-blue-100'
-          }`;
-          
-          const iconColor = this.getIconColor(notification.color || notification.type);
-          
-          item.innerHTML = `
-            <div class="w-8 h-8 bg-${notification.color || 'blue'}-50 rounded-lg flex items-center justify-center flex-shrink-0">
-              <i class="fas ${notification.icon || 'fa-bell'} ${iconColor} text-sm"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="font-medium text-gray-800 text-sm ${notification.read ? 'opacity-75' : ''}">${notification.title}</div>
-              <div class="text-gray-600 text-xs ${notification.read ? 'opacity-75' : ''}">${notification.message}</div>
-              <div class="text-gray-500 text-xs mt-1">${this.formatTime(notification.timestamp)}</div>
-            </div>
-            <div class="flex flex-col items-center space-y-1">
-              ${!notification.read ? '<div class="w-2 h-2 bg-blue-500 rounded-full"></div>' : ''}
-              <button onclick="event.stopPropagation(); notificationSystem.removeNotification('${notification.id}')" class="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-                <i class="fas fa-times text-xs"></i>
-              </button>
-            </div>
-          `;
-          
-          item.addEventListener('click', () => {
-            this.markAsRead(notification.id);
-            if (notification.action) {
-              eval(notification.action);
-            }
-          });
-          
-          list.appendChild(item);
-        });
-      }
-
-      markAsRead(notificationId) {
-        const notification = this.notifications.find(n => n.id === notificationId);
-        if (notification && !notification.read) {
-          notification.read = true;
-          this.unreadCount = Math.max(0, this.unreadCount - 1);
-          this.updateNotificationUI();
-          this.saveNotificationsToMemory();
-        }
-      }
-
-      markAllAsRead() {
-        this.notifications.forEach(n => n.read = true);
-        this.unreadCount = 0;
-        this.updateNotificationUI();
-        this.saveNotificationsToMemory();
-        showToast('อ่านการแจ้งเตือนทั้งหมดแล้ว', 'info');
-      }
-
-      removeNotification(notificationId) {
-        const index = this.notifications.findIndex(n => n.id === notificationId);
-        if (index !== -1) {
-          const notification = this.notifications[index];
-          if (!notification.read) {
-            this.unreadCount = Math.max(0, this.unreadCount - 1);
-          }
-          this.notifications.splice(index, 1);
-          this.updateNotificationUI();
-          this.saveNotificationsToMemory();
-        }
-      }
-
-      clearAllNotifications() {
-        this.notifications = [];
-        this.unreadCount = 0;
-        this.updateNotificationUI();
-        this.saveNotificationsToMemory();
-        showToast('ล้างการแจ้งเตือนทั้งหมดแล้ว', 'info');
-      }
-
-      toggleNotifications() {
-        this.settings.enabled = !this.settings.enabled;
-        this.saveSettings();
-        
-        const status = this.settings.enabled ? 'เปิด' : 'ปิด';
-        showToast(`${status}การแจ้งเตือนแล้ว`, 'info');
-        
-        if (!this.settings.enabled) {
-          this.clearAllNotifications();
-        }
-      }
-
-      saveNotificationsToMemory() {
-        try {
-          window.savedNotifications = this.notifications;
-        } catch (error) {
-          console.warn('Failed to save notifications:', error);
-        }
-      }
-
-      loadNotificationsFromMemory() {
-        try {
-          const saved = window.savedNotifications;
-          if (saved && Array.isArray(saved)) {
-            this.notifications = saved;
-            this.unreadCount = saved.filter(n => !n.read).length;
-            this.updateNotificationUI();
-          }
-        } catch (error) {
-          console.warn('Failed to load notifications:', error);
-        }
-      }
-
-      // Automatic notification triggers
-      checkForExpiringQuizzes() {
-        if (!this.settings.types.expiry) return;
-
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          quizzes.forEach(quiz => {
-            if (quiz.expiryDate && fastLoader.isExpiringSoon && fastLoader.isExpiringSoon(quiz.expiryDate, 1)) {
-              // Check if we already notified about this quiz
-              const existingNotification = this.notifications.find(n => 
-                n.type === 'quiz-expiry' && n.quizId === quiz.id
-              );
-              
-              if (!existingNotification) {
-                this.addNotification({
-                  type: 'quiz-expiry',
-                  title: '⚠️ ควิซใกล้หมดอายุ',
-                  message: `${quiz.quizName} ในวิชา ${subject} จะหมดอายุภายใน 24 ชั่วโมง`,
-                  icon: 'fa-clock',
-                  color: 'orange',
-                  priority: 'high',
-                  quizId: quiz.id,
-                  action: `showQuizzes('${subject}')`
-                });
-              }
-            }
-          });
-        });
-      }
-
-      sendWelcomeNotification() {
-        this.addNotification({
-          type: 'system',
-          title: '🎉 ยินดีต้อนรับ',
-          message: 'ระบบการแจ้งเตือนพร้อมใช้งานแล้ว',
-          icon: 'fa-check-circle',
-          color: 'green',
-          priority: 'normal'
-        });
-      }
-
-      sendTestNotification() {
-        const messages = [
-          'นี่คือการแจ้งเตือนทดสอบ',
-          'ระบบการแจ้งเตือนทำงานปกติ',
-          'ทดสอบเสียงและการแสดงผล',
-          'การแจ้งเตือนแบบ Real-time'
-        ];
-        
-        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
-        
-        this.addNotification({
-          type: 'system',
-          title: '🔔 ทดสอบการแจ้งเตือน',
-          message: randomMessage,
-          icon: 'fa-test-tube',
-          color: 'blue',
-          priority: 'normal'
-        });
-      }
-    }
-
-    const notificationSystem = new NotificationSystem();
-
-    // Fast Loading System
-    class FastLoader {
-      constructor() {
-        this.loadStartTime = 0;
-      }
-
-      async loadData() {
-        this.loadStartTime = performance.now();
-        showLoadingOverlay(true);
-        
-        try {
-          // Try cache first
-          const cachedData = cache.get('subjects_data');
-          if (cachedData && CONFIG.FAST_LOAD) {
-            await this.processData(cachedData);
-            hideSkeletonLoaders();
-            showLoadingOverlay(false);
-            this.updateLoadTime();
-            showToast('โหลดจาก Cache สำเร็จ', 'success');
-            
-            // Background refresh
-            setTimeout(() => this.refreshData(), 1000);
-            return;
-          }
-
-          // Load from API
-          await this.refreshData();
-          
-        } catch (error) {
-          console.error('Load failed:', error);
-          showToast('การโหลดล้มเหลว กำลังใช้ข้อมูลตัวอย่าง', 'warning');
-          await this.loadSampleData();
-        }
-      }
-
-      async refreshData() {
-        try {
-          const data = await SheetsAPI.readData();
-          cache.set('subjects_data', data);
-          await this.processData(data);
-          hideSkeletonLoaders();
-          showLoadingOverlay(false);
-          this.updateLoadTime();
-          
-        } catch (error) {
-          throw error;
-        }
-      }
-
-      async processData(rawData) {
-        return new Promise((resolve) => {
-          // Fast processing with setTimeout to prevent blocking
-          setTimeout(() => {
-            state.subjects = {};
-            let totalQuizzes = 0;
-            let activeQuizzes = 0;
-
-            rawData.slice(1).forEach(row => {
-              const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
-              
-              if (subject && subject.trim()) {
-                if (!state.subjects[subject]) {
-                  state.subjects[subject] = [];
-                }
-                
-                if (quizName) {
-                  const quiz = { 
-                    id: Date.now() + Math.random(),
-                    quizName, 
-                    quizLink, 
-                    quizDescription, 
-                    expiryDate, 
-                    status,
-                    subject,
-                    lastUpdated: new Date().toLocaleString('th-TH')
-                  };
-                  
-                  state.subjects[subject].push(quiz);
-                  totalQuizzes++;
-                  
-                  if (quizLink && !this.isExpired(expiryDate)) {
-                    activeQuizzes++;
-                  }
-                }
-              }
-            });
-
-            // Fast counter animation
-            this.updateCounters(Object.keys(state.subjects).length, totalQuizzes, activeQuizzes);
-
-            renderSubjects();
-            resolve();
-          }, 10);
-        });
-      }
-
-      updateCounters(subjects, total, active) {
-        const updateElement = (id, value) => {
-          const element = document.getElementById(id);
-          if (element) element.textContent = value;
-        };
-        
-        updateElement('total-subjects', subjects);
-        updateElement('total-quizzes', total);
-        updateElement('active-quizzes', active);
-      }
-
-      async loadSampleData() {
-        const sampleData = [
-          ['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status'],
-          ['คณิตศาสตร์', 'ควิซเรื่องเซต', 'https://example.com/quiz1', 'เรื่องเซตและความสัมพันธ์', '31/12/2024, 23:59', 'อัพเดตล่าสุด'],
-          ['ฟิสิกส์', 'ควิซเรื่องแรง', 'https://example.com/quiz2', 'แรงและการเคลื่อนที่', '31/12/2024, 23:59', 'อัพเดตล่าสุด'],
-          ['เคมี', 'ควิซเรื่องธาตุ', 'https://example.com/quiz3', 'ธาตุและสารประกอบ', '31/12/2024, 23:59', 'อัพเดตล่าสุด'],
-          ['ชีววิทยา', 'ควิซเรื่องเซลล์', 'https://example.com/quiz4', 'โครงสร้างเซลล์', '31/12/2024, 23:59', 'อัพเดตล่าสุด']
-        ];
-        
-        cache.set('subjects_data', sampleData);
-        await this.processData(sampleData);
-        hideSkeletonLoaders();
-        showLoadingOverlay(false);
-        this.updateLoadTime();
-      }
-
-      fastAnimateCounter(elementId, targetValue) {
-        const element = document.getElementById(elementId);
-        if (!element) return;
-        element.textContent = targetValue;
-      }
-
-      animateCounter(elementId, targetValue) {
-        const element = document.getElementById(elementId);
-        if (!element) return;
-        
-        const currentValue = parseInt(element.textContent) || 0;
-        const increment = Math.ceil((targetValue - currentValue) / 10);
-        
-        if (currentValue !== targetValue) {
-          element.textContent = Math.min(currentValue + increment, targetValue);
-          if (currentValue + increment < targetValue) {
-            setTimeout(() => this.animateCounter(elementId, targetValue), 50);
-          }
-        }
-      }
-
-      updateLoadTime() {
-        const loadTime = Math.round(performance.now() - this.loadStartTime);
-        state.loadTime = loadTime;
-        document.getElementById('load-time').textContent = loadTime + 'ms';
-        document.getElementById('admin-load-time').textContent = loadTime + 'ms';
-      }
-
-      isExpired(expiryDate) {
-        if (!expiryDate) return false;
-        try {
-          const [date, time] = expiryDate.split(", ");
-          const [day, month, year] = date.split("/");
-          const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
-          return new Date(formattedDate).getTime() < Date.now();
-        } catch {
-          return false;
-        }
-      }
-    }
-
-    const fastLoader = new FastLoader();
-
-    // Simplified Sheets API
+    // Sheets API
     const SheetsAPI = {
       async readData(range = CONFIG.QUIZ_RANGE) {
         const url = `https://sheets.googleapis.com/v4/spreadsheets/${CONFIG.SHEET_ID}/values/${range}?key=${CONFIG.API_KEY}`;
         
         try {
-          const response = await fetch(url, {
-            headers: {
-              'Accept': 'application/json',
-            }
-          });
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
           const data = await response.json();
           return data.values || [];
-          
         } catch (error) {
           console.error('API Error:', error);
           throw error;
@@ -2320,619 +808,12 @@
       }
     };
 
-    // Quiz Management System
-    class QuizManager {
-      constructor() {
-        this.currentQuiz = null;
-      }
-
-      openManager() {
-        this.populateSubjects();
-        this.loadQuizList();
-        document.getElementById('quiz-manager-modal').classList.remove('hidden');
-      }
-
-      closeManager() {
-        document.getElementById('quiz-manager-modal').classList.add('hidden');
-        this.resetForm();
-      }
-
-      populateSubjects() {
-        const select = document.getElementById('quiz-subject');
-        select.innerHTML = '<option value="">เลือกวิชา</option>';
-        
-        Object.keys(state.subjects).forEach(subject => {
-          const option = document.createElement('option');
-          option.value = subject;
-          option.textContent = subject;
-          select.appendChild(option);
-        });
-
-        // Add "New Subject" option
-        const newOption = document.createElement('option');
-        newOption.value = '__new__';
-        newOption.textContent = '+ เพิ่มวิชาใหม่';
-        select.appendChild(newOption);
-      }
-
-      loadQuizList() {
-        const tbody = document.getElementById('quiz-table-body');
-        tbody.innerHTML = '';
-
-        let allQuizzes = [];
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          quizzes.forEach(quiz => {
-            allQuizzes.push({ ...quiz, subject });
-          });
-        });
-
-        if (allQuizzes.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="5" class="text-center text-gray-500 py-8">
-                <i class="fas fa-search text-2xl mb-2"></i>
-                <p>ไม่มีข้อมูลควิซ</p>
-              </td>
-            </tr>
-          `;
-          return;
-        }
-
-        allQuizzes.forEach(quiz => {
-          const row = document.createElement('tr');
-          const isExpired = fastLoader.isExpired(quiz.expiryDate);
-          
-          row.innerHTML = `
-            <td class="font-medium">${quiz.subject}</td>
-            <td>${quiz.quizName}</td>
-            <td>
-              <span class="badge ${this.getStatusBadgeClass(quiz.status, isExpired)}">
-                ${isExpired ? 'หมดอายุ' : quiz.status || 'ไม่ระบุ'}
-              </span>
-            </td>
-            <td class="text-sm text-gray-600">
-              ${quiz.expiryDate ? this.formatDate(quiz.expiryDate) : 'ไม่ระบุ'}
-            </td>
-            <td>
-              <div class="flex space-x-1">
-                <button onclick="window.editQuizWithAuth('${quiz.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="แก้ไขควิซ">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button onclick="window.deleteQuizWithAuth('${quiz.id}')" class="text-red-600 hover:text-red-800 p-1" title="ลบควิซ">
-                  <i class="fas fa-trash"></i>
-                </button>
-                <button onclick="window.duplicateQuiz('${quiz.id}')" class="text-green-600 hover:text-green-800 p-1" title="คัดลอกควิซ">
-                  <i class="fas fa-copy"></i>
-                </button>
-              </div>
-            </td>
-          `;
-          
-          tbody.appendChild(row);
-        });
-      }
-
-      getStatusBadgeClass(status, isExpired) {
-        if (isExpired) return 'badge-danger';
-        
-        switch (status) {
-          case 'อัพเดตล่าสุด': return 'badge-success';
-          case 'รออัพเดต': return 'badge-warning';
-          case 'ปิดปรับปรุง': return 'badge-danger';
-          default: return 'badge-warning';
-        }
-      }
-
-      formatDate(dateString) {
-        try {
-          const [date, time] = dateString.split(", ");
-          return date + (time ? ` ${time}` : '');
-        } catch {
-          return dateString;
-        }
-      }
-
-      saveQuiz(event) {
-        event.preventDefault();
-        
-        const formData = {
-          subject: document.getElementById('quiz-subject').value,
-          quizName: document.getElementById('quiz-name').value,
-          quizLink: document.getElementById('quiz-link').value,
-          quizDescription: document.getElementById('quiz-description').value,
-          expiryDate: this.formatExpiryDate(document.getElementById('quiz-expiry').value),
-          status: document.getElementById('quiz-status').value
-        };
-
-        // Handle new subject
-        if (formData.subject === '__new__') {
-          const newSubject = prompt('ชื่อวิชาใหม่:');
-          if (!newSubject) return;
-          formData.subject = newSubject.trim();
-        }
-
-        // Validation
-        if (!formData.subject || !formData.quizName || !formData.quizLink) {
-          showToast('กรุณากรอกข้อมูลที่จำเป็น', 'error');
-          return;
-        }
-
-        const action = document.getElementById('quiz-action').value;
-        const quizId = document.getElementById('quiz-id').value;
-
-        if (action === 'edit' && quizId) {
-          this.updateQuiz(quizId, formData);
-        } else {
-          this.addQuiz(formData);
-        }
-      }
-
-      addQuiz(quizData) {
-        try {
-          const quiz = {
-            id: Date.now() + Math.random(),
-            ...quizData,
-            lastUpdated: new Date().toLocaleString('th-TH')
-          };
-
-          if (!state.subjects[quizData.subject]) {
-            state.subjects[quizData.subject] = [];
-          }
-
-          state.subjects[quizData.subject].push(quiz);
-          this.saveToCache();
-          this.resetForm();
-          this.loadQuizList();
-          
-          showToast('เพิ่มควิซเสร็จสิ้น', 'success');
-          
-          // Send notification
-          notificationSystem.addNotification({
-            type: 'quiz-new',
-            title: '✨ ควิซใหม่ถูกเพิ่ม',
-            message: `เพิ่ม "${quiz.quizName}" ในวิชา ${quiz.subject} เรียบร้อยแล้ว`,
-            icon: 'fa-plus-circle',
-            color: 'green',
-            priority: 'normal',
-            action: `showQuizzes('${quiz.subject}')`
-          });
-          
-          // Update display if viewing this subject
-          if (state.currentSubject === quizData.subject) {
-            renderQuizzes(state.subjects[quizData.subject]);
-          } else {
-            renderSubjects();
-          }
-          
-          // Notify data change
-          notifyDataChange();
-          
-        } catch (error) {
-          console.error('Error adding quiz:', error);
-          showToast('เกิดข้อผิดพลาดในการเพิ่มควิซ', 'error');
-          
-          notificationSystem.addNotification({
-            type: 'error',
-            title: '❌ เกิดข้อผิดพลาด',
-            message: 'ไม่สามารถเพิ่มควิซได้ กรุณาลองใหม่อีกครั้ง',
-            icon: 'fa-exclamation-circle',
-            color: 'red',
-            priority: 'high'
-          });
-        }
-      }
-
-      updateQuiz(quizId, quizData) {
-        let found = false;
-        let oldSubject = null;
-        
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          const quizIndex = quizzes.findIndex(q => q.id == quizId);
-          if (quizIndex !== -1) {
-            oldSubject = subject;
-            // Remove from old subject if subject changed
-            if (subject !== quizData.subject) {
-              quizzes.splice(quizIndex, 1);
-              if (quizzes.length === 0) {
-                delete state.subjects[subject];
-              }
-              
-              // Add to new subject
-              if (!state.subjects[quizData.subject]) {
-                state.subjects[quizData.subject] = [];
-              }
-              state.subjects[quizData.subject].push({
-                id: quizId,
-                ...quizData,
-                lastUpdated: new Date().toLocaleString('th-TH')
-              });
-            } else {
-              // Update in same subject
-              state.subjects[subject][quizIndex] = {
-                id: quizId,
-                ...quizData,
-                lastUpdated: new Date().toLocaleString('th-TH')
-              };
-            }
-            found = true;
-          }
-        });
-
-        if (found) {
-          this.saveToCache();
-          this.resetForm();
-          this.loadQuizList();
-          showToast('แก้ไขควิซเสร็จสิ้น', 'success');
-          
-          // Send notification
-          notificationSystem.addNotification({
-            type: 'quiz-update',
-            title: '📝 ควิซได้รับการอัพเดต',
-            message: `อัพเดต "${quizData.quizName}" เรียบร้อยแล้ว`,
-            icon: 'fa-edit',
-            color: 'blue',
-            priority: 'normal',
-            action: `showQuizzes('${quizData.subject}')`
-          });
-          
-          // Update display
-          if (state.currentSubject) {
-            renderQuizzes(state.subjects[state.currentSubject] || []);
-          } else {
-            renderSubjects();
-          }
-        }
-      }
-
-      editQuiz(quizId) {
-        let targetQuiz = null;
-        
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          const quiz = quizzes.find(q => q.id == quizId);
-          if (quiz) {
-            targetQuiz = { ...quiz, subject };
-          }
-        });
-
-        if (!targetQuiz) {
-          showToast('ไม่พบควิซที่ต้องการแก้ไข', 'error');
-          return;
-        }
-
-        // Fill form
-        document.getElementById('quiz-id').value = targetQuiz.id;
-        document.getElementById('quiz-action').value = 'edit';
-        document.getElementById('quiz-subject').value = targetQuiz.subject;
-        document.getElementById('quiz-name').value = targetQuiz.quizName;
-        document.getElementById('quiz-link').value = targetQuiz.quizLink;
-        document.getElementById('quiz-description').value = targetQuiz.quizDescription || '';
-        document.getElementById('quiz-status').value = targetQuiz.status || 'อัพเดตล่าสุด';
-        
-        if (targetQuiz.expiryDate) {
-          document.getElementById('quiz-expiry').value = this.parseExpiryDate(targetQuiz.expiryDate);
-        }
-
-        document.getElementById('save-btn-text').textContent = 'อัพเดตควิซ';
-        
-        // Scroll to top of form
-        document.getElementById('quiz-form').scrollIntoView({ behavior: 'smooth' });
-      }
-
-      deleteQuiz(quizId) {
-        if (!confirm('ต้องการลบควิซนี้หรือไม่?')) return;
-
-        let found = false;
-        let deletedQuizName = '';
-        let deletedSubject = '';
-        
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          const quizIndex = quizzes.findIndex(q => q.id == quizId);
-          if (quizIndex !== -1) {
-            deletedQuizName = quizzes[quizIndex].quizName;
-            deletedSubject = subject;
-            quizzes.splice(quizIndex, 1);
-            if (quizzes.length === 0) {
-              delete state.subjects[subject];
-            }
-            found = true;
-          }
-        });
-
-        if (found) {
-          this.saveToCache();
-          this.loadQuizList();
-          showToast('ลบควิซเสร็จสิ้น', 'success');
-          
-          // Send notification
-          notificationSystem.addNotification({
-            type: 'quiz-delete',
-            title: '🗑️ ลบควิซแล้ว',
-            message: `ลบ "${deletedQuizName}" จากวิชา ${deletedSubject} เรียบร้อยแล้ว`,
-            icon: 'fa-trash',
-            color: 'red',
-            priority: 'normal'
-          });
-          
-          // Update display
-          if (state.currentSubject) {
-            renderQuizzes(state.subjects[state.currentSubject] || []);
-          } else {
-            renderSubjects();
-          }
-        }
-      }
-
-      duplicateQuiz(quizId) {
-        let targetQuiz = null;
-        
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          const quiz = quizzes.find(q => q.id == quizId);
-          if (quiz) {
-            targetQuiz = { ...quiz, subject };
-          }
-        });
-
-        if (!targetQuiz) return;
-
-        const newQuiz = {
-          id: Date.now() + Math.random(),
-          quizName: targetQuiz.quizName + ' (สำเนา)',
-          quizLink: targetQuiz.quizLink,
-          quizDescription: targetQuiz.quizDescription,
-          expiryDate: targetQuiz.expiryDate,
-          status: targetQuiz.status,
-          subject: targetQuiz.subject,
-          lastUpdated: new Date().toLocaleString('th-TH')
-        };
-
-        state.subjects[targetQuiz.subject].push(newQuiz);
-        this.saveToCache();
-        this.loadQuizList();
-        showToast('คัดลอกควิซเสร็จสิ้น', 'success');
-        
-        // Update display
-        if (state.currentSubject === targetQuiz.subject) {
-          renderQuizzes(state.subjects[targetQuiz.subject]);
-        } else {
-          renderSubjects();
-        }
-      }
-
-      formatExpiryDate(datetimeLocal) {
-        if (!datetimeLocal) return '';
-        
-        try {
-          const date = new Date(datetimeLocal);
-          const day = date.getDate().toString().padStart(2, '0');
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const year = date.getFullYear();
-          const hours = date.getHours().toString().padStart(2, '0');
-          const minutes = date.getMinutes().toString().padStart(2, '0');
-          
-          return `${day}/${month}/${year}, ${hours}:${minutes}`;
-        } catch {
-          return '';
-        }
-      }
-
-      parseExpiryDate(dateString) {
-        if (!dateString) return '';
-        
-        try {
-          const [date, time] = dateString.split(", ");
-          const [day, month, year] = date.split("/");
-          const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-          
-          if (time) {
-            return `${formattedDate}T${time}`;
-          }
-          return `${formattedDate}T00:00`;
-        } catch {
-          return '';
-        }
-      }
-
-      resetForm() {
-        document.getElementById('quiz-form').reset();
-        document.getElementById('quiz-id').value = '';
-        document.getElementById('quiz-action').value = 'add';
-        document.getElementById('save-btn-text').textContent = 'บันทึกควิซ';
-      }
-
-      saveToCache() {
-        try {
-          cache.set('subjects_data', this.convertToRawData());
-          notifyDataChange();
-        } catch (error) {
-          console.error('Error saving to cache:', error);
-          showToast('การบันทึกล้มเหลว', 'error');
-        }
-      }
-
-      convertToRawData() {
-        try {
-          const rawData = [['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status']];
-          
-          Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-            quizzes.forEach(quiz => {
-              rawData.push([
-                subject,
-                quiz.quizName || '',
-                quiz.quizLink || '',
-                quiz.quizDescription || '',
-                quiz.expiryDate || '',
-                quiz.status || ''
-              ]);
-            });
-          });
-          
-          return rawData;
-        } catch (error) {
-          console.error('Error converting data:', error);
-          return [['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status']];
-        }
-      }
-    }
-
-    const quizManager = new QuizManager();
-
-    // Bulk Import System
-    class BulkImporter {
-      showModal() {
-        document.getElementById('bulk-import-modal').classList.remove('hidden');
-      }
-
-      closeModal() {
-        document.getElementById('bulk-import-modal').classList.add('hidden');
-        this.hideAllSections();
-      }
-
-      showCsvImport() {
-        this.hideAllSections();
-        document.getElementById('csv-import-section').classList.remove('hidden');
-      }
-
-      showManualBulk() {
-        this.hideAllSections();
-        document.getElementById('manual-bulk-section').classList.remove('hidden');
-      }
-
-      hideAllSections() {
-        document.getElementById('csv-import-section').classList.add('hidden');
-        document.getElementById('manual-bulk-section').classList.add('hidden');
-      }
-
-      importCsvFile() {
-        const fileInput = document.getElementById('csv-file');
-        const file = fileInput.files[0];
-        
-        if (!file) {
-          showToast('กรุณาเลือกไฟล์ CSV', 'error');
-          return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          try {
-            const csvData = this.parseCsv(e.target.result);
-            this.importData(csvData);
-          } catch (error) {
-            showToast('ไฟล์ CSV ไม่ถูกต้อง', 'error');
-          }
-        };
-        reader.readAsText(file);
-      }
-
-      importBulkText() {
-        const text = document.getElementById('bulk-text').value.trim();
-        if (!text) {
-          showToast('กรุณาป้อนข้อมูล', 'error');
-          return;
-        }
-
-        const lines = text.split('\n').filter(line => line.trim());
-        const data = [];
-        
-        lines.forEach(line => {
-          const parts = line.split('|').map(part => part.trim());
-          if (parts.length >= 3) { // At least subject, name, link
-            data.push(parts);
-          }
-        });
-
-        if (data.length === 0) {
-          showToast('ไม่พบข้อมูลที่ถูกต้อง', 'error');
-          return;
-        }
-
-        this.importData(data);
-      }
-
-      parseCsv(csvText) {
-        const lines = csvText.split('\n');
-        const result = [];
-        
-        lines.forEach(line => {
-          if (line.trim()) {
-            // Simple CSV parsing - in real app would use proper CSV parser
-            const parts = line.split(',').map(part => part.trim().replace(/^"|"$/g, ''));
-            result.push(parts);
-          }
-        });
-        
-        return result.slice(1); // Skip header
-      }
-
-      importData(data) {
-        let imported = 0;
-        let errors = 0;
-
-        data.forEach(row => {
-          try {
-            const [subject, quizName, quizLink, description, expiryDate, status] = row;
-            
-            if (!subject || !quizName || !quizLink) {
-              errors++;
-              return;
-            }
-
-            const quiz = {
-              id: Date.now() + Math.random() + imported,
-              quizName: quizName.trim(),
-              quizLink: quizLink.trim(),
-              quizDescription: description ? description.trim() : '',
-              expiryDate: expiryDate ? expiryDate.trim() : '',
-              status: status ? status.trim() : 'อัพเดตล่าสุด',
-              subject: subject.trim(),
-              lastUpdated: new Date().toLocaleString('th-TH')
-            };
-
-            if (!state.subjects[quiz.subject]) {
-              state.subjects[quiz.subject] = [];
-            }
-
-            state.subjects[quiz.subject].push(quiz);
-            imported++;
-
-          } catch (error) {
-            errors++;
-          }
-        });
-
-        quizManager.saveToCache();
-        renderSubjects();
-        this.closeModal();
-        
-        const message = `นำเข้าสำเร็จ ${imported} รายการ${errors > 0 ? `, ล้มเหลว ${errors} รายการ` : ''}`;
-        showToast(message, imported > 0 ? 'success' : 'warning');
-        
-        // Send notification
-        notificationSystem.addNotification({
-          type: 'system',
-          title: imported > 0 ? '📥 นำเข้าข้อมูลสำเร็จ' : '⚠️ การนำเข้าข้อมูลล้มเหลว',
-          message: message,
-          icon: imported > 0 ? 'fa-check-circle' : 'fa-exclamation-triangle',
-          color: imported > 0 ? 'green' : 'orange',
-          priority: imported > 0 ? 'normal' : 'high'
-        });
-      }
-    }
-
-    const bulkImporter = new BulkImporter();
-
     // UI Helper Functions
     function showLoadingOverlay(show) {
       document.getElementById('loading-overlay').classList.toggle('hidden', !show);
     }
 
-    function hideSkeletonLoaders() {
-      document.querySelectorAll('.skeleton-card').forEach(card => {
-        card.style.display = 'none';
-      });
-    }
-
     function showToast(message, type = 'info') {
-      const toast = document.createElement('div');
       const colors = {
         success: 'bg-green-500',
         error: 'bg-red-500',
@@ -2940,7 +821,8 @@
         info: 'bg-blue-500'
       };
       
-      toast.className = `${colors[type]} text-white px-6 py-4 rounded-2xl shadow-lg transform translate-x-full transition-transform duration-300`;
+      const toast = document.createElement('div');
+      toast.className = `${colors[type]} text-white px-4 py-3 rounded-xl shadow-lg transform translate-x-full transition-transform duration-300`;
       toast.innerHTML = `
         <div class="flex items-center space-x-2">
           <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : type === 'warning' ? 'exclamation' : 'info'}-circle"></i>
@@ -2949,171 +831,157 @@
       `;
       
       document.getElementById('toast-container').appendChild(toast);
-      
-      setTimeout(() => {
-        toast.classList.remove('translate-x-full');
-      }, 100);
-      
+      setTimeout(() => toast.classList.remove('translate-x-full'), 100);
       setTimeout(() => {
         toast.classList.add('translate-x-full');
         setTimeout(() => toast.remove(), 300);
       }, 3000);
     }
 
-    // Enhanced UI Functions
+    // Data Management
+    async function loadData() {
+      const startTime = performance.now();
+      showLoadingOverlay(true);
+      
+      try {
+        // Check cache first
+        let data = cache.get('quiz_data');
+        if (!data) {
+          data = await SheetsAPI.readData();
+          cache.set('quiz_data', data);
+        }
+        
+        processData(data);
+        hideSkeletonLoaders();
+        updateLoadTime(performance.now() - startTime);
+        
+      } catch (error) {
+        console.error('Load failed:', error);
+        showToast('การโหลดล้มเหลว', 'error');
+        loadSampleData();
+      } finally {
+        showLoadingOverlay(false);
+      }
+    }
+
+    function processData(rawData) {
+      appState.subjects = {};
+      let totalQuizzes = 0;
+      let activeQuizzes = 0;
+
+      rawData.slice(1).forEach(row => {
+        const [subject, quizName, quizLink, quizDescription, expiryDate, status] = row || [];
+        
+        if (subject && subject.trim()) {
+          if (!appState.subjects[subject]) {
+            appState.subjects[subject] = [];
+          }
+          
+          if (quizName) {
+            const quiz = { 
+              id: Math.random().toString(36).substr(2, 9),
+              quizName, 
+              quizLink, 
+              quizDescription, 
+              expiryDate, 
+              status,
+              subject
+            };
+            
+            appState.subjects[subject].push(quiz);
+            totalQuizzes++;
+            
+            if (quizLink && !isExpired(expiryDate)) {
+              activeQuizzes++;
+            }
+          }
+        }
+      });
+
+      updateCounters(Object.keys(appState.subjects).length, totalQuizzes, activeQuizzes);
+      renderSubjects();
+    }
+
+    function loadSampleData() {
+      const sampleData = [
+        ['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status'],
+        ['คณิตศาสตร์', 'ควิซเรื่องเซต', 'https://example.com/quiz1', 'เรื่องเซตและความสัมพันธ์', '31/12/2024, 23:59', 'อัพเดตล่าสุด'],
+        ['ฟิสิกส์', 'ควิซเรื่องแรง', 'https://example.com/quiz2', 'แรงและการเคลื่อนที่', '31/12/2024, 23:59', 'อัพเดตล่าสุด'],
+        ['เคมี', 'ควิซเรื่องธาตุ', 'https://example.com/quiz3', 'ธาตุและสารประกอบ', '31/12/2024, 23:59', 'อัพเดตล่าสุด']
+      ];
+      
+      processData(sampleData);
+    }
+
+    function hideSkeletonLoaders() {
+      document.querySelectorAll('.skeleton-card').forEach(card => {
+        card.style.display = 'none';
+      });
+    }
+
+    function updateCounters(subjects, total, active) {
+      document.getElementById('total-subjects').textContent = subjects;
+      document.getElementById('total-quizzes').textContent = total;
+      document.getElementById('active-quizzes').textContent = active;
+      document.getElementById('admin-total-quizzes').textContent = total;
+    }
+
+    function updateLoadTime(time) {
+      const loadTime = Math.round(time);
+      document.getElementById('load-time').textContent = loadTime + 'ms';
+      document.getElementById('admin-load-time').textContent = loadTime + 'ms';
+      appState.loadTime = loadTime;
+    }
+
+    function isExpired(expiryDate) {
+      if (!expiryDate) return false;
+      try {
+        const [date, time] = expiryDate.split(", ");
+        const [day, month, year] = date.split("/");
+        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
+        return new Date(formattedDate).getTime() < Date.now();
+      } catch {
+        return false;
+      }
+    }
+
+    // UI Rendering
     function renderSubjects() {
       const grid = document.getElementById('subjects-grid');
-      
-      // Clear skeleton loaders
-      grid.querySelectorAll('.skeleton-card').forEach(card => card.remove());
-      
-      const subjects = state.searchResults || state.subjects;
-
-      if (Object.keys(subjects).length === 0) {
-        grid.innerHTML = `
-          <div class="col-span-full text-center py-12">
-            <i class="fas fa-book-open text-gray-400 text-6xl mb-4"></i>
-            <h3 class="text-2xl font-bold text-gray-600 mb-2">ไม่มีข้อมูลวิชา</h3>
-            <p class="text-gray-500">เพิ่มควิซใหม่เพื่อเริ่มต้นใช้งาน</p>
-            <button onclick="window.showQuizManagerWithAuth()" class="btn btn-primary mt-4 admin-only">
-              <i class="fas fa-plus"></i>
-              เพิ่มควิซแรก
-            </button>
-          </div>
-        `;
-        
-        // Update admin button visibility
-        authSystem.updateUI();
-        return;
-      }
-
       grid.innerHTML = '';
-      Object.entries(subjects).forEach(([subject, quizzes], index) => {
-        const card = createEnhancedSubjectCard(subject, quizzes, index);
+      
+      const subjects = appState.searchResults || appState.subjects;
+      
+      Object.entries(subjects).forEach(([subject, quizzes]) => {
+        const card = createSubjectCard(subject, quizzes);
         grid.appendChild(card);
       });
-      
-      // Update admin button visibility after rendering
-      setTimeout(() => {
-        authSystem.updateUI();
-        updateAdminButtonsVisibility();
-      }, 100);
     }
 
-    function updateAdminButtonsVisibility() {
-      const isAdmin = state.isAuthenticated && state.userRole === 'admin';
-      
-      // Show/hide admin edit buttons
-      document.querySelectorAll('.admin-edit-btn').forEach(btn => {
-        btn.style.display = isAdmin ? 'inline-flex' : 'none';
-      });
-      
-      // Show/hide admin-only buttons
-      document.querySelectorAll('.admin-only').forEach(btn => {
-        btn.style.display = isAdmin ? 'inline-flex' : 'none';
-      });
-    }
-
-    function createEnhancedSubjectCard(subject, quizzes, index) {
-      const availableQuizzes = quizzes.filter(q => q.quizName && q.quizLink && !fastLoader.isExpired(q.expiryDate)).length;
-      const expiringSoon = quizzes.filter(q => fastLoader.isExpiringSoon && fastLoader.isExpiringSoon(q.expiryDate)).length;
-      const hasQuizzes = quizzes.some(q => q.quizName);
+    function createSubjectCard(subject, quizzes) {
+      const availableQuizzes = quizzes.filter(q => q.quizName && q.quizLink && !isExpired(q.expiryDate)).length;
       
       const card = document.createElement('div');
-      card.className = `quiz-card glass-morphism rounded-3xl p-6 border cursor-pointer fast-load ${hasQuizzes ? 'hover:shadow-2xl' : 'opacity-75'}`;
-      card.style.animationDelay = `${index * 50}ms`; // Faster animation
-      
-      const icon = getSubjectIcon(subject);
-      
-      let statusIndicator = '';
-      if (expiringSoon > 0) {
-        statusIndicator = `
-          <div class="absolute top-4 right-4 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>
-          <div class="absolute top-2 right-2 text-xs bg-orange-100 text-orange-800 px-2 py-1 rounded-full">
-            ${expiringSoon} ใกล้หมดอายุ
-          </div>
-        `;
-      }
-      
+      card.className = 'quiz-card glass-morphism rounded-3xl p-6 border cursor-pointer';
       card.innerHTML = `
-        <div class="relative">
-          ${statusIndicator}
-          <div class="text-center">
-            <div class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <i class="fas ${icon} text-white text-3xl"></i>
-            </div>
-            <h3 class="font-bold text-gray-800 mb-3 text-xl">${subject}</h3>
-            ${!hasQuizzes ? 
-              '<div class="inline-block px-4 py-2 bg-yellow-100 text-yellow-800 text-sm rounded-2xl font-medium">รออัพเดต</div>' :
-              `<div class="space-y-2">
-                <div class="inline-block px-4 py-2 bg-green-100 text-green-800 text-sm rounded-2xl font-medium">
-                  ${availableQuizzes} ควิซพร้อมใช้
-                </div>
-                ${expiringSoon > 0 ? 
-                  `<div class="inline-block px-4 py-2 bg-orange-100 text-orange-800 text-sm rounded-2xl font-medium">
-                    ${expiringSoon} ใกล้หมดอายุ
-                  </div>` : ''
-                }
-              </div>`
-            }
-            <div class="mt-4 text-xs text-gray-500">
-              โหลดจาก: Cache (${state.loadTime}ms)
-            </div>
-            <div class="mt-2 flex justify-center space-x-2">
-              <button onclick="event.stopPropagation(); window.editSubjectWithAuth('${subject}')" class="text-gray-400 hover:text-blue-600 p-1 admin-edit-btn" style="display: none;" title="แก้ไขชื่อวิชา">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button onclick="event.stopPropagation(); window.addQuizToSubjectWithAuth('${subject}')" class="text-gray-400 hover:text-green-600 p-1 admin-edit-btn" style="display: none;" title="เพิ่มควิซในวิชานี้">
-                <i class="fas fa-plus"></i>
-              </button>
-            </div>
+        <div class="text-center">
+          <div class="w-20 h-20 bg-gradient-to-br from-primary to-secondary rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <i class="fas fa-book text-white text-3xl"></i>
+          </div>
+          <h3 class="font-bold text-gray-800 mb-3 text-xl">${subject}</h3>
+          <div class="inline-block px-4 py-2 bg-green-100 text-green-800 text-sm rounded-2xl font-medium">
+            ${availableQuizzes} ควิซพร้อมใช้
           </div>
         </div>
       `;
       
-      if (hasQuizzes) {
-        card.addEventListener('click', () => {
-          showQuizzes(subject);
-          state.analytics.quizAccesses++;
-        });
-      }
-      
+      card.addEventListener('click', () => showQuizzes(subject));
       return card;
     }
 
-    function getSubjectIcon(subject) {
-      const icons = {
-        'คอมพิวเตอร์': 'fa-laptop-code',
-        'คณิตศาสตร์': 'fa-calculator',
-        'คณิต': 'fa-calculator',
-        'วิทยาศาสตร์': 'fa-flask',
-        'วิทย์': 'fa-flask',
-        'ภาษา': 'fa-language',
-        'ประวัติศาสตร์': 'fa-landmark',
-        'ประวัติ': 'fa-landmark',
-        'ภูมิศาสตร์': 'fa-globe',
-        'ภูมิ': 'fa-globe',
-        'ฟิสิกส์': 'fa-atom',
-        'ฟิสิก': 'fa-atom',
-        'เคมี': 'fa-vial',
-        'ชีววิทยา': 'fa-dna',
-        'ชีวะ': 'fa-dna',
-        'อังกฤษ': 'fa-language',
-        'english': 'fa-language',
-        'default': 'fa-book'
-      };
-      
-      for (const [key, icon] of Object.entries(icons)) {
-        if (subject.toLowerCase().includes(key.toLowerCase())) {
-          return icon;
-        }
-      }
-      return icons.default;
-    }
-
     function showQuizzes(subject) {
-      state.currentSubject = subject;
-      const quizzes = state.subjects[subject];
+      appState.currentSubject = subject;
+      const quizzes = appState.subjects[subject];
       
       document.getElementById('subjects-section').classList.add('hidden');
       document.getElementById('quiz-section').classList.remove('hidden');
@@ -3125,874 +993,423 @@
     function renderQuizzes(quizzes) {
       const grid = document.getElementById('quiz-grid');
       grid.innerHTML = '';
-
-      const sortedQuizzes = [...quizzes].sort((a, b) => {
-        if (state.sortOrder === 'name') {
-          return (a.quizName || '').localeCompare(b.quizName || '');
-        } else {
-          return new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0);
-        }
-      });
-
-      sortedQuizzes.forEach((quiz, index) => {
+      
+      quizzes.forEach(quiz => {
         if (!quiz.quizName) return;
-        
-        const card = createEnhancedQuizCard(quiz, index);
+        const card = createQuizCard(quiz);
         grid.appendChild(card);
       });
-      
-      // Update admin button visibility after rendering
-      setTimeout(() => {
-        updateAdminButtonsVisibility();
-      }, 100);
     }
 
-    function createEnhancedQuizCard(quiz, index) {
-      const isExpiredQuiz = fastLoader.isExpired(quiz.expiryDate);
-      const isExpiringSoon = fastLoader.isExpiringSoon && fastLoader.isExpiringSoon(quiz.expiryDate);
-      const countdown = quiz.expiryDate ? calculateCountdown(quiz.expiryDate) : null;
+    function createQuizCard(quiz) {
+      const isExpiredQuiz = isExpired(quiz.expiryDate);
       
       const card = document.createElement('div');
-      card.className = 'quiz-card glass-morphism rounded-3xl p-6 border fast-load hover:shadow-2xl animate-slide-up';
-      card.style.animationDelay = `${index * 50}ms`;
+      card.className = 'quiz-card glass-morphism rounded-3xl p-6 border';
       
       let statusBadge = '';
-      let statusIndicator = '';
-      
       if (isExpiredQuiz) {
-        statusBadge = '<div class="inline-block px-4 py-2 bg-red-100 text-red-800 text-sm rounded-2xl font-medium mb-3">หมดอายุแล้ว</div>';
-        statusIndicator = '<div class="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full"></div>';
-      } else if (isExpiringSoon) {
-        statusBadge = `<div class="inline-block px-4 py-2 bg-orange-100 text-orange-800 text-sm rounded-2xl font-medium mb-3"><i class="fas fa-clock mr-1"></i>${countdown}</div>`;
-        statusIndicator = '<div class="absolute top-4 right-4 w-3 h-3 bg-orange-500 rounded-full animate-pulse"></div>';
+        statusBadge = '<div class="badge badge-danger mb-3">หมดอายุแล้ว</div>';
       } else if (quiz.status) {
-        const statusColors = {
-          'อัพเดตล่าสุด': 'bg-green-100 text-green-800',
-          'รออัพเดต': 'bg-yellow-100 text-yellow-800',
-          'ปิดปรับปรุง': 'bg-red-100 text-red-800'
-        };
-        const colorClass = statusColors[quiz.status] || 'bg-gray-100 text-gray-800';
-        statusBadge = `<div class="inline-block px-4 py-2 ${colorClass} text-sm rounded-2xl font-medium mb-3">${quiz.status}</div>`;
+        const statusClass = quiz.status === 'อัพเดตล่าสุด' ? 'badge-success' : 'badge-warning';
+        statusBadge = `<div class="badge ${statusClass} mb-3">${quiz.status}</div>`;
       }
       
       card.innerHTML = `
-        <div class="relative">
-          ${statusIndicator}
-          <div class="flex items-start space-x-4">
-            <div class="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center flex-shrink-0">
-              <i class="fas fa-file-alt text-gray-600 text-2xl"></i>
-            </div>
-            <div class="flex-1 min-w-0">
-              <h3 class="font-bold text-gray-800 mb-2 text-lg leading-tight">${quiz.quizName}</h3>
-              ${statusBadge}
-              ${quiz.quizDescription ? `<p class="text-gray-600 text-sm mb-4 leading-relaxed">${quiz.quizDescription}</p>` : ''}
-              
-              <div class="flex items-center justify-between mt-4">
-                <div class="flex space-x-2">
-                  ${quiz.quizLink && !isExpiredQuiz ? 
-                    `<button onclick="window.accessQuiz('${quiz.quizLink}', '${quiz.quizName}')" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white text-sm rounded-2xl hover:shadow-lg transition-all font-medium">
-                      <i class="fas fa-external-link-alt mr-2"></i>ดูเฉลย
-                    </button>` :
-                    '<span class="px-4 py-2 bg-gray-100 text-gray-600 text-sm rounded-2xl font-medium">ไม่พร้อมใช้งาน</span>'
-                  }
-                  <button onclick="window.editQuizWithAuth('${quiz.id}')" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 text-sm rounded-2xl hover:bg-blue-200 transition-all admin-edit-btn" style="display: none;" title="แก้ไขควิซ">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                </div>
-                
-                <div class="text-right">
-                  <div class="text-xs text-gray-500">อัพเดต: ${quiz.lastUpdated || 'ไม่ระบุ'}</div>
-                  ${countdown && !isExpiredQuiz ? `<div class="text-xs text-orange-600 font-medium">${countdown}</div>` : ''}
-                </div>
-              </div>
-            </div>
-          </div>
+        <h3 class="font-bold text-gray-800 mb-2 text-lg">${quiz.quizName}</h3>
+        ${statusBadge}
+        ${quiz.quizDescription ? `<p class="text-gray-600 text-sm mb-4">${quiz.quizDescription}</p>` : ''}
+        
+        <div class="flex justify-between items-center">
+          ${quiz.quizLink && !isExpiredQuiz ? 
+            `<a href="${quiz.quizLink}" target="_blank" class="btn btn-primary btn-sm">
+              <i class="fas fa-external-link-alt"></i>ดูเฉลย
+            </a>` :
+            '<span class="text-gray-500 text-sm">ไม่พร้อมใช้งาน</span>'
+          }
+          ${appState.isAuthenticated ? 
+            `<button onclick="editQuiz('${quiz.id}')" class="btn btn-secondary btn-sm">
+              <i class="fas fa-edit"></i>
+            </button>` : ''
+          }
         </div>
       `;
       
       return card;
     }
 
-    function calculateCountdown(expiryDate) {
-      if (!expiryDate) return '';
-      try {
-        const [date, time] = expiryDate.split(", ");
-        const [day, month, year] = date.split("/");
-        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
-        const timeLeft = new Date(formattedDate).getTime() - Date.now();
-        
-        if (timeLeft <= 0) return 'หมดเวลา';
-        
-        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        
-        if (days > 7) return `${days} วัน`;
-        if (days > 0) return `${days} วัน ${hours} ชม.`;
-        if (hours > 0) return `${hours} ชม. ${minutes} นาที`;
-        return `${minutes} นาที`;
-      } catch {
-        return '';
-      }
-    }
-
-    // Search Functions
+    // Search functionality
     function handleSearch() {
       const query = document.getElementById('search-input').value.toLowerCase().trim();
       
       if (!query) {
-        state.searchResults = null;
-        document.getElementById('search-results-count').classList.add('hidden');
+        appState.searchResults = null;
         renderSubjects();
         return;
       }
 
       const results = {};
-      let totalResults = 0;
-      
-      Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-        const matchingQuizzes = quizzes.filter(quiz => {
-          if (state.currentFilter !== 'all') {
-            if (state.currentFilter === 'active' && fastLoader.isExpired(quiz.expiryDate)) return false;
-            if (state.currentFilter === 'expired' && !fastLoader.isExpired(quiz.expiryDate)) return false;
-            if (state.currentFilter === 'updated' && quiz.status !== 'อัพเดตล่าสุด') return false;
-          }
-          
-          return subject.toLowerCase().includes(query) ||
-                 (quiz.quizName && quiz.quizName.toLowerCase().includes(query)) ||
-                 (quiz.quizDescription && quiz.quizDescription.toLowerCase().includes(query));
-        });
+      Object.entries(appState.subjects).forEach(([subject, quizzes]) => {
+        const matchingQuizzes = quizzes.filter(quiz => 
+          subject.toLowerCase().includes(query) ||
+          (quiz.quizName && quiz.quizName.toLowerCase().includes(query)) ||
+          (quiz.quizDescription && quiz.quizDescription.toLowerCase().includes(query))
+        );
         
         if (matchingQuizzes.length > 0 || subject.toLowerCase().includes(query)) {
           results[subject] = quizzes;
-          totalResults += matchingQuizzes.length;
         }
       });
 
-      state.searchResults = results;
-      
-      const countElement = document.getElementById('search-results-count');
-      countElement.textContent = `${totalResults} ผลลัพธ์`;
-      countElement.classList.remove('hidden');
-      
+      appState.searchResults = results;
       renderSubjects();
     }
 
-    // Debounced search for better performance
-    let searchTimeout;
-    function debouncedSearch() {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(handleSearch, CONFIG.DEBOUNCE_DELAY);
-    }
-
-    // Global function definitions for onclick handlers
-    window.accessQuiz = function(link, name) {
-      state.analytics.quizAccesses++;
-      window.open(link, '_blank');
-      showToast(`เปิดดูเฉลย: ${name}`, 'info');
-    };
-
-    // Authentication Functions
-    window.showAdminLoginModal = function() {
-      if (state.isAuthenticated && state.userRole === 'admin') {
-        window.showAdminPanel();
+    // Quiz Management
+    function showQuizManager() {
+      if (!appState.isAuthenticated) {
+        showToast('กรุณาเข้าสู่ระบบก่อน', 'warning');
+        showAdminLogin();
         return;
       }
-      authSystem.showLoginModal();
-    };
+      
+      const modal = document.getElementById('quiz-manager-modal');
+      modal.classList.remove('hidden');
+      populateSubjects();
+    }
 
-    window.closeAdminLogin = function() {
-      authSystem.closeLoginModal();
-    };
+    function closeQuizManager() {
+      document.getElementById('quiz-manager-modal').classList.add('hidden');
+      document.getElementById('quiz-form').reset();
+    }
 
-    window.adminLogin = function(event) {
+    function populateSubjects() {
+      const select = document.getElementById('quiz-subject');
+      select.innerHTML = '<option value="">เลือกวิชา</option>';
+      
+      Object.keys(appState.subjects).forEach(subject => {
+        const option = document.createElement('option');
+        option.value = subject;
+        option.textContent = subject;
+        select.appendChild(option);
+      });
+      
+      const newOption = document.createElement('option');
+      newOption.value = '__new__';
+      newOption.textContent = '+ เพิ่มวิชาใหม่';
+      select.appendChild(newOption);
+    }
+
+    function saveQuiz(event) {
       event.preventDefault();
       
-      const username = document.getElementById('admin-username').value.trim();
-      const password = document.getElementById('admin-password').value;
-      const warningDiv = document.getElementById('login-warning');
-      const warningText = document.getElementById('warning-text');
-      const submitBtn = document.getElementById('login-submit-btn');
-
-      // Show loading
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>กำลังตรวจสอบ...';
-
-      setTimeout(() => {
-        const result = authSystem.authenticate(username, password);
-        
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ';
-
-        if (result.success) {
-          authSystem.closeLoginModal();
-          showToast(result.message, 'success');
-          updateAuthButton();
-        } else {
-          warningText.textContent = result.message;
-          warningDiv.classList.remove('hidden');
-          
-          if (result.locked) {
-            submitBtn.disabled = true;
-            setTimeout(() => {
-              submitBtn.disabled = false;
-              warningDiv.classList.add('hidden');
-            }, 5000);
-          }
-        }
-      }, 1000); // Simulate network delay
-    };
-
-    window.adminLogout = function() {
-      if (confirm('ต้องการออกจากระบบแอดมินหรือไม่?')) {
-        authSystem.logout();
-        updateAuthButton();
-      }
-    };
-
-    window.guestModeLogin = function() {
-      state.userRole = 'guest';
-      authSystem.closeLoginModal();
-      showToast('เข้าใช้โหมดผู้เยี่ยมชม', 'info');
-    };
-
-    window.togglePasswordVisibility = function() {
-      const passwordField = document.getElementById('admin-password');
-      const toggleIcon = document.getElementById('password-toggle-icon');
+      let subject = document.getElementById('quiz-subject').value;
+      const quizName = document.getElementById('quiz-name').value;
+      const quizLink = document.getElementById('quiz-link').value;
+      const quizDescription = document.getElementById('quiz-description').value;
+      const expiryDate = formatExpiryDate(document.getElementById('quiz-expiry').value);
+      const status = document.getElementById('quiz-status').value;
       
-      if (passwordField.type === 'password') {
-        passwordField.type = 'text';
-        toggleIcon.className = 'fas fa-eye-slash';
-      } else {
-        passwordField.type = 'password';
-        toggleIcon.className = 'fas fa-eye';
+      if (subject === '__new__') {
+        subject = prompt('ชื่อวิชาใหม่:');
+        if (!subject) return;
       }
-    };
+      
+      const quiz = {
+        id: Math.random().toString(36).substr(2, 9),
+        quizName,
+        quizLink,
+        quizDescription,
+        expiryDate,
+        status,
+        subject
+      };
+      
+      if (!appState.subjects[subject]) {
+        appState.subjects[subject] = [];
+      }
+      
+      appState.subjects[subject].push(quiz);
+      
+      showToast('บันทึกควิซเสร็จสิ้น', 'success');
+      closeQuizManager();
+      
+      if (appState.currentSubject === subject) {
+        renderQuizzes(appState.subjects[subject]);
+      } else {
+        renderSubjects();
+      }
+    }
+
+    function formatExpiryDate(datetimeLocal) {
+      if (!datetimeLocal) return '';
+      
+      const date = new Date(datetimeLocal);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}/${month}/${year}, ${hours}:${minutes}`;
+    }
+
+    // Authentication
+    function showAdminLogin() {
+      document.getElementById('admin-login-modal').classList.remove('hidden');
+    }
+
+    function closeAdminLogin() {
+      document.getElementById('admin-login-modal').classList.add('hidden');
+    }
+
+    function adminLogin(event) {
+      event.preventDefault();
+      
+      const username = document.getElementById('admin-username').value;
+      const password = document.getElementById('admin-password').value;
+      
+      // Simple authentication (in production, use proper authentication)
+      if (username === 'admin' && password === 'admin123') {
+        appState.isAuthenticated = true;
+        appState.userRole = 'admin';
+        showToast('เข้าสู่ระบบสำเร็จ', 'success');
+        closeAdminLogin();
+        updateAuthButton();
+      } else {
+        showToast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
+      }
+    }
 
     function updateAuthButton() {
       const authButton = document.getElementById('auth-button');
-      if (state.isAuthenticated && state.userRole === 'admin') {
-        authButton.innerHTML = '<i class="fas fa-cog mr-2"></i>แอดมินแพนเนล';
-        authButton.onclick = window.showAdminPanel;
+      if (appState.isAuthenticated) {
+        authButton.innerHTML = '<i class="fas fa-user"></i><span class="hidden sm:inline ml-2">Admin</span>';
+        authButton.onclick = logout;
       } else {
-        authButton.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบแอดมิน';
-        authButton.onclick = window.showAdminLoginModal;
+        authButton.innerHTML = '<i class="fas fa-sign-in-alt"></i><span class="hidden sm:inline ml-2">เข้าสู่ระบบ</span>';
+        authButton.onclick = showAdminLogin;
       }
     }
 
-    // Protected Admin Functions
-    window.showQuizManagerWithAuth = function() {
-      if (authSystem.requireAuth('จัดการควิซ')) {
-        window.showQuizManager();
+    function logout() {
+      if (confirm('ต้องการออกจากระบบหรือไม่?')) {
+        appState.isAuthenticated = false;
+        appState.userRole = 'guest';
+        showToast('ออกจากระบบเรียบร้อย', 'info');
+        updateAuthButton();
       }
-    };
+    }
 
-    window.showBulkImportWithAuth = function() {
-      if (authSystem.requireAuth('นำเข้าข้อมูล')) {
-        window.showBulkImport();
+    // Admin Panel
+    function showAdminPanel() {
+      if (!appState.isAuthenticated) {
+        showToast('กรุณาเข้าสู่ระบบก่อน', 'warning');
+        showAdminLogin();
+        return;
       }
-    };
+      document.getElementById('admin-panel-modal').classList.remove('hidden');
+    }
 
-    window.addQuizToSubjectWithAuth = function(subject) {
-      if (authSystem.requireAuth('เพิ่มควิซใหม่')) {
-        window.addQuizToSubject(subject);
-      }
-    };
+    function closeAdminPanel() {
+      document.getElementById('admin-panel-modal').classList.add('hidden');
+    }
 
-    window.editQuizWithAuth = function(quizId) {
-      if (authSystem.requireAuth('แก้ไขควิซ')) {
-        window.editQuiz(quizId);
-      }
-    };
+    // Notifications
+    function showNotifications() {
+      document.getElementById('notifications-panel').classList.remove('hidden');
+      updateNotificationCount();
+    }
 
-    window.deleteQuizWithAuth = function(quizId) {
-      if (authSystem.requireAuth('ลบควิซ')) {
-        window.deleteQuiz(quizId);
-      }
-    };
+    function closeNotifications() {
+      document.getElementById('notifications-panel').classList.add('hidden');
+    }
 
-    window.editSubjectWithAuth = function(subject) {
-      if (authSystem.requireAuth('แก้ไขชื่อวิชา')) {
-        window.editSubject(subject);
-      }
-    };
-
-    // Original Functions (unchanged for public access)
-    window.showQuizManager = function() {
-      quizManager.openManager();
-    };
-
-    window.closeQuizManager = function() {
-      quizManager.closeManager();
-    };
-
-    window.saveQuiz = function(event) {
-      quizManager.saveQuiz(event);
-    };
-
-    window.editQuiz = function(quizId) {
-      quizManager.editQuiz(quizId);
-      quizManager.openManager();
-    };
-
-    window.deleteQuiz = function(quizId) {
-      quizManager.deleteQuiz(quizId);
-    };
-
-    window.duplicateQuiz = function(quizId) {
-      quizManager.duplicateQuiz(quizId);
-    };
-
-    window.addQuizToSubject = function(subject) {
-      if (subject) {
-        quizManager.openManager();
-        setTimeout(() => {
-          document.getElementById('quiz-subject').value = subject;
-        }, 100);
-      } else {
-        quizManager.openManager();
-      }
-    };
-
-    window.showBulkImport = function() {
-      bulkImporter.showModal();
-    };
-
-    window.closeBulkImport = function() {
-      bulkImporter.closeModal();
-    };
-
-    window.showCsvImport = function() {
-      bulkImporter.showCsvImport();
-    };
-
-    window.showManualBulk = function() {
-      bulkImporter.showManualBulk();
-    };
-
-    window.importCsvFile = function() {
-      bulkImporter.importCsvFile();
-    };
-
-    window.importBulkText = function() {
-      bulkImporter.importBulkText();
-    };
-
-    window.exportAllData = function() {
-      try {
-        const data = quizManager.convertToRawData();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `allquiz-backup-${new Date().toISOString().split('T')[0]}.json`;
-        a.click();
-        showToast('ส่งออกข้อมูลเสร็จสิ้น', 'success');
-        
-        notificationSystem.addNotification({
-          type: 'system',
-          title: '📤 ส่งออกข้อมูลสำเร็จ',
-          message: `ส่งออกข้อมูลทั้งหมด ${data.length - 1} รายการเรียบร้อยแล้ว`,
-          icon: 'fa-download',
-          color: 'green',
-          priority: 'normal'
-        });
-        
-      } catch (error) {
-        showToast('การส่งออกข้อมูลล้มเหลว', 'error');
-        
-        notificationSystem.addNotification({
-          type: 'error',
-          title: '❌ การส่งออกล้มเหลว',
-          message: 'ไม่สามารถส่งออกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
-          icon: 'fa-exclamation-circle',
-          color: 'red',
-          priority: 'high'
-        });
-      }
-    };
-
-    window.refreshCache = function() {
-      showLoadingOverlay(true);
-      setTimeout(() => {
-        fastLoader.refreshData().then(() => {
-          showToast('รีเฟรชข้อมูลเสร็จสิ้น', 'success');
-          
-          notificationSystem.addNotification({
-            type: 'system',
-            title: '🔄 รีเฟรชข้อมูลสำเร็จ',
-            message: 'ข้อมูลได้รับการอัพเดตจาก Google Sheets แล้ว',
-            icon: 'fa-sync-alt',
-            color: 'blue',
-            priority: 'normal'
-          });
-          
-        }).catch(error => {
-          showToast('การรีเฟรชล้มเหลว', 'error');
-          
-          notificationSystem.addNotification({
-            type: 'error',
-            title: '⚠️ การรีเฟรชล้มเหลว',
-            message: 'ไม่สามารถดึงข้อมูลใหม่จาก Google Sheets ได้',
-            icon: 'fa-exclamation-triangle',
-            color: 'red',
-            priority: 'high'
-          });
-        });
-      }, 500);
-    };
-
-    window.refreshQuizList = function() {
-      quizManager.loadQuizList();
-      showToast('รีเฟรชรายการควิซแล้ว', 'info');
-    };
-
-    window.exportQuizData = function() {
-      const data = quizManager.convertToRawData();
-      const csvContent = data.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `allquiz-export-${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      showToast('ส่งออก CSV เสร็จสิ้น', 'success');
-    };
-
-    window.toggleSearchFilters = function() {
-      const filters = document.getElementById('search-filters');
-      filters.classList.toggle('hidden');
-    };
-
-    window.filterByStatus = function(status) {
-      state.currentFilter = status;
+    function updateNotificationCount() {
+      const count = appState.notifications.length;
+      const badges = [document.getElementById('notification-count'), document.getElementById('notification-count-mobile')];
       
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('bg-primary', 'text-white');
-        btn.classList.add('bg-gray-200', 'text-gray-700');
+      badges.forEach(badge => {
+        if (count > 0) {
+          badge.textContent = count > 99 ? '99+' : count;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
       });
-      
-      event.target.classList.remove('bg-gray-200', 'text-gray-700');
-      event.target.classList.add('bg-primary', 'text-white');
-      
-      handleSearch();
-    };
+    }
 
-    window.sortQuizzes = function(order) {
-      state.sortOrder = order;
-      if (state.currentSubject) {
-        renderQuizzes(state.subjects[state.currentSubject]);
+    function addNotification(title, message, type = 'info') {
+      const notification = {
+        id: Date.now(),
+        title,
+        message,
+        type,
+        timestamp: new Date()
+      };
+      
+      appState.notifications.unshift(notification);
+      updateNotificationCount();
+      renderNotifications();
+    }
+
+    function renderNotifications() {
+      const list = document.getElementById('notification-list');
+      
+      if (appState.notifications.length === 0) {
+        list.innerHTML = `
+          <div class="text-center text-gray-500 py-8">
+            <i class="fas fa-bell-slash text-3xl mb-2 opacity-50"></i>
+            <p class="text-sm">ไม่มีการแจ้งเตือน</p>
+          </div>
+        `;
+        return;
       }
-    };
+      
+      list.innerHTML = appState.notifications.map(notification => `
+        <div class="bg-gray-50 p-4 rounded-xl">
+          <div class="flex justify-between items-start">
+            <div>
+              <h4 class="font-medium text-gray-800">${notification.title}</h4>
+              <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
+              <p class="text-xs text-gray-500 mt-2">${formatTime(notification.timestamp)}</p>
+            </div>
+            <button onclick="removeNotification(${notification.id})" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
 
-    window.goBackToSubjects = function() {
+    function removeNotification(id) {
+      appState.notifications = appState.notifications.filter(n => n.id !== id);
+      updateNotificationCount();
+      renderNotifications();
+    }
+
+    function formatTime(timestamp) {
+      const now = new Date();
+      const diff = now - timestamp;
+      
+      if (diff < 60000) return 'เมื่อสักครู่';
+      if (diff < 3600000) return `${Math.floor(diff / 60000)} นาทีที่แล้ว`;
+      if (diff < 86400000) return `${Math.floor(diff / 3600000)} ชั่วโมงที่แล้ว`;
+      return timestamp.toLocaleDateString('th-TH');
+    }
+
+    // Other Functions
+    function goBackToSubjects() {
       document.getElementById('quiz-section').classList.add('hidden');
       document.getElementById('subjects-section').classList.remove('hidden');
-      state.currentSubject = null;
-    };
+      appState.currentSubject = null;
+    }
 
-    window.editSubject = function(subject) {
-      const newName = prompt('ชื่อวิชาใหม่:', subject);
-      if (newName && newName.trim() && newName.trim() !== subject) {
-        const quizzes = state.subjects[subject];
-        delete state.subjects[subject];
-        
-        quizzes.forEach(quiz => {
-          quiz.subject = newName.trim();
-          quiz.lastUpdated = new Date().toLocaleString('th-TH');
-        });
-        
-        state.subjects[newName.trim()] = quizzes;
-        quizManager.saveToCache();
-        renderSubjects();
-        showToast('แก้ไชื่อวิชาเสร็จสิ้น', 'success');
-      }
-    };
+    function showHome() {
+      goBackToSubjects();
+    }
 
-    // Admin Functions
-    window.showAdminPanel = function() {
-      updateAdminData();
-      document.getElementById('admin-modal').classList.remove('hidden');
-    };
-
-    window.closeAdminPanel = function() {
-      document.getElementById('admin-modal').classList.add('hidden');
-    };
-
-    window.clearAllCache = function() {
-      if (confirm('ต้องการล้าง Cache ทั้งหมดหรือไม่?')) {
-        cache.clear();
-        updateAdminData();
-      }
-    };
-
-    window.backupData = function() {
-      const backupData = {
-        subjects: state.subjects,
-        metadata: {
-          exportDate: new Date().toISOString(),
-          totalQuizzes: Object.values(state.subjects).reduce((sum, quizzes) => sum + quizzes.length, 0),
-          totalSubjects: Object.keys(state.subjects).length,
-          version: '2.0.0'
-        }
-      };
-      
-      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+    function exportData() {
+      const dataStr = JSON.stringify(appState.subjects, null, 2);
+      const blob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `allquiz-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `allquiz-export-${new Date().toISOString().split('T')[0]}.json`;
       a.click();
-      showToast('สำรองข้อมูลเสร็จสิ้น', 'success');
-    };
-
-    window.resetSystem = function() {
-      if (confirm('ต้องการรีเซ็ตระบบหรือไม่? ข้อมูลทั้งหมดจะถูกลบ!')) {
-        if (confirm('ยืนยันการรีเซ็ต? การกระทำนี้ไม่สามารถยกเลิกได้!')) {
-          cache.clear();
-          state.subjects = {};
-          state.searchResults = null;
-          renderSubjects();
-          updateAdminData();
-          showToast('รีเซ็ตระบบเสร็จสิ้น', 'success');
-        }
-      }
-    };
-
-    // Analytics and Notification Functions
-    window.toggleRealTimeNotifications = function() {
-      const panel = document.getElementById('realtime-notifications');
-      panel.classList.toggle('hidden');
-      
-      if (!panel.classList.contains('hidden')) {
-        notificationSystem.updateNotificationList();
-      }
-    };
-
-    window.toggleAnalytics = function() {
-      showToast('Analytics พร้อมใช้งาน', 'info');
-    };
-
-    // Notification Functions
-    window.markAllAsRead = function() {
-      notificationSystem.markAllAsRead();
-    };
-
-    window.clearAllNotifications = function() {
-      if (confirm('ต้องการล้างการแจ้งเตือนทั้งหมดหรือไม่?')) {
-        notificationSystem.clearAllNotifications();
-      }
-    };
-
-    window.toggleNotifications = function() {
-      notificationSystem.toggleNotifications();
-    };
-
-    window.sendTestNotification = function() {
-      notificationSystem.sendTestNotification();
-    };
-
-    window.showNotificationSettings = function() {
-      document.getElementById('notification-settings-modal').classList.remove('hidden');
-      notificationSystem.updateSettingsUI();
-    };
-
-    window.closeNotificationSettings = function() {
-      document.getElementById('notification-settings-modal').classList.add('hidden');
-    };
-
-    window.saveNotificationSettings = function() {
-      // Collect settings from form
-      notificationSystem.settings.enabled = document.getElementById('enable-notifications').checked;
-      notificationSystem.settings.sound = document.getElementById('notification-sound').checked;
-      notificationSystem.settings.desktop = document.getElementById('desktop-notifications').checked;
-      notificationSystem.settings.types.newQuiz = document.getElementById('new-quiz-notifications').checked;
-      notificationSystem.settings.types.expiry = document.getElementById('expiry-notifications').checked;
-      notificationSystem.settings.types.system = document.getElementById('system-notifications').checked;
-      notificationSystem.settings.types.error = document.getElementById('error-notifications').checked;
-      notificationSystem.settings.maxNotifications = parseInt(document.getElementById('max-notifications').value);
-      notificationSystem.settings.duration = parseInt(document.getElementById('notification-duration').value);
-
-      notificationSystem.saveSettings();
-      window.closeNotificationSettings();
-      showToast('บันทึกการตั้งค่าเสร็จสิ้น', 'success');
-
-      notificationSystem.addNotification({
-        type: 'system',
-        title: '⚙️ อัพเดตการตั้งค่า',
-        message: 'การตั้งค่าการแจ้งเตือนได้รับการอัพเดตแล้ว',
-        icon: 'fa-cog',
-        color: 'blue',
-        priority: 'normal'
-      });
-    };
-
-    window.resetNotificationSettings = function() {
-      if (confirm('ต้องการรีเซ็ตการตั้งค่าเป็นค่าเริ่มต้นหรือไม่?')) {
-        notificationSystem.settings = {
-          enabled: true,
-          sound: true,
-          desktop: false,
-          maxNotifications: 100,
-          duration: 5000,
-          types: {
-            newQuiz: true,
-            expiry: true,
-            system: true,
-            error: true
-          }
-        };
-        notificationSystem.saveSettings();
-        showToast('รีเซ็ตการตั้งค่าเสร็จสิ้น', 'info');
-      }
-    };
-
-    // Helper Functions
-    function updateAdminData() {
-      const totalQuizzes = Object.values(state.subjects).reduce((sum, quizzes) => sum + quizzes.length, 0);
-      
-      const adminTotalElement = document.getElementById('admin-total-quizzes');
-      const cacheSizeElement = document.getElementById('cache-size');
-      const lastUpdateElement = document.getElementById('last-admin-update');
-      
-      if (adminTotalElement) adminTotalElement.textContent = totalQuizzes;
-      if (cacheSizeElement) cacheSizeElement.textContent = cache.size() + ' KB';
-      if (lastUpdateElement) lastUpdateElement.textContent = new Date().toLocaleTimeString('th-TH');
-      
-      // Update performance stats safely
-      const updateElement = (id, value) => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = value;
-      };
-      
-      updateElement('total-subjects', Object.keys(state.subjects).length);
-      updateElement('total-quizzes', totalQuizzes);
-      updateElement('active-quizzes', 
-        Object.values(state.subjects).reduce((sum, quizzes) => 
-          sum + quizzes.filter(q => q.quizLink && !fastLoader.isExpired(q.expiryDate)).length, 0)
-      );
+      URL.revokeObjectURL(url);
+      showToast('ส่งออกข้อมูลเสร็จสิ้น', 'success');
     }
 
-    // Enhanced isExpiringSoon function for fastLoader
-    fastLoader.isExpiringSoon = function(expiryDate, daysThreshold = 7) {
-      if (!expiryDate) return false;
-      try {
-        const [date, time] = expiryDate.split(", ");
-        const [day, month, year] = date.split("/");
-        const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
-        const timeLeft = new Date(formattedDate).getTime() - Date.now();
-        const daysLeft = timeLeft / (1000 * 60 * 60 * 24);
-        return daysLeft > 0 && daysLeft <= daysThreshold;
-      } catch {
-        return false;
-      }
-    };
+    function refreshData() {
+      cache.clear();
+      loadData();
+      showToast('กำลังรีเฟรชข้อมูล', 'info');
+    }
 
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', async () => {
-      try {
-        // Initialize search with debouncing
-        const searchInput = document.getElementById('search-input');
-        if (searchInput) {
-          searchInput.addEventListener('input', debouncedSearch);
-        }
-        
-        // Show initial loading
-        showLoadingOverlay(true);
-        
-        // Initialize notification system
-        notificationSystem.loadNotificationsFromMemory();
-        
-        // Initialize fast loading system
-        await fastLoader.loadData();
-        
-        // Update admin data
-        updateAdminData();
-        
-        // Initialize auth system UI
-        authSystem.updateUI();
-        updateAuthButton();
-        
-        // Send welcome notification
-        setTimeout(() => {
-          notificationSystem.sendWelcomeNotification();
-        }, 2000);
-        
-        // Check for expiring quizzes every 30 minutes
-        setInterval(() => {
-          notificationSystem.checkForExpiringQuizzes();
-        }, 30 * 60 * 1000);
-        
-        // Auto-refresh every 5 minutes (with error handling)
-        setInterval(() => {
-          fastLoader.refreshData().then(() => {
-            notificationSystem.addNotification({
-              type: 'system',
-              title: '🔄 ข้อมูลอัพเดต',
-              message: 'ข้อมูลได้รับการซิงค์จาก Google Sheets แล้ว',
-              icon: 'fa-sync-alt',
-              color: 'blue',
-              priority: 'low'
-            });
-          }).catch(error => {
-            console.warn('Auto-refresh failed:', error);
-            notificationSystem.addNotification({
-              type: 'error',
-              title: '⚠️ การซิงค์ล้มเหลว',
-              message: 'ไม่สามารถซิงค์ข้อมูลจาก Google Sheets ได้',
-              icon: 'fa-exclamation-triangle',
-              color: 'orange',
-              priority: 'high'
-            });
-          });
-        }, 5 * 60 * 1000);
-        
-        console.log('Allquiz Enhanced initialized successfully');
-        
-      } catch (error) {
-        console.error('Application initialization failed:', error);
-        showToast('เกิดข้อผิดพลาดในการเริ่มต้นระบบ กำลังใช้โหมดออฟไลน์', 'warning');
-        showLoadingOverlay(false);
-        
-        // Send error notification
-        notificationSystem.addNotification({
-          type: 'error',
-          title: '❌ เกิดข้อผิดพลาดในการเริ่มต้น',
-          message: 'ระบบกำลังใช้โหมดออฟไลน์ ฟีเจอร์บางส่วนอาจไม่พร้อมใช้งาน',
-          icon: 'fa-exclamation-circle',
-          color: 'red',
-          priority: 'high'
-        });
-        
-        // Load sample data as fallback
-        try {
-          await fastLoader.loadSampleData();
-          authSystem.updateUI();
-          
-          notificationSystem.addNotification({
-            type: 'system',
-            title: '📋 โหลดข้อมูลตัวอย่าง',
-            message: 'ใช้ข้อมูลตัวอย่างเนื่องจากไม่สามารถเชื่อมต่อ API ได้',
-            icon: 'fa-database',
-            color: 'yellow',
-            priority: 'normal'
-          });
-          
-        } catch (fallbackError) {
-          console.error('Fallback loading failed:', fallbackError);
-          showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
-          
-          notificationSystem.addNotification({
-            type: 'error',
-            title: '💥 ข้อผิดพลาดร้ายแรง',
-            message: 'ไม่สามารถโหลดข้อมูลใด ๆ ได้ กรุณารีเฟรชหน้าเว็บ',
-            icon: 'fa-skull',
-            color: 'red',
-            priority: 'urgent'
-          });
-        }
-      }
+    function clearCache() {
+      cache.clear();
+      showToast('ล้างแคชเสร็จสิ้น', 'success');
+    }
+
+    function backupData() {
+      exportData();
+    }
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', () => {
+      loadData();
+      updateAuthButton();
+      
+      // Welcome notification
+      setTimeout(() => {
+        addNotification('ยินดีต้อนรับ', 'ระบบ Allquiz พร้อมใช้งานแล้ว', 'success');
+      }, 2000);
     });
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (event) => {
-      // Ctrl+N: New Quiz
-      if (event.ctrlKey && event.key === 'n') {
-        event.preventDefault();
-        window.showQuizManager();
-      }
-      
-      // Ctrl+R: Refresh
-      if (event.ctrlKey && event.key === 'r') {
-        event.preventDefault();
-        window.refreshCache();
-      }
-      
-      // Escape: Close modals
       if (event.key === 'Escape') {
+        // Close all modals
         document.querySelectorAll('.modal-overlay').forEach(modal => {
-          if (!modal.classList.contains('hidden')) {
-            modal.classList.add('hidden');
-          }
+          modal.classList.add('hidden');
         });
-        document.getElementById('admin-modal').classList.add('hidden');
       }
     });
 
-    // Auto-save functionality
-    let autoSaveTimeout;
-    function autoSave() {
-      clearTimeout(autoSaveTimeout);
-      autoSaveTimeout = setTimeout(() => {
-        if (CONFIG.AUTO_SAVE) {
-          try {
-            quizManager.saveToCache();
-          } catch (error) {
-            console.warn('Auto-save failed:', error);
-          }
-        }
-      }, 2000);
-    }
+    // Handle touch events for better mobile experience
+    let touchStartX = 0;
+    let touchEndX = 0;
 
-    // Data change notification
-    function notifyDataChange() {
-      autoSave();
-    }
-
-    // Performance monitoring
-    const performanceObserver = new PerformanceObserver((list) => {
-      list.getEntries().forEach((entry) => {
-        if (entry.entryType === 'navigation') {
-          const loadTimeElement = document.getElementById('load-time');
-          if (loadTimeElement) {
-            loadTimeElement.textContent = Math.round(entry.loadEventEnd - entry.loadEventStart) + 'ms';
-          }
-        }
-      });
+    document.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
     });
 
-    try {
-      performanceObserver.observe({ entryTypes: ['navigation'] });
-    } catch (error) {
-      console.log('Performance Observer not supported:', error);
-    }
+    document.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    });
 
-    // Initialize tooltips and help system
-    function initializeHelp() {
-      try {
-        const helpTips = [
-          { element: '#search-input', tip: 'พิมพ์เพื่อค้นหาแบบ Real-time' },
-          { element: '[onclick*="showQuizManager"]', tip: 'Ctrl+N เพื่อเพิ่มควิซใหม่' },
-          { element: '[onclick*="refreshCache"]', tip: 'Ctrl+R เพื่อรีเฟรชข้อมูล' }
-        ];
-        
-        helpTips.forEach(({ element, tip }) => {
-          const el = document.querySelector(element);
-          if (el) {
-            el.title = tip;
-          }
-        });
-      } catch (error) {
-        console.warn('Help system initialization failed:', error);
+    function handleSwipe() {
+      const swipeThreshold = 50;
+      const diff = touchStartX - touchEndX;
+      
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0 && appState.currentSubject) {
+          // Swipe left - could implement next quiz
+        } else if (diff < 0 && appState.currentSubject) {
+          // Swipe right - go back
+          goBackToSubjects();
+        }
       }
     }
 
-    // Initialize help system after DOM load
-    setTimeout(initializeHelp, 1000);
+    // Optimize for different screen sizes
+    function optimizeForDevice() {
+      const isMobile = window.innerWidth < 768;
+      
+      if (isMobile) {
+        // Mobile optimizations
+        document.querySelectorAll('.modal-content').forEach(modal => {
+          modal.style.maxHeight = '85vh';
+        });
+      }
+    }
 
-    // Global error handler
-    window.addEventListener('error', function(event) {
+    window.addEventListener('resize', optimizeForDevice);
+    optimizeForDevice();
+
+    // Error handling
+    window.addEventListener('error', (event) => {
       console.error('Global error:', event.error);
-      if (event.error && event.error.message) {
-        showToast('เกิดข้อผิดพลาดในระบบ', 'error');
+      if (event.error && event.error.message && !event.error.message.includes('Script error')) {
+        showToast('เกิดข้อผิดพลาด กรุณาลองใหม่', 'error');
       }
     });
 
-    // Unhandled promise rejection handler
-    window.addEventListener('unhandledrejection', function(event) {
+    window.addEventListener('unhandledrejection', (event) => {
       console.error('Unhandled promise rejection:', event.reason);
       event.preventDefault();
-      showToast('เกิดข้อผิดพลาดในการประมวลผล', 'warning');
     });
   </script>
 </body>
