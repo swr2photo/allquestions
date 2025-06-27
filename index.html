@@ -202,6 +202,11 @@
       background: #5a6268;
     }
 
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -319,6 +324,165 @@
       to { 
         transform: translateY(0);
         opacity: 1;
+      }
+    }
+
+    /* Notification specific styles */
+    .notification-item {
+      transition: all 0.3s ease;
+    }
+
+    .notification-item:hover {
+      transform: translateX(-5px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .notification-toast {
+      animation: slideInRight 0.3s ease-out forwards;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification-priority-urgent {
+      animation: urgentPulse 1s infinite;
+    }
+
+    @keyframes urgentPulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+      }
+      50% { 
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+      }
+    }
+
+    .notification-badge {
+      animation: bounceIn 0.6s;
+    }
+
+    @keyframes bounceIn {
+      0% {
+        transform: scale(0);
+      }
+      50% {
+        transform: scale(1.25);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Sound wave animation for notifications */
+    .sound-wave {
+      display: inline-block;
+      animation: soundWave 1s ease-in-out infinite;
+    }
+
+    @keyframes soundWave {
+      0%, 100% {
+        transform: scaleY(1);
+      }
+      50% {
+        transform: scaleY(1.5);
+      }
+    }
+
+    /* Notification panel styles */
+    #realtime-notifications {
+      backdrop-filter: blur(10px);
+    }
+
+    #realtime-notifications .glass-morphism {
+      box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    }
+
+    /* Button hover effects for notifications */
+    .notification-action-btn {
+      transition: all 0.2s ease;
+    }
+
+    .notification-action-btn:hover {
+      transform: scale(1.1);
+    }
+
+    /* Settings modal specific styles */
+    #notification-settings-modal .modal-content {
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    /* Toggle switch custom styles */
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .toggle-slider {
+      background-color: #007AFF;
+    }
+
+    input:checked + .toggle-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Notification count badge pulse */
+    #notification-count.new-notification {
+      animation: badgePulse 2s ease-in-out infinite;
+    }
+
+    @keyframes badgePulse {
+      0% {
+        transform: scale(1);
+        background-color: #FF3B30;
+      }
+      50% {
+        transform: scale(1.1);
+        background-color: #FF6B60;
+      }
+      100% {
+        transform: scale(1);
+        background-color: #FF3B30;
       }
     }
   </style>
@@ -976,6 +1140,159 @@
     </div>
   </div>
 
+  <!-- Notification Settings Modal -->
+  <div id="notification-settings-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-md">
+      <div class="p-6 border-b bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-3xl">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center mr-3">
+              <i class="fas fa-bell text-xl"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-bold">ตั้งค่าการแจ้งเตือน</h3>
+              <p class="text-purple-100 text-sm">จัดการการแจ้งเตือนของคุณ</p>
+            </div>
+          </div>
+          <button onclick="window.closeNotificationSettings()" class="text-white/70 hover:text-white">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <div class="space-y-4">
+          <!-- General Settings -->
+          <div class="space-y-3">
+            <h4 class="font-semibold text-gray-800 border-b pb-2">การตั้งค่าทั่วไป</h4>
+            
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">เปิดการแจ้งเตือน</div>
+                <div class="text-sm text-gray-600">รับการแจ้งเตือนทั้งหมด</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="enable-notifications" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">เสียงแจ้งเตือน</div>
+                <div class="text-sm text-gray-600">เล่นเสียงเมื่อมีการแจ้งเตือน</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="notification-sound" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">การแจ้งเตือนเดสก์ท็อป</div>
+                <div class="text-sm text-gray-600">แจ้งเตือนผ่านเบราว์เซอร์</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="desktop-notifications" class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Notification Types -->
+          <div class="space-y-3">
+            <h4 class="font-semibold text-gray-800 border-b pb-2">ประเภทการแจ้งเตือน</h4>
+            
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">ควิซใหม่</div>
+                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อมีควิซใหม่</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="new-quiz-notifications" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">ควิซหมดอายุ</div>
+                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อควิซใกล้หมดอายุ</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="expiry-notifications" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">การอัพเดตระบบ</div>
+                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อระบบมีการเปลี่ยนแปลง</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="system-notifications" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="font-medium text-gray-800">ข้อผิดพลาดระบบ</div>
+                <div class="text-sm text-gray-600">แจ้งเตือนเมื่อเกิดข้อผิดพลาด</div>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="error-notifications" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Advanced Settings -->
+          <div class="space-y-3">
+            <h4 class="font-semibold text-gray-800 border-b pb-2">การตั้งค่าขั้นสูง</h4>
+            
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">จำนวนการแจ้งเตือนสูงสุด</label>
+              <select id="max-notifications" class="form-input">
+                <option value="50">50 รายการ</option>
+                <option value="100" selected>100 รายการ</option>
+                <option value="200">200 รายการ</option>
+                <option value="500">500 รายการ</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">ระยะเวลาแสดงการแจ้งเตือน</label>
+              <select id="notification-duration" class="form-input">
+                <option value="3000">3 วินาที</option>
+                <option value="5000" selected>5 วินาที</option>
+                <option value="10000">10 วินาที</option>
+                <option value="0">ไม่หายไปอัตโนมัติ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-between items-center mt-6 pt-4 border-t">
+          <button onclick="window.resetNotificationSettings()" class="text-gray-500 hover:text-gray-700 text-sm">
+            รีเซ็ตค่าเริ่มต้น
+          </button>
+          <div class="flex space-x-3">
+            <button onclick="window.closeNotificationSettings()" class="btn btn-secondary">
+              ยกเลิก
+            </button>
+            <button onclick="window.saveNotificationSettings()" class="btn btn-primary">
+              <i class="fas fa-save mr-2"></i>
+              บันทึก
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Admin Status Bar -->
   <div id="admin-status-bar" class="fixed top-0 right-4 mt-16 bg-white shadow-lg rounded-2xl px-4 py-2 z-40 hidden">
     <div class="flex items-center space-x-3">
@@ -1181,9 +1498,21 @@
 
         this.updateUI();
         this.startSessionTimer();
+        
+        // Send notification
+        notificationSystem.addNotification({
+          type: 'auth',
+          title: '🔓 เข้าสู่ระบบสำเร็จ',
+          message: `ยินดีต้อนรับ ${username} (${role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้เยี่ยมชม'})`,
+          icon: 'fa-sign-in-alt',
+          color: 'green',
+          priority: 'normal'
+        });
       }
 
       logout(message = 'ออกจากระบบเรียบร้อย') {
+        const wasAuthenticated = state.isAuthenticated;
+        
         state.isAuthenticated = false;
         state.userRole = 'guest';
         
@@ -1195,6 +1524,18 @@
         this.updateUI();
         this.stopSessionTimer();
         showToast(message, 'info');
+        
+        // Send notification only if was actually logged in
+        if (wasAuthenticated) {
+          notificationSystem.addNotification({
+            type: 'auth',
+            title: '🔒 ออกจากระบบ',
+            message: message,
+            icon: 'fa-sign-out-alt',
+            color: 'gray',
+            priority: 'normal'
+          });
+        }
       }
 
       isAccountLocked() {
@@ -1303,6 +1644,489 @@
     }
 
     const authSystem = new AuthSystem();
+
+    // Enhanced Notification System
+    class NotificationSystem {
+      constructor() {
+        this.notifications = [];
+        this.settings = {
+          enabled: true,
+          sound: true,
+          desktop: false,
+          maxNotifications: 100,
+          duration: 5000,
+          types: {
+            newQuiz: true,
+            expiry: true,
+            system: true,
+            error: true
+          }
+        };
+        this.unreadCount = 0;
+        this.loadSettings();
+        this.requestDesktopPermission();
+      }
+
+      loadSettings() {
+        try {
+          const saved = window.notificationSettings;
+          if (saved) {
+            this.settings = { ...this.settings, ...saved };
+          }
+        } catch (error) {
+          console.warn('Failed to load notification settings:', error);
+        }
+      }
+
+      saveSettings() {
+        try {
+          window.notificationSettings = this.settings;
+          this.updateSettingsUI();
+        } catch (error) {
+          console.warn('Failed to save notification settings:', error);
+        }
+      }
+
+      updateSettingsUI() {
+        document.getElementById('enable-notifications').checked = this.settings.enabled;
+        document.getElementById('notification-sound').checked = this.settings.sound;
+        document.getElementById('desktop-notifications').checked = this.settings.desktop;
+        document.getElementById('new-quiz-notifications').checked = this.settings.types.newQuiz;
+        document.getElementById('expiry-notifications').checked = this.settings.types.expiry;
+        document.getElementById('system-notifications').checked = this.settings.types.system;
+        document.getElementById('error-notifications').checked = this.settings.types.error;
+        document.getElementById('max-notifications').value = this.settings.maxNotifications;
+        document.getElementById('notification-duration').value = this.settings.duration;
+        
+        const toggleText = document.getElementById('notification-toggle-text');
+        if (toggleText) {
+          toggleText.textContent = this.settings.enabled ? 'ปิด' : 'เปิด';
+        }
+      }
+
+      async requestDesktopPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+          try {
+            const permission = await Notification.requestPermission();
+            this.settings.desktop = permission === 'granted';
+          } catch (error) {
+            console.warn('Desktop notification permission denied:', error);
+          }
+        }
+      }
+
+      addNotification(notification) {
+        if (!this.settings.enabled) return;
+
+        const id = Date.now() + Math.random();
+        const newNotification = {
+          id,
+          ...notification,
+          timestamp: new Date(),
+          read: false,
+          priority: notification.priority || 'normal' // low, normal, high, urgent
+        };
+
+        // Check if this type is enabled
+        if (!this.isTypeEnabled(notification.type)) return;
+
+        this.notifications.unshift(newNotification);
+        this.unreadCount++;
+
+        // Limit notifications
+        if (this.notifications.length > this.settings.maxNotifications) {
+          this.notifications = this.notifications.slice(0, this.settings.maxNotifications);
+        }
+
+        this.updateNotificationUI();
+        this.showToastNotification(newNotification);
+        
+        if (this.settings.sound) {
+          this.playNotificationSound(newNotification.priority);
+        }
+
+        if (this.settings.desktop && Notification.permission === 'granted') {
+          this.showDesktopNotification(newNotification);
+        }
+
+        // Auto-expire based on priority
+        const expireTime = this.getExpireTime(newNotification.priority);
+        if (expireTime > 0) {
+          setTimeout(() => {
+            this.removeNotification(id);
+          }, expireTime);
+        }
+
+        // Store in memory
+        this.saveNotificationsToMemory();
+      }
+
+      isTypeEnabled(type) {
+        const typeMap = {
+          'quiz-new': 'newQuiz',
+          'quiz-update': 'newQuiz',
+          'quiz-expiry': 'expiry',
+          'system': 'system',
+          'error': 'error',
+          'auth': 'system',
+          'success': 'system',
+          'warning': 'system'
+        };
+        
+        const settingKey = typeMap[type] || 'system';
+        return this.settings.types[settingKey];
+      }
+
+      getExpireTime(priority) {
+        switch (priority) {
+          case 'urgent': return 30000; // 30 seconds
+          case 'high': return 15000; // 15 seconds
+          case 'normal': return 10000; // 10 seconds
+          case 'low': return 5000; // 5 seconds
+          default: return this.settings.duration;
+        }
+      }
+
+      showToastNotification(notification) {
+        const toast = document.createElement('div');
+        toast.className = `notification-toast flex items-center space-x-3 bg-white border border-gray-200 rounded-2xl p-4 shadow-lg max-w-sm ${this.getPriorityClass(notification.priority)}`;
+        
+        const iconColor = this.getIconColor(notification.color || notification.type);
+        
+        toast.innerHTML = `
+          <div class="w-10 h-10 bg-${notification.color || 'blue'}-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <i class="fas ${notification.icon || 'fa-bell'} ${iconColor} text-lg"></i>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-medium text-gray-800 text-sm">${notification.title}</div>
+            <div class="text-gray-600 text-xs">${notification.message}</div>
+            <div class="text-gray-500 text-xs mt-1">${this.formatTime(notification.timestamp)}</div>
+          </div>
+          <div class="flex flex-col space-y-1">
+            <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+              <i class="fas fa-times text-sm"></i>
+            </button>
+            ${notification.action ? `<button onclick="${notification.action}" class="text-blue-600 hover:text-blue-800 text-xs">
+              <i class="fas fa-external-link-alt"></i>
+            </button>` : ''}
+          </div>
+        `;
+        
+        document.getElementById('toast-container').appendChild(toast);
+        
+        const expireTime = this.settings.duration;
+        if (expireTime > 0) {
+          setTimeout(() => {
+            if (toast.parentElement) {
+              toast.style.transform = 'translateX(100%)';
+              setTimeout(() => toast.remove(), 300);
+            }
+          }, expireTime);
+        }
+      }
+
+      showDesktopNotification(notification) {
+        try {
+          const desktopNotification = new Notification(notification.title, {
+            body: notification.message,
+            icon: '/favicon.ico',
+            tag: notification.id,
+            silent: !this.settings.sound
+          });
+
+          desktopNotification.onclick = () => {
+            window.focus();
+            this.markAsRead(notification.id);
+            if (notification.action) {
+              eval(notification.action);
+            }
+          };
+
+          setTimeout(() => {
+            desktopNotification.close();
+          }, 10000);
+
+        } catch (error) {
+          console.warn('Desktop notification failed:', error);
+        }
+      }
+
+      playNotificationSound(priority = 'normal') {
+        try {
+          // Create audio context for different priority sounds
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          // Different frequencies for different priorities
+          const frequencies = {
+            urgent: [800, 600, 800, 600],
+            high: [600, 800],
+            normal: [400],
+            low: [300]
+          };
+
+          const freq = frequencies[priority] || frequencies.normal;
+          let index = 0;
+
+          const playTone = () => {
+            if (index < freq.length) {
+              oscillator.frequency.value = freq[index];
+              gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+              gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+              
+              index++;
+              if (index < freq.length) {
+                setTimeout(playTone, 200);
+              }
+            }
+          };
+
+          oscillator.start();
+          playTone();
+          
+          setTimeout(() => {
+            oscillator.stop();
+          }, freq.length * 200);
+
+        } catch (error) {
+          console.warn('Sound notification failed:', error);
+        }
+      }
+
+      getPriorityClass(priority) {
+        switch (priority) {
+          case 'urgent': return 'border-red-300 bg-red-50';
+          case 'high': return 'border-orange-300 bg-orange-50';
+          case 'normal': return 'border-blue-300 bg-blue-50';
+          case 'low': return 'border-gray-300 bg-gray-50';
+          default: return 'border-gray-200';
+        }
+      }
+
+      getIconColor(color) {
+        const colors = {
+          red: 'text-red-500',
+          orange: 'text-orange-500',
+          yellow: 'text-yellow-500',
+          green: 'text-green-500',
+          blue: 'text-blue-500',
+          purple: 'text-purple-500',
+          gray: 'text-gray-500'
+        };
+        return colors[color] || 'text-blue-500';
+      }
+
+      formatTime(timestamp) {
+        const now = new Date();
+        const diff = now - timestamp;
+        
+        if (diff < 60000) return 'เมื่อสักครู่';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} นาทีที่แล้ว`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)} ชั่วโมงที่แล้ว`;
+        return timestamp.toLocaleDateString('th-TH');
+      }
+
+      updateNotificationUI() {
+        const badge = document.getElementById('notification-count');
+        
+        if (this.unreadCount > 0) {
+          badge.textContent = this.unreadCount > 99 ? '99+' : this.unreadCount;
+          badge.classList.remove('hidden');
+        } else {
+          badge.classList.add('hidden');
+        }
+
+        this.updateNotificationList();
+      }
+
+      updateNotificationList() {
+        const list = document.getElementById('notification-list');
+        list.innerHTML = '';
+        
+        if (this.notifications.length === 0) {
+          list.innerHTML = `
+            <div class="text-center text-gray-500 py-8">
+              <i class="fas fa-bell-slash text-3xl mb-2 opacity-50"></i>
+              <p class="text-sm">ไม่มีการแจ้งเตือน</p>
+            </div>
+          `;
+          return;
+        }
+        
+        this.notifications.slice(0, 20).forEach(notification => {
+          const item = document.createElement('div');
+          item.className = `notification-item flex items-start space-x-3 p-3 rounded-xl cursor-pointer transition-all ${
+            notification.read ? 'bg-gray-50 opacity-75' : 'bg-white hover:bg-blue-50 border border-blue-100'
+          }`;
+          
+          const iconColor = this.getIconColor(notification.color || notification.type);
+          
+          item.innerHTML = `
+            <div class="w-8 h-8 bg-${notification.color || 'blue'}-50 rounded-lg flex items-center justify-center flex-shrink-0">
+              <i class="fas ${notification.icon || 'fa-bell'} ${iconColor} text-sm"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="font-medium text-gray-800 text-sm ${notification.read ? 'opacity-75' : ''}">${notification.title}</div>
+              <div class="text-gray-600 text-xs ${notification.read ? 'opacity-75' : ''}">${notification.message}</div>
+              <div class="text-gray-500 text-xs mt-1">${this.formatTime(notification.timestamp)}</div>
+            </div>
+            <div class="flex flex-col items-center space-y-1">
+              ${!notification.read ? '<div class="w-2 h-2 bg-blue-500 rounded-full"></div>' : ''}
+              <button onclick="event.stopPropagation(); notificationSystem.removeNotification('${notification.id}')" class="text-gray-400 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="fas fa-times text-xs"></i>
+              </button>
+            </div>
+          `;
+          
+          item.addEventListener('click', () => {
+            this.markAsRead(notification.id);
+            if (notification.action) {
+              eval(notification.action);
+            }
+          });
+          
+          list.appendChild(item);
+        });
+      }
+
+      markAsRead(notificationId) {
+        const notification = this.notifications.find(n => n.id === notificationId);
+        if (notification && !notification.read) {
+          notification.read = true;
+          this.unreadCount = Math.max(0, this.unreadCount - 1);
+          this.updateNotificationUI();
+          this.saveNotificationsToMemory();
+        }
+      }
+
+      markAllAsRead() {
+        this.notifications.forEach(n => n.read = true);
+        this.unreadCount = 0;
+        this.updateNotificationUI();
+        this.saveNotificationsToMemory();
+        showToast('อ่านการแจ้งเตือนทั้งหมดแล้ว', 'info');
+      }
+
+      removeNotification(notificationId) {
+        const index = this.notifications.findIndex(n => n.id === notificationId);
+        if (index !== -1) {
+          const notification = this.notifications[index];
+          if (!notification.read) {
+            this.unreadCount = Math.max(0, this.unreadCount - 1);
+          }
+          this.notifications.splice(index, 1);
+          this.updateNotificationUI();
+          this.saveNotificationsToMemory();
+        }
+      }
+
+      clearAllNotifications() {
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.updateNotificationUI();
+        this.saveNotificationsToMemory();
+        showToast('ล้างการแจ้งเตือนทั้งหมดแล้ว', 'info');
+      }
+
+      toggleNotifications() {
+        this.settings.enabled = !this.settings.enabled;
+        this.saveSettings();
+        
+        const status = this.settings.enabled ? 'เปิด' : 'ปิด';
+        showToast(`${status}การแจ้งเตือนแล้ว`, 'info');
+        
+        if (!this.settings.enabled) {
+          this.clearAllNotifications();
+        }
+      }
+
+      saveNotificationsToMemory() {
+        try {
+          window.savedNotifications = this.notifications;
+        } catch (error) {
+          console.warn('Failed to save notifications:', error);
+        }
+      }
+
+      loadNotificationsFromMemory() {
+        try {
+          const saved = window.savedNotifications;
+          if (saved && Array.isArray(saved)) {
+            this.notifications = saved;
+            this.unreadCount = saved.filter(n => !n.read).length;
+            this.updateNotificationUI();
+          }
+        } catch (error) {
+          console.warn('Failed to load notifications:', error);
+        }
+      }
+
+      // Automatic notification triggers
+      checkForExpiringQuizzes() {
+        if (!this.settings.types.expiry) return;
+
+        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
+          quizzes.forEach(quiz => {
+            if (quiz.expiryDate && fastLoader.isExpiringSoon && fastLoader.isExpiringSoon(quiz.expiryDate, 1)) {
+              // Check if we already notified about this quiz
+              const existingNotification = this.notifications.find(n => 
+                n.type === 'quiz-expiry' && n.quizId === quiz.id
+              );
+              
+              if (!existingNotification) {
+                this.addNotification({
+                  type: 'quiz-expiry',
+                  title: '⚠️ ควิซใกล้หมดอายุ',
+                  message: `${quiz.quizName} ในวิชา ${subject} จะหมดอายุภายใน 24 ชั่วโมง`,
+                  icon: 'fa-clock',
+                  color: 'orange',
+                  priority: 'high',
+                  quizId: quiz.id,
+                  action: `showQuizzes('${subject}')`
+                });
+              }
+            }
+          });
+        });
+      }
+
+      sendWelcomeNotification() {
+        this.addNotification({
+          type: 'system',
+          title: '🎉 ยินดีต้อนรับ',
+          message: 'ระบบการแจ้งเตือนพร้อมใช้งานแล้ว',
+          icon: 'fa-check-circle',
+          color: 'green',
+          priority: 'normal'
+        });
+      }
+
+      sendTestNotification() {
+        const messages = [
+          'นี่คือการแจ้งเตือนทดสอบ',
+          'ระบบการแจ้งเตือนทำงานปกติ',
+          'ทดสอบเสียงและการแสดงผล',
+          'การแจ้งเตือนแบบ Real-time'
+        ];
+        
+        const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+        
+        this.addNotification({
+          type: 'system',
+          title: '🔔 ทดสอบการแจ้งเตือน',
+          message: randomMessage,
+          icon: 'fa-test-tube',
+          color: 'blue',
+          priority: 'normal'
+        });
+      }
+    }
+
+    const notificationSystem = new NotificationSystem();
 
     // Fast Loading System
     class FastLoader {
@@ -1662,6 +2486,17 @@
           
           showToast('เพิ่มควิซเสร็จสิ้น', 'success');
           
+          // Send notification
+          notificationSystem.addNotification({
+            type: 'quiz-new',
+            title: '✨ ควิซใหม่ถูกเพิ่ม',
+            message: `เพิ่ม "${quiz.quizName}" ในวิชา ${quiz.subject} เรียบร้อยแล้ว`,
+            icon: 'fa-plus-circle',
+            color: 'green',
+            priority: 'normal',
+            action: `showQuizzes('${quiz.subject}')`
+          });
+          
           // Update display if viewing this subject
           if (state.currentSubject === quizData.subject) {
             renderQuizzes(state.subjects[quizData.subject]);
@@ -1675,15 +2510,26 @@
         } catch (error) {
           console.error('Error adding quiz:', error);
           showToast('เกิดข้อผิดพลาดในการเพิ่มควิซ', 'error');
+          
+          notificationSystem.addNotification({
+            type: 'error',
+            title: '❌ เกิดข้อผิดพลาด',
+            message: 'ไม่สามารถเพิ่มควิซได้ กรุณาลองใหม่อีกครั้ง',
+            icon: 'fa-exclamation-circle',
+            color: 'red',
+            priority: 'high'
+          });
         }
       }
 
       updateQuiz(quizId, quizData) {
         let found = false;
+        let oldSubject = null;
         
         Object.entries(state.subjects).forEach(([subject, quizzes]) => {
           const quizIndex = quizzes.findIndex(q => q.id == quizId);
           if (quizIndex !== -1) {
+            oldSubject = subject;
             // Remove from old subject if subject changed
             if (subject !== quizData.subject) {
               quizzes.splice(quizIndex, 1);
@@ -1717,6 +2563,17 @@
           this.resetForm();
           this.loadQuizList();
           showToast('แก้ไขควิซเสร็จสิ้น', 'success');
+          
+          // Send notification
+          notificationSystem.addNotification({
+            type: 'quiz-update',
+            title: '📝 ควิซได้รับการอัพเดต',
+            message: `อัพเดต "${quizData.quizName}" เรียบร้อยแล้ว`,
+            icon: 'fa-edit',
+            color: 'blue',
+            priority: 'normal',
+            action: `showQuizzes('${quizData.subject}')`
+          });
           
           // Update display
           if (state.currentSubject) {
@@ -1765,9 +2622,14 @@
         if (!confirm('ต้องการลบควิซนี้หรือไม่?')) return;
 
         let found = false;
+        let deletedQuizName = '';
+        let deletedSubject = '';
+        
         Object.entries(state.subjects).forEach(([subject, quizzes]) => {
           const quizIndex = quizzes.findIndex(q => q.id == quizId);
           if (quizIndex !== -1) {
+            deletedQuizName = quizzes[quizIndex].quizName;
+            deletedSubject = subject;
             quizzes.splice(quizIndex, 1);
             if (quizzes.length === 0) {
               delete state.subjects[subject];
@@ -1780,6 +2642,16 @@
           this.saveToCache();
           this.loadQuizList();
           showToast('ลบควิซเสร็จสิ้น', 'success');
+          
+          // Send notification
+          notificationSystem.addNotification({
+            type: 'quiz-delete',
+            title: '🗑️ ลบควิซแล้ว',
+            message: `ลบ "${deletedQuizName}" จากวิชา ${deletedSubject} เรียบร้อยแล้ว`,
+            icon: 'fa-trash',
+            color: 'red',
+            priority: 'normal'
+          });
           
           // Update display
           if (state.currentSubject) {
@@ -2031,7 +2903,18 @@
         renderSubjects();
         this.closeModal();
         
-        showToast(`นำเข้าสำเร็จ ${imported} รายการ${errors > 0 ? `, ล้มเหลว ${errors} รายการ` : ''}`, 'success');
+        const message = `นำเข้าสำเร็จ ${imported} รายการ${errors > 0 ? `, ล้มเหลว ${errors} รายการ` : ''}`;
+        showToast(message, imported > 0 ? 'success' : 'warning');
+        
+        // Send notification
+        notificationSystem.addNotification({
+          type: 'system',
+          title: imported > 0 ? '📥 นำเข้าข้อมูลสำเร็จ' : '⚠️ การนำเข้าข้อมูลล้มเหลว',
+          message: message,
+          icon: imported > 0 ? 'fa-check-circle' : 'fa-exclamation-triangle',
+          color: imported > 0 ? 'green' : 'orange',
+          priority: imported > 0 ? 'normal' : 'high'
+        });
       }
     }
 
@@ -2596,14 +3479,37 @@
     };
 
     window.exportAllData = function() {
-      const data = quizManager.convertToRawData();
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `allquiz-backup-${new Date().toISOString().split('T')[0]}.json`;
-      a.click();
-      showToast('ส่งออกข้อมูลเสร็จสิ้น', 'success');
+      try {
+        const data = quizManager.convertToRawData();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `allquiz-backup-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        showToast('ส่งออกข้อมูลเสร็จสิ้น', 'success');
+        
+        notificationSystem.addNotification({
+          type: 'system',
+          title: '📤 ส่งออกข้อมูลสำเร็จ',
+          message: `ส่งออกข้อมูลทั้งหมด ${data.length - 1} รายการเรียบร้อยแล้ว`,
+          icon: 'fa-download',
+          color: 'green',
+          priority: 'normal'
+        });
+        
+      } catch (error) {
+        showToast('การส่งออกข้อมูลล้มเหลว', 'error');
+        
+        notificationSystem.addNotification({
+          type: 'error',
+          title: '❌ การส่งออกล้มเหลว',
+          message: 'ไม่สามารถส่งออกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+          icon: 'fa-exclamation-circle',
+          color: 'red',
+          priority: 'high'
+        });
+      }
     };
 
     window.refreshCache = function() {
@@ -2611,8 +3517,27 @@
       setTimeout(() => {
         fastLoader.refreshData().then(() => {
           showToast('รีเฟรชข้อมูลเสร็จสิ้น', 'success');
+          
+          notificationSystem.addNotification({
+            type: 'system',
+            title: '🔄 รีเฟรชข้อมูลสำเร็จ',
+            message: 'ข้อมูลได้รับการอัพเดตจาก Google Sheets แล้ว',
+            icon: 'fa-sync-alt',
+            color: 'blue',
+            priority: 'normal'
+          });
+          
         }).catch(error => {
           showToast('การรีเฟรชล้มเหลว', 'error');
+          
+          notificationSystem.addNotification({
+            type: 'error',
+            title: '⚠️ การรีเฟรชล้มเหลว',
+            message: 'ไม่สามารถดึงข้อมูลใหม่จาก Google Sheets ได้',
+            icon: 'fa-exclamation-triangle',
+            color: 'red',
+            priority: 'high'
+          });
         });
       }, 500);
     };
@@ -2736,11 +3661,90 @@
 
     // Analytics and Notification Functions
     window.toggleRealTimeNotifications = function() {
-      showToast('ระบบแจ้งเตือนพร้อมใช้งาน', 'info');
+      const panel = document.getElementById('realtime-notifications');
+      panel.classList.toggle('hidden');
+      
+      if (!panel.classList.contains('hidden')) {
+        notificationSystem.updateNotificationList();
+      }
     };
 
     window.toggleAnalytics = function() {
       showToast('Analytics พร้อมใช้งาน', 'info');
+    };
+
+    // Notification Functions
+    window.markAllAsRead = function() {
+      notificationSystem.markAllAsRead();
+    };
+
+    window.clearAllNotifications = function() {
+      if (confirm('ต้องการล้างการแจ้งเตือนทั้งหมดหรือไม่?')) {
+        notificationSystem.clearAllNotifications();
+      }
+    };
+
+    window.toggleNotifications = function() {
+      notificationSystem.toggleNotifications();
+    };
+
+    window.sendTestNotification = function() {
+      notificationSystem.sendTestNotification();
+    };
+
+    window.showNotificationSettings = function() {
+      document.getElementById('notification-settings-modal').classList.remove('hidden');
+      notificationSystem.updateSettingsUI();
+    };
+
+    window.closeNotificationSettings = function() {
+      document.getElementById('notification-settings-modal').classList.add('hidden');
+    };
+
+    window.saveNotificationSettings = function() {
+      // Collect settings from form
+      notificationSystem.settings.enabled = document.getElementById('enable-notifications').checked;
+      notificationSystem.settings.sound = document.getElementById('notification-sound').checked;
+      notificationSystem.settings.desktop = document.getElementById('desktop-notifications').checked;
+      notificationSystem.settings.types.newQuiz = document.getElementById('new-quiz-notifications').checked;
+      notificationSystem.settings.types.expiry = document.getElementById('expiry-notifications').checked;
+      notificationSystem.settings.types.system = document.getElementById('system-notifications').checked;
+      notificationSystem.settings.types.error = document.getElementById('error-notifications').checked;
+      notificationSystem.settings.maxNotifications = parseInt(document.getElementById('max-notifications').value);
+      notificationSystem.settings.duration = parseInt(document.getElementById('notification-duration').value);
+
+      notificationSystem.saveSettings();
+      window.closeNotificationSettings();
+      showToast('บันทึกการตั้งค่าเสร็จสิ้น', 'success');
+
+      notificationSystem.addNotification({
+        type: 'system',
+        title: '⚙️ อัพเดตการตั้งค่า',
+        message: 'การตั้งค่าการแจ้งเตือนได้รับการอัพเดตแล้ว',
+        icon: 'fa-cog',
+        color: 'blue',
+        priority: 'normal'
+      });
+    };
+
+    window.resetNotificationSettings = function() {
+      if (confirm('ต้องการรีเซ็ตการตั้งค่าเป็นค่าเริ่มต้นหรือไม่?')) {
+        notificationSystem.settings = {
+          enabled: true,
+          sound: true,
+          desktop: false,
+          maxNotifications: 100,
+          duration: 5000,
+          types: {
+            newQuiz: true,
+            expiry: true,
+            system: true,
+            error: true
+          }
+        };
+        notificationSystem.saveSettings();
+        showToast('รีเซ็ตการตั้งค่าเสร็จสิ้น', 'info');
+      }
     };
 
     // Helper Functions
@@ -2796,6 +3800,9 @@
         // Show initial loading
         showLoadingOverlay(true);
         
+        // Initialize notification system
+        notificationSystem.loadNotificationsFromMemory();
+        
         // Initialize fast loading system
         await fastLoader.loadData();
         
@@ -2806,10 +3813,37 @@
         authSystem.updateUI();
         updateAuthButton();
         
+        // Send welcome notification
+        setTimeout(() => {
+          notificationSystem.sendWelcomeNotification();
+        }, 2000);
+        
+        // Check for expiring quizzes every 30 minutes
+        setInterval(() => {
+          notificationSystem.checkForExpiringQuizzes();
+        }, 30 * 60 * 1000);
+        
         // Auto-refresh every 5 minutes (with error handling)
         setInterval(() => {
-          fastLoader.refreshData().catch(error => {
+          fastLoader.refreshData().then(() => {
+            notificationSystem.addNotification({
+              type: 'system',
+              title: '🔄 ข้อมูลอัพเดต',
+              message: 'ข้อมูลได้รับการซิงค์จาก Google Sheets แล้ว',
+              icon: 'fa-sync-alt',
+              color: 'blue',
+              priority: 'low'
+            });
+          }).catch(error => {
             console.warn('Auto-refresh failed:', error);
+            notificationSystem.addNotification({
+              type: 'error',
+              title: '⚠️ การซิงค์ล้มเหลว',
+              message: 'ไม่สามารถซิงค์ข้อมูลจาก Google Sheets ได้',
+              icon: 'fa-exclamation-triangle',
+              color: 'orange',
+              priority: 'high'
+            });
           });
         }, 5 * 60 * 1000);
         
@@ -2820,13 +3854,42 @@
         showToast('เกิดข้อผิดพลาดในการเริ่มต้นระบบ กำลังใช้โหมดออฟไลน์', 'warning');
         showLoadingOverlay(false);
         
+        // Send error notification
+        notificationSystem.addNotification({
+          type: 'error',
+          title: '❌ เกิดข้อผิดพลาดในการเริ่มต้น',
+          message: 'ระบบกำลังใช้โหมดออฟไลน์ ฟีเจอร์บางส่วนอาจไม่พร้อมใช้งาน',
+          icon: 'fa-exclamation-circle',
+          color: 'red',
+          priority: 'high'
+        });
+        
         // Load sample data as fallback
         try {
           await fastLoader.loadSampleData();
           authSystem.updateUI();
+          
+          notificationSystem.addNotification({
+            type: 'system',
+            title: '📋 โหลดข้อมูลตัวอย่าง',
+            message: 'ใช้ข้อมูลตัวอย่างเนื่องจากไม่สามารถเชื่อมต่อ API ได้',
+            icon: 'fa-database',
+            color: 'yellow',
+            priority: 'normal'
+          });
+          
         } catch (fallbackError) {
           console.error('Fallback loading failed:', fallbackError);
           showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
+          
+          notificationSystem.addNotification({
+            type: 'error',
+            title: '💥 ข้อผิดพลาดร้ายแรง',
+            message: 'ไม่สามารถโหลดข้อมูลใด ๆ ได้ กรุณารีเฟรชหน้าเว็บ',
+            icon: 'fa-skull',
+            color: 'red',
+            priority: 'urgent'
+          });
         }
       }
     });
