@@ -272,6 +272,55 @@
     .fast-load {
       transition: all 0.15s ease-out;
     }
+
+    .admin-only {
+      transition: all 0.3s ease;
+    }
+
+    .admin-only:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .admin-edit-btn {
+      transition: all 0.2s ease;
+      opacity: 0.7;
+    }
+
+    .admin-edit-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .auth-required::after {
+      content: " 🔒";
+      opacity: 0.5;
+    }
+
+    /* Login modal styles */
+    .modal-overlay {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-content {
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from { 
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+      to { 
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
@@ -382,11 +431,11 @@
       <div class="mb-8">
         <div class="glass-morphism rounded-3xl p-6 border">
           <div class="flex flex-wrap gap-3 justify-center">
-            <button onclick="window.showQuizManager()" class="btn btn-primary">
+            <button onclick="window.showQuizManagerWithAuth()" class="btn btn-primary admin-only">
               <i class="fas fa-plus"></i>
               เพิ่มควิซใหม่
             </button>
-            <button onclick="window.showBulkImport()" class="btn btn-success">
+            <button onclick="window.showBulkImportWithAuth()" class="btn btn-success admin-only">
               <i class="fas fa-upload"></i>
               นำเข้าข้อมูล
             </button>
@@ -397,6 +446,10 @@
             <button onclick="window.refreshCache()" class="btn btn-warning">
               <i class="fas fa-sync-alt"></i>
               รีเฟรชข้อมูล
+            </button>
+            <button onclick="window.showAdminLoginModal()" class="btn" id="auth-button" style="background: linear-gradient(45deg, #667eea, #764ba2); color: white;">
+              <i class="fas fa-sign-in-alt"></i>
+              เข้าสู่ระบบแอดมิน
             </button>
           </div>
         </div>
@@ -488,10 +541,10 @@
         <div class="flex items-center justify-between mb-6">
           <div>
             <h2 id="quiz-section-title" class="text-3xl font-bold text-gray-800">ควิซในวิชา</h2>
-            <p class="text-gray-600 mt-1">จัดการและแก้ไขได้ทันที</p>
+            <p class="text-gray-600 mt-1">จัดการและแก้ไขได้ทันที (ต้องเข้าสู่ระบบแอดมิน)</p>
           </div>
           <div class="flex items-center space-x-3">
-            <button onclick="window.addQuizToSubject()" class="btn btn-primary">
+            <button onclick="window.addQuizToSubjectWithAuth()" class="btn btn-primary admin-only" style="display: none;">
               <i class="fas fa-plus"></i>เพิ่มควิซ
             </button>
             <button onclick="window.sortQuizzes('name')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm hover:bg-gray-200 transition-colors">
@@ -817,6 +870,124 @@
     <!-- Toast notifications will appear here -->
   </div>
 
+  <!-- Admin Login Modal -->
+  <div id="admin-login-modal" class="modal-overlay hidden">
+    <div class="modal-content max-w-md">
+      <div class="p-6 border-b bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-3xl">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-shield-alt text-3xl"></i>
+          </div>
+          <h3 class="text-2xl font-bold">Admin Login</h3>
+          <p class="text-blue-100 mt-1">เข้าสู่ระบบเพื่อจัดการข้อมูล</p>
+        </div>
+      </div>
+      
+      <div class="p-6">
+        <form id="admin-login-form" onsubmit="window.adminLogin(event)">
+          <div class="space-y-4">
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-user mr-2"></i>ชื่อผู้ใช้
+              </label>
+              <input 
+                type="text" 
+                id="admin-username" 
+                class="form-input" 
+                placeholder="admin" 
+                required 
+                autocomplete="username"
+              />
+            </div>
+            
+            <div class="form-group">
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-lock mr-2"></i>รหัสผ่าน
+              </label>
+              <div class="relative">
+                <input 
+                  type="password" 
+                  id="admin-password" 
+                  class="form-input pr-12" 
+                  placeholder="••••••••" 
+                  required 
+                  autocomplete="current-password"
+                />
+                <button 
+                  type="button" 
+                  onclick="window.togglePasswordVisibility()" 
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <i id="password-toggle-icon" class="fas fa-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Login Attempts Warning -->
+            <div id="login-warning" class="hidden bg-red-50 border border-red-200 rounded-lg p-3">
+              <div class="flex items-center">
+                <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                <span class="text-red-700 text-sm" id="warning-text"></span>
+              </div>
+            </div>
+
+            <!-- Demo Credentials -->
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div class="text-xs text-blue-600">
+                <strong>ข้อมูลทดสอบ:</strong><br>
+                ชื่อผู้ใช้: admin<br>
+                รหัสผ่าน: admin123
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex justify-between items-center mt-6">
+            <button 
+              type="button" 
+              onclick="window.closeAdminLogin()" 
+              class="btn btn-secondary"
+            >
+              ยกเลิก
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              id="login-submit-btn"
+            >
+              <i class="fas fa-sign-in-alt mr-2"></i>
+              เข้าสู่ระบบ
+            </button>
+          </div>
+        </form>
+        
+        <!-- Alternative Login Options -->
+        <div class="mt-6 pt-4 border-t border-gray-200">
+          <div class="text-center">
+            <p class="text-sm text-gray-600 mb-3">หรือเข้าด้วยวิธีอื่น</p>
+            <button 
+              onclick="window.guestModeLogin()" 
+              class="text-blue-600 hover:text-blue-800 text-sm underline"
+            >
+              เข้าใช้แบบผู้เยี่ยมชม (ดูข้อมูลอย่างเดียว)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Status Bar -->
+  <div id="admin-status-bar" class="fixed top-0 right-4 mt-16 bg-white shadow-lg rounded-2xl px-4 py-2 z-40 hidden">
+    <div class="flex items-center space-x-3">
+      <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+      <span class="text-sm font-medium text-gray-700">Admin Mode</span>
+      <span class="text-xs text-gray-500" id="admin-session-time">00:00</span>
+      <button onclick="window.adminLogout()" class="text-red-500 hover:text-red-700 ml-2">
+        <i class="fas fa-sign-out-alt"></i>
+      </button>
+    </div>
+  </div>
+
   <script>
     // Enhanced Configuration for Fast Loading
     const CONFIG = {
@@ -833,7 +1004,7 @@
       DEBOUNCE_DELAY: 300
     };
 
-    // Global State with Cache Support
+    // Global State with Authentication
     let state = {
       subjects: {},
       currentSubject: null,
@@ -845,6 +1016,11 @@
       sortOrder: 'name',
       cacheEnabled: true,
       loadTime: 0,
+      // Authentication state
+      isAuthenticated: false,
+      userRole: 'guest', // guest, admin
+      loginAttempts: 0,
+      sessionTimeout: null,
       analytics: {
         pageViews: 0,
         quizAccesses: 0,
@@ -936,6 +1112,198 @@
 
     const cache = new FastCache();
 
+    // Authentication System
+    class AuthSystem {
+      constructor() {
+        this.credentials = {
+          admin: { password: 'admin123', role: 'admin' },
+          demo: { password: 'demo', role: 'admin' },
+          guest: { password: '', role: 'guest' }
+        };
+        this.maxAttempts = 3;
+        this.lockoutTime = 5 * 60 * 1000; // 5 minutes
+        this.sessionDuration = 2 * 60 * 60 * 1000; // 2 hours
+      }
+
+      authenticate(username, password) {
+        // Check if account is locked
+        if (this.isAccountLocked()) {
+          return {
+            success: false,
+            message: 'บัญชีถูกล็อค กรุณารอ 5 นาที',
+            remainingTime: this.getRemainingLockTime()
+          };
+        }
+
+        // Validate credentials
+        const user = this.credentials[username.toLowerCase()];
+        if (!user || user.password !== password) {
+          state.loginAttempts++;
+          
+          if (state.loginAttempts >= this.maxAttempts) {
+            this.lockAccount();
+            return {
+              success: false,
+              message: 'รหัสผ่านผิด 3 ครั้ง บัญชีถูกล็อค 5 นาที',
+              locked: true
+            };
+          }
+
+          return {
+            success: false,
+            message: `รหัสผ่านผิด (เหลือ ${this.maxAttempts - state.loginAttempts} ครั้ง)`,
+            attemptsLeft: this.maxAttempts - state.loginAttempts
+          };
+        }
+
+        // Successful login
+        this.setSession(username, user.role);
+        return {
+          success: true,
+          message: 'เข้าสู่ระบบสำเร็จ',
+          role: user.role
+        };
+      }
+
+      setSession(username, role) {
+        state.isAuthenticated = true;
+        state.userRole = role;
+        state.loginAttempts = 0;
+        
+        // Set session timeout
+        if (state.sessionTimeout) {
+          clearTimeout(state.sessionTimeout);
+        }
+        
+        state.sessionTimeout = setTimeout(() => {
+          this.logout('หมดเวลาเซสชัน กรุณาเข้าสู่ระบบใหม่');
+        }, this.sessionDuration);
+
+        this.updateUI();
+        this.startSessionTimer();
+      }
+
+      logout(message = 'ออกจากระบบเรียบร้อย') {
+        state.isAuthenticated = false;
+        state.userRole = 'guest';
+        
+        if (state.sessionTimeout) {
+          clearTimeout(state.sessionTimeout);
+          state.sessionTimeout = null;
+        }
+
+        this.updateUI();
+        this.stopSessionTimer();
+        showToast(message, 'info');
+      }
+
+      isAccountLocked() {
+        const lockTime = window.accountLockTime;
+        return lockTime && (Date.now() - lockTime) < this.lockoutTime;
+      }
+
+      lockAccount() {
+        window.accountLockTime = Date.now();
+      }
+
+      getRemainingLockTime() {
+        const lockTime = window.accountLockTime;
+        if (!lockTime) return 0;
+        
+        const elapsed = Date.now() - lockTime;
+        const remaining = this.lockoutTime - elapsed;
+        return Math.max(0, Math.ceil(remaining / 1000));
+      }
+
+      updateUI() {
+        const statusBar = document.getElementById('admin-status-bar');
+        const adminButtons = document.querySelectorAll('.admin-only');
+        
+        if (state.isAuthenticated && state.userRole === 'admin') {
+          statusBar.classList.remove('hidden');
+          adminButtons.forEach(btn => {
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            btn.disabled = false;
+          });
+          this.updateAdminButtons(true);
+        } else {
+          statusBar.classList.add('hidden');
+          adminButtons.forEach(btn => {
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.disabled = true;
+          });
+          this.updateAdminButtons(false);
+        }
+      }
+
+      updateAdminButtons(enabled) {
+        // Update navigation buttons
+        const editButtons = document.querySelectorAll('[onclick*="showQuizManager"], [onclick*="showBulkImport"], [onclick*="editQuiz"], [onclick*="deleteQuiz"]');
+        editButtons.forEach(btn => {
+          if (enabled) {
+            btn.classList.remove('hidden');
+            btn.disabled = false;
+          } else {
+            btn.style.display = 'none';
+          }
+        });
+
+        // Update quick action buttons
+        const quickActions = document.querySelector('.glass-morphism .flex');
+        if (quickActions) {
+          const buttons = quickActions.querySelectorAll('button');
+          buttons.forEach((btn, index) => {
+            if (index > 1) { // Keep export and refresh for all users
+              btn.style.display = enabled ? 'inline-flex' : 'none';
+            }
+          });
+        }
+      }
+
+      startSessionTimer() {
+        this.sessionStartTime = Date.now();
+        this.sessionTimer = setInterval(() => {
+          const elapsed = Date.now() - this.sessionStartTime;
+          const minutes = Math.floor(elapsed / 60000);
+          const seconds = Math.floor((elapsed % 60000) / 1000);
+          
+          const timeElement = document.getElementById('admin-session-time');
+          if (timeElement) {
+            timeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+          }
+        }, 1000);
+      }
+
+      stopSessionTimer() {
+        if (this.sessionTimer) {
+          clearInterval(this.sessionTimer);
+          this.sessionTimer = null;
+        }
+      }
+
+      requireAuth(action = 'ใช้ฟีเจอร์นี้') {
+        if (!state.isAuthenticated || state.userRole !== 'admin') {
+          showToast(`กรุณาเข้าสู่ระบบแอดมินเพื่อ${action}`, 'warning');
+          this.showLoginModal();
+          return false;
+        }
+        return true;
+      }
+
+      showLoginModal() {
+        document.getElementById('admin-login-modal').classList.remove('hidden');
+        document.getElementById('admin-username').focus();
+      }
+
+      closeLoginModal() {
+        document.getElementById('admin-login-modal').classList.add('hidden');
+        document.getElementById('admin-login-form').reset();
+        document.getElementById('login-warning').classList.add('hidden');
+      }
+    }
+
+    const authSystem = new AuthSystem();
+
     // Fast Loading System
     class FastLoader {
       constructor() {
@@ -1024,14 +1392,23 @@
             });
 
             // Fast counter animation
-            this.fastAnimateCounter('total-subjects', Object.keys(state.subjects).length);
-            this.fastAnimateCounter('total-quizzes', totalQuizzes);
-            this.fastAnimateCounter('active-quizzes', activeQuizzes);
+            this.updateCounters(Object.keys(state.subjects).length, totalQuizzes, activeQuizzes);
 
             renderSubjects();
             resolve();
           }, 10);
         });
+      }
+
+      updateCounters(subjects, total, active) {
+        const updateElement = (id, value) => {
+          const element = document.getElementById(id);
+          if (element) element.textContent = value;
+        };
+        
+        updateElement('total-subjects', subjects);
+        updateElement('total-quizzes', total);
+        updateElement('active-quizzes', active);
       }
 
       async loadSampleData() {
@@ -1054,6 +1431,21 @@
         const element = document.getElementById(elementId);
         if (!element) return;
         element.textContent = targetValue;
+      }
+
+      animateCounter(elementId, targetValue) {
+        const element = document.getElementById(elementId);
+        if (!element) return;
+        
+        const currentValue = parseInt(element.textContent) || 0;
+        const increment = Math.ceil((targetValue - currentValue) / 10);
+        
+        if (currentValue !== targetValue) {
+          element.textContent = Math.min(currentValue + increment, targetValue);
+          if (currentValue + increment < targetValue) {
+            setTimeout(() => this.animateCounter(elementId, targetValue), 50);
+          }
+        }
       }
 
       updateLoadTime() {
@@ -1179,13 +1571,13 @@
             </td>
             <td>
               <div class="flex space-x-1">
-                <button onclick="window.editQuiz('${quiz.id}')" class="text-blue-600 hover:text-blue-800 p-1">
+                <button onclick="window.editQuizWithAuth('${quiz.id}')" class="text-blue-600 hover:text-blue-800 p-1" title="แก้ไขควิซ">
                   <i class="fas fa-edit"></i>
                 </button>
-                <button onclick="window.deleteQuiz('${quiz.id}')" class="text-red-600 hover:text-red-800 p-1">
+                <button onclick="window.deleteQuizWithAuth('${quiz.id}')" class="text-red-600 hover:text-red-800 p-1" title="ลบควิซ">
                   <i class="fas fa-trash"></i>
                 </button>
-                <button onclick="window.duplicateQuiz('${quiz.id}')" class="text-green-600 hover:text-green-800 p-1">
+                <button onclick="window.duplicateQuiz('${quiz.id}')" class="text-green-600 hover:text-green-800 p-1" title="คัดลอกควิซ">
                   <i class="fas fa-copy"></i>
                 </button>
               </div>
@@ -1252,28 +1644,37 @@
       }
 
       addQuiz(quizData) {
-        const quiz = {
-          id: Date.now() + Math.random(),
-          ...quizData,
-          lastUpdated: new Date().toLocaleString('th-TH')
-        };
+        try {
+          const quiz = {
+            id: Date.now() + Math.random(),
+            ...quizData,
+            lastUpdated: new Date().toLocaleString('th-TH')
+          };
 
-        if (!state.subjects[quizData.subject]) {
-          state.subjects[quizData.subject] = [];
-        }
+          if (!state.subjects[quizData.subject]) {
+            state.subjects[quizData.subject] = [];
+          }
 
-        state.subjects[quizData.subject].push(quiz);
-        this.saveToCache();
-        this.resetForm();
-        this.loadQuizList();
-        
-        showToast('เพิ่มควิซเสร็จสิ้น', 'success');
-        
-        // Update display if viewing this subject
-        if (state.currentSubject === quizData.subject) {
-          renderQuizzes(state.subjects[quizData.subject]);
-        } else {
-          renderSubjects();
+          state.subjects[quizData.subject].push(quiz);
+          this.saveToCache();
+          this.resetForm();
+          this.loadQuizList();
+          
+          showToast('เพิ่มควิซเสร็จสิ้น', 'success');
+          
+          // Update display if viewing this subject
+          if (state.currentSubject === quizData.subject) {
+            renderQuizzes(state.subjects[quizData.subject]);
+          } else {
+            renderSubjects();
+          }
+          
+          // Notify data change
+          notifyDataChange();
+          
+        } catch (error) {
+          console.error('Error adding quiz:', error);
+          showToast('เกิดข้อผิดพลาดในการเพิ่มควิซ', 'error');
         }
       }
 
@@ -1467,26 +1868,37 @@
       }
 
       saveToCache() {
-        cache.set('subjects_data', this.convertToRawData());
+        try {
+          cache.set('subjects_data', this.convertToRawData());
+          notifyDataChange();
+        } catch (error) {
+          console.error('Error saving to cache:', error);
+          showToast('การบันทึกล้มเหลว', 'error');
+        }
       }
 
       convertToRawData() {
-        const rawData = [['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status']];
-        
-        Object.entries(state.subjects).forEach(([subject, quizzes]) => {
-          quizzes.forEach(quiz => {
-            rawData.push([
-              subject,
-              quiz.quizName,
-              quiz.quizLink,
-              quiz.quizDescription || '',
-              quiz.expiryDate || '',
-              quiz.status || ''
-            ]);
+        try {
+          const rawData = [['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status']];
+          
+          Object.entries(state.subjects).forEach(([subject, quizzes]) => {
+            quizzes.forEach(quiz => {
+              rawData.push([
+                subject,
+                quiz.quizName || '',
+                quiz.quizLink || '',
+                quiz.quizDescription || '',
+                quiz.expiryDate || '',
+                quiz.status || ''
+              ]);
+            });
           });
-        });
-        
-        return rawData;
+          
+          return rawData;
+        } catch (error) {
+          console.error('Error converting data:', error);
+          return [['Subject', 'QuizName', 'QuizLink', 'Description', 'ExpiryDate', 'Status']];
+        }
       }
     }
 
@@ -1680,12 +2092,15 @@
             <i class="fas fa-book-open text-gray-400 text-6xl mb-4"></i>
             <h3 class="text-2xl font-bold text-gray-600 mb-2">ไม่มีข้อมูลวิชา</h3>
             <p class="text-gray-500">เพิ่มควิซใหม่เพื่อเริ่มต้นใช้งาน</p>
-            <button onclick="window.showQuizManager()" class="btn btn-primary mt-4">
+            <button onclick="window.showQuizManagerWithAuth()" class="btn btn-primary mt-4 admin-only">
               <i class="fas fa-plus"></i>
               เพิ่มควิซแรก
             </button>
           </div>
         `;
+        
+        // Update admin button visibility
+        authSystem.updateUI();
         return;
       }
 
@@ -1693,6 +2108,26 @@
       Object.entries(subjects).forEach(([subject, quizzes], index) => {
         const card = createEnhancedSubjectCard(subject, quizzes, index);
         grid.appendChild(card);
+      });
+      
+      // Update admin button visibility after rendering
+      setTimeout(() => {
+        authSystem.updateUI();
+        updateAdminButtonsVisibility();
+      }, 100);
+    }
+
+    function updateAdminButtonsVisibility() {
+      const isAdmin = state.isAuthenticated && state.userRole === 'admin';
+      
+      // Show/hide admin edit buttons
+      document.querySelectorAll('.admin-edit-btn').forEach(btn => {
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
+      });
+      
+      // Show/hide admin-only buttons
+      document.querySelectorAll('.admin-only').forEach(btn => {
+        btn.style.display = isAdmin ? 'inline-flex' : 'none';
       });
     }
 
@@ -1742,10 +2177,10 @@
               โหลดจาก: Cache (${state.loadTime}ms)
             </div>
             <div class="mt-2 flex justify-center space-x-2">
-              <button onclick="event.stopPropagation(); window.editSubject('${subject}')" class="text-gray-400 hover:text-blue-600 p-1">
+              <button onclick="event.stopPropagation(); window.editSubjectWithAuth('${subject}')" class="text-gray-400 hover:text-blue-600 p-1 admin-edit-btn" style="display: none;" title="แก้ไขชื่อวิชา">
                 <i class="fas fa-edit"></i>
               </button>
-              <button onclick="event.stopPropagation(); window.addQuizToSubject('${subject}')" class="text-gray-400 hover:text-green-600 p-1">
+              <button onclick="event.stopPropagation(); window.addQuizToSubjectWithAuth('${subject}')" class="text-gray-400 hover:text-green-600 p-1 admin-edit-btn" style="display: none;" title="เพิ่มควิซในวิชานี้">
                 <i class="fas fa-plus"></i>
               </button>
             </div>
@@ -1822,6 +2257,11 @@
         const card = createEnhancedQuizCard(quiz, index);
         grid.appendChild(card);
       });
+      
+      // Update admin button visibility after rendering
+      setTimeout(() => {
+        updateAdminButtonsVisibility();
+      }, 100);
     }
 
     function createEnhancedQuizCard(quiz, index) {
@@ -1872,7 +2312,7 @@
                     </button>` :
                     '<span class="px-4 py-2 bg-gray-100 text-gray-600 text-sm rounded-2xl font-medium">ไม่พร้อมใช้งาน</span>'
                   }
-                  <button onclick="window.editQuiz('${quiz.id}')" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 text-sm rounded-2xl hover:bg-blue-200 transition-all">
+                  <button onclick="window.editQuizWithAuth('${quiz.id}')" class="inline-flex items-center px-3 py-2 bg-blue-100 text-blue-700 text-sm rounded-2xl hover:bg-blue-200 transition-all admin-edit-btn" style="display: none;" title="แก้ไขควิซ">
                     <i class="fas fa-edit"></i>
                   </button>
                 </div>
@@ -1969,6 +2409,132 @@
       showToast(`เปิดดูเฉลย: ${name}`, 'info');
     };
 
+    // Authentication Functions
+    window.showAdminLoginModal = function() {
+      if (state.isAuthenticated && state.userRole === 'admin') {
+        window.showAdminPanel();
+        return;
+      }
+      authSystem.showLoginModal();
+    };
+
+    window.closeAdminLogin = function() {
+      authSystem.closeLoginModal();
+    };
+
+    window.adminLogin = function(event) {
+      event.preventDefault();
+      
+      const username = document.getElementById('admin-username').value.trim();
+      const password = document.getElementById('admin-password').value;
+      const warningDiv = document.getElementById('login-warning');
+      const warningText = document.getElementById('warning-text');
+      const submitBtn = document.getElementById('login-submit-btn');
+
+      // Show loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>กำลังตรวจสอบ...';
+
+      setTimeout(() => {
+        const result = authSystem.authenticate(username, password);
+        
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบ';
+
+        if (result.success) {
+          authSystem.closeLoginModal();
+          showToast(result.message, 'success');
+          updateAuthButton();
+        } else {
+          warningText.textContent = result.message;
+          warningDiv.classList.remove('hidden');
+          
+          if (result.locked) {
+            submitBtn.disabled = true;
+            setTimeout(() => {
+              submitBtn.disabled = false;
+              warningDiv.classList.add('hidden');
+            }, 5000);
+          }
+        }
+      }, 1000); // Simulate network delay
+    };
+
+    window.adminLogout = function() {
+      if (confirm('ต้องการออกจากระบบแอดมินหรือไม่?')) {
+        authSystem.logout();
+        updateAuthButton();
+      }
+    };
+
+    window.guestModeLogin = function() {
+      state.userRole = 'guest';
+      authSystem.closeLoginModal();
+      showToast('เข้าใช้โหมดผู้เยี่ยมชม', 'info');
+    };
+
+    window.togglePasswordVisibility = function() {
+      const passwordField = document.getElementById('admin-password');
+      const toggleIcon = document.getElementById('password-toggle-icon');
+      
+      if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.className = 'fas fa-eye-slash';
+      } else {
+        passwordField.type = 'password';
+        toggleIcon.className = 'fas fa-eye';
+      }
+    };
+
+    function updateAuthButton() {
+      const authButton = document.getElementById('auth-button');
+      if (state.isAuthenticated && state.userRole === 'admin') {
+        authButton.innerHTML = '<i class="fas fa-cog mr-2"></i>แอดมินแพนเนล';
+        authButton.onclick = window.showAdminPanel;
+      } else {
+        authButton.innerHTML = '<i class="fas fa-sign-in-alt mr-2"></i>เข้าสู่ระบบแอดมิน';
+        authButton.onclick = window.showAdminLoginModal;
+      }
+    }
+
+    // Protected Admin Functions
+    window.showQuizManagerWithAuth = function() {
+      if (authSystem.requireAuth('จัดการควิซ')) {
+        window.showQuizManager();
+      }
+    };
+
+    window.showBulkImportWithAuth = function() {
+      if (authSystem.requireAuth('นำเข้าข้อมูล')) {
+        window.showBulkImport();
+      }
+    };
+
+    window.addQuizToSubjectWithAuth = function(subject) {
+      if (authSystem.requireAuth('เพิ่มควิซใหม่')) {
+        window.addQuizToSubject(subject);
+      }
+    };
+
+    window.editQuizWithAuth = function(quizId) {
+      if (authSystem.requireAuth('แก้ไขควิซ')) {
+        window.editQuiz(quizId);
+      }
+    };
+
+    window.deleteQuizWithAuth = function(quizId) {
+      if (authSystem.requireAuth('ลบควิซ')) {
+        window.deleteQuiz(quizId);
+      }
+    };
+
+    window.editSubjectWithAuth = function(subject) {
+      if (authSystem.requireAuth('แก้ไขชื่อวิชา')) {
+        window.editSubject(subject);
+      }
+    };
+
+    // Original Functions (unchanged for public access)
     window.showQuizManager = function() {
       quizManager.openManager();
     };
@@ -2181,14 +2747,23 @@
     function updateAdminData() {
       const totalQuizzes = Object.values(state.subjects).reduce((sum, quizzes) => sum + quizzes.length, 0);
       
-      document.getElementById('admin-total-quizzes').textContent = totalQuizzes;
-      document.getElementById('cache-size').textContent = cache.size() + ' KB';
-      document.getElementById('last-admin-update').textContent = new Date().toLocaleTimeString('th-TH');
+      const adminTotalElement = document.getElementById('admin-total-quizzes');
+      const cacheSizeElement = document.getElementById('cache-size');
+      const lastUpdateElement = document.getElementById('last-admin-update');
       
-      // Update performance stats
-      fastLoader.animateCounter('total-subjects', Object.keys(state.subjects).length);
-      fastLoader.animateCounter('total-quizzes', totalQuizzes);
-      fastLoader.animateCounter('active-quizzes', 
+      if (adminTotalElement) adminTotalElement.textContent = totalQuizzes;
+      if (cacheSizeElement) cacheSizeElement.textContent = cache.size() + ' KB';
+      if (lastUpdateElement) lastUpdateElement.textContent = new Date().toLocaleTimeString('th-TH');
+      
+      // Update performance stats safely
+      const updateElement = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+      };
+      
+      updateElement('total-subjects', Object.keys(state.subjects).length);
+      updateElement('total-quizzes', totalQuizzes);
+      updateElement('active-quizzes', 
         Object.values(state.subjects).reduce((sum, quizzes) => 
           sum + quizzes.filter(q => q.quizLink && !fastLoader.isExpired(q.expiryDate)).length, 0)
       );
@@ -2214,7 +2789,9 @@
       try {
         // Initialize search with debouncing
         const searchInput = document.getElementById('search-input');
-        searchInput.addEventListener('input', debouncedSearch);
+        if (searchInput) {
+          searchInput.addEventListener('input', debouncedSearch);
+        }
         
         // Show initial loading
         showLoadingOverlay(true);
@@ -2225,7 +2802,11 @@
         // Update admin data
         updateAdminData();
         
-        // Auto-refresh every 5 minutes
+        // Initialize auth system UI
+        authSystem.updateUI();
+        updateAuthButton();
+        
+        // Auto-refresh every 5 minutes (with error handling)
         setInterval(() => {
           fastLoader.refreshData().catch(error => {
             console.warn('Auto-refresh failed:', error);
@@ -2236,8 +2817,17 @@
         
       } catch (error) {
         console.error('Application initialization failed:', error);
-        showToast('เกิดข้อผิดพลาดในการเริ่มต้นระบบ', 'error');
+        showToast('เกิดข้อผิดพลาดในการเริ่มต้นระบบ กำลังใช้โหมดออฟไลน์', 'warning');
         showLoadingOverlay(false);
+        
+        // Load sample data as fallback
+        try {
+          await fastLoader.loadSampleData();
+          authSystem.updateUI();
+        } catch (fallbackError) {
+          console.error('Fallback loading failed:', fallbackError);
+          showToast('ไม่สามารถโหลดข้อมูลได้', 'error');
+        }
       }
     });
 
@@ -2272,55 +2862,75 @@
       clearTimeout(autoSaveTimeout);
       autoSaveTimeout = setTimeout(() => {
         if (CONFIG.AUTO_SAVE) {
-          quizManager.saveToCache();
+          try {
+            quizManager.saveToCache();
+          } catch (error) {
+            console.warn('Auto-save failed:', error);
+          }
         }
       }, 2000);
     }
 
-    // Listen for data changes
-    const originalPush = Array.prototype.push;
-    Array.prototype.push = function(...args) {
-      const result = originalPush.apply(this, args);
+    // Data change notification
+    function notifyDataChange() {
       autoSave();
-      return result;
-    };
+    }
 
     // Performance monitoring
     const performanceObserver = new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
         if (entry.entryType === 'navigation') {
-          document.getElementById('load-time').textContent = Math.round(entry.loadEventEnd - entry.loadEventStart) + 'ms';
+          const loadTimeElement = document.getElementById('load-time');
+          if (loadTimeElement) {
+            loadTimeElement.textContent = Math.round(entry.loadEventEnd - entry.loadEventStart) + 'ms';
+          }
         }
       });
     });
 
-    performanceObserver.observe({ entryTypes: ['navigation'] });
-
-    // Service Worker registration for offline support (if needed)
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(error => {
-        console.log('Service Worker registration failed:', error);
-      });
+    try {
+      performanceObserver.observe({ entryTypes: ['navigation'] });
+    } catch (error) {
+      console.log('Performance Observer not supported:', error);
     }
 
     // Initialize tooltips and help system
     function initializeHelp() {
-      const helpTips = [
-        { element: '#search-input', tip: 'พิมพ์เพื่อค้นหาแบบ Real-time' },
-        { element: '[onclick*="showQuizManager"]', tip: 'Ctrl+N เพื่อเพิ่มควิซใหม่' },
-        { element: '[onclick*="refreshCache"]', tip: 'Ctrl+R เพื่อรีเฟรชข้อมูล' }
-      ];
-      
-      helpTips.forEach(({ element, tip }) => {
-        const el = document.querySelector(element);
-        if (el) {
-          el.title = tip;
-        }
-      });
+      try {
+        const helpTips = [
+          { element: '#search-input', tip: 'พิมพ์เพื่อค้นหาแบบ Real-time' },
+          { element: '[onclick*="showQuizManager"]', tip: 'Ctrl+N เพื่อเพิ่มควิซใหม่' },
+          { element: '[onclick*="refreshCache"]', tip: 'Ctrl+R เพื่อรีเฟรชข้อมูล' }
+        ];
+        
+        helpTips.forEach(({ element, tip }) => {
+          const el = document.querySelector(element);
+          if (el) {
+            el.title = tip;
+          }
+        });
+      } catch (error) {
+        console.warn('Help system initialization failed:', error);
+      }
     }
 
     // Initialize help system after DOM load
     setTimeout(initializeHelp, 1000);
+
+    // Global error handler
+    window.addEventListener('error', function(event) {
+      console.error('Global error:', event.error);
+      if (event.error && event.error.message) {
+        showToast('เกิดข้อผิดพลาดในระบบ', 'error');
+      }
+    });
+
+    // Unhandled promise rejection handler
+    window.addEventListener('unhandledrejection', function(event) {
+      console.error('Unhandled promise rejection:', event.reason);
+      event.preventDefault();
+      showToast('เกิดข้อผิดพลาดในการประมวลผล', 'warning');
+    });
   </script>
 </body>
 </html>
