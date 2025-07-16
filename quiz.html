@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เฉลยการประมาณค่า - แบบฝึกหัดสถิติ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #34495e;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #34495e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            min-width: 200px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .nav-tab:last-child {
+            border-right: none;
+        }
+        
+        .nav-tab:hover {
+            background: #2c3e50;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: #3498db;
+            box-shadow: inset 0 -3px 0 #2980b9;
+        }
+        
+        .content {
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .problem-section {
+            display: none;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .problem-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .problem-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .problem-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .problem-title {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .problem-icon {
+            width: 30px;
+            height: 30px;
+            background: #3498db;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .data-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .data-title {
+            color: #e74c3c;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+        
+        .data-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .data-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .data-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .answer-section {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .answer-title {
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .point-estimate {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .confidence-interval {
+            background: #d1ecf1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .calculation-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #6c757d;
+        }
+        
+        .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .formula {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            font-size: 1.1em;
+            letter-spacing: 1px;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .result {
+            background: #d4edda;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 2px solid #28a745;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #155724;
+        }
+        
+        .summary-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .summary-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .summary-card h3 {
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tab {
+                min-width: 150px;
+                font-size: 12px;
+                padding: 12px 15px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 เฉลยการประมาณค่า</h1>
+            <p>แบบฝึกหัดสถิติ - ช่วงความเชื่อมั่น (Confidence Interval)</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showProblem('problem1')">โจทย์ที่ 1: เวลาตอบอีเมล</button>
+            <button class="nav-tab" onclick="showProblem('problem2')">โจทย์ที่ 2: ค่าใช้จ่ายอาหาร</button>
+            <button class="nav-tab" onclick="showProblem('problem3')">โจทย์ที่ 3: ความเร็วอินเทอร์เน็ต</button>
+            <button class="nav-tab" onclick="showProblem('problem4')">โจทย์ที่ 4: เวลารอคิว</button>
+            <button class="nav-tab" onclick="showProblem('problem5')">โจทย์ที่ 5: เวลาเรียนออนไลน์</button>
+            <button class="nav-tab" onclick="showProblem('summary')">สรุปสูตร</button>
+        </div>
+        
+        <div class="content">
+            <!-- Problem 1 -->
+            <div id="problem1" class="problem-section active">
+                <div class="problem-card">
+                    <h2 class="problem-title">
+                        <span class="problem-icon">1</span>
+                        เวลาตอบอีเมลของเจ้าหน้าที่บริการลูกค้า
+                    </h2>
+                    
+                    <div class="data-section">
+                        <div class="data-title">📋 ข้อมูลที่กำหนด:</div>
+                        <ul class="data-list">
+                            <li><strong>ขนาดตัวอย่าง (n)</strong> = 60 อีเมล</li>
+                            <li><strong>ค่าเฉลี่ย (x̄)</strong> = 12.4 นาที</li>
+                            <li><strong>ส่วนเบี่ยงเบนมาตรฐาน (SD)</strong> = 3.2 นาที</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="answer-section">
+                        <div class="answer-title">💡 คำตอบ:</div>
+                        
+                        <div class="point-estimate">
+                            <strong>1. การประมาณค่าแบบจุด:</strong><br>
+                            เวลาเฉลี่ยในการตอบอีเมล = <span class="highlight">12.4 นาที</span>
+                        </div>
+                        
+                        <div class="confidence-interval">
+                            <strong>2. ช่วงความเชื่อมั่น 99%:</strong><br>
+                            
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 1:</strong> เลือกการแจกแจง<br>
+                                    เนื่องจาก n = 60 > 30 และทราบ SD → ใช้ Z-distribution
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 2:</strong> หาค่า Z<br>
+                                    สำหรับระดับความเชื่อมั่น 99%: α = 0.01<br>
+                                    z₁₋α/₂ = z₀.₉₉₅ = <span class="highlight">2.576</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 3:</strong> คำนวณ Standard Error<br>
+                                    SE = SD/√n = 3.2/√60 = 3.2/7.746 = <span class="highlight">0.413</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 4:</strong> คำนวณช่วงความเชื่อมั่น<br>
+                                    <div class="formula">CI = x̄ ± z₁₋α/₂ × SE</div>
+                                    CI = 12.4 ± 2.576 × 0.413<br>
+                                    CI = 12.4 ± 1.064
+                                </div>
+                            </div>
+                            
+                            <div class="result">
+                                ช่วงความเชื่อมั่น 99% = (11.34, 13.46) นาที
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem 2 -->
+            <div id="problem2" class="problem-section">
+                <div class="problem-card">
+                    <h2 class="problem-title">
+                        <span class="problem-icon">2</span>
+                        ค่าใช้จ่ายอาหารกลางวันของนักศึกษา
+                    </h2>
+                    
+                    <div class="data-section">
+                        <div class="data-title">📋 ข้อมูลที่กำหนด:</div>
+                        <ul class="data-list">
+                            <li><strong>ขนาดตัวอย่าง (n)</strong> = 100 คน</li>
+                            <li><strong>ค่าเฉลี่ย (x̄)</strong> = 65 บาท/วัน</li>
+                            <li><strong>ส่วนเบี่ยงเบนมาตรฐาน (SD)</strong> = 12 บาท</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="answer-section">
+                        <div class="answer-title">💡 คำตอบ:</div>
+                        
+                        <div class="point-estimate">
+                            <strong>1. การประมาณค่าแบบจุด:</strong><br>
+                            ค่าใช้จ่ายเฉลี่ย = <span class="highlight">65 บาท/วัน</span>
+                        </div>
+                        
+                        <div class="confidence-interval">
+                            <strong>2. ช่วงความเชื่อมั่น 95%:</strong><br>
+                            
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 1:</strong> เลือกการแจกแจง<br>
+                                    เนื่องจาก n = 100 > 30 และทราบ SD → ใช้ Z-distribution
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 2:</strong> หาค่า Z<br>
+                                    สำหรับระดับความเชื่อมั่น 95%: α = 0.05<br>
+                                    z₁₋α/₂ = z₀.₉₇₅ = <span class="highlight">1.96</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 3:</strong> คำนวณ Standard Error<br>
+                                    SE = SD/√n = 12/√100 = 12/10 = <span class="highlight">1.2</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 4:</strong> คำนวณช่วงความเชื่อมั่น<br>
+                                    <div class="formula">CI = x̄ ± z₁₋α/₂ × SE</div>
+                                    CI = 65 ± 1.96 × 1.2<br>
+                                    CI = 65 ± 2.352
+                                </div>
+                            </div>
+                            
+                            <div class="result">
+                                ช่วงความเชื่อมั่น 95% = (62.65, 67.35) บาท
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem 3 -->
+            <div id="problem3" class="problem-section">
+                <div class="problem-card">
+                    <h2 class="problem-title">
+                        <span class="problem-icon">3</span>
+                        ความเร็วเฉลี่ยของอินเทอร์เน็ตในเขตเมือง
+                    </h2>
+                    
+                    <div class="data-section">
+                        <div class="data-title">📋 ข้อมูลที่กำหนด:</div>
+                        <ul class="data-list">
+                            <li><strong>ขนาดตัวอย่าง (n)</strong> = 40 ตัวอย่าง</li>
+                            <li><strong>ค่าเฉลี่ย (x̄)</strong> = 58.2 Mbps</li>
+                            <li><strong>ส่วนเบี่ยงเบนมาตรฐาน (SD)</strong> = 6.4 Mbps</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="answer-section">
+                        <div class="answer-title">💡 คำตอบ:</div>
+                        
+                        <div class="point-estimate">
+                            <strong>1. การประมาณค่าแบบจุด:</strong><br>
+                            ความเร็วอินเทอร์เน็ตเฉลี่ย = <span class="highlight">58.2 Mbps</span>
+                        </div>
+                        
+                        <div class="confidence-interval">
+                            <strong>2. ช่วงความเชื่อมั่น 90%:</strong><br>
+                            
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 1:</strong> เลือกการแจกแจง<br>
+                                    เนื่องจาก n = 40 > 30 และทราบ SD → ใช้ Z-distribution
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 2:</strong> หาค่า Z<br>
+                                    สำหรับระดับความเชื่อมั่น 90%: α = 0.10<br>
+                                    z₁₋α/₂ = z₀.₉₅ = <span class="highlight">1.645</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 3:</strong> คำนวณ Standard Error<br>
+                                    SE = SD/√n = 6.4/√40 = 6.4/6.325 = <span class="highlight">1.012</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 4:</strong> คำนวณช่วงความเชื่อมั่น<br>
+                                    <div class="formula">CI = x̄ ± z₁₋α/₂ × SE</div>
+                                    CI = 58.2 ± 1.645 × 1.012<br>
+                                    CI = 58.2 ± 1.665
+                                </div>
+                            </div>
+                            
+                            <div class="result">
+                                ช่วงความเชื่อมั่น 90% = (56.54, 59.86) Mbps
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem 4 -->
+            <div id="problem4" class="problem-section">
+                <div class="problem-card">
+                    <h2 class="problem-title">
+                        <span class="problem-icon">4</span>
+                        เวลารอคิวจ่ายเงินในห้างสรรพสินค้า
+                    </h2>
+                    
+                    <div class="data-section">
+                        <div class="data-title">📋 ข้อมูลที่กำหนด:</div>
+                        <ul class="data-list">
+                            <li><strong>ขนาดตัวอย่าง (n)</strong> = 80 คน</li>
+                            <li><strong>ค่าเฉลี่ย (x̄)</strong> = 4.8 นาที</li>
+                            <li><strong>ส่วนเบี่ยงเบนมาตรฐาน (SD)</strong> = 1.6 นาที</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="answer-section">
+                        <div class="answer-title">💡 คำตอบ:</div>
+                        
+                        <div class="point-estimate">
+                            <strong>1. การประมาณค่าแบบจุด:</strong><br>
+                            เวลาเฉลี่ยที่ลูกค้าต้องรอ = <span class="highlight">4.8 นาที</span>
+                        </div>
+                        
+                        <div class="confidence-interval">
+                            <strong>2. ช่วงความเชื่อมั่น 95%:</strong><br>
+                            
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 1:</strong> เลือกการแจกแจง<br>
+                                    เนื่องจาก n = 80 > 30 และทราบ SD → ใช้ Z-distribution
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 2:</strong> หาค่า Z<br>
+                                    สำหรับระดับความเชื่อมั่น 95%: α = 0.05<br>
+                                    z₁₋α/₂ = z₀.₉₇₅ = <span class="highlight">1.96</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 3:</strong> คำนวณ Standard Error<br>
+                                    SE = SD/√n = 1.6/√80 = 1.6/8.944 = <span class="highlight">0.179</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 4:</strong> คำนวณช่วงความเชื่อมั่น<br>
+                                    <div class="formula">CI = x̄ ± z₁₋α/₂ × SE</div>
+                                    CI = 4.8 ± 1.96 × 0.179<br>
+                                    CI = 4.8 ± 0.351
+                                </div>
+                            </div>
+                            
+                            <div class="result">
+                                ช่วงความเชื่อมั่น 95% = (4.45, 5.15) นาที
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Problem 5 -->
+            <div id="problem5" class="problem-section">
+                <div class="problem-card">
+                    <h2 class="problem-title">
+                        <span class="problem-icon">5</span>
+                        เวลาในการเรียนออนไลน์ต่อวัน
+                    </h2>
+                    
+                    <div class="data-section">
+                        <div class="data-title">📋 ข้อมูลที่กำหนด:</div>
+                        <ul class="data-list">
+                            <li><strong>ขนาดตัวอย่าง (n)</strong> = 35 คน</li>
+                            <li><strong>ค่าเฉลี่ย (x̄)</strong> = 3.5 ชั่วโมง/วัน</li>
+                            <li><strong>ส่วนเบี่ยงเบนมาตรฐาน (SD)</strong> = 0.9 ชั่วโมง</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="answer-section">
+                        <div class="answer-title">💡 คำตอบ:</div>
+                        
+                        <div class="point-estimate">
+                            <strong>1. การประมาณค่าแบบจุด:</strong><br>
+                            เวลาเรียนออนไลน์เฉลี่ย = <span class="highlight">3.5 ชั่วโมง/วัน</span>
+                        </div>
+                        
+                        <div class="confidence-interval">
+                            <strong>2. ช่วงความเชื่อมั่น 95%:</strong><br>
+                            
+                            <div class="calculation-steps">
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 1:</strong> เลือกการแจกแจง<br>
+                                    เนื่องจาก n = 35 > 30 และทราบ SD → ใช้ Z-distribution
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 2:</strong> หาค่า Z<br>
+                                    สำหรับระดับความเชื่อมั่น 95%: α = 0.05<br>
+                                    z₁₋α/₂ = z₀.₉₇₅ = <span class="highlight">1.96</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 3:</strong> คำนวณ Standard Error<br>
+                                    SE = SD/√n = 0.9/√35 = 0.9/5.916 = <span class="highlight">0.152</span>
+                                </div>
+                                
+                                <div class="step">
+                                    <strong>ขั้นตอนที่ 4:</strong> คำนวณช่วงความเชื่อมั่น<br>
+                                    <div class="formula">CI = x̄ ± z₁₋α/₂ × SE</div>
+                                    CI = 3.5 ± 1.96 × 0.152<br>
+                                    CI = 3.5 ± 0.298
+                                </div>
+                            </div>
+                            
+                            <div class="result">
+                                ช่วงความเชื่อมั่น 95% = (3.20, 3.80) ชั่วโมง
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Summary -->
+            <div id="summary" class="problem-section">
+                <div class="summary-section">
+                    <h2 style="text-align: center; margin-bottom: 30px;">📋 สรุปสูตรและแนวคิดสำคัญ</h2>
+                    
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h3>🎯 การประมาณค่าแบบจุด</h3>
+                            <p>ค่าประมาณค่าเฉลี่ย = x̄ (ค่าเฉลี่ยของตัวอย่าง)</p>
+                            <p>เป็นการประมาณค่าพารามิเตอร์ด้วยค่าเดียว</p>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>📊 ช่วงความเชื่อมั่น</h3>
+                            <p>เมื่อ n > 30 และทราบ SD:</p>
+                            <div class="formula">CI = x̄ ± z₁₋α/₂ × (SD/√n)</div>
+                            <p>SE = SD/√n (Standard Error)</p>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>📈 ค่า Z สำหรับระดับความเชื่อมั่น</h3>
+                            <ul style="list-style: none; padding: 0;">
+                                <li>• 90%: z = 1.645</li>
+                                <li>• 95%: z = 1.96</li>
+                                <li>• 99%: z = 2.576</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>🔍 เงื่อนไขการใช้ Z-distribution</h3>
+                            <p>1. n > 30 (ตัวอย่างใหญ่)</p>
+                            <p>2. ทราบค่าส่วนเบี่ยงเบนมาตรฐานของตัวอย่าง</p>
+                            <p>3. การแจกแจงของตัวอย่างเป็นปกติ หรือ n ใหญ่พอ</p>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>💡 การตีความช่วงความเชื่อมั่น</h3>
+                            <p>ช่วงความเชื่อมั่น 95% หมายความว่า:</p>
+                            <p>หากสุ่มตัวอย่างซ้ำ 100 ครั้ง จะมี 95 ครั้งที่ช่วงจะครอบคลุมค่าเฉลี่ยจริงของประชากร</p>
+                        </div>
+                        
+                        <div class="summary-card">
+                            <h3>⚡ ขั้นตอนการทำโจทย์</h3>
+                            <p>1. ตรวจสอบเงื่อนไข (n, SD)</p>
+                            <p>2. เลือกการแจกแจงที่เหมาะสม</p>
+                            <p>3. หาค่า Z จากระดับความเชื่อมั่น</p>
+                            <p>4. คำนวณ SE = SD/√n</p>
+                            <p>5. คำนวณช่วงความเชื่อมั่น</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="problem-card" style="margin-top: 30px;">
+                    <h2 class="problem-title">
+                        <span class="problem-icon">💻</span>
+                        โค้ด R สำหรับคำนวณ
+                    </h2>
+                    
+                    <div style="background: #2c3e50; color: #ecf0f1; padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace; margin: 20px 0;">
+<pre style="margin: 0; line-height: 1.6;">
+# ตัวอย่างการคำนวณช่วงความเชื่อมั่น
+calculate_ci <- function(mean_sample, sd_sample, n, confidence_level) {
+    # คำนวณ Z-score
+    alpha <- 1 - confidence_level
+    z_score <- qnorm(1 - alpha/2)
+    
+    # คำนวณ Standard Error
+    SE <- sd_sample / sqrt(n)
+    
+    # คำนวณช่วงความเชื่อมั่น
+    lower_bound <- mean_sample - z_score * SE
+    upper_bound <- mean_sample + z_score * SE
+    
+    # แสดงผลลัพธ์
+    cat("ค่าเฉลี่ย:", mean_sample, "\n")
+    cat("ระดับความเชื่อมั่น:", confidence_level * 100, "%\n")
+    cat("Z-score:", round(z_score, 3), "\n")
+    cat("Standard Error:", round(SE, 3), "\n")
+    cat("ช่วงความเชื่อมั่น: (", round(lower_bound, 2), ", ", 
+        round(upper_bound, 2), ")\n")
+    
+    return(c(lower_bound, upper_bound))
+}
+
+# ตัวอย่างการใช้งาน - โจทย์ที่ 1
+result <- calculate_ci(12.4, 3.2, 60, 0.99)
+</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function showProblem(problemId) {
+            // Hide all problem sections
+            const sections = document.querySelectorAll('.problem-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected problem section
+            document.getElementById(problemId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+        
+        // Add smooth scrolling effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelector('.content').scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+        
+        // Add interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.problem-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 15px 40px rgba(0,0,0,0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 10px 30px rgba(0,0,0,0.1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
