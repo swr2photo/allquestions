@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การทดสอบสมมติฐาน - แก้โจทย์ทางสถิติ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        .math-formula {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1em;
+            background: #f8fafc;
+            border-left: 4px solid #3b82f6;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+        }
+        
+        .solution-step {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 3s ease infinite;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .card-hover {
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .code-block {
+            background: #1e293b;
+            color: #f1f5f9;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+        
+        .result-box {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+        
+        .hypothesis-test {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            display: inline-block;
+            margin: 0.5rem;
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            margin: 0.25rem;
+        }
+        
+        .nav-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+        }
+        
+        .nav-button.active {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .problem-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 2px solid #e5e7eb;
+        }
+        
+        .step-number {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+        
+        .mobile-responsive {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .problem-card {
+                padding: 1rem;
+                margin: 0.5rem 0;
+            }
+            
+            .nav-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .math-formula {
+                font-size: 1rem;
+                padding: 0.4rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">การทดสอบสมมติฐาน</h1>
+            <p class="text-lg text-gray-600">เฉลยโจทย์ทางสถิติแบบละเอียด พร้อมโค้ด R</p>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="text-center mb-8">
+            <div class="nav-button active" onclick="showProblem('overview')">ภาพรวม</div>
+            <div class="nav-button" onclick="showProblem('problem1')">โจทย์ที่ 1</div>
+            <div class="nav-button" onclick="showProblem('problem2')">โจทย์ที่ 2</div>
+            <div class="nav-button" onclick="showProblem('problem3')">โจทย์ที่ 3</div>
+            <div class="nav-button" onclick="showProblem('problem4')">โจทย์ที่ 4</div>
+            <div class="nav-button" onclick="showProblem('problem5')">โจทย์ที่ 5</div>
+        </div>
+        
+        <!-- Overview Section -->
+        <div id="overview" class="section">
+            <div class="problem-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">📊 ภาพรวมการทดสอบสมมติฐาน</h2>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-blue-800 mb-2">ขั้นตอนการทดสอบ</h3>
+                        <ol class="text-sm text-gray-700 space-y-1">
+                            <li>1. กำหนดสมมติฐาน H₀ และ H₁</li>
+                            <li>2. เลือกระดับนัยสำคัญ α</li>
+                            <li>3. คำนวณค่าสถิติทดสอบ Z</li>
+                            <li>4. หาค่าวิกฤต (Critical Value)</li>
+                            <li>5. ตัดสินใจยอมรับหรือปฏิเสธ H₀</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-green-800 mb-2">สูตรการคำนวณ</h3>
+                        <div class="math-formula">
+                            Z = (x̄ - μ) / (SD/√n)
+                        </div>
+                        <p class="text-sm text-gray-700 mt-2">
+                            โดยที่: x̄ = ค่าเฉลี่ยตัวอย่าง, μ = ค่าเฉลี่ยประชากร, SD = ส่วนเบี่ยงเบนมาตรฐาน, n = ขนาดตัวอย่าง
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-yellow-50 p-4 rounded-lg">
+                    <h3 class="text-lg font-semibold text-yellow-800 mb-2">ประเภทการทดสอบ</h3>
+                    <div class="grid md:grid-cols-3 gap-4 text-sm">
+                        <div class="text-center">
+                            <div class="hypothesis-test">Two-tailed</div>
+                            <p class="text-gray-700 mt-2">H₁: μ ≠ μ₀</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="hypothesis-test">Left-tailed</div>
+                            <p class="text-gray-700 mt-2">H₁: μ < μ₀</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="hypothesis-test">Right-tailed</div>
+                            <p class="text-gray-700 mt-2">H₁: μ > μ₀</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem 1 -->
+        <div id="problem1" class="section" style="display: none;">
+            <div class="problem-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">📋 โจทย์ที่ 1: ระยะเวลาการให้บริการลูกค้า</h2>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-gray-700">
+                        บริษัทไปรษณีย์แห่งหนึ่งอ้างว่า เวลาการให้บริการลูกค้าเฉลี่ยไม่เกิน 12 นาทีต่อคน ฝ่ายตรวจสอบได้เก็บข้อมูลจากลูกค้า 45 คน 
+                        พบว่าเวลาเฉลี่ยอยู่ที่ 13.1 นาที และส่วนเบี่ยงเบนมาตรฐานเท่ากับ 2.5 นาที
+                    </p>
+                    <p class="text-gray-700 mt-2 font-semibold">
+                        ให้ตรวจสอบว่า เวลาเฉลี่ยของการให้บริการ เกินกว่า 12 นาทีหรือไม่ ที่ระดับนัยสำคัญ 0.05
+                    </p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">กำหนดสมมติฐาน</h3>
+                            <div class="math-formula">
+                                H₀: μ ≤ 12 (เวลาเฉลี่ยไม่เกิน 12 นาที)<br>
+                                H₁: μ > 12 (เวลาเฉลี่ยเกิน 12 นาที)
+                            </div>
+                            <p class="text-sm text-gray-600">ชนิดการทดสอบ: Right-tailed test</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ข้อมูลที่กำหนด</h3>
+                            <div class="math-formula">
+                                x̄ = 13.1 นาที<br>
+                                μ = 12 นาที<br>
+                                SD = 2.5 นาที<br>
+                                n = 45 คน<br>
+                                α = 0.05
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">คำนวณค่าสถิติทดสอบ Z</h3>
+                            <div class="math-formula">
+                                Z = (x̄ - μ) / (SD/√n)<br>
+                                Z = (13.1 - 12) / (2.5/√45)<br>
+                                Z = 1.1 / (2.5/6.708)<br>
+                                Z = 1.1 / 0.373<br>
+                                Z = 2.95
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">หาค่าวิกฤต</h3>
+                            <div class="math-formula">
+                                α = 0.05 (Right-tailed)<br>
+                                Z₀.₀₅ = 1.645
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ตัดสินใจ</h3>
+                            <div class="math-formula">
+                                Z = 2.95 > 1.645 = Z₀.₀₅
+                            </div>
+                            <div class="result-box">
+                                <strong>สรุป:</strong> ปฏิเสธ H₀ → เวลานอนเฉลี่ยแตกต่างจาก 7 ชั่วโมง
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-800 mb-2">💻 โค้ด R</h3>
+                    <div class="code-block p-4 rounded-lg">
+<pre># โจทย์ที่ 3: เวลานอนของนักศึกษา
+x_bar <- 6.6
+mu0 <- 7
+sd <- 1.2
+n <- 60
+alpha <- 0.05
+
+# คำนวณค่าสถิติทดสอบ Z
+z <- (x_bar - mu0) / (sd / sqrt(n))
+
+# หาค่าวิกฤต (Two-tailed)
+z_critical <- qnorm(1 - alpha/2)
+
+# แสดงผล
+cat("ข้อมูล:\n")
+cat("x̄ =", x_bar, "ชั่วโมง\n")
+cat("μ =", mu0, "ชั่วโมง\n")
+cat("SD =", sd, "ชั่วโมง\n")
+cat("n =", n, "คน\n")
+cat("α =", alpha, "\n\n")
+
+cat("ผลการคำนวณ:\n")
+cat("Z =", round(z, 3), "\n")
+cat("Z-วิกฤต = ±", round(z_critical, 3), "\n\n")
+
+# ตัดสินใจ
+if (abs(z) > z_critical) {
+    cat("ปฏิเสธ H₀ → เวลานอนเฉลี่ยแตกต่างจาก 7 ชั่วโมง\n")
+} else {
+    cat("ยอมรับ H₀ → ยังไม่มีหลักฐานว่าเวลานอนเฉลี่ยแตกต่างจาก 7 ชั่วโมง\n")
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem 4 -->
+        <div id="problem4" class="section" style="display: none;">
+            <div class="problem-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">📚 โจทย์ที่ 4: คะแนน TOEIC พนักงานใหม่</h2>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-gray-700">
+                        บริษัทแห่งหนึ่งระบุว่า พนักงานใหม่ควรมีคะแนน TOEIC เฉลี่ยไม่ต่ำกว่า 600 คะแนน ได้เก็บข้อมูลจากพนักงานใหม่ 38 คน 
+                        พบว่าคะแนนเฉลี่ยคือ 590 และส่วนเบี่ยงเบนมาตรฐาน 40
+                    </p>
+                    <p class="text-gray-700 mt-2 font-semibold">
+                        ให้ตรวจสอบว่า คะแนนเฉลี่ยต่ำกว่า 600 หรือไม่ ที่ระดับนัยสำคัญ 0.10
+                    </p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">กำหนดสมมติฐาน</h3>
+                            <div class="math-formula">
+                                H₀: μ ≥ 600 (คะแนนเฉลี่ยไม่ต่ำกว่า 600)<br>
+                                H₁: μ < 600 (คะแนนเฉลี่ยต่ำกว่า 600)
+                            </div>
+                            <p class="text-sm text-gray-600">ชนิดการทดสอบ: Left-tailed test</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ข้อมูลที่กำหนด</h3>
+                            <div class="math-formula">
+                                x̄ = 590 คะแนน<br>
+                                μ = 600 คะแนน<br>
+                                SD = 40 คะแนน<br>
+                                n = 38 คน<br>
+                                α = 0.10
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">คำนวณค่าสถิติทดสอบ Z</h3>
+                            <div class="math-formula">
+                                Z = (x̄ - μ) / (SD/√n)<br>
+                                Z = (590 - 600) / (40/√38)<br>
+                                Z = -10 / (40/6.164)<br>
+                                Z = -10 / 6.492<br>
+                                Z = -1.54
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">หาค่าวิกฤต</h3>
+                            <div class="math-formula">
+                                α = 0.10 (Left-tailed)<br>
+                                Z₀.₁₀ = -1.282
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ตัดสินใจ</h3>
+                            <div class="math-formula">
+                                Z = -1.54 < -1.282 = Z₀.₁₀
+                            </div>
+                            <div class="result-box">
+                                <strong>สรุป:</strong> ปฏิเสธ H₀ → คะแนนเฉลี่ยต่ำกว่า 600 คะแนน
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-800 mb-2">💻 โค้ด R</h3>
+                    <div class="code-block p-4 rounded-lg">
+<pre># โจทย์ที่ 4: คะแนน TOEIC พนักงานใหม่
+x_bar <- 590
+mu0 <- 600
+sd <- 40
+n <- 38
+alpha <- 0.10
+
+# คำนวณค่าสถิติทดสอบ Z
+z <- (x_bar - mu0) / (sd / sqrt(n))
+
+# หาค่าวิกฤต (Left-tailed)
+z_critical <- qnorm(alpha)
+
+# แสดงผล
+cat("ข้อมูล:\n")
+cat("x̄ =", x_bar, "คะแนน\n")
+cat("μ =", mu0, "คะแนน\n")
+cat("SD =", sd, "คะแนน\n")
+cat("n =", n, "คน\n")
+cat("α =", alpha, "\n\n")
+
+cat("ผลการคำนวณ:\n")
+cat("Z =", round(z, 3), "\n")
+cat("Z-วิกฤต =", round(z_critical, 3), "\n\n")
+
+# ตัดสินใจ
+if (z < z_critical) {
+    cat("ปฏิเสธ H₀ → คะแนนเฉลี่ยต่ำกว่า 600 คะแนน\n")
+} else {
+    cat("ยอมรับ H₀ → ยังไม่มีหลักฐานว่าคะแนนเฉลี่ยต่ำกว่า 600 คะแนน\n")
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem 5 -->
+        <div id="problem5" class="section" style="display: none;">
+            <div class="problem-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">💰 โจทย์ที่ 5: ค่าใช้จ่ายต่อวันของนักศึกษา</h2>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-gray-700">
+                        คณะวิจัยต้องการทราบว่า ค่าใช้จ่ายเฉลี่ยต่อวันของนักศึกษามหาวิทยาลัย A แตกต่างจาก 300 บาทหรือไม่ 
+                        จึงทำการเก็บข้อมูลจาก 36 คน พบว่าค่าใช้จ่ายเฉลี่ยคือ 290 บาท และส่วนเบี่ยงเบนมาตรฐาน 30 บาท
+                    </p>
+                    <p class="text-gray-700 mt-2 font-semibold">
+                        ให้ทดสอบว่า ค่าใช้จ่ายเฉลี่ยแตกต่างจาก 300 บาทหรือไม่ ที่ระดับนัยสำคัญ 0.05
+                    </p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">กำหนดสมมติฐาน</h3>
+                            <div class="math-formula">
+                                H₀: μ = 300 (ค่าใช้จ่ายเฉลี่ยเท่ากับ 300 บาท)<br>
+                                H₁: μ ≠ 300 (ค่าใช้จ่ายเฉลี่ยแตกต่างจาก 300 บาท)
+                            </div>
+                            <p class="text-sm text-gray-600">ชนิดการทดสอบ: Two-tailed test</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ข้อมูลที่กำหนด</h3>
+                            <div class="math-formula">
+                                x̄ = 290 บาท<br>
+                                μ = 300 บาท<br>
+                                SD = 30 บาท<br>
+                                n = 36 คน<br>
+                                α = 0.05
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">คำนวณค่าสถิติทดสอบ Z</h3>
+                            <div class="math-formula">
+                                Z = (x̄ - μ) / (SD/√n)<br>
+                                Z = (290 - 300) / (30/√36)<br>
+                                Z = -10 / (30/6)<br>
+                                Z = -10 / 5<br>
+                                Z = -2.00
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">หาค่าวิกฤต</h3>
+                            <div class="math-formula">
+                                α = 0.05 (Two-tailed)<br>
+                                α/2 = 0.025<br>
+                                Z₀.₀₂₅ = ±1.96
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ตัดสินใจ</h3>
+                            <div class="math-formula">
+                                |Z| = |-2.00| = 2.00 > 1.96 = Z₀.₀₂₅
+                            </div>
+                            <div class="result-box">
+                                <strong>สรุป:</strong> ปฏิเสธ H₀ → ค่าใช้จ่ายเฉลี่ยแตกต่างจาก 300 บาท
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-800 mb-2">💻 โค้ด R</h3>
+                    <div class="code-block p-4 rounded-lg">
+<pre># โจทย์ที่ 5: ค่าใช้จ่ายต่อวันของนักศึกษา
+x_bar <- 290
+mu0 <- 300
+sd <- 30
+n <- 36
+alpha <- 0.05
+
+# คำนวณค่าสถิติทดสอบ Z
+z <- (x_bar - mu0) / (sd / sqrt(n))
+
+# หาค่าวิกฤต (Two-tailed)
+z_critical <- qnorm(1 - alpha/2)
+
+# แสดงผล
+cat("ข้อมูล:\n")
+cat("x̄ =", x_bar, "บาท\n")
+cat("μ =", mu0, "บาท\n")
+cat("SD =", sd, "บาท\n")
+cat("n =", n, "คน\n")
+cat("α =", alpha, "\n\n")
+
+cat("ผลการคำนวณ:\n")
+cat("Z =", round(z, 3), "\n")
+cat("Z-วิกฤต = ±", round(z_critical, 3), "\n\n")
+
+# ตัดสินใจ
+if (abs(z) > z_critical) {
+    cat("ปฏิเสธ H₀ → ค่าใช้จ่ายเฉลี่ยแตกต่างจาก 300 บาท\n")
+} else {
+    cat("ยอมรับ H₀ → ยังไม่มีหลักฐานว่าค่าใช้จ่ายเฉลี่ยแตกต่างจาก 300 บาท\n")
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Summary Table -->
+    <div class="container mx-auto px-4 pb-8 max-w-6xl">
+        <div class="problem-card">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">📊 สรุปผลการทดสอบทั้ง 5 โจทย์</h2>
+            <div class="mobile-responsive">
+                <table class="w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">โจทย์</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">สมมติฐาน</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Z-คำนวณ</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">Z-วิกฤต</th>
+                            <th class="px-4 py-3 text-left font-semibold text-gray-700">ผลการตัดสินใจ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">1. เวลาบริการ</td>
+                            <td class="px-4 py-3">μ > 12 (Right-tailed)</td>
+                            <td class="px-4 py-3">2.95</td>
+                            <td class="px-4 py-3">1.645</td>
+                            <td class="px-4 py-3 text-red-600 font-semibold">ปฏิเสธ H₀</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">2. น้ำหนักกระเป๋า</td>
+                            <td class="px-4 py-3">μ > 5 (Right-tailed)</td>
+                            <td class="px-4 py-3">1.77</td>
+                            <td class="px-4 py-3">2.326</td>
+                            <td class="px-4 py-3 text-green-600 font-semibold">ยอมรับ H₀</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">3. เวลานอน</td>
+                            <td class="px-4 py-3">μ ≠ 7 (Two-tailed)</td>
+                            <td class="px-4 py-3">-2.58</td>
+                            <td class="px-4 py-3">±1.96</td>
+                            <td class="px-4 py-3 text-red-600 font-semibold">ปฏิเสธ H₀</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">4. คะแนน TOEIC</td>
+                            <td class="px-4 py-3">μ < 600 (Left-tailed)</td>
+                            <td class="px-4 py-3">-1.54</td>
+                            <td class="px-4 py-3">-1.282</td>
+                            <td class="px-4 py-3 text-red-600 font-semibold">ปฏิเสธ H₀</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-4 py-3">5. ค่าใช้จ่าย</td>
+                            <td class="px-4 py-3">μ ≠ 300 (Two-tailed)</td>
+                            <td class="px-4 py-3">-2.00</td>
+                            <td class="px-4 py-3">±1.96</td>
+                            <td class="px-4 py-3 text-red-600 font-semibold">ปฏิเสธ H₀</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-6 bg-blue-50 p-4 rounded-lg">
+                <h3 class="font-semibold text-blue-800 mb-2">🎯 สรุปผลรวม</h3>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                        <strong>ปฏิเสธ H₀:</strong> 4 โจทย์
+                        <ul class="ml-4 mt-1 text-gray-700">
+                            <li>• เวลาบริการเกิน 12 นาที</li>
+                            <li>• เวลานอนแตกต่างจาก 7 ชั่วโมง</li>
+                            <li>• คะแนน TOEIC ต่ำกว่า 600</li>
+                            <li>• ค่าใช้จ่ายแตกต่างจาก 300 บาท</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <strong>ยอมรับ H₀:</strong> 1 โจทย์
+                        <ul class="ml-4 mt-1 text-gray-700">
+                            <li>• น้ำหนักกระเป๋าไม่เกิน 5 กก.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="bg-gray-800 text-white text-center py-4">
+        <p>&copy; 2024 การทดสอบสมมติฐาน - เว็บแก้โจทย์ทางสถิติ</p>
+        <p class="text-sm text-gray-400 mt-1">รองรับทุกอุปกรณ์ด้วย Tailwind CSS</p>
+    </footer>
+
+    <script>
+        function showProblem(problemId) {
+            // ซ่อนส่วนทั้งหมด
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // แสดงส่วนที่เลือก
+            document.getElementById(problemId).style.display = 'block';
+            
+            // อัปเดตสถานะปุ่ม
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+        }
+        
+        // เพิ่ม animation เมื่อหน้าโหลด
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.problem-card');
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+        
+        // เพิ่ม smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>ป:</strong> ปฏิเสธ H₀ → เวลาการให้บริการเฉลี่ยเกิน 12 นาที
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-800 mb-2">💻 โค้ด R</h3>
+                    <div class="code-block p-4 rounded-lg">
+<pre># โจทย์ที่ 1: ระยะเวลาการให้บริการลูกค้า
+x_bar <- 13.1
+mu0 <- 12
+sd <- 2.5
+n <- 45
+alpha <- 0.05
+
+# คำนวณค่าสถิติทดสอบ Z
+z <- (x_bar - mu0) / (sd / sqrt(n))
+
+# หาค่าวิกฤต (Right-tailed)
+z_critical <- qnorm(1 - alpha)
+
+# แสดงผล
+cat("ข้อมูล:\n")
+cat("x̄ =", x_bar, "นาที\n")
+cat("μ =", mu0, "นาที\n")
+cat("SD =", sd, "นาที\n")
+cat("n =", n, "คน\n")
+cat("α =", alpha, "\n\n")
+
+cat("ผลการคำนวณ:\n")
+cat("Z =", round(z, 3), "\n")
+cat("Z-วิกฤต =", round(z_critical, 3), "\n\n")
+
+# ตัดสินใจ
+if (z > z_critical) {
+    cat("ปฏิเสธ H₀ → เวลาการให้บริการเฉลี่ยเกิน 12 นาที\n")
+} else {
+    cat("ยอมรับ H₀ → ยังไม่มีหลักฐานว่าเวลาการให้บริการเกิน 12 นาที\n")
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem 2 -->
+        <div id="problem2" class="section" style="display: none;">
+            <div class="problem-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">🎒 โจทย์ที่ 2: น้ำหนักเฉลี่ยของกระเป๋านักเรียน</h2>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-gray-700">
+                        โรงเรียนแห่งหนึ่งต้องการให้นักเรียนพกกระเป๋าที่มีน้ำหนักไม่เกิน 5 กิโลกรัม ได้สุ่มชั่งน้ำหนักกระเป๋านักเรียน 35 คน 
+                        พบว่าน้ำหนักเฉลี่ยคือ 5.3 กิโลกรัม ส่วนเบี่ยงเบนมาตรฐานคือ 1 กิโลกรัม
+                    </p>
+                    <p class="text-gray-700 mt-2 font-semibold">
+                        ให้ตรวจสอบว่า น้ำหนักกระเป๋าเฉลี่ยเกิน 5 กิโลกรัมหรือไม่ ที่ระดับนัยสำคัญ 0.01
+                    </p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">กำหนดสมมติฐาน</h3>
+                            <div class="math-formula">
+                                H₀: μ ≤ 5 (น้ำหนักเฉลี่ยไม่เกิน 5 กิโลกรัม)<br>
+                                H₁: μ > 5 (น้ำหนักเฉลี่ยเกิน 5 กิโลกรัม)
+                            </div>
+                            <p class="text-sm text-gray-600">ชนิดการทดสอบ: Right-tailed test</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ข้อมูลที่กำหนด</h3>
+                            <div class="math-formula">
+                                x̄ = 5.3 กิโลกรัม<br>
+                                μ = 5 กิโลกรัม<br>
+                                SD = 1 กิโลกรัม<br>
+                                n = 35 คน<br>
+                                α = 0.01
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">คำนวณค่าสถิติทดสอบ Z</h3>
+                            <div class="math-formula">
+                                Z = (x̄ - μ) / (SD/√n)<br>
+                                Z = (5.3 - 5) / (1/√35)<br>
+                                Z = 0.3 / (1/5.916)<br>
+                                Z = 0.3 / 0.169<br>
+                                Z = 1.77
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">หาค่าวิกฤต</h3>
+                            <div class="math-formula">
+                                α = 0.01 (Right-tailed)<br>
+                                Z₀.₀₁ = 2.326
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ตัดสินใจ</h3>
+                            <div class="math-formula">
+                                Z = 1.77 < 2.326 = Z₀.₀₁
+                            </div>
+                            <div class="result-box">
+                                <strong>สรุป:</strong> ยอมรับ H₀ → ยังไม่มีหลักฐานว่าน้ำหนักกระเป๋าเฉลี่ยเกิน 5 กิโลกรัม
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="font-semibold text-gray-800 mb-2">💻 โค้ด R</h3>
+                    <div class="code-block p-4 rounded-lg">
+<pre># โจทย์ที่ 2: น้ำหนักเฉลี่ยของกระเป๋านักเรียน
+x_bar <- 5.3
+mu0 <- 5
+sd <- 1
+n <- 35
+alpha <- 0.01
+
+# คำนวณค่าสถิติทดสอบ Z
+z <- (x_bar - mu0) / (sd / sqrt(n))
+
+# หาค่าวิกฤต (Right-tailed)
+z_critical <- qnorm(1 - alpha)
+
+# แสดงผล
+cat("ข้อมูล:\n")
+cat("x̄ =", x_bar, "กิโลกรัม\n")
+cat("μ =", mu0, "กิโลกรัม\n")
+cat("SD =", sd, "กิโลกรัม\n")
+cat("n =", n, "คน\n")
+cat("α =", alpha, "\n\n")
+
+cat("ผลการคำนวณ:\n")
+cat("Z =", round(z, 3), "\n")
+cat("Z-วิกฤต =", round(z_critical, 3), "\n\n")
+
+# ตัดสินใจ
+if (z > z_critical) {
+    cat("ปฏิเสธ H₀ → น้ำหนักกระเป๋าเฉลี่ยเกิน 5 กิโลกรัม\n")
+} else {
+    cat("ยอมรับ H₀ → ยังไม่มีหลักฐานว่าน้ำหนักกระเป๋าเฉลี่ยเกิน 5 กิโลกรัม\n")
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Problem 3 -->
+        <div id="problem3" class="section" style="display: none;">
+            <div class="problem-card">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">😴 โจทย์ที่ 3: เวลานอนของนักศึกษา</h2>
+                
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <p class="text-gray-700">
+                        นักวิจัยต้องการทราบว่า นักศึกษานอนหลับเฉลี่ยแตกต่างจาก 7 ชั่วโมงต่อคืนหรือไม่ จึงสุ่มข้อมูลจากนักศึกษา 60 คน 
+                        พบว่าค่าเฉลี่ยการนอนคือ 6.6 ชั่วโมง และส่วนเบี่ยงเบนมาตรฐาน 1.2 ชั่วโมง
+                    </p>
+                    <p class="text-gray-700 mt-2 font-semibold">
+                        ให้ทดสอบว่า เวลานอนเฉลี่ยแตกต่างจาก 7 ชั่วโมงหรือไม่ ที่ระดับนัยสำคัญ 0.05
+                    </p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <div class="step-number">1</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">กำหนดสมมติฐาน</h3>
+                            <div class="math-formula">
+                                H₀: μ = 7 (เวลานอนเฉลี่ยเท่ากับ 7 ชั่วโมง)<br>
+                                H₁: μ ≠ 7 (เวลานอนเฉลี่ยแตกต่างจาก 7 ชั่วโมง)
+                            </div>
+                            <p class="text-sm text-gray-600">ชนิดการทดสอบ: Two-tailed test</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">2</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ข้อมูลที่กำหนด</h3>
+                            <div class="math-formula">
+                                x̄ = 6.6 ชั่วโมง<br>
+                                μ = 7 ชั่วโมง<br>
+                                SD = 1.2 ชั่วโมง<br>
+                                n = 60 คน<br>
+                                α = 0.05
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">3</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">คำนวณค่าสถิติทดสอบ Z</h3>
+                            <div class="math-formula">
+                                Z = (x̄ - μ) / (SD/√n)<br>
+                                Z = (6.6 - 7) / (1.2/√60)<br>
+                                Z = -0.4 / (1.2/7.746)<br>
+                                Z = -0.4 / 0.155<br>
+                                Z = -2.58
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">4</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">หาค่าวิกฤต</h3>
+                            <div class="math-formula">
+                                α = 0.05 (Two-tailed)<br>
+                                α/2 = 0.025<br>
+                                Z₀.₀₂₅ = ±1.96
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="step-number">5</div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">ตัดสินใจ</h3>
+                            <div class="math-formula">
+                                |Z| = |-2.58| = 2.58 > 1.96 = Z₀.₀₂₅
+                            </div>
+                            <div class="result-box">
+                                <strong>สรุ
