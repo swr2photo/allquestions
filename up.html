@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตรวจสอบการส่งรูปนักศึกษา</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        .upload-box {
+            transition: all 0.3s ease;
+        }
+        
+        .upload-box:hover {
+            transform: translateY(-2px);
+        }
+        
+        .upload-box.dragover {
+            border-color: #4f46e5;
+            background-color: #e0e7ff;
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .student-item:hover {
+            transform: translateX(5px);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-5">
+    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 text-center">
+            <h1 class="text-4xl font-bold mb-3 drop-shadow-lg">📸 ตรวจสอบการส่งรูปนักศึกษา</h1>
+            <p class="text-xl opacity-90">อัปโหลดรูปภาพและไฟล์รายชื่อเพื่อตรวจสอบสถานะการส่งงาน</p>
+        </div>
+
+        <!-- Upload Section -->
+        <div class="p-10 text-center">
+            <h2 class="text-3xl font-semibold mb-8 text-gray-800">อัปโหลดไฟล์</h2>
+            
+            <!-- Image Upload -->
+            <div id="imageUpload" class="upload-box border-3 border-dashed border-gray-300 rounded-2xl p-10 mb-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                <div class="text-6xl mb-5 text-gray-400">📁</div>
+                <div class="text-xl text-gray-600 mb-4">ลากและวางรูปภาพที่นี่ หรือคลิกเพื่อเลือกไฟล์</div>
+                <button class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl" onclick="document.getElementById('imageFiles').click()">
+                    เลือกรูปภาพ
+                </button>
+                <input type="file" id="imageFiles" class="hidden" multiple accept="image/*">
+            </div>
+
+            <!-- Student List Upload -->
+            <div id="studentListUpload" class="upload-box border-3 border-dashed border-gray-300 rounded-2xl p-10 mb-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                <div class="text-6xl mb-5 text-gray-400">📋</div>
+                <div class="text-xl text-gray-600 mb-4">อัปโหลดรายชื่อนักศึกษา (Excel/CSV/TXT) - ไม่บังคับ</div>
+                <button class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl" onclick="document.getElementById('studentListFile').click()">
+                    เลือกไฟล์รายชื่อ
+                </button>
+                <input type="file" id="studentListFile" class="hidden" accept=".xlsx,.xls,.csv,.txt">
+            </div>
+
+            <button id="processBtn" class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-10 py-4 rounded-xl text-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:from-green-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-xl" onclick="processFiles()" disabled>
+                🔍 เริ่มตรวจสอบ
+            </button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-center p-10">
+            <div class="spinner w-12 h-12 border-4 border-gray-300 border-t-indigo-500 rounded-full mx-auto mb-5"></div>
+            <p class="text-xl text-gray-600">กำลังประมวลผล...</p>
+        </div>
+
+        <!-- Stats Section -->
+        <div id="statsSection" class="hidden p-10 bg-gray-50">
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
+                    <div id="totalFiles" class="text-4xl font-bold text-indigo-600 mb-2">0</div>
+                    <div class="text-lg text-gray-600">ไฟล์ทั้งหมด</div>
+                </div>
+                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
+                    <div id="submittedCount" class="text-4xl font-bold text-green-600 mb-2">0</div>
+                    <div class="text-lg text-gray-600">ส่งแล้ว</div>
+                </div>
+                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
+                    <div id="missingCount" class="text-4xl font-bold text-red-600 mb-2">0</div>
+                    <div class="text-lg text-gray-600">ยังไม่ส่ง</div>
+                </div>
+                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
+                    <div id="duplicateCount" class="text-4xl font-bold text-yellow-600 mb-2">0</div>
+                    <div class="text-lg text-gray-600">ส่งซ้ำ</div>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-3 mb-6">
+                <div id="progressFill" class="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-center text-xl mb-8">อัตราการส่งงาน: <span id="submissionRate" class="font-semibold">0%</span></p>
+
+            <!-- Results Section -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <div class="text-xl font-bold text-green-600 mb-5 pb-3 border-b-2 border-gray-200">✅ นักศึกษาที่ส่งแล้ว</div>
+                    <div id="submittedList" class="max-h-96 overflow-y-auto space-y-2"></div>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <div class="text-xl font-bold text-red-600 mb-5 pb-3 border-b-2 border-gray-200">❌ นักศึกษาที่ยังไม่ส่ง</div>
+                    <div id="missingList" class="max-h-96 overflow-y-auto space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Export Section -->
+            <div class="text-center pt-6 border-t border-gray-200">
+                <button class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl" onclick="exportResults()">
+                    📄 ส่งออกรายงาน (CSV)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let imageFiles = [];
+        let studentList = [];
+        let submittedStudents = new Set();
+        let studentFiles = {};
+        let allStudents = [];
+
+        // Event listeners
+        document.getElementById('imageFiles').addEventListener('change', handleImageFiles);
+        document.getElementById('studentListFile').addEventListener('change', handleStudentListFile);
+
+        // Drag and drop functionality
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            document.getElementById('imageUpload').addEventListener(eventName, preventDefaults);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            document.getElementById('imageUpload').addEventListener(eventName, highlight);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            document.getElementById('imageUpload').addEventListener(eventName, unhighlight);
+        });
+
+        function highlight(e) {
+            document.getElementById('imageUpload').classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            document.getElementById('imageUpload').classList.remove('dragover');
+        }
+
+        document.getElementById('imageUpload').addEventListener('drop', handleDrop);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleImageFiles({ target: { files: files } });
+        }
+
+        function handleImageFiles(event) {
+            imageFiles = Array.from(event.target.files);
+            const uploadBox = document.getElementById('imageUpload');
+            const uploadText = uploadBox.querySelector('.text-xl');
+            
+            if (imageFiles.length > 0) {
+                uploadText.textContent = `เลือกรูปภาพแล้ว ${imageFiles.length} ไฟล์`;
+                uploadBox.classList.remove('border-gray-300', 'bg-gray-50');
+                uploadBox.classList.add('border-green-400', 'bg-green-50');
+            }
+            
+            checkCanProcess();
+        }
+
+        function handleStudentListFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const uploadBox = document.getElementById('studentListUpload');
+                const uploadText = uploadBox.querySelector('.text-xl');
+                
+                uploadText.textContent = `เลือกไฟล์: ${file.name}`;
+                uploadBox.classList.remove('border-gray-300', 'bg-gray-50');
+                uploadBox.classList.add('border-green-400', 'bg-green-50');
+                
+                parseStudentList(file);
+            }
+        }
+
+        function parseStudentList(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = e.target.result;
+                
+                if (file.name.endsWith('.csv')) {
+                    parseCSV(data);
+                } else if (file.name.endsWith('.txt')) {
+                    // Handle tab-delimited or space-delimited text files
+                    parseTabDelimited(data);
+                } else {
+                    // For Excel files or other formats, try to extract student IDs from text
+                    extractStudentIdsFromText(data);
+                }
+                
+                // Update UI to show how many students were found
+                if (allStudents.length > 0) {
+                    const uploadBox = document.getElementById('studentListUpload');
+                    const uploadText = uploadBox.querySelector('.text-xl');
+                    uploadText.textContent = `พบรายชื่อนักศึกษา ${allStudents.length} คน จากไฟล์: ${file.name}`;
+                    
+                    // Show preview of first few student IDs
+                    const previewIds = allStudents.slice(0, 5);
+                    console.log('Student IDs found:', previewIds.join(', ') + (allStudents.length > 5 ? '...' : ''));
+                }
+            };
+            
+            reader.readAsText(file, 'utf-8');
+        }
+
+        function parseCSV(data) {
+            const lines = data.split('\n').filter(line => line.trim());
+            
+            // Try CSV format first
+            if (lines[0].includes(',')) {
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                
+                // Find student ID column
+                let idColumn = -1;
+                const possibleColumns = ['student_id', 'รหัสนักศึกษา', 'รหัส', 'id', 'studentid'];
+                
+                for (let i = 0; i < headers.length; i++) {
+                    if (possibleColumns.includes(headers[i])) {
+                        idColumn = i;
+                        break;
+                    }
+                }
+                
+                if (idColumn === -1) {
+                    // Try to find column with student ID pattern
+                    for (let i = 1; i < lines.length && i < 10; i++) {
+                        const cells = lines[i].split(',');
+                        for (let j = 0; j < cells.length; j++) {
+                            if (extractStudentId(cells[j].trim())) {
+                                idColumn = j;
+                                break;
+                            }
+                        }
+                        if (idColumn !== -1) break;
+                    }
+                }
+                
+                if (idColumn !== -1) {
+                    allStudents = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        const cells = lines[i].split(',');
+                        if (cells[idColumn] && cells[idColumn].trim()) {
+                            const studentId = extractStudentId(cells[idColumn].trim());
+                            if (studentId) {
+                                allStudents.push(studentId);
+                            }
+                        }
+                    }
+                }
+            } else {
+                // Try tab-separated format (like your file)
+                parseTabDelimited(data);
+            }
+        }
+        
+        function parseTabDelimited(data) {
+            const lines = data.split('\n').filter(line => line.trim());
+            allStudents = [];
+            
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // Split by tab or multiple spaces
+                const cells = line.split(/\t+|\s{2,}/).map(cell => cell.trim());
+                
+                // Look for student ID in each cell
+                for (let j = 0; j < cells.length; j++) {
+                    const studentId = extractStudentId(cells[j]);
+                    if (studentId) {
+                        allStudents.push(studentId);
+                        break; // Found ID in this line, move to next line
+                    }
+                }
+            }
+            
+            // Remove duplicates
+            allStudents = [...new Set(allStudents)];
+        }
+
+        function extractStudentIdsFromText(text) {
+            const studentIdPattern = /\b(6\d{8}|\d{9}|\d{8})\b/g;
+            const matches = text.match(studentIdPattern);
+            
+            if (matches) {
+                allStudents = [...new Set(matches)];
+            }
+        }
+
+        function checkCanProcess() {
+            const processBtn = document.getElementById('processBtn');
+            processBtn.disabled = imageFiles.length === 0;
+        }
+
+        function extractStudentId(filename) {
+            const patterns = [
+                /\b(6\d{8})\b/,  // 9 digits starting with 6
+                /\b(\d{9})\b/,   // Any 9 digits
+                /\b(\d{8})\b/    // 8 digits
+            ];
+            
+            for (const pattern of patterns) {
+                const match = filename.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+            return null;
+        }
+
+        function processFiles() {
+            document.getElementById('loading').classList.remove('hidden');
+            document.querySelector('.p-10').classList.add('hidden');
+            
+            submittedStudents.clear();
+            studentFiles = {};
+            
+            setTimeout(() => {
+                // Process image files
+                imageFiles.forEach(file => {
+                    const studentId = extractStudentId(file.name);
+                    if (studentId) {
+                        submittedStudents.add(studentId);
+                        if (!studentFiles[studentId]) {
+                            studentFiles[studentId] = [];
+                        }
+                        studentFiles[studentId].push(file.name);
+                    }
+                });
+                
+                displayResults();
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('statsSection').classList.remove('hidden');
+            }, 1000);
+        }
+
+        function displayResults() {
+            const totalFiles = imageFiles.length;
+            const submittedCount = submittedStudents.size;
+            const missingCount = allStudents.length > 0 ? allStudents.length - submittedCount : 0;
+            const duplicateCount = Object.values(studentFiles).filter(files => files.length > 1).length;
+            
+            // Update stats
+            document.getElementById('totalFiles').textContent = totalFiles;
+            document.getElementById('submittedCount').textContent = submittedCount;
+            document.getElementById('missingCount').textContent = missingCount;
+            document.getElementById('duplicateCount').textContent = duplicateCount;
+            
+            // Update progress bar
+            let submissionRate = 0;
+            if (allStudents.length > 0) {
+                submissionRate = (submittedCount / allStudents.length) * 100;
+            }
+            document.getElementById('progressFill').style.width = `${submissionRate}%`;
+            document.getElementById('submissionRate').textContent = `${submissionRate.toFixed(1)}%`;
+            
+            // Display submitted students
+            const submittedList = document.getElementById('submittedList');
+            submittedList.innerHTML = '';
+            
+            Array.from(submittedStudents).sort().forEach(studentId => {
+                const files = studentFiles[studentId];
+                const isDuplicate = files.length > 1;
+                
+                const item = document.createElement('div');
+                item.className = 'student-item p-3 bg-gray-50 rounded-xl flex items-center gap-4 transition-all hover:shadow-md';
+                item.innerHTML = `
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold ${isDuplicate ? 'bg-yellow-500' : 'bg-green-500'}">
+                        ${isDuplicate ? '!' : '✓'}
+                    </div>
+                    <div class="font-semibold text-gray-800">${studentId}</div>
+                    <div class="text-gray-600 text-sm">${files.join(', ')}</div>
+                `;
+                submittedList.appendChild(item);
+            });
+            
+            // Display missing students
+            const missingList = document.getElementById('missingList');
+            missingList.innerHTML = '';
+            
+            if (allStudents.length > 0) {
+                const missingStudents = allStudents.filter(id => !submittedStudents.has(id));
+                missingStudents.sort().forEach(studentId => {
+                    const item = document.createElement('div');
+                    item.className = 'student-item p-3 bg-gray-50 rounded-xl flex items-center gap-4 transition-all hover:shadow-md';
+                    item.innerHTML = `
+                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold bg-red-500">✗</div>
+                        <div class="font-semibold text-gray-800">${studentId}</div>
+                        <div class="text-gray-600 text-sm">ยังไม่ส่ง</div>
+                    `;
+                    missingList.appendChild(item);
+                });
+            } else {
+                missingList.innerHTML = '<p class="text-center text-gray-500">ไม่มีไฟล์รายชื่อนักศึกษา</p>';
+            }
+        }
+
+        function exportResults() {
+            const csvContent = generateCSVReport();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', `submission_report_${new Date().toISOString().split('T')[0]}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        }
+
+        function generateCSVReport() {
+            let csv = 'Student ID,Status,Files,File Count\n';
+            
+            if (allStudents.length > 0) {
+                allStudents.forEach(studentId => {
+                    const files = studentFiles[studentId] || [];
+                    const status = submittedStudents.has(studentId) ? 'Submitted' : 'Missing';
+                    const fileList = files.join('; ');
+                    csv += `${studentId},${status},"${fileList}",${files.length}\n`;
+                });
+            } else {
+                Array.from(submittedStudents).sort().forEach(studentId => {
+                    const files = studentFiles[studentId] || [];
+                    const fileList = files.join('; ');
+                    csv += `${studentId},Submitted,"${fileList}",${files.length}\n`;
+                });
+            }
+            
+            return csv;
+        }
+    </script>
+</body>
+</html>
