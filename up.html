@@ -95,6 +95,14 @@
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
         }
+        .status-similar {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+        .status-nocode {
+            background: linear-gradient(135deg, #6b7280, #4b5563);
+            color: white;
+        }
         .export-btn {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
@@ -112,6 +120,18 @@
             background: linear-gradient(135deg, #dc2626, #b91c1c);
             transform: translateY(-1px);
             box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+        .export-btn.green {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+        .export-btn.green:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+        .export-btn.purple {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        .export-btn.purple:hover {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
         }
         .toggle-switch {
             position: relative;
@@ -156,6 +176,21 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
         }
+        .filter-section {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        .similar-match {
+            background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+            border-left: 4px solid #3b82f6;
+        }
+        .no-code-file {
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border-left: 4px solid #6b7280;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
@@ -182,7 +217,7 @@
                     </div>
                     <div class="stat-card px-6 py-3 rounded-2xl">
                         <i class="fas fa-file-pdf text-white/80 mr-2"></i>
-                        <span class="text-white font-semibold">ส่งออก PDF</span>
+                        <span class="text-white font-semibold">ส่งออกหลายรูปแบบ</span>
                     </div>
                 </div>
             </div>
@@ -230,40 +265,38 @@
                 <i class="fas fa-filter icon-gradient text-3xl mr-3"></i>
                 ตัวเลือกการกรอง
             </h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="space-y-6">
-                    <h3 class="text-xl font-semibold text-gray-700 flex items-center">
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- ประเภทไฟล์ -->
+                <div class="filter-section">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
                         <i class="fas fa-image text-purple-600 mr-2"></i>
                         ประเภทไฟล์
                     </h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-200">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
                             <div class="flex items-center">
-                                <i class="fas fa-images text-blue-600 mr-3 text-xl"></i>
-                                <span class="font-medium">รูปภาพ</span>
-                                <span class="text-sm text-gray-500 ml-2">(.jpg, .png, .gif)</span>
+                                <i class="fas fa-images text-blue-600 mr-2"></i>
+                                <span class="text-sm font-medium">รูปภาพ</span>
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="includeImages" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <div class="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-200">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
                             <div class="flex items-center">
-                                <i class="fas fa-file-pdf text-red-600 mr-3 text-xl"></i>
-                                <span class="font-medium">PDF</span>
-                                <span class="text-sm text-gray-500 ml-2">(.pdf)</span>
+                                <i class="fas fa-file-pdf text-red-600 mr-2"></i>
+                                <span class="text-sm font-medium">PDF</span>
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="includePdf">
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <div class="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-200">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
                             <div class="flex items-center">
-                                <i class="fas fa-file-word text-blue-700 mr-3 text-xl"></i>
-                                <span class="font-medium">เอกสาร</span>
-                                <span class="text-sm text-gray-500 ml-2">(.doc, .docx)</span>
+                                <i class="fas fa-file-word text-blue-700 mr-2"></i>
+                                <span class="text-sm font-medium">เอกสาร</span>
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="includeDoc">
@@ -272,36 +305,80 @@
                         </div>
                     </div>
                 </div>
-                <div class="space-y-6">
-                    <h3 class="text-xl font-semibold text-gray-700 flex items-center">
-                        <i class="fas fa-calendar-alt text-green-600 mr-2"></i>
-                        ช่วงเวลา
+
+                <!-- สถานะ -->
+                <div class="filter-section">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-tasks text-green-600 mr-2"></i>
+                        สถานะ
                     </h3>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label>
-                            <input type="date" id="startDate" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                                <span class="text-sm font-medium">ส่งแล้ว</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="showSubmitted" checked>
+                                <span class="slider"></span>
+                            </label>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label>
-                            <input type="date" id="endDate" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-green-500/20 focus:border-green-500 transition-all duration-300">
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-times-circle text-red-600 mr-2"></i>
+                                <span class="text-sm font-medium">ยังไม่ส่ง</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="showNotSubmitted" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <div class="flex items-center">
+                                <i class="fas fa-exclamation-triangle text-yellow-600 mr-2"></i>
+                                <span class="text-sm font-medium">คล้ายคลึง</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="showSimilar" checked>
+                                <span class="slider"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
-                <div class="space-y-6">
-                    <h3 class="text-xl font-semibold text-gray-700 flex items-center">
+
+                <!-- ช่วงเวลา -->
+                <div class="filter-section">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+                        <i class="fas fa-calendar-alt text-blue-600 mr-2"></i>
+                        ช่วงเวลา
+                    </h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่เริ่มต้น</label>
+                            <input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่สิ้นสุด</label>
+                            <input type="date" id="endDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การเรียงลำดับ -->
+                <div class="filter-section">
+                    <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
                         <i class="fas fa-sort-amount-down text-orange-600 mr-2"></i>
                         การเรียงลำดับ
                     </h3>
-                    <div class="space-y-4">
-                        <select id="sortBy" class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-4 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-300">
+                    <div class="space-y-3">
+                        <select id="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                             <option value="studentId">รหัสนักศึกษา</option>
                             <option value="status">สถานะ</option>
                             <option value="fileCount">จำนวนไฟล์</option>
                             <option value="modifiedTime">วันที่แก้ไข</option>
                         </select>
-                        <div class="flex items-center justify-between p-4 bg-white rounded-xl border-2 border-gray-200">
-                            <span class="font-medium">เรียงจากมากไปน้อย</span>
+                        <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+                            <span class="text-sm font-medium">จากมากไปน้อย</span>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="sortDesc" checked>
                                 <span class="slider"></span>
@@ -378,19 +455,33 @@
                 </h2>
                 <div class="flex gap-3">
                     <button onclick="exportToExcel()" 
-                            class="bg-gradient-to-r from-green-600 to-emerald-600 text-white px-6 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all duration-300 font-semibold flex items-center">
+                            class="export-btn green">
                         <i class="fas fa-file-excel mr-2"></i>
                         Excel
+                    </button>
+                    <button onclick="exportToPNG()" 
+                            class="export-btn purple">
+                        <i class="fas fa-image mr-2"></i>
+                        PNG
                     </button>
                     <button onclick="generatePDF()" 
                             class="export-btn">
                         <i class="fas fa-file-pdf mr-2"></i>
-                        PDF Report
+                        PDF
                     </button>
                 </div>
             </div>
-            <div id="summary" class="grid md:grid-cols-4 gap-6 mb-8"></div>
+            <div id="summary" class="grid md:grid-cols-2 lg:grid-cols-6 gap-4 mb-8"></div>
             <div id="resultList"></div>
+        </div>
+
+        <!-- ไฟล์ที่ไม่มีรหัสนักศึกษา -->
+        <div id="orphanFiles" class="glass-effect rounded-2xl card-shadow p-8 mb-8" style="display: none;">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 flex items-center">
+                <i class="fas fa-file-question icon-gradient text-3xl mr-3"></i>
+                ไฟล์ที่ไม่มีรหัสนักศึกษา
+            </h2>
+            <div id="orphanFilesList"></div>
         </div>
 
         <!-- โหลดดิ้ง -->
@@ -408,8 +499,9 @@
     </div>
 
     <script>
-        let allResults = [];
+let allResults = [];
         let allFiles = [];
+        let orphanFiles = [];
 
         // อัพเดตตัวกรองที่เลือก
         function updateSelectedFilters() {
@@ -426,6 +518,17 @@
                 filters.push('<span class="filter-tag"><i class="fas fa-file-word"></i> เอกสาร</span>');
             }
             
+            // ตัวกรองสถานะ
+            if (document.getElementById('showSubmitted').checked) {
+                filters.push('<span class="filter-tag"><i class="fas fa-check-circle"></i> ส่งแล้ว</span>');
+            }
+            if (document.getElementById('showNotSubmitted').checked) {
+                filters.push('<span class="filter-tag"><i class="fas fa-times-circle"></i> ยังไม่ส่ง</span>');
+            }
+            if (document.getElementById('showSimilar').checked) {
+                filters.push('<span class="filter-tag"><i class="fas fa-exclamation-triangle"></i> คล้ายคลึง</span>');
+            }
+            
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             
@@ -436,215 +539,224 @@
                 filters.push(`<span class="filter-tag"><i class="fas fa-calendar-alt"></i> ถึง ${endDate}</span>`);
             }
             
-            filtersDiv.innerHTML = filters.length > 0 ? filters.join(' ') : '<span class="text-gray-500">ไม่มีตัวกรอง</span>';
+            const sortBy = document.getElementById('sortBy').value;
+            const sortDesc = document.getElementById('sortDesc').checked;
+            filters.push(`<span class="filter-tag"><i class="fas fa-sort"></i> เรียงตาม${getSortLabel(sortBy)} ${sortDesc ? 'มาก→น้อย' : 'น้อย→มาก'}</span>`);
+            
+            filtersDiv.innerHTML = filters.join(' ');
         }
 
-        // Event listeners สำหรับตัวกรอง
-        document.getElementById('includeImages').addEventListener('change', updateSelectedFilters);
-        document.getElementById('includePdf').addEventListener('change', updateSelectedFilters);
-        document.getElementById('includeDoc').addEventListener('change', updateSelectedFilters);
-        document.getElementById('startDate').addEventListener('change', updateSelectedFilters);
-        document.getElementById('endDate').addEventListener('change', updateSelectedFilters);
+        function getSortLabel(sortBy) {
+            const labels = {
+                'studentId': 'รหัสนักศึกษา',
+                'status': 'สถานะ',
+                'fileCount': 'จำนวนไฟล์',
+                'modifiedTime': 'วันที่แก้ไข'
+            };
+            return labels[sortBy] || sortBy;
+        }
 
-        // เริ่มต้นแสดงตัวกรอง
-        updateSelectedFilters();
+        // ฟังก์ชันตรวจสอบรูปแบบรหัสนักศึกษา
+        function isValidStudentId(studentId) {
+            return /^\d{10}$/.test(studentId);
+        }
 
-        // ฟังก์ชันตรวจสอบความถูกต้องของรหัสนักศึกษา
-        function validateStudentId(studentId) {
-            const cleaned = studentId.trim();
-            if (cleaned.length !== 10) {
-                return { valid: false, message: 'รหัสนักศึกษาต้องมี 10 หลัก' };
+        // ฟังก์ชันตรวจสอบไฟล์ประเภทใด
+        function getFileType(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(ext)) {
+                return 'image';
+            } else if (['pdf'].includes(ext)) {
+                return 'pdf';
+            } else if (['doc', 'docx', 'txt', 'rtf'].includes(ext)) {
+                return 'document';
             }
-            if (!/^\d{10}$/.test(cleaned)) {
-                return { valid: false, message: 'รหัสนักศึกษาต้องเป็นตัวเลขเท่านั้น' };
-            }
-            return { valid: true, studentId: cleaned };
+            return 'other';
+        }
+
+        // ฟังก์ชันตรวจสอบไฟล์ที่ควรรวมไว้
+        function shouldIncludeFile(fileName) {
+            const fileType = getFileType(fileName);
+            const includeImages = document.getElementById('includeImages').checked;
+            const includePdf = document.getElementById('includePdf').checked;
+            const includeDoc = document.getElementById('includeDoc').checked;
+            
+            return (fileType === 'image' && includeImages) ||
+                   (fileType === 'pdf' && includePdf) ||
+                   (fileType === 'document' && includeDoc);
         }
 
         // ฟังก์ชันดึงไฟล์จาก Google Drive
         async function fetchDriveFiles() {
-            const folderId = document.getElementById('folderId').value.trim();
-            const apiKey = document.getElementById('apiKey').value.trim();
-
+            const folderId = document.getElementById('folderId').value;
+            const apiKey = document.getElementById('apiKey').value;
+            
             if (!folderId || !apiKey) {
                 alert('กรุณาใส่ Folder ID และ API Key');
-                return null;
+                return [];
             }
-
+            
             try {
-                const response = await fetch(
-                    `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,modifiedTime)&pageSize=1000`
-                );
+                const response = await fetch(`https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,modifiedTime,size)`);
+                const data = await response.json();
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (data.error) {
+                    throw new Error(data.error.message);
                 }
                 
-                const data = await response.json();
                 return data.files || [];
             } catch (error) {
                 console.error('Error fetching files:', error);
-                alert('เกิดข้อผิดพลาดในการดึงข้อมูล: ' + error.message);
-                return null;
+                alert('เกิดข้อผิดพลาดในการดึงไฟล์: ' + error.message);
+                return [];
             }
         }
 
-        // ฟังก์ชันตรวจสอบประเภทไฟล์
-        function getFileType(mimeType, fileName) {
-            const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
-            const pdfTypes = ['application/pdf'];
-            const docTypes = ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-            
-            if (imageTypes.includes(mimeType)) return 'image';
-            if (pdfTypes.includes(mimeType)) return 'pdf';
-            if (docTypes.includes(mimeType)) return 'doc';
-            
-            // ตรวจสอบจากชื่อไฟล์
-            const ext = fileName.toLowerCase().split('.').pop();
-            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) return 'image';
-            if (ext === 'pdf') return 'pdf';
-            if (['doc', 'docx'].includes(ext)) return 'doc';
-            
-            return 'other';
-        }
-
-        // ฟังก์ชันตรวจสอบนักศึกษารายเดียว
+        // ฟังก์ชันตรวจสอบรหัสนักศึกษาเดี่ยว
         async function checkSingleStudent() {
             const studentId = document.getElementById('studentId').value.trim();
-            const validation = validateStudentId(studentId);
             
-            if (!validation.valid) {
-                alert(validation.message);
+            if (!isValidStudentId(studentId)) {
+                alert('รหัสนักศึกษาต้องเป็นตัวเลข 10 หลัก');
                 return;
             }
-
-            showLoading();
-            updateProgress(20);
             
-            if (allFiles.length === 0) {
-                allFiles = await fetchDriveFiles();
-                if (!allFiles) {
-                    hideLoading();
-                    return;
-                }
-            }
-
-            updateProgress(80);
-            const result = checkStudentFiles(validation.studentId, allFiles);
-            allResults = [result];
-            
-            updateProgress(100);
-            displayResults();
-            hideLoading();
+            await checkStudents([studentId]);
         }
 
         // ฟังก์ชันตรวจสอบหลายรายการ
         async function checkMultipleStudents() {
             const studentList = document.getElementById('studentList').value.trim();
+            
             if (!studentList) {
-                alert('กรุณาใส่รายการรหัสนักศึกษา');
+                alert('กรุณาใส่รหัสนักศึกษา');
                 return;
             }
-
-            showLoading();
-            updateProgress(10);
             
-            if (allFiles.length === 0) {
-                allFiles = await fetchDriveFiles();
-                if (!allFiles) {
-                    hideLoading();
-                    return;
-                }
-            }
-
-            updateProgress(30);
-            const studentIds = studentList.split('\n').map(id => id.trim()).filter(id => id);
-            allResults = [];
-
-            for (let i = 0; i < studentIds.length; i++) {
-                const studentId = studentIds[i];
-                const validation = validateStudentId(studentId);
-                if (validation.valid) {
-                    const result = checkStudentFiles(validation.studentId, allFiles);
-                    allResults.push(result);
-                } else {
-                    allResults.push({
-                        studentId: studentId,
-                        status: 'invalid',
-                        message: validation.message,
-                        files: []
-                    });
-                }
-                
-                // อัพเดตความคืบหน้า
-                updateProgress(30 + (i + 1) / studentIds.length * 60);
-            }
-
-            // เรียงลำดับผลลัพธ์
-            sortResults();
+            const studentIds = studentList.split('\n')
+                .map(id => id.trim())
+                .filter(id => id.length > 0);
             
-            updateProgress(100);
-            displayResults();
-            hideLoading();
+            const invalidIds = studentIds.filter(id => !isValidStudentId(id));
+            
+            if (invalidIds.length > 0) {
+                alert(`รหัสนักศึกษาไม่ถูกต้อง: ${invalidIds.join(', ')}`);
+                return;
+            }
+            
+            await checkStudents(studentIds);
         }
 
-        // ฟังก์ชันตรวจสอบไฟล์ของนักศึกษา
-        function checkStudentFiles(studentId, files) {
-            const includeImages = document.getElementById('includeImages').checked;
-            const includePdf = document.getElementById('includePdf').checked;
-            const includeDoc = document.getElementById('includeDoc').checked;
+        // ฟังก์ชันหลักในการตรวจสอบ
+        async function checkStudents(studentIds) {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('orphanFiles').style.display = 'none';
+            
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = '10%';
+            
+            try {
+                // ดึงไฟล์ทั้งหมด
+                const files = await fetchDriveFiles();
+                allFiles = files;
+                progressBar.style.width = '30%';
+                
+                // แยกไฟล์และประมวลผล
+                const results = [];
+                orphanFiles = [];
+                
+                // ค้นหารหัสนักศึกษาในชื่อไฟล์
+                const fileMap = new Map();
+                const studentFileMap = new Map();
+                
+                files.forEach(file => {
+                    if (!shouldIncludeFile(file.name)) return;
+                    
+                    fileMap.set(file.id, file);
+                    
+                    // หารหัสนักศึกษาในชื่อไฟล์
+                    const studentIdMatch = file.name.match(/(\d{10})/);
+                    if (studentIdMatch) {
+                        const foundStudentId = studentIdMatch[1];
+                        if (!studentFileMap.has(foundStudentId)) {
+                            studentFileMap.set(foundStudentId, []);
+                        }
+                        studentFileMap.get(foundStudentId).push(file);
+                    } else {
+                        orphanFiles.push(file);
+                    }
+                });
+                
+                progressBar.style.width = '60%';
+                
+                // ประมวลผลสำหรับแต่ละนักศึกษา
+                studentIds.forEach(studentId => {
+                    const studentFiles = studentFileMap.get(studentId) || [];
+                    const result = {
+                        studentId,
+                        files: studentFiles,
+                        fileCount: studentFiles.length,
+                        status: studentFiles.length > 0 ? 'submitted' : 'not_submitted',
+                        lastModified: studentFiles.length > 0 ? 
+                            Math.max(...studentFiles.map(f => new Date(f.modifiedTime).getTime())) : null
+                    };
+                    
+                    // ตรวจสอบไฟล์ที่คล้ายคลึง
+                    if (studentFiles.length > 1) {
+                        result.status = 'similar';
+                    }
+                    
+                    results.push(result);
+                });
+                
+                progressBar.style.width = '90%';
+                
+                // กรองและเรียงลำดับผลลัพธ์
+                allResults = filterAndSortResults(results);
+                
+                progressBar.style.width = '100%';
+                
+                // แสดงผลลัพธ์
+                displayResults();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('เกิดข้อผิดพลาด: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        // ฟังก์ชันกรองและเรียงลำดับ
+        function filterAndSortResults(results) {
+            const showSubmitted = document.getElementById('showSubmitted').checked;
+            const showNotSubmitted = document.getElementById('showNotSubmitted').checked;
+            const showSimilar = document.getElementById('showSimilar').checked;
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
-
-            const studentFiles = files.filter(file => {
-                const fileType = getFileType(file.mimeType, file.name);
-                const matchesType = (includeImages && fileType === 'image') ||
-                                  (includePdf && fileType === 'pdf') ||
-                                  (includeDoc && fileType === 'doc');
+            
+            let filteredResults = results.filter(result => {
+                // กรองตามสถานะ
+                if (result.status === 'submitted' && !showSubmitted) return false;
+                if (result.status === 'not_submitted' && !showNotSubmitted) return false;
+                if (result.status === 'similar' && !showSimilar) return false;
                 
-                const matchesName = file.name.includes(studentId);
-                
-                // ตรวจสอบช่วงเวลา
-                let matchesDate = true;
-                if (startDate || endDate) {
-                    const fileDate = new Date(file.modifiedTime);
-                    const start = startDate ? new Date(startDate) : null;
-                    const end = endDate ? new Date(endDate + 'T23:59:59') : null;
-                    
-                    if (start && fileDate < start) matchesDate = false;
-                    if (end && fileDate > end) matchesDate = false;
+                // กรองตามวันที่
+                if (result.lastModified) {
+                    const fileDate = new Date(result.lastModified);
+                    if (startDate && fileDate < new Date(startDate)) return false;
+                    if (endDate && fileDate > new Date(endDate + 'T23:59:59')) return false;
                 }
                 
-                return matchesType && matchesName && matchesDate;
+                return true;
             });
-
-            let status = 'not_found';
-            let message = 'ยังไม่ส่งไฟล์หรือชื่อไฟล์ไม่ถูกต้อง';
-
-            if (studentFiles.length > 0) {
-                status = 'found';
-                message = `พบไฟล์ ${studentFiles.length} ไฟล์`;
-            }
-
-            return {
-                studentId: studentId,
-                status: status,
-                message: message,
-                files: studentFiles.map(file => ({
-                    name: file.name,
-                    type: getFileType(file.mimeType, file.name),
-                    modifiedTime: file.modifiedTime,
-                    size: file.size || 0
-                }))
-            };
-        }
-
-        // ฟังก์ชันเรียงลำดับผลลัพธ์
-        function sortResults() {
+            
+            // เรียงลำดับ
             const sortBy = document.getElementById('sortBy').value;
             const sortDesc = document.getElementById('sortDesc').checked;
             
-            allResults.sort((a, b) => {
+            filteredResults.sort((a, b) => {
                 let aValue, bValue;
                 
                 switch (sortBy) {
@@ -653,115 +765,146 @@
                         bValue = b.studentId;
                         break;
                     case 'status':
-                        aValue = a.status === 'found' ? 1 : 0;
-                        bValue = b.status === 'found' ? 1 : 0;
+                        aValue = a.status;
+                        bValue = b.status;
                         break;
                     case 'fileCount':
-                        aValue = a.files.length;
-                        bValue = b.files.length;
+                        aValue = a.fileCount;
+                        bValue = b.fileCount;
                         break;
                     case 'modifiedTime':
-                        aValue = a.files.length > 0 ? new Date(a.files[0].modifiedTime) : new Date(0);
-                        bValue = b.files.length > 0 ? new Date(b.files[0].modifiedTime) : new Date(0);
+                        aValue = a.lastModified || 0;
+                        bValue = b.lastModified || 0;
                         break;
                     default:
                         aValue = a.studentId;
                         bValue = b.studentId;
                 }
                 
-                if (aValue < bValue) return sortDesc ? 1 : -1;
-                if (aValue > bValue) return sortDesc ? -1 : 1;
-                return 0;
+                if (typeof aValue === 'string') {
+                    return sortDesc ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
+                } else {
+                    return sortDesc ? bValue - aValue : aValue - bValue;
+                }
             });
+            
+            return filteredResults;
         }
 
-        // ฟังก์ชันแสดงผลการตรวจสอบ
+        // ฟังก์ชันแสดงผลลัพธ์
         function displayResults() {
-            const resultsDiv = document.getElementById('results');
+            document.getElementById('results').style.display = 'block';
+            
+            // แสดงสรุปผล
+            displaySummary();
+            
+            // แสดงรายการผลลัพธ์
+            displayResultList();
+            
+            // แสดงไฟล์ที่ไม่มีรหัสนักศึกษา
+            if (orphanFiles.length > 0) {
+                displayOrphanFiles();
+            }
+        }
+
+        // ฟังก์ชันแสดงสรุปผล
+        function displaySummary() {
             const summaryDiv = document.getElementById('summary');
-            const resultListDiv = document.getElementById('resultList');
-
-            resultsDiv.style.display = 'block';
-
-            // สรุปผล
-            const total = allResults.length;
-            const found = allResults.filter(r => r.status === 'found').length;
-            const notFound = allResults.filter(r => r.status === 'not_found').length;
-            const invalid = allResults.filter(r => r.status === 'invalid').length;
-            const totalFiles = allResults.reduce((sum, r) => sum + r.files.length, 0);
-
+            
+            const totalCount = allResults.length;
+            const submittedCount = allResults.filter(r => r.status === 'submitted').length;
+            const notSubmittedCount = allResults.filter(r => r.status === 'not_submitted').length;
+            const similarCount = allResults.filter(r => r.status === 'similar').length;
+            const orphanCount = orphanFiles.length;
+            
             summaryDiv.innerHTML = `
-                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-2xl text-center">
-                    <i class="fas fa-users text-3xl mb-3"></i>
-                    <div class="text-3xl font-bold">${total}</div>
-                    <div class="text-blue-100">ทั้งหมด</div>
+                <div class="stat-card p-6 rounded-xl text-center">
+                    <i class="fas fa-users text-4xl text-blue-600 mb-3"></i>
+                    <div class="text-3xl font-bold text-gray-800">${totalCount}</div>
+                    <div class="text-gray-600 font-medium">รายการทั้งหมด</div>
                 </div>
-                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-2xl text-center">
-                    <i class="fas fa-check-circle text-3xl mb-3"></i>
-                    <div class="text-3xl font-bold">${found}</div>
-                    <div class="text-green-100">ส่งแล้ว</div>
+                <div class="stat-card p-6 rounded-xl text-center">
+                    <i class="fas fa-check-circle text-4xl text-green-600 mb-3"></i>
+                    <div class="text-3xl font-bold text-gray-800">${submittedCount}</div>
+                    <div class="text-gray-600 font-medium">ส่งแล้ว</div>
                 </div>
-                <div class="bg-gradient-to-br from-red-500 to-red-600 text-white p-6 rounded-2xl text-center">
-                    <i class="fas fa-times-circle text-3xl mb-3"></i>
-                    <div class="text-3xl font-bold">${notFound + invalid}</div>
-                    <div class="text-red-100">ยังไม่ส่ง</div>
+                <div class="stat-card p-6 rounded-xl text-center">
+                    <i class="fas fa-times-circle text-4xl text-red-600 mb-3"></i>
+                    <div class="text-3xl font-bold text-gray-800">${notSubmittedCount}</div>
+                    <div class="text-gray-600 font-medium">ยังไม่ส่ง</div>
                 </div>
-                <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-2xl text-center">
-                    <i class="fas fa-files text-3xl mb-3"></i>
-                    <div class="text-3xl font-bold">${totalFiles}</div>
-                    <div class="text-purple-100">ไฟล์ทั้งหมด</div>
+                <div class="stat-card p-6 rounded-xl text-center">
+                    <i class="fas fa-exclamation-triangle text-4xl text-yellow-600 mb-3"></i>
+                    <div class="text-3xl font-bold text-gray-800">${similarCount}</div>
+                    <div class="text-gray-600 font-medium">คล้ายคลึง</div>
+                </div>
+                <div class="stat-card p-6 rounded-xl text-center">
+                    <i class="fas fa-file-question text-4xl text-gray-600 mb-3"></i>
+                    <div class="text-3xl font-bold text-gray-800">${orphanCount}</div>
+                    <div class="text-gray-600 font-medium">ไฟล์ไม่มีรหัส</div>
+                </div>
+                <div class="stat-card p-6 rounded-xl text-center">
+                    <i class="fas fa-percentage text-4xl text-purple-600 mb-3"></i>
+                    <div class="text-3xl font-bold text-gray-800">${totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0}%</div>
+                    <div class="text-gray-600 font-medium">อัตราส่ง</div>
                 </div>
             `;
+        }
 
-            // รายการผลการตรวจสอบ
-            let resultHTML = '<div class="space-y-6">';
+        // ฟังก์ชันแสดงรายการผลลัพธ์
+        function displayResultList() {
+            const resultListDiv = document.getElementById('resultList');
+            
+            if (allResults.length === 0) {
+                resultListDiv.innerHTML = '<div class="text-center py-8 text-gray-500">ไม่มีข้อมูลที่ตรงกับเงื่อนไข</div>';
+                return;
+            }
+            
+            let html = '<div class="space-y-4">';
             
             allResults.forEach(result => {
-                const statusBadge = result.status === 'found' ? 
-                    '<span class="status-badge status-success"><i class="fas fa-check-circle"></i> ส่งแล้ว</span>' :
-                    result.status === 'invalid' ?
-                    '<span class="status-badge status-warning"><i class="fas fa-exclamation-triangle"></i> ไม่ถูกต้อง</span>' :
-                    '<span class="status-badge status-error"><i class="fas fa-times-circle"></i> ยังไม่ส่ง</span>';
-
-                resultHTML += `
-                    <div class="bg-white rounded-2xl p-6 border-2 ${result.status === 'found' ? 'border-green-200' : 'border-red-200'} hover:shadow-lg transition-all duration-300">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center">
-                                <i class="fas fa-user-graduate text-2xl text-gray-600 mr-3"></i>
+                const statusInfo = getStatusInfo(result.status);
+                const lastModifiedText = result.lastModified ? 
+                    new Date(result.lastModified).toLocaleDateString('th-TH', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : 'ไม่มีข้อมูล';
+                
+                html += `
+                    <div class="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-blue-300 transition-all duration-300">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                            <div class="flex items-center mb-2 md:mb-0">
+                                <i class="fas fa-user-circle text-3xl text-blue-600 mr-3"></i>
                                 <div>
                                     <div class="text-xl font-bold text-gray-800">${result.studentId}</div>
-                                    <div class="text-sm text-gray-500">${result.message}</div>
+                                    <div class="text-gray-600">${result.fileCount} ไฟล์</div>
                                 </div>
                             </div>
-                            ${statusBadge}
+                            <div class="flex items-center gap-3">
+                                <div class="${statusInfo.badgeClass}">
+                                    <i class="${statusInfo.icon}"></i>
+                                    ${statusInfo.text}
+                                </div>
+                            </div>
                         </div>
+                        
                         ${result.files.length > 0 ? `
                             <div class="border-t pt-4">
-                                <h4 class="font-semibold text-gray-700 mb-3 flex items-center">
-                                    <i class="fas fa-folder-open mr-2"></i>
-                                    ไฟล์ที่พบ (${result.files.length} ไฟล์)
-                                </h4>
-                                <div class="grid gap-3">
+                                <h4 class="font-semibold text-gray-700 mb-2">ไฟล์ที่พบ:</h4>
+                                <div class="grid md:grid-cols-2 gap-2">
                                     ${result.files.map(file => `
-                                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                                            <div class="flex items-center">
-                                                <i class="fas fa-${file.type === 'image' ? 'image' : file.type === 'pdf' ? 'file-pdf' : 'file-word'} text-lg mr-3 ${file.type === 'image' ? 'text-blue-600' : file.type === 'pdf' ? 'text-red-600' : 'text-blue-700'}"></i>
-                                                <div>
-                                                    <div class="font-medium text-gray-800">${file.name}</div>
-                                                    <div class="text-sm text-gray-500">${new Date(file.modifiedTime).toLocaleDateString('th-TH', { 
-                                                        year: 'numeric', 
-                                                        month: 'long', 
-                                                        day: 'numeric',
-                                                        hour: '2-digit',
-                                                        minute: '2-digit'
-                                                    })}</div>
-                                                </div>
-                                            </div>
-                                            <span class="text-xs bg-gray-200 px-2 py-1 rounded-full font-medium">
-                                                ${file.type.toUpperCase()}
-                                            </span>
+                                        <div class="flex items-center p-2 bg-gray-50 rounded-lg">
+                                            <i class="fas fa-file text-blue-600 mr-2"></i>
+                                            <span class="text-sm text-gray-700 truncate">${file.name}</span>
                                         </div>
                                     `).join('')}
+                                </div>
+                                <div class="mt-2 text-sm text-gray-500">
+                                    <i class="fas fa-clock mr-1"></i>
+                                    แก้ไขล่าสุด: ${lastModifiedText}
                                 </div>
                             </div>
                         ` : ''}
@@ -769,127 +912,174 @@
                 `;
             });
             
-            resultHTML += '</div>';
-            resultListDiv.innerHTML = resultHTML;
+            html += '</div>';
+            resultListDiv.innerHTML = html;
         }
 
-        // ฟังก์ชันแสดงการโหลด
-        function showLoading() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results').style.display = 'none';
+        // ฟังก์ชันแสดงไฟล์ที่ไม่มีรหัสนักศึกษา
+        function displayOrphanFiles() {
+            document.getElementById('orphanFiles').style.display = 'block';
+            const orphanListDiv = document.getElementById('orphanFilesList');
+            
+            if (orphanFiles.length === 0) {
+                orphanListDiv.innerHTML = '<div class="text-center py-8 text-gray-500">ไม่มีไฟล์ที่ไม่มีรหัสนักศึกษา</div>';
+                return;
+            }
+            
+            let html = '<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">';
+            
+            orphanFiles.forEach(file => {
+                html += `
+                    <div class="no-code-file p-4 rounded-xl">
+                        <div class="flex items-center mb-2">
+                            <i class="fas fa-file text-gray-600 mr-2"></i>
+                            <div class="font-medium text-gray-800 truncate">${file.name}</div>
+                        </div>
+                        <div class="text-sm text-gray-600">
+                            <i class="fas fa-clock mr-1"></i>
+                            ${new Date(file.modifiedTime).toLocaleDateString('th-TH')}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            orphanListDiv.innerHTML = html;
         }
 
-        // ฟังก์ชันซ่อนการโหลด
-        function hideLoading() {
-            document.getElementById('loading').style.display = 'none';
-        }
-
-        // ฟังก์ชันอัพเดตความคืบหน้า
-        function updateProgress(percent) {
-            document.getElementById('progressBar').style.width = percent + '%';
+        // ฟังก์ชันได้ข้อมูลสถานะ
+        function getStatusInfo(status) {
+            switch (status) {
+                case 'submitted':
+                    return {
+                        text: 'ส่งแล้ว',
+                        icon: 'fas fa-check-circle',
+                        badgeClass: 'status-badge status-success'
+                    };
+                case 'not_submitted':
+                    return {
+                        text: 'ยังไม่ส่ง',
+                        icon: 'fas fa-times-circle',
+                        badgeClass: 'status-badge status-error'
+                    };
+                case 'similar':
+                    return {
+                        text: 'คล้ายคลึง',
+                        icon: 'fas fa-exclamation-triangle',
+                        badgeClass: 'status-badge status-similar'
+                    };
+                default:
+                    return {
+                        text: 'ไม่ทราบ',
+                        icon: 'fas fa-question-circle',
+                        badgeClass: 'status-badge status-nocode'
+                    };
+            }
         }
 
         // ฟังก์ชันส่งออก Excel
         function exportToExcel() {
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "รหัสนักศึกษา,สถานะ,จำนวนไฟล์,รายละเอียด\n";
+            let csvContent = "รหัสนักศึกษา,สถานะ,จำนวนไฟล์,วันที่แก้ไขล่าสุด,ชื่อไฟล์\n";
             
             allResults.forEach(result => {
-                const status = result.status === 'found' ? 'ส่งแล้ว' : result.status === 'invalid' ? 'ไม่ถูกต้อง' : 'ยังไม่ส่ง';
-                const fileDetails = result.files.map(f => f.name).join('; ');
-                csvContent += `${result.studentId},${status},${result.files.length},"${fileDetails}"\n`;
+                const statusText = getStatusInfo(result.status).text;
+                const lastModified = result.lastModified ? 
+                    new Date(result.lastModified).toLocaleDateString('th-TH') : 'ไม่มีข้อมูล';
+                const fileNames = result.files.map(f => f.name).join('; ');
+                
+                csvContent += `${result.studentId},${statusText},${result.fileCount},${lastModified},"${fileNames}"\n`;
             });
             
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "student-submission-report.csv");
-            document.body.appendChild(link);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `student_report_${new Date().toISOString().split('T')[0]}.csv`;
             link.click();
-            document.body.removeChild(link);
         }
 
-        // ฟังก์ชันสร้าง PDF
+        // ฟังก์ชันส่งออก PNG
+        async function exportToPNG() {
+            const element = document.getElementById('results');
+            const canvas = await html2canvas(element, {
+                backgroundColor: '#ffffff',
+                scale: 2
+            });
+            
+            const link = document.createElement('a');
+            link.download = `student_report_${new Date().toISOString().split('T')[0]}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // ฟังก์ชันส่งออก PDF
         async function generatePDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // หัวข้อ
-            doc.setFontSize(20);
-            doc.text('Student Submission Report', 20, 20);
+            // เพิ่มฟอนต์ภาษาไทย (ถ้ามี)
+            doc.setFont('helvetica');
+            doc.setFontSize(16);
+            doc.text('Student Image Submission Report', 20, 20);
             
-            const date = new Date().toLocaleDateString('th-TH', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            doc.setFontSize(12);
-            doc.text(`Generated: ${date}`, 20, 30);
+            let yPosition = 40;
             
             // สรุปผล
-            const total = allResults.length;
-            const found = allResults.filter(r => r.status === 'found').length;
-            const notFound = allResults.filter(r => r.status === 'not_found').length;
-            const invalid = allResults.filter(r => r.status === 'invalid').length;
-            const totalFiles = allResults.reduce((sum, r) => sum + r.files.length, 0);
-            
-            doc.setFontSize(16);
-            doc.text('Summary', 20, 45);
             doc.setFontSize(12);
-            doc.text(`Total Students: ${total}`, 20, 55);
-            doc.text(`Submitted: ${found}`, 20, 65);
-            doc.text(`Not Submitted: ${notFound + invalid}`, 20, 75);
-            doc.text(`Total Files: ${totalFiles}`, 20, 85);
+            doc.text(`Total Students: ${allResults.length}`, 20, yPosition);
+            yPosition += 10;
+            doc.text(`Submitted: ${allResults.filter(r => r.status === 'submitted').length}`, 20, yPosition);
+            yPosition += 10;
+            doc.text(`Not Submitted: ${allResults.filter(r => r.status === 'not_submitted').length}`, 20, yPosition);
+            yPosition += 10;
+            doc.text(`Similar: ${allResults.filter(r => r.status === 'similar').length}`, 20, yPosition);
+            yPosition += 20;
             
             // รายละเอียด
-            doc.setFontSize(16);
-            doc.text('Details', 20, 100);
-            
-            let y = 110;
             doc.setFontSize(10);
-            
             allResults.forEach(result => {
-                if (y > 270) {
+                if (yPosition > 250) {
                     doc.addPage();
-                    y = 20;
+                    yPosition = 20;
                 }
                 
-                const status = result.status === 'found' ? 'SUBMITTED' : result.status === 'invalid' ? 'INVALID' : 'NOT SUBMITTED';
-                doc.text(`${result.studentId}: ${status}`, 20, y);
-                y += 10;
-                
-                if (result.files.length > 0) {
-                    result.files.forEach(file => {
-                        if (y > 270) {
-                            doc.addPage();
-                            y = 20;
-                        }
-                        const fileDate = new Date(file.modifiedTime).toLocaleDateString('th-TH');
-                        doc.text(`  - ${file.name} (${file.type.toUpperCase()}) - ${fileDate}`, 25, y);
-                        y += 8;
-                    });
-                }
-                y += 5;
+                const statusText = getStatusInfo(result.status).text;
+                doc.text(`${result.studentId} - ${statusText} (${result.fileCount} files)`, 20, yPosition);
+                yPosition += 8;
             });
             
-            doc.save('student-submission-report.pdf');
+            doc.save(`student_report_${new Date().toISOString().split('T')[0]}.pdf`);
         }
 
-        // Event listeners
-        document.getElementById('studentId').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkSingleStudent();
-            }
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // อัพเดตตัวกรองเมื่อมีการเปลี่ยนแปลง
+            const filterElements = [
+                'includeImages', 'includePdf', 'includeDoc',
+                'showSubmitted', 'showNotSubmitted', 'showSimilar',
+                'startDate', 'endDate', 'sortBy', 'sortDesc'
+            ];
+            
+            filterElements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('change', updateSelectedFilters);
+                }
+            });
+            
+            // อัพเดตตัวกรองครั้งแรก
+            updateSelectedFilters();
+            
+            // ตรวจสอบรูปแบบรหัสนักศึกษา
+            document.getElementById('studentId').addEventListener('input', function() {
+                const value = this.value.replace(/\D/g, '');
+                if (value.length > 10) {
+                    this.value = value.slice(0, 10);
+                } else {
+                    this.value = value;
+                }
+            });
         });
 
-        document.getElementById('studentId').addEventListener('input', function(e) {
-            e.target.value = e.target.value.replace(/[^0-9]/g, '');
-        });
-
-        // เริ่มต้นอัพเดตตัวกรอง
-        updateSelectedFilters();
     </script>
 </body>
 </html>
