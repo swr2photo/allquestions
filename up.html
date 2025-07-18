@@ -3,523 +3,457 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ตรวจสอบการส่งรูปนักศึกษา</title>
+    <title>ระบบตรวจสอบการส่งรูปภาพนักศึกษา</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
         body {
-            font-family: 'Sarabun', sans-serif;
+            font-family: 'Prompt', sans-serif;
         }
-        
-        .upload-box {
-            transition: all 0.3s ease;
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-        
-        .upload-box:hover {
-            transform: translateY(-2px);
+        .card-shadow {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
-        .upload-box.dragover {
-            border-color: #4f46e5;
-            background-color: #e0e7ff;
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .student-item:hover {
-            transform: translateX(5px);
-        }
-        
-        .stat-card:hover {
-            transform: translateY(-5px);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 min-h-screen p-5">
-    <div class="max-w-6xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-8 text-center">
-            <h1 class="text-4xl font-bold mb-3 drop-shadow-lg">📸 ตรวจสอบการส่งรูปนักศึกษา</h1>
-            <p class="text-xl opacity-90">อัปโหลดรูปภาพและไฟล์รายชื่อเพื่อตรวจสอบสถานะการส่งงาน</p>
+<body class="bg-gray-50 min-h-screen">
+    <div class="gradient-bg py-8">
+        <div class="container mx-auto px-4">
+            <h1 class="text-4xl font-bold text-white text-center mb-2">
+                ระบบตรวจสอบการส่งรูปภาพนักศึกษา
+            </h1>
+            <p class="text-white/80 text-center text-lg">
+                ตรวจสอบสถานะการส่งรูปภาพใน Google Drive
+            </p>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- การตั้งค่า -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                การตั้งค่า Google Drive
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Google Drive Folder ID</label>
+                    <input type="text" id="folderId" placeholder="ใส่ Folder ID ของ Google Drive"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <p class="text-xs text-gray-500 mt-1">หา ID จาก URL: /folders/[ID นี่]</p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Google API Key</label>
+                    <input type="password" id="apiKey" placeholder="ใส่ Google API Key"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                    <p class="text-xs text-gray-500 mt-1">ต้องมีสิทธิ์ใน Google Drive API</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Upload Section -->
-        <div class="p-10 text-center">
-            <h2 class="text-3xl font-semibold mb-8 text-gray-800">อัปโหลดไฟล์</h2>
-            
-            <!-- Image Upload -->
-            <div id="imageUpload" class="upload-box border-3 border-dashed border-gray-300 rounded-2xl p-10 mb-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
-                <div class="text-6xl mb-5 text-gray-400">📁</div>
-                <div class="text-xl text-gray-600 mb-4">ลากและวางรูปภาพที่นี่ หรือคลิกเพื่อเลือกไฟล์</div>
-                <button class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl" onclick="document.getElementById('imageFiles').click()">
-                    เลือกรูปภาพ
-                </button>
-                <input type="file" id="imageFiles" class="hidden" multiple accept="image/*">
+        <!-- ช่องกรอกรหัสนักศึกษา -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                ตรวจสอบรหัสนักศึกษา
+            </h2>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">รหัสนักศึกษา (10 หลัก)</label>
+                    <input type="text" id="studentId" placeholder="เช่น 6514567890" maxlength="10"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="checkSingleStudent()" 
+                            class="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium">
+                        ตรวจสอบ
+                    </button>
+                </div>
             </div>
-
-            <!-- Student List Upload -->
-            <div id="studentListUpload" class="upload-box border-3 border-dashed border-gray-300 rounded-2xl p-10 mb-6 cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
-                <div class="text-6xl mb-5 text-gray-400">📋</div>
-                <div class="text-xl text-gray-600 mb-4">อัปโหลดรายชื่อนักศึกษา (Excel/CSV/TXT) - ไม่บังคับ</div>
-                <button class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl" onclick="document.getElementById('studentListFile').click()">
-                    เลือกไฟล์รายชื่อ
-                </button>
-                <input type="file" id="studentListFile" class="hidden" accept=".xlsx,.xls,.csv,.txt">
-            </div>
-
-            <button id="processBtn" class="bg-gradient-to-r from-green-500 to-blue-500 text-white px-10 py-4 rounded-xl text-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:from-green-600 hover:to-blue-600 transition-all shadow-lg hover:shadow-xl" onclick="processFiles()" disabled>
-                🔍 เริ่มตรวจสอบ
-            </button>
         </div>
 
-        <!-- Loading -->
-        <div id="loading" class="hidden text-center p-10">
-            <div class="spinner w-12 h-12 border-4 border-gray-300 border-t-indigo-500 rounded-full mx-auto mb-5"></div>
-            <p class="text-xl text-gray-600">กำลังประมวลผล...</p>
+        <!-- ตรวจสอบหลายรายการ -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-2xl font-semibold text-gray-800 mb-4 flex items-center">
+                <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                ตรวจสอบหลายรายการ
+            </h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">รายการรหัสนักศึกษา</label>
+                    <textarea id="studentList" placeholder="ใส่รหัสนักศึกษาแต่ละบรรทัด&#10;6514567890&#10;6514567891&#10;6514567892" 
+                              rows="8" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">ตัวเลือกการค้นหา</label>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="includeImages" checked class="mr-2">
+                            <label for="includeImages">รูปภาพ (.jpg, .jpeg, .png, .gif)</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="includePdf" class="mr-2">
+                            <label for="includePdf">ไฟล์ PDF</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="includeDoc" class="mr-2">
+                            <label for="includeDoc">เอกสาร (.doc, .docx)</label>
+                        </div>
+                    </div>
+                    <button onclick="checkMultipleStudents()" 
+                            class="w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors duration-200 font-medium mt-4">
+                        ตรวจสอบทั้งหมด
+                    </button>
+                </div>
+            </div>
         </div>
 
-        <!-- Stats Section -->
-        <div id="statsSection" class="hidden p-10 bg-gray-50">
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
-                    <div id="totalFiles" class="text-4xl font-bold text-indigo-600 mb-2">0</div>
-                    <div class="text-lg text-gray-600">ไฟล์ทั้งหมด</div>
-                </div>
-                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
-                    <div id="submittedCount" class="text-4xl font-bold text-green-600 mb-2">0</div>
-                    <div class="text-lg text-gray-600">ส่งแล้ว</div>
-                </div>
-                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
-                    <div id="missingCount" class="text-4xl font-bold text-red-600 mb-2">0</div>
-                    <div class="text-lg text-gray-600">ยังไม่ส่ง</div>
-                </div>
-                <div class="stat-card bg-white p-6 rounded-2xl text-center shadow-lg transition-all hover:shadow-xl">
-                    <div id="duplicateCount" class="text-4xl font-bold text-yellow-600 mb-2">0</div>
-                    <div class="text-lg text-gray-600">ส่งซ้ำ</div>
-                </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="w-full bg-gray-200 rounded-full h-3 mb-6">
-                <div id="progressFill" class="bg-gradient-to-r from-green-500 to-blue-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
-            </div>
-            <p class="text-center text-xl mb-8">อัตราการส่งงาน: <span id="submissionRate" class="font-semibold">0%</span></p>
-
-            <!-- Results Section -->
-            <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <div class="bg-white rounded-2xl p-6 shadow-lg">
-                    <div class="text-xl font-bold text-green-600 mb-5 pb-3 border-b-2 border-gray-200">✅ นักศึกษาที่ส่งแล้ว</div>
-                    <div id="submittedList" class="max-h-96 overflow-y-auto space-y-2"></div>
-                </div>
-                <div class="bg-white rounded-2xl p-6 shadow-lg">
-                    <div class="text-xl font-bold text-red-600 mb-5 pb-3 border-b-2 border-gray-200">❌ นักศึกษาที่ยังไม่ส่ง</div>
-                    <div id="missingList" class="max-h-96 overflow-y-auto space-y-2"></div>
-                </div>
-            </div>
-
-            <!-- Export Section -->
-            <div class="text-center pt-6 border-t border-gray-200">
-                <button class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl text-lg font-medium hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg hover:shadow-xl" onclick="exportResults()">
-                    📄 ส่งออกรายงาน (CSV)
+        <!-- ผลการตรวจสอบ -->
+        <div id="results" class="bg-white rounded-xl card-shadow p-6 mb-8" style="display: none;">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                    <svg class="w-6 h-6 mr-2 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    </svg>
+                    ผลการตรวจสอบ
+                </h2>
+                <button onclick="generatePDF()" 
+                        class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors duration-200 font-medium flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    ดาวน์โหลด PDF
                 </button>
             </div>
+            <div id="summary" class="grid md:grid-cols-3 gap-4 mb-6"></div>
+            <div id="resultList"></div>
+        </div>
+
+        <!-- โหลดดิ้ง -->
+        <div id="loading" class="text-center py-8" style="display: none;">
+            <div class="pulse-animation">
+                <div class="inline-block w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <p class="mt-4 text-gray-600 text-lg">กำลังตรวจสอบข้อมูล...</p>
         </div>
     </div>
 
     <script>
-        let imageFiles = [];
-        let studentList = [];
-        let submittedStudents = new Set();
-        let studentFiles = {};
-        let allStudents = [];
+        let allResults = [];
+        let allFiles = [];
 
-        // Event listeners
-        document.getElementById('imageFiles').addEventListener('change', handleImageFiles);
-        document.getElementById('studentListFile').addEventListener('change', handleStudentListFile);
-
-        // Drag and drop functionality
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            document.getElementById('imageUpload').addEventListener(eventName, preventDefaults);
-        });
-
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            document.getElementById('imageUpload').addEventListener(eventName, highlight);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            document.getElementById('imageUpload').addEventListener(eventName, unhighlight);
-        });
-
-        function highlight(e) {
-            document.getElementById('imageUpload').classList.add('dragover');
-        }
-
-        function unhighlight(e) {
-            document.getElementById('imageUpload').classList.remove('dragover');
-        }
-
-        document.getElementById('imageUpload').addEventListener('drop', handleDrop);
-
-        function handleDrop(e) {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            handleImageFiles({ target: { files: files } });
-        }
-
-        function handleImageFiles(event) {
-            imageFiles = Array.from(event.target.files);
-            const uploadBox = document.getElementById('imageUpload');
-            const uploadText = uploadBox.querySelector('.text-xl');
-            
-            if (imageFiles.length > 0) {
-                uploadText.textContent = `เลือกรูปภาพแล้ว ${imageFiles.length} ไฟล์`;
-                uploadBox.classList.remove('border-gray-300', 'bg-gray-50');
-                uploadBox.classList.add('border-green-400', 'bg-green-50');
+        // ฟังก์ชันตรวจสอบความถูกต้องของรหัสนักศึกษา
+        function validateStudentId(studentId) {
+            const cleaned = studentId.trim();
+            if (cleaned.length !== 10) {
+                return { valid: false, message: 'รหัสนักศึกษาต้องมี 10 หลัก' };
             }
-            
-            checkCanProcess();
-        }
-
-        function handleStudentListFile(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const uploadBox = document.getElementById('studentListUpload');
-                const uploadText = uploadBox.querySelector('.text-xl');
-                
-                uploadText.textContent = `กำลังอ่านไฟล์: ${file.name}`;
-                uploadBox.classList.remove('border-gray-300', 'bg-gray-50');
-                uploadBox.classList.add('border-yellow-400', 'bg-yellow-50');
-                
-                parseStudentList(file);
+            if (!/^\d{10}$/.test(cleaned)) {
+                return { valid: false, message: 'รหัสนักศึกษาต้องเป็นตัวเลขเท่านั้น' };
             }
+            return { valid: true, studentId: cleaned };
         }
 
-        function parseStudentList(file) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = e.target.result;
-                
-                if (file.name.endsWith('.csv')) {
-                    parseCSV(data);
-                } else if (file.name.endsWith('.txt')) {
-                    parseTabDelimited(data);
-                } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                    parseExcel(data);
-                } else {
-                    extractStudentIdsFromText(data);
-                }
-                
-                // Update UI to show how many students were found
-                if (allStudents.length > 0) {
-                    const uploadBox = document.getElementById('studentListUpload');
-                    const uploadText = uploadBox.querySelector('.text-xl');
-                    uploadText.textContent = `พบรายชื่อนักศึกษา ${allStudents.length} คน จากไฟล์: ${file.name}`;
-                    uploadBox.classList.remove('border-yellow-400', 'bg-yellow-50');
-                    uploadBox.classList.add('border-green-400', 'bg-green-50');
-                    
-                    // Show preview of first few student IDs
-                    const previewIds = allStudents.slice(0, 5);
-                    console.log('Student IDs found:', previewIds.join(', ') + (allStudents.length > 5 ? '...' : ''));
-                } else {
-                    const uploadBox = document.getElementById('studentListUpload');
-                    const uploadText = uploadBox.querySelector('.text-xl');
-                    uploadText.textContent = `ไม่พบรหัสนักศึกษาในไฟล์: ${file.name}`;
-                    uploadBox.classList.remove('border-yellow-400', 'bg-yellow-50');
-                    uploadBox.classList.add('border-red-400', 'bg-red-50');
-                }
-            };
-            
-            // Use different reader methods based on file type
-            if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
-                reader.readAsArrayBuffer(file);
-            } else {
-                reader.readAsText(file, 'utf-8');
+        // ฟังก์ชันดึงไฟล์จาก Google Drive
+        async function fetchDriveFiles() {
+            const folderId = document.getElementById('folderId').value.trim();
+            const apiKey = document.getElementById('apiKey').value.trim();
+
+            if (!folderId || !apiKey) {
+                alert('กรุณาใส่ Folder ID และ API Key');
+                return null;
             }
-        }
 
-        function parseExcel(data) {
             try {
-                const workbook = XLSX.read(data, { type: 'array' });
-                const sheetName = workbook.SheetNames[0];
-                const sheet = workbook.Sheets[sheetName];
+                const response = await fetch(
+                    `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents&key=${apiKey}&fields=files(id,name,mimeType,modifiedTime)`
+                );
                 
-                // Convert sheet to JSON
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                
-                allStudents = [];
-                
-                // Process each row
-                for (let i = 0; i < jsonData.length; i++) {
-                    const row = jsonData[i];
-                    if (!row || row.length === 0) continue;
-                    
-                    // Look for student ID in each cell of the row
-                    for (let j = 0; j < row.length; j++) {
-                        const cellValue = row[j];
-                        if (cellValue) {
-                            const studentId = extractStudentId(cellValue.toString());
-                            if (studentId) {
-                                allStudents.push(studentId);
-                                break; // Found ID in this row, move to next row
-                            }
-                        }
-                    }
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                // Remove duplicates
-                allStudents = [...new Set(allStudents)];
-                
-                console.log('Excel file processed. Found student IDs:', allStudents.length);
-                
+                const data = await response.json();
+                return data.files || [];
             } catch (error) {
-                console.error('Error parsing Excel file:', error);
-                alert('เกิดข้อผิดพลาดในการอ่านไฟล์ Excel กรุณาลองใช้ไฟล์ CSV แทน');
+                console.error('Error fetching files:', error);
+                alert('เกิดข้อผิดพลาดในการดึงข้อมูล: ' + error.message);
+                return null;
             }
         }
 
-        function parseCSV(data) {
-            const lines = data.split('\n').filter(line => line.trim());
+        // ฟังก์ชันตรวจสอบประเภทไฟล์
+        function getFileType(mimeType, fileName) {
+            const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            const pdfTypes = ['application/pdf'];
+            const docTypes = ['application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
             
-            // Try CSV format first
-            if (lines[0].includes(',')) {
-                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-                
-                // Find student ID column
-                let idColumn = -1;
-                const possibleColumns = ['student_id', 'รหัสนักศึกษา', 'รหัส', 'id', 'studentid'];
-                
-                for (let i = 0; i < headers.length; i++) {
-                    if (possibleColumns.includes(headers[i])) {
-                        idColumn = i;
-                        break;
-                    }
-                }
-                
-                if (idColumn === -1) {
-                    // Try to find column with student ID pattern
-                    for (let i = 1; i < lines.length && i < 10; i++) {
-                        const cells = lines[i].split(',');
-                        for (let j = 0; j < cells.length; j++) {
-                            if (extractStudentId(cells[j].trim())) {
-                                idColumn = j;
-                                break;
-                            }
-                        }
-                        if (idColumn !== -1) break;
-                    }
-                }
-                
-                if (idColumn !== -1) {
-                    allStudents = [];
-                    for (let i = 1; i < lines.length; i++) {
-                        const cells = lines[i].split(',');
-                        if (cells[idColumn] && cells[idColumn].trim()) {
-                            const studentId = extractStudentId(cells[idColumn].trim());
-                            if (studentId) {
-                                allStudents.push(studentId);
-                            }
-                        }
-                    }
-                }
-            } else {
-                // Try tab-separated format
-                parseTabDelimited(data);
-            }
+            if (imageTypes.includes(mimeType)) return 'image';
+            if (pdfTypes.includes(mimeType)) return 'pdf';
+            if (docTypes.includes(mimeType)) return 'doc';
+            
+            // ตรวจสอบจากชื่อไฟล์
+            const ext = fileName.toLowerCase().split('.').pop();
+            if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) return 'image';
+            if (ext === 'pdf') return 'pdf';
+            if (['doc', 'docx'].includes(ext)) return 'doc';
+            
+            return 'other';
         }
-        
-        function parseTabDelimited(data) {
-            const lines = data.split('\n').filter(line => line.trim());
-            allStudents = [];
+
+        // ฟังก์ชันตรวจสอบนักศึกษารายเดียว
+        async function checkSingleStudent() {
+            const studentId = document.getElementById('studentId').value.trim();
+            const validation = validateStudentId(studentId);
             
-            for (let i = 0; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                // Split by tab or multiple spaces
-                const cells = line.split(/\t+|\s{2,}/).map(cell => cell.trim());
-                
-                // Look for student ID in each cell
-                for (let j = 0; j < cells.length; j++) {
-                    const studentId = extractStudentId(cells[j]);
-                    if (studentId) {
-                        allStudents.push(studentId);
-                        break; // Found ID in this line, move to next line
-                    }
+            if (!validation.valid) {
+                alert(validation.message);
+                return;
+            }
+
+            document.getElementById('loading').style.display = 'block';
+            
+            if (allFiles.length === 0) {
+                allFiles = await fetchDriveFiles();
+                if (!allFiles) {
+                    document.getElementById('loading').style.display = 'none';
+                    return;
                 }
             }
+
+            const result = checkStudentFiles(validation.studentId, allFiles);
+            allResults = [result];
             
-            // Remove duplicates
-            allStudents = [...new Set(allStudents)];
+            displayResults();
+            document.getElementById('loading').style.display = 'none';
         }
 
-        function extractStudentIdsFromText(text) {
-            const studentIdPattern = /\b(6\d{8}|\d{9}|\d{8})\b/g;
-            const matches = text.match(studentIdPattern);
-            
-            if (matches) {
-                allStudents = [...new Set(matches)];
+        // ฟังก์ชันตรวจสอบหลายรายการ
+        async function checkMultipleStudents() {
+            const studentList = document.getElementById('studentList').value.trim();
+            if (!studentList) {
+                alert('กรุณาใส่รายการรหัสนักศึกษา');
+                return;
             }
-        }
 
-        function checkCanProcess() {
-            const processBtn = document.getElementById('processBtn');
-            processBtn.disabled = imageFiles.length === 0;
-        }
-
-        function extractStudentId(filename) {
-            const patterns = [
-                /\b(6\d{8})\b/,  // 9 digits starting with 6
-                /\b(\d{9})\b/,   // Any 9 digits
-                /\b(\d{8})\b/    // 8 digits
-            ];
+            document.getElementById('loading').style.display = 'block';
             
-            for (const pattern of patterns) {
-                const match = filename.match(pattern);
-                if (match) {
-                    return match[1];
+            if (allFiles.length === 0) {
+                allFiles = await fetchDriveFiles();
+                if (!allFiles) {
+                    document.getElementById('loading').style.display = 'none';
+                    return;
                 }
             }
-            return null;
+
+            const studentIds = studentList.split('\n').map(id => id.trim()).filter(id => id);
+            allResults = [];
+
+            for (const studentId of studentIds) {
+                const validation = validateStudentId(studentId);
+                if (validation.valid) {
+                    const result = checkStudentFiles(validation.studentId, allFiles);
+                    allResults.push(result);
+                } else {
+                    allResults.push({
+                        studentId: studentId,
+                        status: 'invalid',
+                        message: validation.message,
+                        files: []
+                    });
+                }
+            }
+
+            displayResults();
+            document.getElementById('loading').style.display = 'none';
         }
 
-        function processFiles() {
-            document.getElementById('loading').classList.remove('hidden');
-            document.querySelector('.p-10').classList.add('hidden');
-            
-            submittedStudents.clear();
-            studentFiles = {};
-            
-            setTimeout(() => {
-                // Process image files
-                imageFiles.forEach(file => {
-                    const studentId = extractStudentId(file.name);
-                    if (studentId) {
-                        submittedStudents.add(studentId);
-                        if (!studentFiles[studentId]) {
-                            studentFiles[studentId] = [];
-                        }
-                        studentFiles[studentId].push(file.name);
-                    }
-                });
+        // ฟังก์ชันตรวจสอบไฟล์ของนักศึกษา
+        function checkStudentFiles(studentId, files) {
+            const includeImages = document.getElementById('includeImages').checked;
+            const includePdf = document.getElementById('includePdf').checked;
+            const includeDoc = document.getElementById('includeDoc').checked;
+
+            const studentFiles = files.filter(file => {
+                const fileType = getFileType(file.mimeType, file.name);
+                const matchesType = (includeImages && fileType === 'image') ||
+                                  (includePdf && fileType === 'pdf') ||
+                                  (includeDoc && fileType === 'doc');
                 
-                displayResults();
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('statsSection').classList.remove('hidden');
-            }, 1000);
+                return matchesType && file.name.includes(studentId);
+            });
+
+            let status = 'not_found';
+            let message = 'ยังไม่ส่งไฟล์หรือชื่อไฟล์ไม่ถูกต้อง';
+
+            if (studentFiles.length > 0) {
+                status = 'found';
+                message = `พบไฟล์ ${studentFiles.length} ไฟล์`;
+            }
+
+            return {
+                studentId: studentId,
+                status: status,
+                message: message,
+                files: studentFiles.map(file => ({
+                    name: file.name,
+                    type: getFileType(file.mimeType, file.name),
+                    modifiedTime: file.modifiedTime
+                }))
+            };
         }
 
+        // ฟังก์ชันแสดงผลการตรวจสอบ
         function displayResults() {
-            const totalFiles = imageFiles.length;
-            const submittedCount = submittedStudents.size;
-            const missingCount = allStudents.length > 0 ? allStudents.length - submittedCount : 0;
-            const duplicateCount = Object.values(studentFiles).filter(files => files.length > 1).length;
+            const resultsDiv = document.getElementById('results');
+            const summaryDiv = document.getElementById('summary');
+            const resultListDiv = document.getElementById('resultList');
+
+            resultsDiv.style.display = 'block';
+
+            // สรุปผล
+            const total = allResults.length;
+            const found = allResults.filter(r => r.status === 'found').length;
+            const notFound = allResults.filter(r => r.status === 'not_found').length;
+            const invalid = allResults.filter(r => r.status === 'invalid').length;
+
+            summaryDiv.innerHTML = `
+                <div class="bg-blue-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-blue-700">${total}</div>
+                    <div class="text-blue-600">ทั้งหมด</div>
+                </div>
+                <div class="bg-green-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-green-700">${found}</div>
+                    <div class="text-green-600">ส่งแล้ว</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg text-center">
+                    <div class="text-2xl font-bold text-red-700">${notFound + invalid}</div>
+                    <div class="text-red-600">ยังไม่ส่ง</div>
+                </div>
+            `;
+
+            // รายการผลการตรวจสอบ
+            let resultHTML = '<div class="space-y-4">';
             
-            // Update stats
-            document.getElementById('totalFiles').textContent = totalFiles;
-            document.getElementById('submittedCount').textContent = submittedCount;
-            document.getElementById('missingCount').textContent = missingCount;
-            document.getElementById('duplicateCount').textContent = duplicateCount;
-            
-            // Update progress bar
-            let submissionRate = 0;
-            if (allStudents.length > 0) {
-                submissionRate = (submittedCount / allStudents.length) * 100;
-            }
-            document.getElementById('progressFill').style.width = `${submissionRate}%`;
-            document.getElementById('submissionRate').textContent = `${submissionRate.toFixed(1)}%`;
-            
-            // Display submitted students
-            const submittedList = document.getElementById('submittedList');
-            submittedList.innerHTML = '';
-            
-            Array.from(submittedStudents).sort().forEach(studentId => {
-                const files = studentFiles[studentId];
-                const isDuplicate = files.length > 1;
-                
-                const item = document.createElement('div');
-                item.className = 'student-item p-3 bg-gray-50 rounded-xl flex items-center gap-4 transition-all hover:shadow-md';
-                item.innerHTML = `
-                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold ${isDuplicate ? 'bg-yellow-500' : 'bg-green-500'}">
-                        ${isDuplicate ? '!' : '✓'}
+            allResults.forEach(result => {
+                const statusClass = result.status === 'found' ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50';
+                const statusIcon = result.status === 'found' ? 
+                    '<svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>' :
+                    '<svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>';
+
+                resultHTML += `
+                    <div class="border ${statusClass} rounded-lg p-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                ${statusIcon}
+                                <span class="ml-2 font-medium">${result.studentId}</span>
+                            </div>
+                            <span class="text-sm text-gray-600">${result.message}</span>
+                        </div>
+                        ${result.files.length > 0 ? `
+                            <div class="mt-2 pl-7">
+                                <div class="text-sm text-gray-600">
+                                    ไฟล์ที่พบ:
+                                    ${result.files.map(file => `<div class="ml-2">• ${file.name} (${file.type})</div>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
                     </div>
-                    <div class="font-semibold text-gray-800">${studentId}</div>
-                    <div class="text-gray-600 text-sm">${files.join(', ')}</div>
                 `;
-                submittedList.appendChild(item);
             });
             
-            // Display missing students
-            const missingList = document.getElementById('missingList');
-            missingList.innerHTML = '';
-            
-            if (allStudents.length > 0) {
-                const missingStudents = allStudents.filter(id => !submittedStudents.has(id));
-                missingStudents.sort().forEach(studentId => {
-                    const item = document.createElement('div');
-                    item.className = 'student-item p-3 bg-gray-50 rounded-xl flex items-center gap-4 transition-all hover:shadow-md';
-                    item.innerHTML = `
-                        <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-sm font-bold bg-red-500">✗</div>
-                        <div class="font-semibold text-gray-800">${studentId}</div>
-                        <div class="text-gray-600 text-sm">ยังไม่ส่ง</div>
-                    `;
-                    missingList.appendChild(item);
-                });
-            } else {
-                missingList.innerHTML = '<p class="text-center text-gray-500">ไม่มีไฟล์รายชื่อนักศึกษา</p>';
-            }
+            resultHTML += '</div>';
+            resultListDiv.innerHTML = resultHTML;
         }
 
-        function exportResults() {
-            const csvContent = generateCSVReport();
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
+        // ฟังก์ชันสร้าง PDF
+        async function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
             
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute('href', url);
-                link.setAttribute('download', `submission_report_${new Date().toISOString().split('T')[0]}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
+            // เพิ่มฟอนต์ไทย (จำลอง)
+            doc.setFont('helvetica');
+            doc.setFontSize(16);
+            doc.text('Student Submission Report', 20, 20);
+            
+            const date = new Date().toLocaleDateString('th-TH');
+            doc.setFontSize(12);
+            doc.text(`Generated on: ${date}`, 20, 30);
+            
+            // สรุปผล
+            const total = allResults.length;
+            const found = allResults.filter(r => r.status === 'found').length;
+            const notFound = allResults.filter(r => r.status === 'not_found').length;
+            const invalid = allResults.filter(r => r.status === 'invalid').length;
+            
+            doc.setFontSize(14);
+            doc.text('Summary:', 20, 45);
+            doc.setFontSize(12);
+            doc.text(`Total students: ${total}`, 20, 55);
+            doc.text(`Submitted: ${found}`, 20, 65);
+            doc.text(`Not submitted: ${notFound + invalid}`, 20, 75);
+            
+            // รายละเอียด
+            doc.setFontSize(14);
+            doc.text('Details:', 20, 90);
+            
+            let y = 100;
+            doc.setFontSize(10);
+            
+            allResults.forEach(result => {
+                if (y > 270) {
+                    doc.addPage();
+                    y = 20;
+                }
+                
+                const status = result.status === 'found' ? 'SUBMITTED' : 'NOT SUBMITTED';
+                doc.text(`${result.studentId}: ${status}`, 20, y);
+                y += 10;
+                
+                if (result.files.length > 0) {
+                    result.files.forEach(file => {
+                        if (y > 270) {
+                            doc.addPage();
+                            y = 20;
+                        }
+                        doc.text(`  - ${file.name}`, 25, y);
+                        y += 8;
+                    });
+                }
+                y += 5;
+            });
+            
+            doc.save('student-submission-report.pdf');
         }
 
-        function generateCSVReport() {
-            let csv = 'Student ID,Status,Files,File Count\n';
-            
-            if (allStudents.length > 0) {
-                allStudents.forEach(studentId => {
-                    const files = studentFiles[studentId] || [];
-                    const status = submittedStudents.has(studentId) ? 'Submitted' : 'Missing';
-                    const fileList = files.join('; ');
-                    csv += `${studentId},${status},"${fileList}",${files.length}\n`;
-                });
-            } else {
-                Array.from(submittedStudents).sort().forEach(studentId => {
-                    const files = studentFiles[studentId] || [];
-                    const fileList = files.join('; ');
-                    csv += `${studentId},Submitted,"${fileList}",${files.length}\n`;
-                });
+        // Event listeners
+        document.getElementById('studentId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkSingleStudent();
             }
-            
-            return csv;
-        }
+        });
+
+        document.getElementById('studentId').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
     </script>
 </body>
 </html>
