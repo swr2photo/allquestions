@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อความพิเศษสำหรับจอม</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Sarabun', sans-serif;
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            from {
+                box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+            }
+            to {
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.6);
+            }
+        }
+        
+        .sparkle {
+            position: absolute;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            border-radius: 50%;
+            animation: sparkle 2s linear infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        .message-enter {
+            animation: messageEnter 1s ease-out;
+        }
+        
+        .card-flip {
+            transform-style: preserve-3d;
+            animation: cardFlip 1.5s ease-in-out;
+        }
+        
+        @keyframes cardFlip {
+            0% {
+                transform: perspective(1000px) rotateY(-90deg) scale(0.8);
+                opacity: 0;
+            }
+            50% {
+                transform: perspective(1000px) rotateY(0deg) scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: perspective(1000px) rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .message-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 
+                0 25px 45px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.2),
+                0 0 50px rgba(139, 92, 246, 0.2);
+        }
+        
+        @keyframes messageEnter {
+            from {
+                opacity: 0;
+                transform: scale(0.8) translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #ff6b6b;
+            animation: confetti 3s linear infinite;
+        }
+        
+        @keyframes confetti {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 overflow-hidden relative">
+    <!-- Sparkles Background -->
+    <div class="sparkle" style="top: 20%; left: 10%; width: 4px; height: 4px; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 50%; left: 80%; width: 3px; height: 3px; animation-delay: 0.5s;"></div>
+    <div class="sparkle" style="top: 30%; left: 60%; width: 5px; height: 5px; animation-delay: 1s;"></div>
+    <div class="sparkle" style="top: 70%; left: 20%; width: 4px; height: 4px; animation-delay: 1.5s;"></div>
+    <div class="sparkle" style="top: 80%; left: 70%; width: 3px; height: 3px; animation-delay: 2s;"></div>
+
+    <div class="min-h-screen flex items-center justify-center p-4 relative z-10">
+        <!-- Login Container -->
+        <div id="loginContainer" class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/20">
+            <div class="text-center mb-8">
+                <div class="floating mb-6">
+                    <div class="w-24 h-24 mx-auto bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
+                        <span class="text-4xl">💌</span>
+                    </div>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2">ข้อความพิเศษ</h1>
+                <p class="text-purple-200">สำหรับแกคนเก่ง</p>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-white text-sm font-medium mb-3">กรอกรหัส 6 หลัก</label>
+                <div class="flex gap-2 justify-center">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-white/20 border-2 border-purple-300/30 rounded-lg text-white placeholder-purple-200 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 transition-all duration-300" oninput="moveToNext(this, 0)">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-white/20 border-2 border-purple-300/30 rounded-lg text-white placeholder-purple-200 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 transition-all duration-300" oninput="moveToNext(this, 1)">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-white/20 border-2 border-purple-300/30 rounded-lg text-white placeholder-purple-200 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 transition-all duration-300" oninput="moveToNext(this, 2)">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-white/20 border-2 border-purple-300/30 rounded-lg text-white placeholder-purple-200 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 transition-all duration-300" oninput="moveToNext(this, 3)">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-white/20 border-2 border-purple-300/30 rounded-lg text-white placeholder-purple-200 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 transition-all duration-300" oninput="moveToNext(this, 4)">
+                    <input type="text" maxlength="1" class="w-12 h-12 text-center text-xl font-bold bg-white/20 border-2 border-purple-300/30 rounded-lg text-white placeholder-purple-200 focus:border-purple-400 focus:outline-none focus:ring-2 focus:ring-purple-400/30 transition-all duration-300" oninput="moveToNext(this, 5)">
+                </div>
+            </div>
+            
+            <button onclick="checkCode()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-3 px-6 rounded-xl hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-300 pulse-glow">
+                เปิดข้อความ ✨
+            </button>
+            
+            <div id="errorMessage" class="mt-4 text-center text-red-300 text-sm hidden">
+                รหัสไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง 🔄
+            </div>
+        </div>
+
+        <!-- Message Container -->
+        <div id="messageContainer" class="message-card rounded-3xl p-8 max-w-2xl w-full shadow-2xl border-2 border-white/20 hidden">
+            <div class="text-center message-enter">
+                <!-- Card Header -->
+                <div class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-2xl p-4 mb-6 border border-white/10">
+                    <div class="floating mb-4">
+                        <div class="w-20 h-20 mx-auto bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
+                            <span class="text-4xl">🎁</span>
+                        </div>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">การ์ดพิเศษ</h1>
+                    <div class="w-16 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mx-auto"></div>
+                </div>
+                
+                <!-- Card Body -->
+                <div class="bg-white/10 rounded-2xl p-6 mb-6 border border-white/10 relative overflow-hidden">
+                    <!-- Decorative corner -->
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-yellow-400/20 to-transparent rounded-bl-full"></div>
+                    <div class="absolute bottom-0 left-0 w-20 h-20 bg-gradient-to-tr from-pink-400/20 to-transparent rounded-tr-full"></div>
+                    
+                    <h2 class="text-2xl font-bold text-white mb-4">สวัสดีแก! 🤝</h2>
+                    
+                    <div class="text-left space-y-4">
+                        <p class="text-lg text-white leading-relaxed">
+                            🤔 ถามก่อนแกเหนื่อยมั้ย? หวังว่าแกจะสบายๆ และไม่ได้ทำงานหนักเกินไปนะ
+                        </p>
+                        <p class="text-lg text-white leading-relaxed">
+                            💪 ถ้าเหนื่อยก็พักบ้างเถอะ ไม่ต้องฝืนตัวเองมากเกินไป สุขภาพสำคัญกว่า
+                        </p>
+                        <p class="text-lg text-white leading-relaxed">
+                            🎯 แต่ก็รู้ว่าแกเป็นคนที่เก่งและทำอะไรก็ทำได้ ไฟต์ต่อไปนะเพื่อน!
+                        </p>
+                        <p class="text-lg text-white leading-relaxed">
+                            🌟 อย่าลืมดูแลตัวเองด้วยล่ะ ขอให้แกมีแรงและมีความสุขเสมอ! 👊
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Card Footer -->
+                <div class="bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-2xl p-4 mb-6 border border-white/10">
+                    <div class="flex justify-center gap-4 text-3xl mb-4">
+                        <span class="animate-bounce" style="animation-delay: 0s;">🏆</span>
+                        <span class="animate-bounce" style="animation-delay: 0.2s;">⚡</span>
+                        <span class="animate-bounce" style="animation-delay: 0.4s;">🚀</span>
+                        <span class="animate-bounce" style="animation-delay: 0.6s;">🎯</span>
+                        <span class="animate-bounce" style="animation-delay: 0.8s;">💪</span>
+                    </div>
+                    <p class="text-sm text-purple-200 italic">จากใจจริง ♥</p>
+                </div>
+                
+                <button onclick="showLogin()" class="bg-gradient-to-r from-green-400 to-blue-500 text-white font-semibold py-3 px-8 rounded-xl hover:from-green-500 hover:to-blue-600 transform hover:scale-105 transition-all duration-300 shadow-lg">
+                    ปิดการ์ด 🔒
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const correctCode = "051048"; // เปลี่ยนรหัสได้ตรงนี้
+        
+        function moveToNext(current, index) {
+            if (current.value.length === 1 && index < 5) {
+                const inputs = document.querySelectorAll('input[type="text"]');
+                inputs[index + 1].focus();
+            }
+            
+            // Auto-check when all fields are filled
+            const allInputs = document.querySelectorAll('input[type="text"]');
+            const allFilled = Array.from(allInputs).every(input => input.value.length === 1);
+            if (allFilled) {
+                setTimeout(checkCode, 300);
+            }
+        }
+        
+        function checkCode() {
+            const inputs = document.querySelectorAll('input[type="text"]');
+            const enteredCode = Array.from(inputs).map(input => input.value).join('');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            if (enteredCode === correctCode) {
+                showMessage();
+                createConfetti();
+            } else {
+                errorMessage.classList.remove('hidden');
+                // Shake effect for wrong code
+                inputs.forEach(input => {
+                    input.style.animation = 'none';
+                    input.offsetHeight; // Trigger reflow
+                    input.style.animation = 'shake 0.5s ease-in-out';
+                });
+                
+                setTimeout(() => {
+                    errorMessage.classList.add('hidden');
+                    inputs.forEach(input => {
+                        input.style.animation = '';
+                        input.value = '';
+                    });
+                    inputs[0].focus();
+                }, 2000);
+            }
+        }
+        
+        function showMessage() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('messageContainer').classList.remove('hidden');
+            
+            // Add card flip animation
+            setTimeout(() => {
+                const messageCard = document.querySelector('.message-card');
+                if (messageCard) {
+                    messageCard.classList.add('card-flip');
+                }
+            }, 100);
+        }
+        
+        function showLogin() {
+            document.getElementById('messageContainer').classList.add('hidden');
+            document.getElementById('loginContainer').style.display = 'block';
+            
+            // Clear inputs
+            const inputs = document.querySelectorAll('input[type="text"]');
+            inputs.forEach(input => input.value = '');
+            inputs[0].focus();
+        }
+        
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+        
+        // Focus first input on load
+        window.onload = function() {
+            document.querySelector('input[type="text"]').focus();
+        }
+        
+        // Add shake animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-5px); }
+                75% { transform: translateX(5px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
