@@ -757,6 +757,7 @@
     const CONFIG = {
       SHEET_ID: "1-7p30j2PR8oLeyJ02vMq1ut5IZ6iSh8zvMFS50w74Lc",
       QUIZ_RANGE: "Allquestions",
+      ANNOUNCEMENTS_RANGE: "Announcements",
       API_KEY: "AIzaSyDpvXNmtRybEEu9JXzKOWF3F61-3tM5SCE",
       CACHE_DURATION: 5 * 60 * 1000
     };
@@ -838,6 +839,28 @@
       }, 3000);
     }
 
+    async function copyLink(link, quizName = 'ควิซ') {
+      if (!link) return;
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(link);
+        } else {
+          const tempInput = document.createElement('input');
+          tempInput.value = link;
+          document.body.appendChild(tempInput);
+          tempInput.select();
+          document.execCommand('copy');
+          tempInput.remove();
+        }
+
+        showToast(`คัดลอกลิงก์ ${quizName} แล้ว`, 'success');
+      } catch (error) {
+        console.error('Copy failed', error);
+        showToast('ไม่สามารถคัดลอกลิงก์ได้', 'error');
+      }
+    }
+
     // Data Management
     async function loadData() {
       const startTime = performance.now();
@@ -850,11 +873,12 @@
           data = await SheetsAPI.readData();
           cache.set('quiz_data', data);
         }
-        
+
         processData(data);
         hideSkeletonLoaders();
         updateLoadTime(performance.now() - startTime);
-        
+        updateLastSync(new Date());
+
       } catch (error) {
         console.error('Load failed:', error);
         showToast('การโหลดล้มเหลว', 'error');
@@ -909,8 +933,56 @@
         ['ฟิสิกส์', 'ควิซเรื่องแรง', 'https://example.com/quiz2', 'แรงและการเคลื่อนที่', '31/12/2024, 23:59', 'อัพเดตล่าสุด'],
         ['เคมี', 'ควิซเรื่องธาตุ', 'https://example.com/quiz3', 'ธาตุและสารประกอบ', '31/12/2024, 23:59', 'อัพเดตล่าสุด']
       ];
-      
+
       processData(sampleData);
+      updateLastSync(new Date());
+    }
+
+    async function loadAnnouncements() {
+      try {
+        let data = cache.get('announcements');
+
+        if (!data) {
+          data = await SheetsAPI.readData(CONFIG.ANNOUNCEMENTS_RANGE);
+          cache.set('announcements', data);
+        }
+
+        processAnnouncements(data);
+      } catch (error) {
+        console.error('Announcement load failed:', error);
+        showToast('ไม่สามารถดึงประกาศได้', 'warning');
+      }
+    }
+
+    function processAnnouncements(rawData) {
+      if (!Array.isArray(rawData) || rawData.length <= 1) {
+        appState.notifications = [];
+        updateNotificationCount();
+        renderNotifications();
+        return;
+      }
+
+      const [, ...rows] = rawData;
+
+      appState.notifications = rows
+        .filter(row => row && row[0])
+        .map((row, index) => {
+          const [title, message, type = 'info', timeString] = row;
+          const parsedTime = new Date(timeString || Date.now());
+          const timestamp = isNaN(parsedTime.getTime()) ? new Date() : parsedTime;
+
+          return {
+            id: `${Date.now()}-${index}`,
+            title,
+            message: message || '',
+            type,
+            timestamp
+          };
+        })
+        .sort((a, b) => b.timestamp - a.timestamp);
+
+      updateNotificationCount();
+      renderNotifications();
     }
 
     function hideSkeletonLoaders() {
@@ -933,34 +1005,120 @@
       appState.loadTime = loadTime;
     }
 
-    function isExpired(expiryDate) {
-      if (!expiryDate) return false;
+    function updateLastSync(date = new Date()) {
+      const target = document.getElementById('last-sync-time');
+      if (!target) return;
+
+      const formatted = date.toLocaleString('th-TH', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: 'short'
+      });
+
+      target.textContent = `อัปเดตล่าสุด ${formatted}`;
+    }
+
+    function parseExpiryDate(expiryDate) {
+      if (!expiryDate) return null;
+
       try {
         const [date, time] = expiryDate.split(", ");
         const [day, month, year] = date.split("/");
         const formattedDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${time || "00:00:00"}`;
-        return new Date(formattedDate).getTime() < Date.now();
+        const parsed = new Date(formattedDate);
+        return isNaN(parsed.getTime()) ? null : parsed;
       } catch {
-        return false;
+        return null;
       }
+    }
+
+    function isExpired(expiryDate) {
+      const parsedDate = parseExpiryDate(expiryDate);
+      if (!parsedDate) return false;
+      return parsedDate.getTime() < Date.now();
+    }
+
+    function getExpiryInfo(expiryDate) {
+      const parsedDate = parseExpiryDate(expiryDate);
+
+      if (!parsedDate) {
+        return { label: 'ไม่มีวันหมดอายุ', color: 'text-gray-500', icon: 'fa-infinity' };
+      }
+
+      const now = Date.now();
+      const diffMs = parsedDate.getTime() - now;
+      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      if (diffMs < 0) {
+        return { label: 'หมดอายุแล้ว', color: 'text-red-600', icon: 'fa-clock' };
+      }
+
+      if (diffDays <= 1) {
+        return { label: 'หมดอายุภายใน 24 ชั่วโมง', color: 'text-amber-600', icon: 'fa-clock' };
+      }
+
+      if (diffDays <= 7) {
+        return { label: `หมดอายุใน ${diffDays} วัน`, color: 'text-amber-600', icon: 'fa-clock' };
+      }
+
+      return {
+        label: parsedDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }),
+        color: 'text-green-600',
+        icon: 'fa-calendar-alt'
+      };
+    }
+
+    function sortQuizzesByExpiry(a, b) {
+      const now = Date.now();
+      const aDate = parseExpiryDate(a.expiryDate);
+      const bDate = parseExpiryDate(b.expiryDate);
+
+      const aExpired = aDate ? aDate.getTime() < now : false;
+      const bExpired = bDate ? bDate.getTime() < now : false;
+
+      if (aExpired !== bExpired) return aExpired ? 1 : -1;
+      if (aDate && bDate) return aDate - bDate;
+      if (aDate) return -1;
+      if (bDate) return 1;
+
+      return a.quizName.localeCompare(b.quizName, 'th');
     }
 
     // UI Rendering
     function renderSubjects() {
       const grid = document.getElementById('subjects-grid');
       grid.innerHTML = '';
-      
+
       const subjects = appState.searchResults || appState.subjects;
-      
-      Object.entries(subjects).forEach(([subject, quizzes]) => {
-        const card = createSubjectCard(subject, quizzes);
+
+      const subjectEntries = Object.entries(subjects).map(([subject, quizzes]) => ({
+        subject,
+        quizzes,
+        availableQuizzes: quizzes.filter(q => q.quizName && q.quizLink && !isExpired(q.expiryDate)).length
+      })).sort((a, b) => b.availableQuizzes - a.availableQuizzes || a.subject.localeCompare(b.subject, 'th'));
+
+      if (subjectEntries.length === 0) {
+        grid.innerHTML = `
+          <div class="glass-morphism rounded-3xl p-6 border text-center col-span-full">
+            <p class="text-gray-700 font-semibold mb-1">ไม่พบผลลัพธ์ที่ค้นหา</p>
+            <p class="text-gray-500 text-sm">ลองใช้คำค้นหาอื่นหรือเคลียร์ตัวกรอง</p>
+          </div>
+        `;
+        return;
+      }
+
+      subjectEntries.forEach(({ subject, quizzes, availableQuizzes }) => {
+        const card = createSubjectCard(subject, quizzes, availableQuizzes);
         grid.appendChild(card);
       });
     }
 
-    function createSubjectCard(subject, quizzes) {
-      const availableQuizzes = quizzes.filter(q => q.quizName && q.quizLink && !isExpired(q.expiryDate)).length;
-      
+    function createSubjectCard(subject, quizzes, availableQuizzes = 0) {
+      if (!availableQuizzes) {
+        availableQuizzes = quizzes.filter(q => q.quizName && q.quizLink && !isExpired(q.expiryDate)).length;
+      }
+
       const card = document.createElement('div');
       card.className = 'quiz-card glass-morphism rounded-3xl p-6 border cursor-pointer';
       card.innerHTML = `
@@ -972,6 +1130,7 @@
           <div class="inline-block px-4 py-2 bg-green-100 text-green-800 text-sm rounded-2xl font-medium">
             ${availableQuizzes} ควิซพร้อมใช้
           </div>
+          <p class="text-gray-500 text-xs mt-2">ทั้งหมด ${quizzes.length} ควิซในวิชานี้</p>
         </div>
       `;
       
@@ -993,9 +1152,22 @@
     function renderQuizzes(quizzes) {
       const grid = document.getElementById('quiz-grid');
       grid.innerHTML = '';
-      
-      quizzes.forEach(quiz => {
-        if (!quiz.quizName) return;
+
+      const visibleQuizzes = (quizzes || []).filter(quiz => quiz.quizName);
+
+      if (visibleQuizzes.length === 0) {
+        grid.innerHTML = `
+          <div class="glass-morphism rounded-3xl p-6 border text-center col-span-full">
+            <p class="text-gray-700 font-semibold mb-1">ยังไม่มีควิซในวิชานี้</p>
+            <p class="text-gray-500 text-sm">เพิ่มควิซใหม่หรือรีเฟรชข้อมูลอีกครั้ง</p>
+          </div>
+        `;
+        return;
+      }
+
+      const sortedQuizzes = visibleQuizzes.sort((a, b) => sortQuizzesByExpiry(a, b));
+
+      sortedQuizzes.forEach(quiz => {
         const card = createQuizCard(quiz);
         grid.appendChild(card);
       });
@@ -1003,10 +1175,11 @@
 
     function createQuizCard(quiz) {
       const isExpiredQuiz = isExpired(quiz.expiryDate);
-      
+      const expiryInfo = getExpiryInfo(quiz.expiryDate);
+
       const card = document.createElement('div');
       card.className = 'quiz-card glass-morphism rounded-3xl p-6 border';
-      
+
       let statusBadge = '';
       if (isExpiredQuiz) {
         statusBadge = '<div class="badge badge-danger mb-3">หมดอายุแล้ว</div>';
@@ -1014,27 +1187,38 @@
         const statusClass = quiz.status === 'อัพเดตล่าสุด' ? 'badge-success' : 'badge-warning';
         statusBadge = `<div class="badge ${statusClass} mb-3">${quiz.status}</div>`;
       }
-      
+
       card.innerHTML = `
         <h3 class="font-bold text-gray-800 mb-2 text-lg">${quiz.quizName}</h3>
         ${statusBadge}
         ${quiz.quizDescription ? `<p class="text-gray-600 text-sm mb-4">${quiz.quizDescription}</p>` : ''}
-        
-        <div class="flex justify-between items-center">
-          ${quiz.quizLink && !isExpiredQuiz ? 
+        <div class="flex items-center gap-2 text-sm ${expiryInfo.color} mt-1">
+          <i class="fas ${expiryInfo.icon}"></i>
+          <span>${expiryInfo.label}</span>
+        </div>
+
+        <div class="flex justify-between items-center mt-4 gap-3 flex-wrap">
+          ${quiz.quizLink && !isExpiredQuiz ?
             `<a href="${quiz.quizLink}" target="_blank" class="btn btn-primary btn-sm">
               <i class="fas fa-external-link-alt"></i>ดูเฉลย
             </a>` :
             '<span class="text-gray-500 text-sm">ไม่พร้อมใช้งาน</span>'
           }
-          ${appState.isAuthenticated ? 
-            `<button onclick="editQuiz('${quiz.id}')" class="btn btn-secondary btn-sm">
-              <i class="fas fa-edit"></i>
-            </button>` : ''
-          }
+          <div class="flex items-center gap-2 ml-auto">
+            ${quiz.quizLink ?
+              `<button onclick='copyLink(${JSON.stringify(quiz.quizLink)}, ${JSON.stringify(quiz.quizName)})' class="btn btn-secondary btn-sm" aria-label="คัดลอกลิงก์ ${quiz.quizName}">
+                <i class="fas fa-link"></i>
+              </button>` : ''
+            }
+            ${appState.isAuthenticated ?
+              `<button onclick="editQuiz('${quiz.id}')" class="btn btn-secondary btn-sm" aria-label="แก้ไข ${quiz.quizName}">
+                <i class="fas fa-edit"></i>
+              </button>` : ''
+            }
+          </div>
         </div>
       `;
-      
+
       return card;
     }
 
@@ -1339,12 +1523,8 @@
     // Initialize app
     document.addEventListener('DOMContentLoaded', () => {
       loadData();
+      loadAnnouncements();
       updateAuthButton();
-      
-      // Welcome notification
-      setTimeout(() => {
-        addNotification('ยินดีต้อนรับ', 'ระบบ Allquiz พร้อมใช้งานแล้ว', 'success');
-      }, 2000);
     });
 
     // Keyboard shortcuts
