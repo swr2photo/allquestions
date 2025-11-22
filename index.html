@@ -1458,7 +1458,7 @@
               <p class="text-sm text-gray-600 mt-1">${notification.message}</p>
               <p class="text-xs text-gray-500 mt-2">${formatTime(notification.timestamp)}</p>
             </div>
-            <button onclick="removeNotification(${notification.id})" class="text-gray-400 hover:text-gray-600">
+            <button onclick="removeNotification('${notification.id}')" class="text-gray-400 hover:text-gray-600">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -1467,7 +1467,8 @@
     }
 
     function removeNotification(id) {
-      appState.notifications = appState.notifications.filter(n => n.id !== id);
+      const targetId = String(id);
+      appState.notifications = appState.notifications.filter(n => String(n.id) !== targetId);
       updateNotificationCount();
       renderNotifications();
     }
