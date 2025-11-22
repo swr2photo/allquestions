@@ -850,15 +850,17 @@
           data = await SheetsAPI.readData();
           cache.set('quiz_data', data);
         }
-        
+
         processData(data);
         hideSkeletonLoaders();
         updateLoadTime(performance.now() - startTime);
-        
+        updateLastSyncTime();
+
       } catch (error) {
         console.error('Load failed:', error);
         showToast('การโหลดล้มเหลว', 'error');
         loadSampleData();
+        updateLastSyncTime(true);
       } finally {
         showLoadingOverlay(false);
       }
@@ -933,6 +935,22 @@
       appState.loadTime = loadTime;
     }
 
+    function formatLastSync(date) {
+      return date.toLocaleString('th-TH', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+    }
+
+    function updateLastSyncTime(isFallback = false) {
+      const element = document.getElementById('last-sync-time');
+      if (!element) return;
+
+      const prefix = isFallback ? 'ใช้ข้อมูลสำรอง • ' : 'อัปเดตล่าสุด • ';
+      element.textContent = prefix + formatLastSync(new Date());
+    }
+
     function isExpired(expiryDate) {
       if (!expiryDate) return false;
       try {
@@ -949,10 +967,28 @@
     function renderSubjects() {
       const grid = document.getElementById('subjects-grid');
       grid.innerHTML = '';
-      
+
       const subjects = appState.searchResults || appState.subjects;
-      
-      Object.entries(subjects).forEach(([subject, quizzes]) => {
+      const subjectEntries = Object.entries(subjects);
+
+      if (subjectEntries.length === 0) {
+        const query = document.getElementById('search-input').value.trim();
+        const emptyState = document.createElement('div');
+        emptyState.className = 'col-span-full glass-morphism rounded-3xl p-6 border text-center text-gray-700';
+        emptyState.innerHTML = `
+          <div class="w-14 h-14 mx-auto mb-3 rounded-2xl bg-gray-100 flex items-center justify-center">
+            <i class="fas fa-magnifying-glass text-2xl text-gray-500"></i>
+          </div>
+          <p class="font-semibold mb-2">${query ? 'ไม่พบผลการค้นหา' : 'ยังไม่มีวิชา'}</p>
+          <p class="text-sm text-gray-500 mb-4">${query ? 'ลองปรับคำค้นหา หรือรีเซ็ตการค้นหา' : 'เพิ่มวิชาใหม่เพื่อเริ่มต้น'}</p>
+          ${query ? '<button class="btn btn-primary btn-sm" onclick="resetSearch()"><i class="fas fa-rotate-left"></i> ล้างการค้นหา</button>' : ''}
+        `;
+
+        grid.appendChild(emptyState);
+        return;
+      }
+
+      subjectEntries.forEach(([subject, quizzes]) => {
         const card = createSubjectCard(subject, quizzes);
         grid.appendChild(card);
       });
@@ -1041,7 +1077,7 @@
     // Search functionality
     function handleSearch() {
       const query = document.getElementById('search-input').value.toLowerCase().trim();
-      
+
       if (!query) {
         appState.searchResults = null;
         renderSubjects();
@@ -1062,6 +1098,13 @@
       });
 
       appState.searchResults = results;
+      renderSubjects();
+    }
+
+    function resetSearch() {
+      const searchInput = document.getElementById('search-input');
+      searchInput.value = '';
+      appState.searchResults = null;
       renderSubjects();
     }
 
