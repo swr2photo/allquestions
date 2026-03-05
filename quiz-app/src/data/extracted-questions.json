@@ -1,0 +1,5147 @@
+{
+  "Digital Technology Literacy": {
+    "quizzes": [
+      {
+        "filename": "Data Analysis.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ข้อใดคือระบบสารสนเทศเกี่ยวข้อมูลนักศึกษา",
+            "choices": [
+              {
+                "text": "SIS",
+                "isCorrect": true
+              },
+              {
+                "text": "KM",
+                "isCorrect": false
+              },
+              {
+                "text": "DSS",
+                "isCorrect": false
+              },
+              {
+                "text": "GIS",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "จากคำกล่าวที่ Data Analysis คือ ทักษะการวิเคราะห์ข้อมูลต่าง ๆ เพื่อหาข้อสรุปของข้อมูลนั้น เป็นการนำข้อมูลที่ได้มาเข้าสู่กระบวนการแสดงค่า หาความหมาย และสรุปผลที่ได้จากข้อมูล ถูกต้องหรือไม่",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ข้อใดคือองค์ประกอบของ Information System",
+            "choices": [
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              },
+              {
+                "text": "People",
+                "isCorrect": false
+              },
+              {
+                "text": "Technology",
+                "isCorrect": false
+              },
+              {
+                "text": "Process",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "Business Analyst มีหน้าที่ในการวิเคราะห์ข้อมูลใช่หรือไม่",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "การวิเคราะห์ข้อมูลที่มีความซับซ้อนที่ใช้ในระดับการทำงานของ Machine Learning หรือ Pattern Recognition คือข้อใด",
+            "choices": [
+              {
+                "text": "Diagnostic Analytics",
+                "isCorrect": false
+              },
+              {
+                "text": "Descriptive Analytics",
+                "isCorrect": false
+              },
+              {
+                "text": "Predictive Analytics",
+                "isCorrect": true
+              },
+              {
+                "text": "Prescriptive Analytics",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 5
+      },
+      {
+        "filename": "HardwareQuiz.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1NKZOh-iNwtZmf4_O_suy54t5cgJOdL8V",
+          "driveUrl": "https://drive.google.com/file/d/1NKZOh-iNwtZmf4_O_suy54t5cgJOdL8V/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "QuizInternet.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "19s_-SSAtMXcwZoczw2i2E6z30m7SRBGz",
+          "driveUrl": "https://drive.google.com/file/d/19s_-SSAtMXcwZoczw2i2E6z30m7SRBGz/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "SoftwareQuiz.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "15j1Ql-8zgw4WpIV7z_-rrQPuIrsJfUI3",
+          "driveUrl": "https://drive.google.com/file/d/15j1Ql-8zgw4WpIV7z_-rrQPuIrsJfUI3/preview",
+          "hasPin": false,
+          "pin": null
+        }
+      }
+    ]
+  },
+  "EVERYDAY ENGLISH": {
+    "quizzes": [
+      {
+        "filename": "(Unit 1) Part 1_Grammar.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1VVB1OQOnPAgXn3M840cJy5qlsGzqW-Sk",
+          "driveUrl": "https://drive.google.com/file/d/1VVB1OQOnPAgXn3M840cJy5qlsGzqW-Sk/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "(Unit 1) Part 2_ Vocabulary.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1VzDwcyl3kHbAtk6NQmv4Jqpvg4pkz_o3",
+          "driveUrl": "https://drive.google.com/file/d/1VzDwcyl3kHbAtk6NQmv4Jqpvg4pkz_o3/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "(Unit 1) Part 3_Expressions.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "10_LuNKtnpG58ffkOxujyOLMw9FgnhzvA",
+          "driveUrl": "https://drive.google.com/file/d/10_LuNKtnpG58ffkOxujyOLMw9FgnhzvA/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "(Unit 1) Part 4_Writing.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1SwJyWxRz_G1tkbfglvIagLdm6wxqNt8n",
+          "driveUrl": "https://drive.google.com/file/d/1SwJyWxRz_G1tkbfglvIagLdm6wxqNt8n/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "(Unit 1) Part 5_Listening.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1OIuwYF16DLzWAFGxPaZlv_ONhMXRTvxT",
+          "driveUrl": "https://drive.google.com/file/d/1OIuwYF16DLzWAFGxPaZlv_ONhMXRTvxT/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      }
+    ]
+  },
+  "SAVE EARTH  SAVE US": {
+    "quizzes": [
+      {
+        "filename": "Week 6 Green City.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "เมืองมีความสำคัญในด้านใดบ้าง",
+            "choices": [
+              {
+                "text": "ด้านเศรษฐกิจ",
+                "isCorrect": false
+              },
+              {
+                "text": "ด้านสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "ด้านสิ่งแวดล้อม",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "เมือง 2 แห่งแรกของโลกที่เป็น Megacity หรือ มีประชากรเกิน 10 ล้านคน นับแต่ปี 1950 คือเมืองอะไร",
+            "choices": [
+              {
+                "text": "New York และ Tokyo",
+                "isCorrect": true
+              },
+              {
+                "text": "New Delhi และ New York",
+                "isCorrect": false
+              },
+              {
+                "text": "Los Angeles และ Osaka",
+                "isCorrect": false
+              },
+              {
+                "text": "New Delhi และ Jakarta",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "เป้าหมายการพัฒนาที่ยั่งยืน หรือ Sustainable Development Goals- SDGs ในข้อใดที่ว่าด้วย “เมืองและชุมชน”",
+            "choices": [
+              {
+                "text": "SDG 5",
+                "isCorrect": false
+              },
+              {
+                "text": "SDG 11",
+                "isCorrect": true
+              },
+              {
+                "text": "SDG 2",
+                "isCorrect": false
+              },
+              {
+                "text": "SDG 14",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ข้อใดถือเป็น “ความท้าทาย” ที่เมืองทั่วโลกต้องเผชิญ",
+            "choices": [
+              {
+                "text": "ภัยธรรมชาติ",
+                "isCorrect": false
+              },
+              {
+                "text": "การเปลี่ยนแปลงทางดิจิทัล",
+                "isCorrect": false
+              },
+              {
+                "text": "ประชากรสูงอายุ",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ข้อใดที่ ไม่ใช่ รูปแบบของการเปลี่ยนเมืองตามแนวคิด Gray City to Green City",
+            "choices": [
+              {
+                "text": "เปลี่ยนจากเมืองที่ประสบปัญหาน้ำท่วมบ่อยครั้ง ไปสู่ การเพิ่มความสามารถของเมืองในการรับมือกับปัญหาน้ำท่วมได้อย่างเหมาะสม",
+                "isCorrect": false
+              },
+              {
+                "text": "เปลี่ยนจากเมืองที่ต้องนำเข้าวัตถุดิบและอาหาร ไปสู่ การให้คนในเมืองได้ร่วมสร้างแหล่งอาหารในชุมชนตนเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "เปลี่ยนจากเมืองที่มีบ้านเรือนสิ่งปลูกสร้างที่สอดคล้องกับสภาพภูมิอากาศ ไปสู่ เมืองที่เน้นการสร้างบ้านเรือนมีรูปทรงที่ทันสมัยเหมือนในต่างประเทศ",
+                "isCorrect": true
+              },
+              {
+                "text": "เปลี่ยนจากเมืองที่ผู้คนใช้รถส่วนตัวเป็นหลัก ไปสู่ การจัดระบบขนส่งเพื่อเคลื่อนย้ายผู้คนในเมือง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "ข้อใดถือว่าเป็นการจัดการเมืองตามแนวคิด Habitat City",
+            "choices": [
+              {
+                "text": "การรักษาสภาพทางนิเวศของเมืองและปรับเปลี่ยนให้น้อยที่สุด",
+                "isCorrect": true
+              },
+              {
+                "text": "การตัดต้นไม้สองข้างถนนบนทางเท้าเพื่อมิให้บดบังหน้าร้าน",
+                "isCorrect": false
+              },
+              {
+                "text": "การถมทางน้ำสาธารณะเพื่อเพิ่มพื้นที่ถนน",
+                "isCorrect": false
+              },
+              {
+                "text": "การใช้สารเคมีเพื่อกำจัดวัชพืชในสวนสาธารณะ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ข้อใด ไม่ใช่ น้ำที่นำมาใช้เป็นส่วนหนึ่งของการผลิตน้ำของประเทศสิงค์โปร์",
+            "choices": [
+              {
+                "text": "น้ำเสียที่ผ่านการบำบัดแล้ว",
+                "isCorrect": false
+              },
+              {
+                "text": "น้ำดิบที่นำเข้าจากประเทศไทย",
+                "isCorrect": true
+              },
+              {
+                "text": "น้ำทะเล",
+                "isCorrect": false
+              },
+              {
+                "text": "น้ำจากแหล่งกักเก็บในเมือง เช่น คลอง สระ บึงรับน้ำ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "ข้อใดที่ ไม่ได้ เป็นตัวอย่างที่แสดงถึงการนำเทคโนโลยี Smart City มาใช้",
+            "choices": [
+              {
+                "text": "การเดินแจกใบปลิวงานวิ่งการกุศล",
+                "isCorrect": true
+              },
+              {
+                "text": "การดูแลสุขภาพผู้สูงอายุทางไกล หรือ Tele-healthcare",
+                "isCorrect": false
+              },
+              {
+                "text": "การติดตั้งระบบ Sensor ตรวจวัดคุณภาพน้ำ",
+                "isCorrect": false
+              },
+              {
+                "text": "การจ่ายค่าน้ำประปาผ่านการสแกน QR Code",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "ข้อใดที่แสดงถึงการดำเนินงานเพื่อมุ่งสู่การเป็น “เมืองคาร์บอนต่ำ”",
+            "choices": [
+              {
+                "text": "การส่งเสริมให้มีการบริโภคอาหารท้องถิ่นเพื่อลด Food miles",
+                "isCorrect": true
+              },
+              {
+                "text": "การเพิ่มพื้นที่ถนนและสร้างที่จอดรถเพื่อส่งเสริมการใช้รถส่วนตัว",
+                "isCorrect": false
+              },
+              {
+                "text": "การเก็บขยะแล้วนำไปกองรวมกันที่หลุมขยะนอกเมือง",
+                "isCorrect": false
+              },
+              {
+                "text": "การปรับพื้นที่ในเมืองให้ลาดซีเมนต์และตัดต้นไม้เพื่อให้เมืองดูโล่งตา",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "จากกรณีศึกษาของเมือง Toyama ประเทศญี่ปุ่น ข้อใด ไม่ใช่ประโยชน์ ที่ได้จากการส่งเสริมระบบขนส่งมวลชนของเมือง",
+            "choices": [
+              {
+                "text": "ทำให้ผู้สูงอายุสามารถเดินทางได้สะดวกขึ้น",
+                "isCorrect": false
+              },
+              {
+                "text": "พ่อค้าแม่ค้าสามารถขึ้นไปขายสินค้าบนรถไฟได้",
+                "isCorrect": true
+              },
+              {
+                "text": "ช่วยลดปัญหาการจราจรในช่วงเวลาเร่งด่วน",
+                "isCorrect": false
+              },
+              {
+                "text": "ย่านการค้าที่เคยซบเซาได้มีชีวิตชีวาขึ้นอีกครั้ง",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 10
+      },
+      {
+        "filename": "Week 7 ปัญหาหมอกควันภาคใต้.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "นักศึกษาเคยอ่านเจอปัญหาหมอกควันภาคใต้ในวารสารวิชาการ, หนังสือพิมพ์, โทรทัศน์ หรืออื่นๆ",
+            "choices": [
+              {
+                "text": "ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "นักศึกษาเคยเรียนรายวิชาที่เกี่ยวข้องกับวิทยาศาสตร์สิ่งแวดล้อม หรืออนามัยสิ่งแวดล้อม",
+            "choices": [
+              {
+                "text": "ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "นักศึกษาเคยเรียนรายวิชาที่เกี่ยวข้องกับวิทยาศาสตร์สิ่งแวดล้อม หรืออนามัยสิ่งแวดล้อม",
+            "choices": [
+              {
+                "text": "ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "จากข้อ 3 โปรดยกตัวอย่างมา 1 ตัวอย่าง",
+            "choices": [
+              {
+                "text": "การเผาในที่โล่ง เช่น การเผาป่าเพื่อการเกษตร หรือการเผาขยะ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "นักศึกษาเคยเรียนรายวิชาที่เกี่ยวข้องกับวิทยาศาสตร์สิ่งแวดล้อม หรืออนามัยสิ่งแวดล้อม",
+            "choices": [
+              {
+                "text": "ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "จากข้อ 5 โปรดยกตัวอย่างมา 1 ตัวอย่าง",
+            "choices": [
+              {
+                "text": "ปัญหาสุขภาพ เช่น โรคทางเดินหายใจ โรคหัวใจและหลอดเลือด โรคภูมิแพ้",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "นักศึกษาทราบประชาชนกลุ่มเสี่ยงต่อปัญหาหมอกควันภาคใต้",
+            "choices": [
+              {
+                "text": "ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "จากข้อ 7 โปรดยกตัวอย่างมา 1 ตัวอย่าง",
+            "choices": [
+              {
+                "text": "เด็กเล็ก ระบบทางเดินหายใจของเด็กยังพัฒนาไม่เต็มที่ จึงได้รับผลกระทบจากมลพิษทางอากาศได้ง่ายกว่าผู้ใหญ่",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "นักศึกษาทราบวิธีการดูแลสุขภาพจากปัญหาหมอกควันภาคใต้",
+            "choices": [
+              {
+                "text": "ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "จากข้อ 9 โปรดยกตัวอย่างมา 1 ตัวอย่าง",
+            "choices": [
+              {
+                "text": "สวมใส่หน้ากากอนามัย โดยเฉพาะหน้ากาก N95 ที่สามารถกรองฝุ่น PM2.5 ได้",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 10
+      },
+      {
+        "filename": "Week 8 Green Thinking.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ข้อใดต่อไปนี้ไม่ใช่วัตถุอันตราย",
+            "choices": [
+              {
+                "text": "ก. หนุ่มหึงโหดสารภาพสาดน้ำกรดใส่เมียตาย เล่าปมแค้นวางแผนตั้งแต่สงกรานต์",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. Samsung Galaxy S7 edge ลุกไหม้ระหว่างชาร์จแบตเตอรี่ข้ามคืน",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. นักดนตรีหนุ่มอกหัก เขียนจดหมายลาตาย บน FaceBook ก่อนซดยาฆ่าแมลง",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ถูกทุกข้อ",
+                "isCorrect": false
+              },
+              {
+                "text": "จ. ผิดทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "ผลกระทบจากวัตถุอันตรายคือ",
+            "choices": [
+              {
+                "text": "ก. กัดกร่อน",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ติดไฟง่าย",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ระเบิด",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. เป็นอันตราย",
+                "isCorrect": false
+              },
+              {
+                "text": "จ. ก-ข-ค-ง ถูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ฉ. ก-ข-ค-ง ผิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "NIMBY คืออะไร",
+            "choices": [
+              {
+                "text": "ก. การมีส่วนร่วมของประชาชน",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. Not in my backyard syndrome",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. การต่อต้านจากประชาชน",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ข้อ ข และ ค ถูก",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ข้อดี ของการมีส่วนร่วมคือ",
+            "choices": [
+              {
+                "text": "ก. มีผู้นำกลุ่มชี้นำความคิด",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ให้ประโยชน์กับกลุ่มคนบางกลุ่ม",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ลดปัญหาการเพิกเฉย การทอดทิ้งทางสังคม",
+                "isCorrect": true
+              },
+              {
+                "text": "ง. ลดความขัดแย้งทางความคิด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ข้อเสีย ของการมีส่วนร่วมของประชาชนข้อใดต่อไปนี้ไม่ถูกต้อง",
+            "choices": [
+              {
+                "text": "ก. มีค่าใช้จ่ายสูง",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ใช้เวลามาก",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ทำลายความน่าเชื่อถือขององค์กร",
+                "isCorrect": true
+              },
+              {
+                "text": "ง. ก่อให้เกิดการประท้วง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "ประชาชนทั่วไปมีสิทธิ์ในการมีส่วนร่วมอะไรบ้าง",
+            "choices": [
+              {
+                "text": "ก. ร่วมได้รับข้อมูลข่าวสารจากหน่วยงาน",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ร่วมแสดงความคิดเห็น",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ร่วมพิจารณาประเด็นสิ่งแวดล้อม",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ร่วมรับผลประโยชน์",
+                "isCorrect": false
+              },
+              {
+                "text": "จ. ก+ข+ค ถูกต้อง",
+                "isCorrect": true
+              },
+              {
+                "text": "ฉ. ก+ข+ง ถูกต้อง",
+                "isCorrect": false
+              },
+              {
+                "text": "ช. ก+ข+ค+ง ถูกต้อง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ใครคือบุคคลชายขอบ",
+            "choices": [
+              {
+                "text": "ก. ผู้สูงอายุ ที่มีอายุเกิน 60 ปี ขึ้นไป",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. เด็กที่มีอายุต่ำกว่า 15 ปี",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ผู้พิการ",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ชนกลุ่มน้อย",
+                "isCorrect": false
+              },
+              {
+                "text": "จ. ผู้ที่ไม่ได้รับการศึกษา",
+                "isCorrect": false
+              },
+              {
+                "text": "ฉ. ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "นาย เท้ง ณัฐพงษ์ เรืองปัญญาวุฒิ ตรงกับการมีส่วนร่วมทางการเมืองในข้อใด",
+            "choices": [
+              {
+                "text": "ก. ไม่มีกิจกรรมใดๆ ทางการเมือง (Apathetics)",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ผู้ชม (Spectator Activities)",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ช่วงเปลี่ยนแปลง (Transitional Activities)",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ระดับนักสู้ (Gladiatorial Activities)",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "การประชาพิจารณ์ คือ",
+            "choices": [
+              {
+                "text": "ก. Polling",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. Public Hearing",
+                "isCorrect": true
+              },
+              {
+                "text": "ค. Referendum",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. การประชามติ",
+                "isCorrect": false
+              },
+              {
+                "text": "จ. ถูกทุกข้อ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "ผลของการมีส่วนร่วมของประชาชนจะออกมาในรูปแบบใดได้บ้าง",
+            "choices": [
+              {
+                "text": "ก. ยิ่งประชาชนมีส่วนร่วมมาก มีโอกาสประสบความสำเร็จ",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ยิ่งประชาชนมีส่วนร่วมมาก ก็อาจจะไม่ประสบความสำเร็จ",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ยิ่งประชาชนมีส่วนร่วมมาก การตัดสินใจจะยิ่งมีประสิทธิภาพ",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ยิ่งประชาชนมีส่วนร่วมจำนวนมาก การตัดสินใจอาจไม่มีมีประสิทธิภาพ",
+                "isCorrect": false
+              },
+              {
+                "text": "จ. ก+ค ถูกต้อง",
+                "isCorrect": false
+              },
+              {
+                "text": "ฉ. ข+ง ถูกต้อง",
+                "isCorrect": false
+              },
+              {
+                "text": "ช. ก+ข+ค+ง ถูกต้อง",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 10
+      },
+      {
+        "filename": "Week 9 เรียนรู้การเกิดและวิธีการรับมือกับภัยพิบัติต่างๆ.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ความหมายของคำว่า “สึ” และ “นามิ” ในภาษาญี่ปุ่น",
+            "choices": [
+              {
+                "text": "ก. ทะเล และ คลื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ท้องฟ้า และ ทะเล",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ท่าเรือ และ คลื่น",
+                "isCorrect": true
+              },
+              {
+                "text": "ง. ท่าเรือ และ ทะเล",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "จากวีดีโอที่ได้รับชม จงอธิบายการเกิดปรากฏการณ์สึนามิ",
+            "choices": [
+              {
+                "text": "ก. จากแผ่นดินไหวใต้ท้องทะเล ทางตอนเหนือของเกาะสุมาตรา ประเทศอินโดนีเซีย แผ่นเปลือกโลกอินเดียมุดตัวลงไปใต้แผ่นเปลือกยูเรเซีย ทำให้แผ่นเปลื่อกโลกยูเรเซีย เกิดการดีดตัวขึ้น กลายเป็น แรงสั่นสะเทือนขนาด 9.1 ริกเตอร์",
+                "isCorrect": true
+              },
+              {
+                "text": "ข. เกิดจากกิจกรรมของมนุษย์",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. เกิดจากพายุกลางมหาสมุทร",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ถูกทุกข้อ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ความจริงที่เหลือเชื่อเกี่ยวกับสึนามิ",
+            "choices": [
+              {
+                "text": "ก. 80% สึนามิเกิดขึ้นที่บริเวณวงแหวนแห่งไฟ มหาสมุทธแปซิฟิก",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. คลื่นสึนามิที่สูงที่สุด 524 เมตร เกิดขึ้นที่อ่าวลิทูยา อะลาสกา เมกา",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ไม่มีชนเผามอแกนคนใดเสียชีวิตจากสึนามิ",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "สาเหตุหลักที่ทำให้พื้นที่ ตะกั่วป่า จังหวัดพังงา เกิดการสูญเสียมากที่สุด",
+            "choices": [
+              {
+                "text": "ก. เพราะลักษณะภูมิศาสตร์ของชายหาดมีลักษณะต่ำและมีทางลาดลงไปในทะเล และไม่มีเกาะ",
+                "isCorrect": true
+              },
+              {
+                "text": "ข. เพราะลักษณะภูมิศาสตร์ของพื้นที่ ตะกั่วป่า เป็นที่ราบสูง",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. เพราะมีจำนวนประชากรอาศัยอยู่เป็นจำนวนมาก",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ไม่มีข้อใดถูก",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ตัวอย่างสิ่งของหรืออุปกรณ์ในเป้ฉุกเฉินที่ควรมีพกติดตัวไว้",
+            "choices": [
+              {
+                "text": "ก. น้ำดื่ม อาหารแห้ง ถุงมือ ถ่านไฟฉาย",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. วิทยุพกพา มีดพก",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ถุงขยะดำ อาหารกระป๋อง",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "จังหวัดใดต่อไปนี้ที่ไม่ใช่พื้นที่เสี่ยงต่อการเกิดสึนามิในประเทศไทยเฉพาะภาคใต้",
+            "choices": [
+              {
+                "text": "ก. ระนอง พังงา ภูเก็ต สงขลา ปัตตานี นราธิวาส",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. กระบี่ ตรัง สตูล",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ชุมพร สุราษฎร์ธานี นครศรีธรรมราช",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ยะลา สตูล พัทลุง",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "สัญญาณธรรมชาติที่ไม่เกี่ยวข้องกับการเกิดปรากฏการณ์สึนามิ",
+            "choices": [
+              {
+                "text": "ก. สัตว์มีพฤติกรรมเปลี่ยนแปลงไปจากเดิม",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. น้ำทะเลเพิ่มขึ้นอย่างรวดเร็ว",
+                "isCorrect": true
+              },
+              {
+                "text": "ค. น้ำทะเลลดลงอย่างรวดเร็ว",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ไม่มีข้อใดถูก",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "ข้อใดไม่ใช่วิธีปฏิบัติตัวหรือเอาตัวรอดเมื่อเกิดสึนามิ",
+            "choices": [
+              {
+                "text": "ก. สังเกตุจุดที่อยู่ว่าเสี่ยงต่อการเกิดสึนามิหรือไม่",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. วิ่งเข้าหาทะเล",
+                "isCorrect": true
+              },
+              {
+                "text": "ค. ปีนต้นไม้ คว้าสิ่งของเพื่อใช้พยุ่งตัว อยู่ห่างจากจุดเสี่ยงภัย",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. วิ่งหันหน้าเข้าแผ่นดินแล้ววิ่งไปให้ไกลที่สุด หรือหนีขึ้นภูเขา หรือที่สูง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "ข้อห้ามเด็ดขาดเวลาเกิดสึนามิ",
+            "choices": [
+              {
+                "text": "ก. ห้ามวิ่งตามแนวชายหาด",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. อย่าหนีด้วยรถหรือยานพาหนะ",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ห้ามว่ายน้ำ",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "คุณได้เรียนรู้อะไรบ้างจากวิดีโอสารคดี ต้องรอด: สึนามิ",
+            "choices": [
+              {
+                "text": "ก. ได้รู้วิธีการรับมือกับการเกิดสึนามิ",
+                "isCorrect": false
+              },
+              {
+                "text": "ข. ได้รู้สาเหตุของการเกิดสึนามิ",
+                "isCorrect": false
+              },
+              {
+                "text": "ค. ได้รู้อุปกรณ์ที่ต้องเตรียมในการเอาตัวรอดจากการสึนามิ",
+                "isCorrect": false
+              },
+              {
+                "text": "ง. ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 10
+      },
+      {
+        "filename": "ผลิตภัณฑ์พอลิเมอร์ในชีวิตประจำวัน.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "11FFv8zORXCnX-6gqkb5LnZbf4TM4Ilue",
+          "driveUrl": "https://drive.google.com/file/d/11FFv8zORXCnX-6gqkb5LnZbf4TM4Ilue/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      }
+    ]
+  },
+  "ธรรมชาติบำบัด": {
+    "quizzes": [
+      {
+        "filename": "Aromatherapy.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "เพื่อป้องกันความเป็นพิษระคายเคืองต่อผิวหนัง ควรผสมน้ำมันหอมระเหยอย่างไร",
+            "choices": [
+              {
+                "text": "ไม่จำเป็นจะต้องผสมก่อนใช้",
+                "isCorrect": false
+              },
+              {
+                "text": "ใช้น้ำมันหอมระเหยเพียงเล็กน้อย",
+                "isCorrect": false
+              },
+              {
+                "text": "ผสมกับน้ำมันตัวพาก่อนใช้",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "ข้อใดเป็นวิธีการสกัดน้ำมันจากดอกไม้ที่ทำให้ได้กลิ่นที่ใกล้เคียงกับกลิ่นตามธรรมชาติมากที่สุด",
+            "choices": [
+              {
+                "text": "Acuelle",
+                "isCorrect": false
+              },
+              {
+                "text": "Enfleurage",
+                "isCorrect": true
+              },
+              {
+                "text": "Expression",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ผู้ใดคือ บิดาแห่ง Aromatherapy ยุคสมัยใหม่",
+            "choices": [
+              {
+                "text": "Rene-Maurice Gattefosse",
+                "isCorrect": true
+              },
+              {
+                "text": "Avicenna",
+                "isCorrect": false
+              },
+              {
+                "text": "Pedacius Dioscorides",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ข้อใดเป็นฤทธิ์ต่อระบบประสาทของน้ำมันลาเวนเดอร์",
+            "choices": [
+              {
+                "text": "ระงับประสาท",
+                "isCorrect": true
+              },
+              {
+                "text": "กระตุ้นประสาท",
+                "isCorrect": false
+              },
+              {
+                "text": "กดประสาท",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "สตรีที่อยู่ในระหว่างการตั้งครรภ์ ควรหลีกเลี่ยงการใช้น้ำมันหอมระเหยในข้อใด",
+            "choices": [
+              {
+                "text": "น้ำมันดอกคาโมไมล์",
+                "isCorrect": true
+              },
+              {
+                "text": "น้ำมันกุหลาบ",
+                "isCorrect": false
+              },
+              {
+                "text": "น้ำมันมะลิ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "Aromatherapy หมายถึงการบำบัดตามข้อใด",
+            "choices": [
+              {
+                "text": "การบำบัดด้วยน้ำ",
+                "isCorrect": false
+              },
+              {
+                "text": "การบำบัดด้วยการใช้กลิ่น",
+                "isCorrect": true
+              },
+              {
+                "text": "การบำบัดด้วยเสียง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ข้อใดหมายถึงสารหอมที่ได้จากการนำเอา essential oil หรือสารหอมตามธรรมชาติ ที่เราทราบคุณสมบัติทางเคมี ฟิสิกส์ มาผ่านขบวนการแยก เพื่อให้ได้สารหอมบริสุทธิ์เดี่ยว ชนิดเดียวออกมา",
+            "choices": [
+              {
+                "text": "Isolate",
+                "isCorrect": true
+              },
+              {
+                "text": "Synthetic",
+                "isCorrect": false
+              },
+              {
+                "text": "Semi-synthetic",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "ข้อใดเป็นวิธีการใช้ประโยชน์ของน้ำมันหอมระเหยที่ใช้กับอาการในระบบทางเดินหายใจได้ดีที่สุด",
+            "choices": [
+              {
+                "text": "การแช่",
+                "isCorrect": false
+              },
+              {
+                "text": "การประคบ",
+                "isCorrect": false
+              },
+              {
+                "text": "การสูดไอน้ำ",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 8
+      },
+      {
+        "filename": "Spa and Hydrotherapy.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1JY7Vigvrbce63IvLQ6dTWWWc9creS7Qw",
+          "driveUrl": "https://drive.google.com/file/d/1JY7Vigvrbce63IvLQ6dTWWWc9creS7Qw/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "กัวซา.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 2,
+            "text": "กัวซาเพื่อความผ่อนคลายควรเลือกเเผ่นกัวซาบางๆ",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "Flase",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ก่อนกัวซาควรตรวจสอบแผ่นกัวซาให้แน่ใจว่าไม่มีรอยแตก บิ่น",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "Flase",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "การกัวซาใบหน้าเหมาะกับแผ่นกัวซาชนิดใดมากที่สุด",
+            "choices": [
+              {
+                "text": "เหรียญ",
+                "isCorrect": false
+              },
+              {
+                "text": "หยก",
+                "isCorrect": true
+              },
+              {
+                "text": "ไม้",
+                "isCorrect": false
+              },
+              {
+                "text": "เปลือกหอย",
+                "isCorrect": false
+              },
+              {
+                "text": "ช้อนสเเตนเลส",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "กัวซาเป็นภูมิปัญญาการแพทย์พื้นบ้านของประเทศใด",
+            "choices": [
+              {
+                "text": "อินเดีย",
+                "isCorrect": false
+              },
+              {
+                "text": "ลาว",
+                "isCorrect": false
+              },
+              {
+                "text": "ไทย",
+                "isCorrect": false
+              },
+              {
+                "text": "มาเลเซีย",
+                "isCorrect": false
+              },
+              {
+                "text": "จีน",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "หลังกัวซาเสร็จควรอาบน้ำอุ่นทันที",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": false
+              },
+              {
+                "text": "Flase",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 5
+      },
+      {
+        "filename": "การนวดตนเองและการนวดตนเองด้วยอุปกรณ์.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "การนวดตนเอง ควรเริ่มนวดจากข้างขวาก่อนเสมอ",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": false
+              },
+              {
+                "text": "False",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "ท่าทางที่เหมาะสมในการฝ่าเท้าด้วยตนเอง คือ ท่านั่งพับเพียบ",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "\"หมอน้อย\" ใช้เป็นเครื่องทุ่นแรงในการนวดรักษาผู้ป่วยและนวดตนเอง",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ทฤษฎีการนวดไทย ประกอบด้วย ทฤษฎีธาตุ 4 และเส้นประธานสิบ",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ไม้เดือยไก่ เป็นการออกแบบเลียนแบบธรรมชาติ ไว้สำหรับการนวดท้อง",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "\"ตะขอวิไล\" เป็นการนวดกดจุด ใช้นวดบริเวณคอ บ่า หลัง เอว",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "การนวดตนเอง คือ การกด บีบ คลึง กล้ามเนื้อส่วนต่างๆ ด้วย 2 มือหรืออุปกรณ์ช่วยนวด",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "หมอนไม้ เป็นอุปกรณ์ใช้สำหรับการนวดต้นคอ สำหรับหนุนนอนแทนหมอนช่วงกลางคืน",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 8
+      },
+      {
+        "filename": "ข้อสอบกลางภาคธรรมชาติบำบัด.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "11rrMrq-H0oXLbn3syM6rnriSzxTo_jPL",
+          "driveUrl": "https://drive.google.com/file/d/11rrMrq-H0oXLbn3syM6rnriSzxTo_jPL/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "ข้อสอบปลายภาคธรรมชาติบำบัด.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "16K8lux0SdRFEDP8QydPu5iH1XZTXiVCM",
+          "driveUrl": "https://drive.google.com/file/d/16K8lux0SdRFEDP8QydPu5iH1XZTXiVCM/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "ดังสิ.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 2,
+            "text": "กัวซาเพื่อความผ่อนคลายควรเลือกเเผ่นกัวซาบางๆ",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "Flase",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ก่อนกัวซาควรตรวจสอบแผ่นกัวซาให้แน่ใจว่าไม่มีรอยแตก บิ่น",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "Flase",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "การกัวซาใบหน้าเหมาะกับแผ่นกัวซาชนิดใดมากที่สุด",
+            "choices": [
+              {
+                "text": "เหรียญ",
+                "isCorrect": false
+              },
+              {
+                "text": "หยก",
+                "isCorrect": true
+              },
+              {
+                "text": "ไม้",
+                "isCorrect": false
+              },
+              {
+                "text": "เปลือกหอย",
+                "isCorrect": false
+              },
+              {
+                "text": "ช้อนสเเตนเลส",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "กัวซาเป็นภูมิปัญญาการแพทย์พื้นบ้านของประเทศใด",
+            "choices": [
+              {
+                "text": "อินเดีย",
+                "isCorrect": false
+              },
+              {
+                "text": "ลาว",
+                "isCorrect": false
+              },
+              {
+                "text": "ไทย",
+                "isCorrect": false
+              },
+              {
+                "text": "มาเลเซีย",
+                "isCorrect": false
+              },
+              {
+                "text": "จีน",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "“",
+            "choices": [
+              {
+                "text": "ปอด",
+                "isCorrect": true
+              },
+              {
+                "text": "ตับ",
+                "isCorrect": false
+              },
+              {
+                "text": "ลำไส้",
+                "isCorrect": false
+              },
+              {
+                "text": "กระเพราะอาหาร",
+                "isCorrect": false
+              },
+              {
+                "text": "หัวใจ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "หลังกัวซาเสร็จควรอาบน้ำอุ่นทันที",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": false
+              },
+              {
+                "text": "Flase",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 6
+      },
+      {
+        "filename": "ผักพื้นบ้าน.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ข้อใดกล่าวถึงคุณค่าของผักพื้นบ้านต่างจากข้ออื่น ๆ",
+            "choices": [
+              {
+                "text": "ป้ามารี เข้าใจว่าผักพื้นบ้านทุกอย่างชนิดคือหญ้าและไม่ควรนำมารับประทาน",
+                "isCorrect": false
+              },
+              {
+                "text": "น้าแน็กทำอุปกรณ์เครื่องใช้จากต้นกะลามะพร้าวที่เหลือจากการนำมาประกอบอาหาร",
+                "isCorrect": true
+              },
+              {
+                "text": "ดากานดาตระหนักถึงคุณค่าด้านอาหารของผักพื้นบ้านในชุมชน",
+                "isCorrect": false
+              },
+              {
+                "text": "ป้ารวิวารบอกหลาน ๆ ว่าผักบ้านบางชนิดนำมาใช้ประกอบพิธีกรรมได้",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "ข้อใด เป็นผักพื้นบ้านที่นำมาปรุงเป็นอาหาร และไม่มีกลิ่นหอมเฉพาะตัว",
+            "choices": [
+              {
+                "text": "ใบแมงลัก",
+                "isCorrect": false
+              },
+              {
+                "text": "ผักแขยง",
+                "isCorrect": false
+              },
+              {
+                "text": "ใบโหรพา",
+                "isCorrect": false
+              },
+              {
+                "text": "ใบตำลึง",
+                "isCorrect": true
+              },
+              {
+                "text": "ใบกะเพรา",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ใบชะพลู ผักแพว ใบยอ เป็นผักพื้นบ้านที่มีปริมาณสารอาหารชนิดใดอยู่เป็นจำนวนมาก",
+            "choices": [
+              {
+                "text": "แคลเซ๊ยม",
+                "isCorrect": false
+              },
+              {
+                "text": "ธาตุเหล็ก",
+                "isCorrect": true
+              },
+              {
+                "text": "วิตามิน ซี",
+                "isCorrect": false
+              },
+              {
+                "text": "วิตามิน เอ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ผักพื้นบ้านในข้อใด มีถิ่นกำเนิดในประเทศไทย",
+            "choices": [
+              {
+                "text": "ผักกูด",
+                "isCorrect": true
+              },
+              {
+                "text": "บัวบก",
+                "isCorrect": false
+              },
+              {
+                "text": "จันใบหอม",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ผักพื้นบ้านในข้อใด มีถิ่นกำเนิดที่ ชวา นิวกินี ฟิลิปปินส์ และถูกนำเข้ามาปลูกในประเทศไทย",
+            "choices": [
+              {
+                "text": "ดอกขี้เหล็ก",
+                "isCorrect": false
+              },
+              {
+                "text": "ตำลึง",
+                "isCorrect": false
+              },
+              {
+                "text": "ดอกแค",
+                "isCorrect": false
+              },
+              {
+                "text": "มะอึก",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "ผักพื้นบ้านชนิดใด มีกลิ่นหอม นิยมนำมาใส่ในลาบ มีถิ่นกำเนิดมาจากทวีปอเมริกาใต้ และถูกนำเข้ามาปลูกในประเทศไทยในเวลาต่อมา",
+            "choices": [
+              {
+                "text": "ผักชีฝรั่ง",
+                "isCorrect": true
+              },
+              {
+                "text": "ต้นขี้เหล็ก",
+                "isCorrect": false
+              },
+              {
+                "text": "ดอกลำพู",
+                "isCorrect": false
+              },
+              {
+                "text": "ผักกูด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ผักพื้นบ้านในข้อใด มีถิ่นกำเนิดในประเทศไทย ใช้ส่วนของใบสด (รสมัน ไม่มีกลิ่น) รับประทานเป็นผักเคียงกับขนมจีน",
+            "choices": [
+              {
+                "text": "ใบรา",
+                "isCorrect": false
+              },
+              {
+                "text": "ชะอม",
+                "isCorrect": false
+              },
+              {
+                "text": "มะอึก",
+                "isCorrect": true
+              },
+              {
+                "text": "มันปู",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "\"อาการตัวร้อน ปวดศีรษะ วิงเวียน คอแห้ง ปากแห้ง ร้อนใน อาจมีผื่นตามร่างกาย\" คืออาการที่มักเจ็บป่วยในฤดูกาลใด และ ควรแนะนำให้รับประทานผักพื้นบ้าน รสใด",
+            "choices": [
+              {
+                "text": "ฤดูฝน. แนะนำ ผักพื้นบ้านรสจืดเย็น",
+                "isCorrect": false
+              },
+              {
+                "text": "ฤดูร้อน , แนะนำ ผักพื้นบ้านรสขมเย็น จืด",
+                "isCorrect": true
+              },
+              {
+                "text": "ฤดูร้อน, แนะนำ ผักพื้นบ้านรสเผ็ดร้อน",
+                "isCorrect": false
+              },
+              {
+                "text": "ฤดูฝน, แนะนำ ผักพื้นบ้านรสหวาน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "ข้อใดถูกต้อง เกี่ยวกับ รส และ สรรพคุณของผักพื้นบ้าน",
+            "choices": [
+              {
+                "text": "ผักรสหวาน มีสรรพคุณบำรุงกำลัง แก้อ่อนเพลีย",
+                "isCorrect": true
+              },
+              {
+                "text": "ผักรสเผ็ดร้อน มีสรรพคุณแก้ไข้",
+                "isCorrect": false
+              },
+              {
+                "text": "ผักรสฝาด มีสรรพคุณ บำรุงเส้นเอ็น",
+                "isCorrect": false
+              },
+              {
+                "text": "ผักรสจืด มีสรรพคุณ ขับลมในลำไส้",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "ส่วนใดของพืชที่สามารถนำมาเป็นผักพื้นบ้าน",
+            "choices": [
+              {
+                "text": "เหง้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ดอก",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              },
+              {
+                "text": "ยอดอ่อน",
+                "isCorrect": false
+              },
+              {
+                "text": "ผล",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "text": "ผักพื้นบ้านของภาคใดในประเทศไทย มักเป็นพืชน้ำ เช่น ผักสันตะวา บัวสาย และมักปรุงอาหารด้วยรส เปรี้ยว หวาน เค็มเผ็ด",
+            "choices": [
+              {
+                "text": "ภาคกลาง",
+                "isCorrect": true
+              },
+              {
+                "text": "ภาคใต้",
+                "isCorrect": false
+              },
+              {
+                "text": "ภาคเหนือ",
+                "isCorrect": false
+              },
+              {
+                "text": "ภาคตะวันออกเฉียงเหนือ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "text": "ข้อใด คือ ผักพื้นบ้านที่เป็นไม้ยืนต้น ใบมีรสเปรี้ยว และ นำมาประกอบอาหาร เช่น ต้มกับเนื้อสัตว์",
+            "choices": [
+              {
+                "text": "ชะมวง",
+                "isCorrect": true
+              },
+              {
+                "text": "ผักเหลียง",
+                "isCorrect": false
+              },
+              {
+                "text": "ลำพู",
+                "isCorrect": false
+              },
+              {
+                "text": "กระโดน",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 12
+      },
+      {
+        "filename": "ฤาษีดัดตน.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ภาพเขียนฤาษีดัดตน มีปรากฏหลักฐาน ณ วัดใด",
+            "choices": [
+              {
+                "text": "วัดมัชฌิมาวาส",
+                "isCorrect": false
+              },
+              {
+                "text": "วัดมหาธาตุ",
+                "isCorrect": false
+              },
+              {
+                "text": "วัดพระเชตุพนวิมลมังคลาราม",
+                "isCorrect": true
+              },
+              {
+                "text": "วัดพระศรีสรรเพชญ์",
+                "isCorrect": false
+              },
+              {
+                "text": "วัดไชยวัฒนาราม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "คนไข้มีอาการปวดศีรษะ หูอื้อ เมื่อยล้ากล้ามเนื้อใบหน้าและสายตา ควรบริหารร่างกายด้วยท่าฤาษีดัดตนในข้อใด",
+            "choices": [
+              {
+                "text": "ท่าแก้กล่อนปัตคาตและเส้นมหาสนุกระงับ",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ลมเจ็บศีรษะและตามัว และแก้เกียจ",
+                "isCorrect": true
+              },
+              {
+                "text": "ท่าแก้ลมในแขน",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่านวดกล้ามเนื้อใบหน้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ปวดท้องและข้อเท้า และแก้ลมปวดศีรษะ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "คนไข้มีอาการไหล่ติด ยกไหล่ได้แต่ค่อนข้างลำบาก ควรบริหารร่างกายด้วยท่าฤาษีดัดตนในข้อใด",
+            "choices": [
+              {
+                "text": "ท่าแก้ลมในข้อมือและแก้ลมในลำลึงค์",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ลมในแขน",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ตะคริวมือ ตะคริวเท้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ลมเจ็บศีรษะและตามัว และแก้เกียจ",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้แขนขัด แก้ขัดแขน",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ข้อใด คือวัสดุที่ใช้ในการหล่อรูปฤาดัดตน ในสมัยรัชกาลของพระบาทสมเด็จพระนั่งเกล้าเจ้าอยู่หัว",
+            "choices": [
+              {
+                "text": "สังกะสี และ ปูนขาว",
+                "isCorrect": false
+              },
+              {
+                "text": "สังกะสี และ เหล็ก",
+                "isCorrect": false
+              },
+              {
+                "text": "สังกะสี และ ดีบุก",
+                "isCorrect": true
+              },
+              {
+                "text": "ปูนขาว และ น้ำมันตังอิ๊ว",
+                "isCorrect": false
+              },
+              {
+                "text": "ปูนขาว และ น้ำมันตะกั่ว",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ข้อใด คือ “ท่าเตรียม” ของการบริหารร่างกายของด้วยฤาษีดัดตน ด้วยท่าแก้ลมในแขน",
+            "choices": [
+              {
+                "text": "ท่านั่งชันเข่า และขาอีกข้างสอดใต้เข่า",
+                "isCorrect": true
+              },
+              {
+                "text": "ท่านั่งเหยียดขาข้างหนึ่งเฉียงไปข้างหน้า และขาอีกข้างงอเข่าพับขาให้ฝ่าเท้าชิดกับต้นขาข้างที่เหยียด",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่านั่งขัดสมาธิ",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่านั่งเหยียดขาทั้ง 2 ข้าง",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่านั่งคุกเข่า",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "ข้อใด คือคำอธิบายของท่าฤาษีดัดตนที่มีประโยชน์ในด้าน การทดสอบการทรงตัวของร่างกาย",
+            "choices": [
+              {
+                "text": "“ยกศีรษะขึ้นให้มากที่สุดในลักษณะหน้าตรง ใช้มือที่แนบข้างลำตัวเลื่อนไปจับข้อเท้า เหนี่ยวข้อเท้าให้ยกขึ้น จนหัวเข่าแยกออกจากกัน”",
+                "isCorrect": false
+              },
+              {
+                "text": "“ใช้มือบีบนวดจากต้นขาไปจนถึงข้อเท้า สามารถก้มแตะ หรือวางฝ่ามือลงที่พื้นได้ โดยขาทั้งสองข้าง เหยียดตึง”",
+                "isCorrect": false
+              },
+              {
+                "text": "“ยืนแยกขา แบะปลายเท้าออก มือทั้งสองข้างกำซ้อนกันที่ระดับอก ย่อตัวลงช้า ๆ กลั้นลมหายใจสักครู่”",
+                "isCorrect": false
+              },
+              {
+                "text": "“ยืนแยกขา แบะปลายเท้าออก ย่อตัวลงเล็กน้อย วางมือที่หน้าขา ยกขาข้างซ้ายลอยขึ้นเหนือพื้น และต้านการกดมือซ้าย”",
+                "isCorrect": true
+              },
+              {
+                "text": "“งอขาทั้งสองข้าง ให้ปลายเท้างุ้มชี้มาทางส่วนหลังให้มากที่สุด ส่วนของมือ หน้าท้องและหน้าขาให้แนบพื้น”",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "“... สูดลมหายใจเข้าให้ลึกที่สุด พร้อมกับดัดเหยียดมือที่ประสานไว้ไปทางท้องน้อยจนไหล่ตึง คางยกขึ้น ปลายเท้างุ้มลง...” คือ คำอธิบายรายละเอียดของท่าฤาษีดัดตนท่าใด",
+            "choices": [
+              {
+                "text": "ท่าแก้ลมเลือดนัยน์ตามัว และแก้ลมอันรัดทั้งตัว",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ตะโพกสลักเพชร แก้ไหล่ตะโพกขัด",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้เมื่อยปลายมือ ปลายเท้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ตะคริวมือ ตะคริวเท้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้โรคในอก",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "จากภาพวาด ตรงกับฤาษีดัดตนในท่าใด",
+            "choices": [
+              {
+                "text": "ท่าแก้เกียจ",
+                "isCorrect": true
+              },
+              {
+                "text": "ท่าแก้ลมในแขน",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ลมในข้อมือและในลำไส้",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้ลมเจ็บศีรษะและตามัว",
+                "isCorrect": false
+              },
+              {
+                "text": "ท่าแก้แขนขัดและขัดแขน",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 8
+      },
+      {
+        "filename": "สมาธิบำบัด.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "วิทิสาสมาธิ คือทำสมาธิวันละ 3 เวลา เช้า กลางวัน เย็น ครั้งละ 5 นาที อย่างสม่ำเสมอเป็นประจำทุกวัน",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "สมาธิ มี 3 รูแบบ คือ 1.ธรรมชาติ 2.สร้างขึ้น 3.เกิดขึ้นเอง",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "จุดประสงค์ของการทำสมาธิ เพื่อสะสมพลังจิต",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ทุกครั้งที่ทำสมาธิ พลังจิตที่เกิดขึ้นจะแบ่งเป็น 2 ส่วน 1) พลังหลัก เก็บไว้ที่จิต 60% 2) พลังเฉลี่ย ใช้ในชีวิตประจำวัน 40 %",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ผลงานวิจัย พบว่า การทำสมาธิช่วยลดระดับอารมณ์ มีผลทำให้คลื่นสมองราบเรียบ เช่น คลื่น ALPHA 9-13 Hertz ตรงกับลักษณะการแสดงออก คือ พักผ่อน มีสมาธิ สบาย สงบ เป็นผลดีต่ออารมณ์ของเรา",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "การทำสมาธิโดยทำต่อเนื่อง 1 เดือน เท่ากับ 450 นาที หรือ 7.50 ชั่วโมง ซึ่งถือว่าเป็นเกณฑ์ขั้นสูง ในการทำสมาธิ",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": false
+              },
+              {
+                "text": "False",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "การเริ่มต้นของสมาธิคือ คำบริกรรม คือการนึกอยู่คำเดียวในใจ ควรเป็นคำที่มีความหมายที่ดี",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "การฝึกสมาธิเป็นหนึ่งในเทคนิคที่มีประสิทธิภาพที่สุดในการบรรเทาสภาวะทางจิตใจที่หลากหลาย รวมทั้งความวิตกกังวลและภาวะซึมเศร้า และช่วยการนอนหลับได้ดีขึ้น",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 8
+      },
+      {
+        "filename": "สีบำบัด.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "หากสภาพจิตใจเป็นลบ ไม่มั่นคง ไม่มั่นใจคนรอบข้าง มีโอกาสจะชอบสีใดขึ้นมากระทันหัน",
+            "choices": [
+              {
+                "text": "แดง",
+                "isCorrect": false
+              },
+              {
+                "text": "ฟ้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ดำ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "สีชนิดใดเหมาะกับการใช้ในธุรกิจที่เกี่ยวข้องกับความน่าเชื่อถือ เช่น บัญชี ฝ่ายบุคคล เป็นศูนย์กลางอำนายการ",
+            "choices": [
+              {
+                "text": "สีธาตุดิน เช่น สีเบส สีครีม เหลือง ส้ม น้ำตาล",
+                "isCorrect": true
+              },
+              {
+                "text": "สีธาตุน้ำ เช่น ฟ้า น้ำเงิน ดำ",
+                "isCorrect": false
+              },
+              {
+                "text": "สีธาตุไม้ เช่น เขียวอ่อน เขียวแก่ น้ำตาล",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "สีใดบ่งบอกถึงความรอบคอบ สติปัญญา การควบคุมตนเอง",
+            "choices": [
+              {
+                "text": "ส้ม",
+                "isCorrect": false
+              },
+              {
+                "text": "เขียว",
+                "isCorrect": false
+              },
+              {
+                "text": "น้ำเงิน",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "หากเราพักผ่อนไม่เพียงพอ มีความอ่อนล้า มีโอกาสที่จะทำให้เราชอบสีใดกระทันหัน",
+            "choices": [
+              {
+                "text": "แดง",
+                "isCorrect": false
+              },
+              {
+                "text": "เขียว",
+                "isCorrect": true
+              },
+              {
+                "text": "น้ำเงิน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "การใช้สีห้องนอนสีใดช่วยให้กล้ามเนื้อคลายตัว ลดความตึงเครียดสะสมได้",
+            "choices": [
+              {
+                "text": "สีเบส-ครีม",
+                "isCorrect": true
+              },
+              {
+                "text": "สีเขียวอ่อน",
+                "isCorrect": false
+              },
+              {
+                "text": "สีฟ้าอ่อน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "การใช้สีชนิดใดมีความคลื่นความถี่ในช่วงกลาง ช่วยลดอาการล้าของสายตา ลดอาการปวดศีรษะ เหมาะกับการตกแต่งโต๊ะทำงาน",
+            "choices": [
+              {
+                "text": "สีดำ",
+                "isCorrect": false
+              },
+              {
+                "text": "สีส้ม",
+                "isCorrect": false
+              },
+              {
+                "text": "สีเขียว",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "สีชนิดใด เหมาะกับผู้สูงอายุ ช่วยทำให้รู้สึกอ่อนเยาว์",
+            "choices": [
+              {
+                "text": "สีเหลือง",
+                "isCorrect": false
+              },
+              {
+                "text": "สีชมพู",
+                "isCorrect": true
+              },
+              {
+                "text": "สีขาว",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "สีชนิดใดช่วยลดอาการอกหักหรือเสียใจจากการสูญเสีย ได้ดีที่สุด",
+            "choices": [
+              {
+                "text": "สีฟ้าร่วมกับสีเขียว",
+                "isCorrect": false
+              },
+              {
+                "text": "สีดำร่วมกับสีน้ำตาล",
+                "isCorrect": false
+              },
+              {
+                "text": "สีเขียว ร่วมกับสีเหลือง",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "สีชนิดใดเหมาะกับการกระตุ้นความคิดสร้างสรรค์ และการคิดนอกกรอบ เพิ่มพลังสมอง",
+            "choices": [
+              {
+                "text": "สีแดง-ส้ม",
+                "isCorrect": false
+              },
+              {
+                "text": "สีเหลือง-เขียว",
+                "isCorrect": true
+              },
+              {
+                "text": "สีม่วง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "สีชนิดใดเหมาะกับการกระตุ้นความรอบคอบและความอดทนให้สูงขึ้น",
+            "choices": [
+              {
+                "text": "สีขาว-ฟ้า",
+                "isCorrect": false
+              },
+              {
+                "text": "สีส้ม-เหลือง",
+                "isCorrect": false
+              },
+              {
+                "text": "สีน้ำเงิน-ดำ",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 10
+      },
+      {
+        "filename": "หัวข้อการประคบสมุนไพร.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ส่วนใดของต้นตะไคร้ที่นำมาทำลูกประคบสมุนไพร",
+            "choices": [
+              {
+                "text": "ลำต้น",
+                "isCorrect": true
+              },
+              {
+                "text": "ใบ",
+                "isCorrect": false
+              },
+              {
+                "text": "ราก",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "ขนาดของผ้าดิบที่เหมาะสมในการนำมาทำลูกประคบสมุนไพร ควรมีขนาดเท่าใด",
+            "choices": [
+              {
+                "text": "50*50 เซนติเมตร",
+                "isCorrect": true
+              },
+              {
+                "text": "35*35 เซนติเมตร",
+                "isCorrect": false
+              },
+              {
+                "text": "40*40 เซนติเมตร",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "สมุนไพรชนิดใดที่มีสรรพคุณ “ช่วยดูดซับความร้อน และช่วยพาตัวยาสมุนไพรซึมผ่านผิวหนัง”",
+            "choices": [
+              {
+                "text": "เกลือ",
+                "isCorrect": true
+              },
+              {
+                "text": "การบูร",
+                "isCorrect": false
+              },
+              {
+                "text": "พิมเสน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ส่วนประกอบหลักในการทำลูกประคบสมุนไพร คือสมุนไพรชนิดใด",
+            "choices": [
+              {
+                "text": "Citrus hystrix DC.",
+                "isCorrect": false
+              },
+              {
+                "text": "Zingiber cassumunar Roxb.",
+                "isCorrect": true
+              },
+              {
+                "text": "Cymbopogon citratus (DC.) Stapf. Clear my choice",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ข้อใดเป็นเวลาที่เหมาะสมสำหรับการนึ่งลูกประคบสมุนไพรก่อนการใช้งาน",
+            "choices": [
+              {
+                "text": "30 นาที",
+                "isCorrect": false
+              },
+              {
+                "text": "10 นาที",
+                "isCorrect": false
+              },
+              {
+                "text": "15 นาที",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "พืชสมุนไพรในข้อใด ที่มีชื่อวิทยาศาสตร์ “Zingiber cassumunar Roxb.”",
+            "choices": [
+              {
+                "text": "ไพล",
+                "isCorrect": true
+              },
+              {
+                "text": "ตะไคร้",
+                "isCorrect": false
+              },
+              {
+                "text": "ขมิ้นชัน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ข้อใดคือประโยชน์ของการประคบสมุนไพร",
+            "choices": [
+              {
+                "text": "บรรเทาอาการปวดเมื่อย ลดอาการเกร็งของกล้ามเนื้อ",
+                "isCorrect": true
+              },
+              {
+                "text": "เพิ่มการไหลเวียนของระบบน้ำเหลืองในร่างกาย",
+                "isCorrect": false
+              },
+              {
+                "text": "ช่วยลดอาการไอ และหอบเหนื่อย",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "สมุนไพรในข้อใดใช้ใบในการนำมาทำเป็นลูกประคบ",
+            "choices": [
+              {
+                "text": "ตะไคร้",
+                "isCorrect": false
+              },
+              {
+                "text": "ไพล",
+                "isCorrect": false
+              },
+              {
+                "text": "มะขาม",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 8
+      },
+      {
+        "filename": "หัวข้อการแพทย์อินเดีย.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ข้อใดคือคุณสมบัติของธาตุลม ตามหลักการแพทย์อายุรเวท",
+            "choices": [
+              {
+                "text": "Soft",
+                "isCorrect": false
+              },
+              {
+                "text": "Mobile",
+                "isCorrect": true
+              },
+              {
+                "text": "Hot",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "หากร่างกายมีระบบปิตตะเด่น ข้อใดคือคำแนะนำที่ในการดูแลสุขภาพที่เหมาะสมในการสร้างสมดุล",
+            "choices": [
+              {
+                "text": "ออกกำลังกายที่มีการแข่งขัน เป็นกิจกรรมกลุ่ม",
+                "isCorrect": false
+              },
+              {
+                "text": "เน้นการนั่งสมาธิ กำหนดลมหายใจ โยคะ",
+                "isCorrect": false
+              },
+              {
+                "text": "การพักผ่อนในที่เย็นสบาย เช่น ว่ายน้ำ นั่งใต้ร่มไม้ นั่งพักในที่บริเวณใกล้แหล่งน้ำที่มีอากาศเย็นสดชื่น",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ข้อใดคือคุณสมบัติของธาตุไฟ ตามหลักการแพทย์อายุรเวท",
+            "choices": [
+              {
+                "text": "Stable",
+                "isCorrect": false
+              },
+              {
+                "text": "Hot",
+                "isCorrect": true
+              },
+              {
+                "text": "Cool",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ข้อใดคือคุณสมบัติของธาตุน้ำ ตามหลักการแพทย์อายุรเวท",
+            "choices": [
+              {
+                "text": "Density",
+                "isCorrect": false
+              },
+              {
+                "text": "Heat",
+                "isCorrect": false
+              },
+              {
+                "text": "Soft",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ข้อใดคือการทำงานของระบบปิตตะ",
+            "choices": [
+              {
+                "text": "การขับเคลื่อน การไหลเวียนทุกอย่างภายในร่างกาย",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบการเผาผลาญ การสร้างความร้อนของร่างกาย",
+                "isCorrect": true
+              },
+              {
+                "text": "การเก็บสะสมพลังงานเข้าสู่ร่างกาย ระบบที่เกี่ยวข้องกับของเหลวต่าง ๆ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "ข้อใดคือการทำงานของระบบวาตะ",
+            "choices": [
+              {
+                "text": "ระบบการเผาผลาญ การสร้างความร้อนของร่างกาย",
+                "isCorrect": false
+              },
+              {
+                "text": "การเก็บสะสมพลังงานเข้าสู่ร่างกาย ระบบที่เกี่ยวข้องกับของเหลวต่าง ๆ",
+                "isCorrect": false
+              },
+              {
+                "text": "การขับเคลื่อน การไหลเวียนทุกอย่างภายในร่างกาย",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ข้อใดคือการทำงานของระบบกัปผะ (เสมหะ)",
+            "choices": [
+              {
+                "text": "การเก็บสะสมพลังงานเข้าสู่ร่างกาย ระบบที่เกี่ยวข้องกับของเหลวต่าง ๆ",
+                "isCorrect": true
+              },
+              {
+                "text": "การขับเคลื่อน การไหลเวียนทุกอย่างภายในร่างกาย",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบการเผาผลาญ การสร้างความร้อนของร่างกาย",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "\"นาย B รูปร่างสมส่วน ผมสีอ่อน เป็นคนขี้หงุดหงิดง่าย ขี้ร้อน ใบหน้ามีสิวที่ใบหน้าเห็นได้ชัด กินอาหารได้มาก ตัวอุ่นไปทางร้อน\" จากข้อมูล นาย B มีระบบการทำงานใดเด่น",
+            "choices": [
+              {
+                "text": "ระบบปิตตะ",
+                "isCorrect": true
+              },
+              {
+                "text": "ระบบกัปผะ (เสมหะ)",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบวาตะ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "อาการปวดศีรษะ โรควิตกกังวล โรคประสาทต่าง ๆ อาการเหล่านี้เป็นอาการที่บ่งบอกถึงความผิดปกติของระบบใดมากที่สุด",
+            "choices": [
+              {
+                "text": "ระบบวาตะ",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบปิตตะ",
+                "isCorrect": true
+              },
+              {
+                "text": "ระบบกัปผะ (เสมหะ)",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "พฤติกรรมใดส่งเสริมระบบปิตตะ (ระบบไฟ) ให้มากขึ้น",
+            "choices": [
+              {
+                "text": "การอาบน้ำ",
+                "isCorrect": false
+              },
+              {
+                "text": "นอนกลางวัน",
+                "isCorrect": false
+              },
+              {
+                "text": "ต่อสู้ แข่งขัน",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 10
+      },
+      {
+        "filename": "หัวข้อความหมายและแนวคิดธรรมชาติบำบัด(ครั้งที่1-2).html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1TG4JFu9TcdUgwjpT-o7_cNoQhkCmTEJ2",
+          "driveUrl": "https://drive.google.com/file/d/1TG4JFu9TcdUgwjpT-o7_cNoQhkCmTEJ2/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "หัวข้อสมุนไพรในงานสาธารณสุขมูลฐาน Ep2 (ครั้งที่ 3).html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "10AFw0zOwJK4fAlY9bDNhVzK94eRKuZNx",
+          "driveUrl": "https://drive.google.com/file/d/10AFw0zOwJK4fAlY9bDNhVzK94eRKuZNx/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "หัวข้อสมุนไพรในงานสาธารณสุขมูลฐาน Ep3 (ครั้งที่ 4).html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1xE4hpDswmWMSjCTqXocqCMSSBF3D-kBD",
+          "driveUrl": "https://drive.google.com/file/d/1xE4hpDswmWMSjCTqXocqCMSSBF3D-kBD/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "หัวข้อสมุนไพรในงานสาธารณสุขมูลฐาน Ep4 (ครั้งที่ 5).html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1lz1-igGkpTEglogYKX4q421_zFfWHCuk",
+          "driveUrl": "https://drive.google.com/file/d/1lz1-igGkpTEglogYKX4q421_zFfWHCuk/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "อาหารสุขภาพ.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "ร่างกายวิตามิน D สามารถสังเคราะห์ได้โดยวิธีได้",
+            "choices": [
+              {
+                "text": "สัมผัสรังสี gammar",
+                "isCorrect": false
+              },
+              {
+                "text": "สัมผัสรังสี ultraviolet B",
+                "isCorrect": true
+              },
+              {
+                "text": "สัมผัสรังสี ultraviolet C",
+                "isCorrect": false
+              },
+              {
+                "text": "สัมผัสรังสี ultraviolet A",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "วิตามินในข้อใดมีผลต่อการรักษาสมดุลแคลเซียม",
+            "choices": [
+              {
+                "text": "วิตามิน D",
+                "isCorrect": true
+              },
+              {
+                "text": "วิตามิน C",
+                "isCorrect": false
+              },
+              {
+                "text": "วิตามิน B",
+                "isCorrect": false
+              },
+              {
+                "text": "วิตามิน A",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "วิตามินในข้อใดร่างกายสามารถสังเคราะห์เองได้",
+            "choices": [
+              {
+                "text": "วิตามิน E",
+                "isCorrect": false
+              },
+              {
+                "text": "วิตามิน C",
+                "isCorrect": false
+              },
+              {
+                "text": "วิตามิน A",
+                "isCorrect": false
+              },
+              {
+                "text": "วิตามิน K",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "หลักแนวคิดอาหารสุขภาพจะต้องจัดอาหารให้มีสัดส่วนของ ผัก:คาร์โบไฮเดรต:โปรตีน ตามข้อใด",
+            "choices": [
+              {
+                "text": "2:1:1",
+                "isCorrect": true
+              },
+              {
+                "text": "1:1:2",
+                "isCorrect": false
+              },
+              {
+                "text": "1:1:1",
+                "isCorrect": false
+              },
+              {
+                "text": "1:2:1",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "หากนักศึกษารับประทานหอยนางรมสดจะได้แร่ธาตุในข้อใด",
+            "choices": [
+              {
+                "text": "Zinc",
+                "isCorrect": true
+              },
+              {
+                "text": "Phosphorus",
+                "isCorrect": false
+              },
+              {
+                "text": "Calcium",
+                "isCorrect": false
+              },
+              {
+                "text": "Potassium",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "หากนักศึกษารับประทานอาหารผัดเลือดหมูจะได้แร่ธาตุในข้อใด",
+            "choices": [
+              {
+                "text": "Iron",
+                "isCorrect": true
+              },
+              {
+                "text": "Sodium",
+                "isCorrect": false
+              },
+              {
+                "text": "Magnesium",
+                "isCorrect": false
+              },
+              {
+                "text": "Calcium",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "อาหารชีวจิตตรงกับข้อใด",
+            "choices": [
+              {
+                "text": "ส้มตำปูลาร้า",
+                "isCorrect": false
+              },
+              {
+                "text": "ไก่กรอบครีมมะนาว",
+                "isCorrect": false
+              },
+              {
+                "text": "ยำคอหมูย่าง",
+                "isCorrect": false
+              },
+              {
+                "text": "สลัดไข่ใส่แซลมอลย่างซีอิ้ว",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "เมื่อร่างกายอยู่ในสภาวะขาดสารอาหารจะเกิดกระบวนการในข้อใด",
+            "choices": [
+              {
+                "text": "Glycolysis",
+                "isCorrect": false
+              },
+              {
+                "text": "Gluconeogenesis",
+                "isCorrect": true
+              },
+              {
+                "text": "Hydroxylation",
+                "isCorrect": false
+              },
+              {
+                "text": "Oxidation",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 8
+      }
+    ]
+  },
+  "พลเมืองที่ดี": {
+    "quizzes": [
+      {
+        "filename": "question01.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "1wfaqi8ASthG8BJ3Sx_kybpB9FCDLVY98",
+          "driveUrl": "https://drive.google.com/file/d/1wfaqi8ASthG8BJ3Sx_kybpB9FCDLVY98/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "ข้อสอบหน่วยที่ 2.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "กรณีศึกษาใดกล่าวผิดในสิทธิพื้นฐานของคนไทยระหว่างบุคคล",
+            "choices": [
+              {
+                "text": "พิมพ์เรียนจบคณะวิศวกรรมศาสตร์เลือกทำงานเป็นวิศวกร",
+                "isCorrect": false
+              },
+              {
+                "text": "ปลาทูมีเสรีภาพในการนับถือศาสนาคริสต์ตั้งเเต่กำเนิด",
+                "isCorrect": false
+              },
+              {
+                "text": "แก้วมีเสรีภาพในการเเสดงความคิดเห็นโดยกล่าวถึงผู้อื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "ปูเป้มีสิทธิได้ทุนเรียนต่อจากรัฐบาลจนจบปริญญาตรี",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "ข้อใดกล่าวถูกต้องในความหมายของ “เสรีภาพ”",
+            "choices": [
+              {
+                "text": "ประสงค์จะทำกิจกรรมใดใดก็ได้ในที่สาธารณะโดยไม่ต้องสนใจสิ่งแวดล้อม",
+                "isCorrect": false
+              },
+              {
+                "text": "มีสิทธิในการละเมิดเสรีภาพผู้อื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "สภาวการณ์ของมนุษย์ที่ไม่อยู่ภายใต้การครอบงำของบุคคลอื่น",
+                "isCorrect": true
+              },
+              {
+                "text": "หากกระทำการผิดได้รับการละเว้นโทษ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ข้อใดกล่าวผิดในเรื่องความเสมอภาคทางโอกาส (Equality of Opportunity)",
+            "choices": [
+              {
+                "text": "พลเมืองมีโอกาสการได้รับการศึกษาแบบเท่าเทียมกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "พลเมืองมีสิทธิได้รับการบริการสาธารณะของรัฐ",
+                "isCorrect": false
+              },
+              {
+                "text": "พลเมืองมีโอกาสถือครองกระบวนการทางกฎหมายที่มีผลต่อประชาชน",
+                "isCorrect": true
+              },
+              {
+                "text": "พลเมืองมีโอกาสได้รับบริการทั้งด้านการศึกษา ด้านสาธารณสุข และเข้าถึงยารักษาโรค",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "ข้อใดกล่าวถูกต้องในสิทธิทางสังคม",
+            "choices": [
+              {
+                "text": "เป็นสิทธิในการปฏิบัติตามความเชื่อทางศาสนาเป็นหลัก",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิในการแสดงความคิดเห็นและการแสดงออกกับรัฐ",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่ได้รับการศึกษา หลักประกันและเสรีภาพ ความมั่นคง",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิในการเลือกงานได้อย่างอิสระและรับค่าจ้างอย่างเป็นธรรม",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "กรณีศึกษาใดไม่ใช่เป็นหน้าที่พลเมืองต่อสิทธิทางวัฒนธรรมที่พึงเข้าร่วม",
+            "choices": [
+              {
+                "text": "ประเพณีชักพระเดือนสิบ",
+                "isCorrect": false
+              },
+              {
+                "text": "ประเพณีผีตาโขน",
+                "isCorrect": false
+              },
+              {
+                "text": "ประเพณีรำลึกเหตุการณ์การเปลี่ยนแปลงระบบประชาธิปไตย",
+                "isCorrect": true
+              },
+              {
+                "text": "ประเพณียี่เป็ง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "ข้อใดกล่าวผิดถึงปัจจัยในเรื่องความไม่เสมอภาคทางการศึกษา",
+            "choices": [
+              {
+                "text": "ความเหลื่อมล้ำทางรายได้",
+                "isCorrect": false
+              },
+              {
+                "text": "ความเหลื่อมล้ำทางด้านโอกาส",
+                "isCorrect": false
+              },
+              {
+                "text": "ความเหลื่อมล้ำเรื่องทางวัฒนธรรม",
+                "isCorrect": true
+              },
+              {
+                "text": "ความเหลื่อมล้ำเรื่องทางทรัพย์สิน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ข้อใดกล่าวผิดถึงความหมายของ “เสรีภาพ”",
+            "choices": [
+              {
+                "text": "เป็นสิ่งที่บุคคลสามารถกระทำการใดใดก็ได้",
+                "isCorrect": true
+              },
+              {
+                "text": "หากละเมิดเสรีภาพบุคคลอื่นต้องได้รับโทษ",
+                "isCorrect": false
+              },
+              {
+                "text": "สามารถกระทำการได้อย่างอิสระ แต่ต้องอยู่ภายใต้กติกา",
+                "isCorrect": false
+              },
+              {
+                "text": "ประโยชน์ที่บุคคลกระทำการได้ แต่ต้องอยู่ภายใต้กฎระเบียบ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "ข้อใดกล่าวผิดในเรื่องเสรีภาพขั้นพื้นฐาน Fundamental Freedoms",
+            "choices": [
+              {
+                "text": "เสรีภาพที่เกิดจากความหวาดกลัว",
+                "isCorrect": true
+              },
+              {
+                "text": "เสรีภาพในการชุมนุมในหน่วยงานของรัฐ",
+                "isCorrect": false
+              },
+              {
+                "text": "เสรีภาพในการนับถือศาสนา",
+                "isCorrect": false
+              },
+              {
+                "text": "เสรีภาพในการพูดเเละแสดงออก",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "ข้อใดกล่าวผิดในเรื่องเกี่ยวกับสิทธิมนุษยชน",
+            "choices": [
+              {
+                "text": "เป็นสิทธิขั้นพื้นฐานในเรื่องสิทธิบุคคล",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่ต้องเคารพและห้ามละเมิดสิทธิผู้อื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่ครอบคลุมความเท่าเทียมภายใต้สังคมที่หลากหลาย",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่เปิดช่องว่างให้ผู้อื่นสามารถเข้ามาออกสิทธิ ออกเสียงในชีวิตคนอื่น",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "ข้อใดกล่าวถูกถึงหลักความโปร่งใส (Accountability) ของการนำความเสมอภาคไปใช้ทางการเมืองในข้อปฏิบัติ",
+            "choices": [
+              {
+                "text": "การรักษาสมดุลและส่งเสริมให้ประชาชนพัฒนาตนเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "การใส่ใจต่อระบบสาธารณะ ความกระตือรือร้นในการแก้ปัญหา",
+                "isCorrect": false
+              },
+              {
+                "text": "การบริหารจัดการทรัพยากรที่มีอยู่อย่างจำกัดให้เกิดประโยชน์สูงสุด",
+                "isCorrect": true
+              },
+              {
+                "text": "การอยู่ภายใต้กฎหมายและต้องเปิดเผยมีประสิทธิภาพ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "text": "กรณีศึกษาใดไม่เข้าเกณฑ์หลักคุณธรรม (Morality) ในเรื่องแนวคิดความเสมอภาค",
+            "choices": [
+              {
+                "text": "น้องเอวาเป็นทีมแพทย์ที่รักษาผู้ป่วยยากไร้ในการผ่าตัด",
+                "isCorrect": false
+              },
+              {
+                "text": "มะขิ่นทำขนมเค้กไปขายในราคาที่เป็นกลางและไม่หวังผลกำไรเกินตัว",
+                "isCorrect": false
+              },
+              {
+                "text": "หมูเด้งเข้าร่วมทีมตรวจสอบกลุ่มทุจริตในโรงพยาบาล",
+                "isCorrect": false
+              },
+              {
+                "text": "มาตาลดายึดหลักมาตรฐานของตนเองในการตัดสินผู้อื่น",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "text": "ข้อใดกล่าวผิดในเรื่องเกี่ยวกับสิทธิมนุษยชน",
+            "choices": [
+              {
+                "text": "เป็นสิทธิที่ต้องเคารพและห้ามละเมิดสิทธิผู้อื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่ต้องเคารพและห้ามละเมิดสิทธิผู้อื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่เปิดช่องว่างให้ผู้อื่นสามารถเข้ามาออกสิทธิ ออกเสียงในชีวิตคนอื่น",
+                "isCorrect": true
+              },
+              {
+                "text": "เป็นสิทธิขั้นพื้นฐานในเรื่องสิทธิบุคคล",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "text": "ข้อใดกล่าวถูกต้องเกี่ยวกับความเสมอภาคในแนวนอน (Horizontal Equity)",
+            "choices": [
+              {
+                "text": "คำนึงถึงประชาชนในเรื่องระบบบริการส่วนบุคคล",
+                "isCorrect": true
+              },
+              {
+                "text": "อยู่ในสถานภาพผู้ให้บริการ สถานบริการที่จัดสรรเพื่อคุณภาพชีวิต",
+                "isCorrect": false
+              },
+              {
+                "text": "เน้นในเรื่องคุณภาพที่เกี่ยวข้องกับเรื่องชีวิตส่วนตน",
+                "isCorrect": false
+              },
+              {
+                "text": "ความจำเป็นของชีวิตผูกกับเรื่องสถานะทางการเงิน เพศ อายุ ความเชื่อ เป็นต้น",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 14,
+            "text": "ข้อใดกล่าวผิดเรื่องความเท่าเทียมกันของ \"มนุษย์\" (Human Dignity)",
+            "choices": [
+              {
+                "text": "มนุษย์เท่าเทียมกันในฐานะที่เป็นมนุษยชาติ",
+                "isCorrect": false
+              },
+              {
+                "text": "มนุษย์ที่มีฐานะสูงกว่าย่อมมีสิทธิมีเสียงของความเป็นมนุษย์มากกว่าคนที่ด้อยกว่าเสมอ",
+                "isCorrect": true
+              },
+              {
+                "text": "มนุษย์มีความเท่าเทียมกันของโอกาสจากการแบ่งปันของบุคคลที่มีกำลังมากกว่าเสมอ",
+                "isCorrect": false
+              },
+              {
+                "text": "มนุษย์เท่าเทียมกันในฐานะที่มีความสามารถทางศีลธรรม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 15,
+            "text": "องค์กรเอกชนใดมีบทบาทที่เข้ามาสนับสนุนเรื่องสิทธิมนุษยชน",
+            "choices": [
+              {
+                "text": "PTT Public Company Limited",
+                "isCorrect": false
+              },
+              {
+                "text": "Siam Cement Group",
+                "isCorrect": false
+              },
+              {
+                "text": "Charoen Pokphand Group Company",
+                "isCorrect": false
+              },
+              {
+                "text": "Non-governmental organization",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "text": "ข้อใดกล่าวผิดเกี่ยวกับสิทธิมนุษยชน (Human right)",
+            "choices": [
+              {
+                "text": "ต้องอยู่ภายใต้พื้นฐานของสิทธิ เสรีภาพคำนึงถึงความเสมอภาคและเป็นธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "ต้องคำนึงถึงสิทธิประโยชน์ส่วนบุคคลเป็นหลัก และให้ภาครัฐช่วยเหลือเสมอ",
+                "isCorrect": true
+              },
+              {
+                "text": "ต้องคำนึงถึงความเป็นมนุษย์ของความแตกต่างที่หลากหลายในสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "ต้องคำนึงถึงความเท่าเทียม ศักดิ์ ศรี ของความเป็นมนุษย์ (Human Dignity)",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 17,
+            "text": "ข้อใดกล่าวอธิบายถึงความเสมอภาคทางโอกาส (Equality of Opportunity) ในการบริการจากสาธารณรัฐได้อย่างถูกต้อง",
+            "choices": [
+              {
+                "text": "ได้รับโอกาสเป็นประธานนักเรียนได้",
+                "isCorrect": false
+              },
+              {
+                "text": "ได้รับโอกาสในการเกล่าวปราศัยเรื่องการเมือง",
+                "isCorrect": false
+              },
+              {
+                "text": "ได้รับโอกาสในการฉีดวัคซีน Covid 19",
+                "isCorrect": true
+              },
+              {
+                "text": "ได้รับโอกาสในการฉีดวัคซีนที่ดีเพราะจ่ายมากกว่าคนอื่น",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 18,
+            "text": "แนวคิดเป้าหมาย SDG 10 ของ Sustainable Development Goal ข้อใดกล่าวถูกถึงจุดเน้นที่สำคัญ",
+            "choices": [
+              {
+                "text": "เน้นความเป็นหุ้นส่วนการพัฒนา (Partnership) ความร่วมมือของทุกภาคส่วน",
+                "isCorrect": false
+              },
+              {
+                "text": "เน้นการเติบโตทางเศรษฐกิจ (economic growth) เป็นสำคัญ",
+                "isCorrect": false
+              },
+              {
+                "text": "เน้นเสริมสร้างศักยภาพและส่งเสริมครอบคลุมถึงหลักประกันโอกาสในทางปฏิบัติตามที่เหมาะสมและเท่าเทียม",
+                "isCorrect": true
+              },
+              {
+                "text": "เน้นเรื่องการแก้ไขปัญหาเรื่องการขจัดความยากจนและเสริมสร้างความมั่นคงทางอาหาร",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 19,
+            "text": "ข้อใดไม่ใช่นิยามของสมาชิกในสังคมในนิยามพลเมืองในระบอบประชาธิปไตย",
+            "choices": [
+              {
+                "text": "มีการขับเคลื่อนผ่านกระบวนการเคลื่อนไหวทางสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "มีจิตสำนึกร่วม จิตสาธารณะในการช่วยเหลือผู้อื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "มีความคิดเห็นที่แตกต่างและมีข้อโต้แย้งบนพื้นฐานของตนเอง",
+                "isCorrect": true
+              },
+              {
+                "text": "มีกฎ ระเบียบ ข้อบังคับ ชัดเจนในสังคม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 20,
+            "text": "ข้อใดกล่าวผิดถึงลักษณะคุณสมบัติความเป็นพลเมืองของ Kahne (2004)",
+            "choices": [
+              {
+                "text": "มีการอนุรักษ์วิถีชีวิต ประเพณีของชุมชนท้องถิ่น",
+                "isCorrect": false
+              },
+              {
+                "text": "มีการทำประชาพิจารณ์ผลประโยชน์ของตนเข้าสู่ชุมชน",
+                "isCorrect": true
+              },
+              {
+                "text": "มีจิตสำนึกรักบ้านเกิดจังหวัดของตนเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "มีการนำสื่อดิจิทัลมาปรับใช้กับชนบท",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 21,
+            "text": "พัฒนาการของสิทธิและเสรีภาพช่วงที่ 1 คืออะไร ?",
+            "choices": [
+              {
+                "text": "เป็นเรื่องการแสดงความคิดเห็นการหาทางออกทางการเมือง",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นเรื่องเกี่ยวกับสินทรัพย์ของตนเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นเรื่องลัทธิ การนับถือความเชื่อในการตัดสินความผิด",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 22,
+            "text": "ข้อใดกล่าวผิดเกี่ยวกับสังคม “อนาธิปไตย”",
+            "choices": [
+              {
+                "text": "เป็นสังคมกลุ่มเล็กที่คุ้มครองตนเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสังคมที่ไร้รัฐ ไร้การควบคุม",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นคู่ตรงข้าม (Binary Opposite) กับคำว่าประชาธิปไตย",
+                "isCorrect": true
+              },
+              {
+                "text": "เป็นสังคมที่ไม่ได้สร้างคามเดือดร้อน และเบียดเบียนผู้ใด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 24,
+            "text": "ข้อใดกล่าวถึงความสำคัญของมนุษยชนได้อย่างครอบคลุม",
+            "choices": [
+              {
+                "text": "ถูกนำมาใช้กับสังคมชั้นสูงในสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกนำมาใช้กับการขจัดคนการคนกลุ่มน้อยในสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกนำมาใช้กับประเทศพัฒนาแล้ว",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกนำมาใช้ในเรื่องเกี่ยวกับความสัมพันธ์ระหว่างประเทศ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 25,
+            "text": "“นักศึกษามหาวิทยาลัยสงขลานครินทร์ได้รับสิทธิรักษาในโรงพยาบาล” คำกล่าวข้างต้น อยู่ในสิทธิกลุ่มใด",
+            "choices": [
+              {
+                "text": "สิทธิทางเศรษฐกิจ",
+                "isCorrect": false
+              },
+              {
+                "text": "สิทธิทางสังคม",
+                "isCorrect": true
+              },
+              {
+                "text": "สิทธิทางการเมือง",
+                "isCorrect": false
+              },
+              {
+                "text": "สิทธิทางพลเมือง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 26,
+            "text": "การปราบรามเรื่อง Corruption เป็นหน้าที่ของรัฐด้านใดที่ต้องเข้ามาควบคุมตามหน้าที่ของรัฐหมวด 5",
+            "choices": [
+              {
+                "text": "ด้านข้อมูล ข่าวสาร สาธารณะ",
+                "isCorrect": false
+              },
+              {
+                "text": "ด้านขจัดทุจริตและประพฤติมิชอบ",
+                "isCorrect": true
+              },
+              {
+                "text": "ด้านการคุ้มครองผู้บริโภค",
+                "isCorrect": false
+              },
+              {
+                "text": "ด้านสาธารณูปโภค",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 27,
+            "text": "สวัสดิการของสหภาพแรงงานเป็นเรื่องสิทธิและเสรีภาพในหมวดใด",
+            "choices": [
+              {
+                "text": "สิทธิในกระบวนการยุติธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "สิทธิและเสรีภาพในการประกอบอาชีพ",
+                "isCorrect": true
+              },
+              {
+                "text": "สิทธิและเสรีภาพส่วนบุคคล",
+                "isCorrect": false
+              },
+              {
+                "text": "สิทธิในทรัพย์สิน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 28,
+            "text": "บิวกิ้นมีการต่อยอดทักษะเพิ่มเติมจากความรู้เดิมในฐานของคณะวิศวกรรมศาสตร์ บิวกิ้นมีทักษะของบทบาทนักศึกษาแบบใด",
+            "choices": [
+              {
+                "text": "Up Skills",
+                "isCorrect": true
+              },
+              {
+                "text": "Adaptability Skills",
+                "isCorrect": false
+              },
+              {
+                "text": "Re Skills",
+                "isCorrect": false
+              },
+              {
+                "text": "New Skills",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 29,
+            "text": "ข้อใดกล่าวถูกต้องถึงการสร้างโอกาสและความเสมอภาคในการมีส่วนร่วมในการกระจายอำนาจ",
+            "choices": [
+              {
+                "text": "การพัฒนาความยั่งยืนและสร้างอนาคตให้ลูกหลาน",
+                "isCorrect": false
+              },
+              {
+                "text": "การเปิดเวทีการทำประชาพิจารณ์",
+                "isCorrect": true
+              },
+              {
+                "text": "การส่งเสริมสิทธิมนุษยชน",
+                "isCorrect": false
+              },
+              {
+                "text": "การกระจายทรัพยากรในการบริการ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 30,
+            "text": "นักปรัชญา John Locke กับ Jean-Jacques Rousseau) กล่าวถึงทฤษฎีใดที่พูดถึงแนวคิดความเสมอภาค",
+            "choices": [
+              {
+                "text": "ทฤษฎีความสัมพันธ์เชิงสัญลักษณ์",
+                "isCorrect": false
+              },
+              {
+                "text": "ทฤษฎีสัญญาประชาคม",
+                "isCorrect": true
+              },
+              {
+                "text": "ทฤษฎีการเมืองเรื่องพื้นที่",
+                "isCorrect": false
+              },
+              {
+                "text": "ทฤษฎีความขัดแย้ง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 31,
+            "text": "ข้อใดกล่าวถึงความหมายของความเสมอภาคระหว่างบุคคลได้อย่างครอบคลุม",
+            "choices": [
+              {
+                "text": "การไม่เลือกปฏิบัติเพราะความแตกต่างเฉพาะตัวของบุคคล",
+                "isCorrect": true
+              },
+              {
+                "text": "การมีสิทธิทางการเมืองและการเลือกตั้ง",
+                "isCorrect": false
+              },
+              {
+                "text": "การออกกฎหมาย กฎระเบียบต้องมีข้อบังคับอย่างเท่าเทียมกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "การมีโอกาสเข้ารับการฉีดวัคซีน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 32,
+            "text": "ข้อใดอธิบายถึงเรื่องความเสมอภาคได้อย่างถูกต้อง",
+            "choices": [
+              {
+                "text": "เป็นการเข้าถึงระบบบริการที่มีคุณภาพจากนโยบายเท่ากันทุกคน",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นการบริการที่มีคุณภาพที่รัฐจัดสรรให้อย่างเท่าเทียม",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นอำนาจจากผู้ที่มีปัจจัยมากกว่าคนอื่นในอภิสิทธิ์",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นฐานทรัพยากรทั้งในระดับรายบุคคล ครอบครัวและชุมชน",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 33,
+            "text": "ระบบใดเป็นการอธิบายเรื่องช่องว่างของวรรณะ ชนชั้นและการแข่งขัน",
+            "choices": [
+              {
+                "text": "ระบบสิ่งแวดล้อม",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบการศึกษา",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบเศรษฐกิจ",
+                "isCorrect": false
+              },
+              {
+                "text": "ระบบโครงสร้างทางสังคม",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 34,
+            "text": "ข้อใดไม่ใช่จุดเน้นที่สำคัญของ SDG 10 ตามเป้า Sustainable Development Goal",
+            "choices": [
+              {
+                "text": "การลดสงครามการเมืองที่เกิดขึ้นในแผนระยะสั้น",
+                "isCorrect": false
+              },
+              {
+                "text": "การลดความยากจนและอยู่ดีกินดี",
+                "isCorrect": false
+              },
+              {
+                "text": "การลดการใช้แรงงานเด็ก",
+                "isCorrect": false
+              },
+              {
+                "text": "การลดการช่วยเหลือผู้ลี้ภัย",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 35,
+            "text": "นโยบาย 30 บาท รักษาทุกโรคเป็นการขับเคลื่อนความเท่าเทียมกลุ่มใด",
+            "choices": [
+              {
+                "text": "ความเท่าเทียมในเรื่องโอกาส",
+                "isCorrect": true
+              },
+              {
+                "text": "ความเท่าเทียมในเรื่องรายได้",
+                "isCorrect": false
+              },
+              {
+                "text": "ความเท่าเทียมการเข้าถึงการศึกษา",
+                "isCorrect": false
+              },
+              {
+                "text": "ความเท่าเทียมในระบบเศรษฐกิจ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 36,
+            "text": "ข้อใดคือชุดคำศัพท์ของความจำเป็นในเรื่องความเสมอภาคกับความจำเป็นทางสังคม",
+            "choices": [
+              {
+                "text": "พลเมือง กฎหมาย อนาธิปไตย",
+                "isCorrect": false
+              },
+              {
+                "text": "การปลดปล่อย ความเท่าเทียม ความเสมอภาค",
+                "isCorrect": false
+              },
+              {
+                "text": "ความหลากหลาย ความเป็นอยุติธรรม ความเสมอภาค",
+                "isCorrect": true
+              },
+              {
+                "text": "รัฐ กฎระเบียบ ผู้มีอำนาจ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 37,
+            "text": "ข้อใดไม่ใช่ความหมายของ Bernard (1962) ในเรื่องความเสมอภาค",
+            "choices": [
+              {
+                "text": "การมีข้อโต้แย้งในเรื่องความหลากหลายเพราะความต่างทางชาติพันธุ์",
+                "isCorrect": true
+              },
+              {
+                "text": "การมีกำลังมากกว่าคนอื่นคือการแบ่งปันโอกาสทางสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "จริยธรรมคือความสามารถที่มนุษย์มีความเท่าเทียมกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "การพูดและภาษาถือเป็นเครื่องมือการสร้างความสัมพันธ์ของมนุษย์",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 38,
+            "text": "ข้อใดไม่ใช่ความแตกต่างหลากหลาย (Diversity)",
+            "choices": [
+              {
+                "text": "ทรัพยากรธรรมชาติ",
+                "isCorrect": true
+              },
+              {
+                "text": "สีผิว",
+                "isCorrect": false
+              },
+              {
+                "text": "ชาติพันธุ์",
+                "isCorrect": false
+              },
+              {
+                "text": "ภาษา",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 39,
+            "text": "ข้อใดกล่าวถึงคำสำคัญของ Equality Before the law ถูกต้อง",
+            "choices": [
+              {
+                "text": "สิทธิ กฎหมาย การเมือง",
+                "isCorrect": true
+              },
+              {
+                "text": "พลเมือง มนุษย์ ระเบียบ",
+                "isCorrect": false
+              },
+              {
+                "text": "เสรีภาพ มาตรา ข้อบังคับ",
+                "isCorrect": false
+              },
+              {
+                "text": "อิสระ เสรีภาพขั้นพื้นฐาน กฎหมาย",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 40,
+            "text": "หลักการ CSR ทางสังคมเชิงบรรษัทนับเป็นหลักการความเป็นพลเมืองในข้อปฏิบัติประเภทใด",
+            "choices": [
+              {
+                "text": "Participation",
+                "isCorrect": false
+              },
+              {
+                "text": "Accountability",
+                "isCorrect": false
+              },
+              {
+                "text": "Cost-effectiveness or Economy",
+                "isCorrect": false
+              },
+              {
+                "text": "Responsibility",
+                "isCorrect": true
+              }
+            ]
+          }
+        ],
+        "answersFound": 39
+      },
+      {
+        "filename": "ข้อสอบหน่วยที่ 3.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "เพจชื่อดังเพจหนึ่งในเฟสบุ๊คที่ชอบวิจารณ์การเมืองในช่วงที่เกิดปัญหาใหญ่ในประเทศและมักเป็นการปลุกกระแสให้ลูกเพจแสดงความคิดเห็นในเชิงทะเลาะเบาะแว้งกัน ยิ่งมีประเด็นให้ลูกเพจทะเลาะกันมากเท่าใด ก็ยิ่งทำให้เพจได้รับความนิยมเพิ่มขึ้นเรื่อย ๆ จึงใช้วิธีการดังกล่าวสร้างความนิยมให้แก่เพจของตนเอง ท่านมีความคิดเห็นอย่างไรกับพฤติกรรมนี้",
+            "choices": [
+              {
+                "text": "การกระทำนี้เป็นการสร้างความขัดแย้งในสังคมไทย",
+                "isCorrect": true
+              },
+              {
+                "text": "ประชาชนควรร้องเรียนให้มีการปิดเพจดังกล่าวเพื่อป้องกันปัญหาในอนาคต",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นสิทธิที่จะทำการเปิดพื้นที่แสดงความคิดเห็นให้ประชาชนเข้ามาถกเถียง",
+                "isCorrect": false
+              },
+              {
+                "text": "ถึงเพจนี้จะสร้างความขัดแย้ง แต่คนในสังคมควรยอมรับในความแตกต่างทางความคิดและอยู่ด้วยกันอย่างสันติ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "คำพังเพยในข้อใด หมายถึงสังคมของการขาดแคลนพลเมืองดี",
+            "choices": [
+              {
+                "text": "วัวหายล้อมคอก",
+                "isCorrect": false
+              },
+              {
+                "text": "ขี่ช้างจับตั๊กแตน",
+                "isCorrect": false
+              },
+              {
+                "text": "รักวัวให้ผูก รักลูกให้ตี",
+                "isCorrect": false
+              },
+              {
+                "text": "มือใครยาวสาวได้สาวเอา",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ปรีดาพรเป็นครูที่โรงเรียนแห่งหนึ่งโดยเธอได้รับมอบหมายให้คุมการสอบเข้ามหาวิทยาลัย เมื่อถึงวันสอบเข้ากลับพบว่าหลานของตนนั้นสอบห้องเดียวกับที่เธอคุมอยู่และวันนั้นหลานก็เข้าห้องสายเกินกว่าเวลาที่จะให้เข้าห้องสอบได้ตามกฎ แต่หลานบอกว่าเกิดจากเหตุฉุกเฉินเพราะมีรถเกิดอุบัติเหตุระหว่างทางที่เดินทางมาสอบจึงทำให้รถติดเป็นอย่างมากและมาเข้าสอบไม่ทันจึงขอความเห็นใจจากปรีดาพร สิ่งใดต่อไปนี้คือสิ่งที่ปรีดาพรควรทำมากที่สุด",
+            "choices": [
+              {
+                "text": "ส่งเรื่องให้ทางกองกลางเพื่อพิจารณาระหว่างนั้นยังไม่ให้หลานเข้าสอบ",
+                "isCorrect": true
+              },
+              {
+                "text": "ไม่ยอมให้หลานเข้าห้องสอบเพราะเลยเวลามาแล้วซึ่งเป็นไปตามกฎที่กำหนดไว้",
+                "isCorrect": false
+              },
+              {
+                "text": "ยอมให้หลานเข้าห้องสอบเพราะหากขาดสอบครั้งนี้จะทำให้หลานต้องรอสอบใหม่ปีหน้าซึ่งจะเสียทั้งเวลาและโอกาสได้จึงควรช่วยเหลือเพราะเป็นเหตุจำเป็น",
+                "isCorrect": false
+              },
+              {
+                "text": "ยอมให้หลานเข้าห้องสอบและทำข้อสอบแล้วโทรไปถามความจริงกับแม่ของเด็กทีหลัง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "บุคคลในข้อใดไม่ใช่ความเป็นพลเมืองในวิถีทางสังคม",
+            "choices": [
+              {
+                "text": "แก้วใส่ชุดขาวไปงานศพของคุณตา",
+                "isCorrect": false
+              },
+              {
+                "text": "เกดช่วยคณครูยกหนังสือ",
+                "isCorrect": false
+              },
+              {
+                "text": "ตาลสอนหนังสือให้น้องสาว",
+                "isCorrect": false
+              },
+              {
+                "text": "แจนเมินเฉยเมื่อเพื่อนกำลังซื้อสินค้าจากเพจปลอม",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "ข้อใดไม่จัดเป็น “บทบาทขัดกัน”",
+            "choices": [
+              {
+                "text": "แม่มาตักบาตรให้กับลูกชายที่บวชเป็นพระภิกษุ",
+                "isCorrect": true
+              },
+              {
+                "text": "พ่อกับลูกทำงานในหน่วยเดียวกัน แต่พ่ออยู่ภายใต้บัญชาของลูก",
+                "isCorrect": false
+              },
+              {
+                "text": "พ่อมีอาชีพเป็นตำรวจ จับกุมลูกชายที่ขโมงของคนอื่น",
+                "isCorrect": false
+              },
+              {
+                "text": "คุณครูมีอาชีพเสริมเป็นเจ้าของร้านขายของชำ มักขายบุหรี่ให้กับลูกค้าที่เป็นนักเรียน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "วันหนึ่งจุมพลได้ขึ้นรถเมล์เพื่อที่จะเดินทางไปทำงานตามปกติทุกวัน บังเอิญบนรถเมล์วันนั้นมีสตรีมีครรภ์ยืนอยู่ข้าง ๆ จุมพล แต่จุมพลทำเป็นมองไม่เห็นสตรีมีครรภ์คนนั้น เพราะไม่อยากยืนเมื่อยและเสียสละที่นั่งของตนให้ จึงเพิกเฉยต่อไป แต่มีป้าที่นั่งข้าง ๆ เห็นจึงพูดเสียงดังขึ้นมาว่า “คนสมัยนี้นี่มันแล้งน้ำใจกันจริง ๆ เห็นคนท้องแต่ก็ทำเป็นไม่เห็น” ด้วยความที่ป้าพูดเสียงดังทำให้คนบนรถเมล์ต่างมองจุมพลด้วยสายตาเหยียดหยามและพากันติฉินนินทาว่าจุมพลแล้งน้ำใจ จากนั้นป้าที่พูดเสียงดังก็ลุกจากที่นั่งให้สตรีมีครรภ์คนนั้นนั่ง และเดินลงจากรถเมล์ไป จากเหตุการณ์ข้างต้น จุมพลถูกลงโทษจากผู้คนด้วยการถูกติฉินนินทา และมองเหยียดหยาม เพราะจุมพลทำผิดหรือฝ่าฝืนบรรทัดฐานทางสังคมหรือ Social normal ในข้อใด",
+            "choices": [
+              {
+                "text": "กฎหมาย (Law)",
+                "isCorrect": false
+              },
+              {
+                "text": "การควบคุมทางสังคม (Social Control)",
+                "isCorrect": false
+              },
+              {
+                "text": "จารีตประเพณี (Mores)",
+                "isCorrect": false
+              },
+              {
+                "text": "วิถีประชา/ วิถีชาวบ้าน (Folkways)",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "นางสาวน้อยเดินทางไปสัมภาษณ์งาน เมื่อไปถึงเลขาแจ้งให้เธอเข้าห้องทำงานของหัวหน้าฝ่ายบุคคลได้เลย แต่โปรดรอสักครู่เพราะเจ้านายของเธอกำลังติดธุระ เมื่อนางสาวน้อยเข้ามาสิ่งที่เธอพบเจอ คือ ห้องทำงานขนาดใหญ่ มีโต๊ะทำงานตัวหรูตัวเดียว ไม่ปะปนกับพนักงานอื่น เก้าอี้ดูนุ่มใหญ่สบาย ภายในห้องติดเครื่องปรับอากาศและมีชุดรับแขกจำนวน 1 ชุด จากข้อความข้างต้นบอกสัญลักษณ์ของตำแหน่งในข้อใดถูกต้องที่สุด",
+            "choices": [
+              {
+                "text": "คำนำหน้าชื่อ",
+                "isCorrect": false
+              },
+              {
+                "text": "ความแตกต่างของการแต่งกาย",
+                "isCorrect": false
+              },
+              {
+                "text": "สัญลักษณ์ทางวัตถุ",
+                "isCorrect": true
+              },
+              {
+                "text": "ภาวะทางชีววิทยา",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "บุคคลใดต่อไปนี้ปฏิบัติตามบทบาทหน้าที่ของตนเองได้ดีที่สุด",
+            "choices": [
+              {
+                "text": "ตั้มขโมยยาจากร้านเภสัชไปให้แม่ที่ป่วย เพราะไม่มีเงิน",
+                "isCorrect": false
+              },
+              {
+                "text": "น้อยให้เพื่อนลอกการบ้านเป็นประจำ เพราะเป็นหน้าที่ของเพื่อนที่ดี",
+                "isCorrect": false
+              },
+              {
+                "text": "เป้นำเงินที่ตนมีทั้งหมดไปทำบุญ ทำให้ตนเองอดอาหาร",
+                "isCorrect": false
+              },
+              {
+                "text": "เนยช่วยคนติดยา โดยประสานเจ้าหน้าที่ให้นำตัวไปรักษา",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "ในการทำงานกลุ่มใหญ่มีเพื่อนร่วมกลุ่มจำนวนหนึ่งไม่ได้มีส่วนร่วมในการช่วยทำงานกลุ่มเลย ในฐานะที่นักศึกษาเป็นเพื่อนร่วมกลุ่ม นักศึกษาเห็นด้วยกับการกระทำใดต่อไปนี้",
+            "choices": [
+              {
+                "text": "คุยกับเขาดี ๆ แล้วแบ่งงานให้ทำตามความสามารถของแต่ละคน",
+                "isCorrect": true
+              },
+              {
+                "text": "เข้าไปบอกตรง ๆ ด้วยน้ำเสียงห้วน ๆ",
+                "isCorrect": false
+              },
+              {
+                "text": "เอาเรื่องนี้ไปบอกเพื่อนในกลุ่มแล้วตีตัวออกห่าง",
+                "isCorrect": false
+              },
+              {
+                "text": "ไล่ออกจากกลุ่มทันที",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "ในฐานะที่เราเป็นนักศึกษาควรจะมีลักษณะของพลเมืองที่ดีในวิถีประชาธิปไตยยกเว้นข้อใด",
+            "choices": [
+              {
+                "text": "ชักชวนให้ผู้อื่นเคารพการตัดสินใจของตนเองในทุกเรื่อง",
+                "isCorrect": true
+              },
+              {
+                "text": "เคารพหลักความเสมอภาค",
+                "isCorrect": false
+              },
+              {
+                "text": "พึ่งพาตนเองและรับผิดชอบตนเองได้",
+                "isCorrect": false
+              },
+              {
+                "text": "เคารพกติกา เคารพกฎหมาย ใช้กติกาในการแก้ปัญหา",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "text": "นายแพทย์เจนจบเป็นแพทย์เชี่ยวชาญที่ประจำตำแหน่งอยู่ในโรงพยาบาลแห่งหนึ่ง วันหนึ่งเขาเพิ่งรู้ว่าลูกสาวของเขาเจ็บป่วยกระทันหันและกำลังมาโรงพยาบาลที่เขารักษาอยู่ แต่เมื่อลูกสาวเขามาถึงกลับมีผู้ป่วยฉุกเฉินอาการหนักที่ประสบอุบัติเหตุมาถึงพร้อมกันและขณะนั้นแพทย์คนอื่นก็กำลังติดผ่าตัดด่วนอยู่ไม่สามารถรักษาผู้ป่วยฉุกเฉินคนนี้ได้ สิ่งใดต่อไปนี้คือสิ่งที่แพทย์คนนี้ควรกระทำมากที่สุด",
+            "choices": [
+              {
+                "text": "รักษาผู้ป่วยอีกคนที่อาการหนักเพราะลูกสาวของตนเองนั้นอาการไม่หนักแต่อีกฝ่ายเป็นผู้ป่วยฉุกเฉินจำเป็นต้องรักษาอย่างเร่งด่วนโดยบอกให้เหตุผลกับลูกของตนทีหลัก",
+                "isCorrect": true
+              },
+              {
+                "text": "ตัดสินใจรักษาลูกสาวของตนก่อนทันทีเพราะพ่อที่ดีควรต้องช่วยเหลือลูกเสมอไม่ว่าจะเกิดอะไรขึ้น",
+                "isCorrect": false
+              },
+              {
+                "text": "รีบไปรักษาผู้ป่วยฉุกเฉินก่อนทันทีเพราะเป็นไปตามข้อพึงปฏิบัติโดยทิ้งความสนใจจากลูก",
+                "isCorrect": false
+              },
+              {
+                "text": "ตัดสินใจรักษาลูกสาวตัวเองก่อนแล้วค่อยไปให้เหตุผลกับผู้ป่วยอีกท่านว่าลูกของเขานั้นมาถึงก่อน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "text": "ใครปฏิบัติตนเป็นพลเมืองในวิถีทางสังคมได้น่ายกย่องที่สุด",
+            "choices": [
+              {
+                "text": "อีริกชอบพูดบูลลี่รูปร่างและหน้าตาของเพื่อน จนทำให้เพื่อนเสียความมั่นใจไม่กล้าเข้าสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "เบนเคารพความแตกต่างหลากหลายอย่างเท่าเทียมของเพื่อนมนุษย์ ไม่เบียดเบียนไม่ว่าจะเป็นเพศสภาพ เชื้อชาติ หรือความเชื่อที่ต่างจากตน",
+                "isCorrect": true
+              },
+              {
+                "text": "ลูคัสชอบขับขี่รถจักรยานยนต์บนทางเท้า เมื่อมีผู้สัญจรผ่านไปมาเขาจะบีบแตรไล่ผู้คนที่ผ่านไปมาพร้อมกับด่าทอ",
+                "isCorrect": false
+              },
+              {
+                "text": "แม็กซ์รังแกเพื่อนร่วมห้องที่พิการทางสายตา พร้อมชักชวนเพื่อน ๆ มารุมกลั่นแกล้งและด่าประณามว่าเป็นภาระสังคม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "text": "ข้อใดต่อไปนี้ไม่ใช่ผลดีที่เกิดจากการที่สมาชิกในสังคมประชาธิปไตยรู้จักปฏิบัติตนเป็นพลเมืองดีตามวิถีประชาธิปไตย รู้จักปฏิบัติตนเป็นพลเมืองดีตามวิถีประชาธิปไตยต่อสังคมและประเทศชาติ",
+            "choices": [
+              {
+                "text": "สังคมมีความเป็นระเบียบเรียบร้อย",
+                "isCorrect": false
+              },
+              {
+                "text": "ทำให้สังคมและประเทศชาติมีการพัฒนาไปอย่างมั่นคง",
+                "isCorrect": false
+              },
+              {
+                "text": "สังคมมีความเป็นธรรม เมื่อทุกคนได้รับสิทธิเท่าเทียมกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "ทำให้คนในสังคมมีความขัดแย้งกัน",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 14,
+            "text": "“ลุงพอใจ เป็นชายแก่คนหนึ่ง มีอาชีพเก็บของเก่าขาย ทุกเช้าลุงพอใจจะทำบุญตักบาตร” ข้อใดเรียงความเป็นพลเมืองในวิถีทางสังคมได้ถูกต้อง",
+            "choices": [
+              {
+                "text": "สถานภาพที่มีมาแต่กำเนิด สถานภาพที่ได้รับมาภายหลัง บทบาทหน้าที่ บรรทัดฐาน",
+                "isCorrect": false
+              },
+              {
+                "text": "บทบาทหน้าที่ บรรทัดฐาน สถานภาพที่มีมาแต่กำเนิด สถานภาพที่ได้มาภายหลัง",
+                "isCorrect": false
+              },
+              {
+                "text": "สถานภาพที่ได้รับมาภายหลัง บทบาทหน้าที่ สถานภาพที่มีมาแต่กำเนิด บรรทัดฐาน",
+                "isCorrect": false
+              },
+              {
+                "text": "สถานภาพที่ได้รับมาภายหลัง บทบาทหน้าที่ บรรทัดฐาน สถานภาพที่มีมาแต่กำเนิด",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 15,
+            "text": "ประชาชนที่มีความเป็นพลเมืองในวิถีทางสังคมที่ดีจะส่งผลดีต่อประเทศข้อใดมากที่สุด",
+            "choices": [
+              {
+                "text": "สังคมจะสงบสุขและเป็นระเบียบเรียบร้อย",
+                "isCorrect": true
+              },
+              {
+                "text": "เจ้าหน้าที่ตำรวจไม่ต้องทำงานหนัก",
+                "isCorrect": false
+              },
+              {
+                "text": "รัฐสภาต้องตรากฎหมายใหม่",
+                "isCorrect": false
+              },
+              {
+                "text": "ทำให้มีความมั่นคงในด้านเศรษฐกิจที่ดี",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "text": "การปฏิบัติตนของบุคคลใดถือว่าได้ทำหน้าที่ของการเป็นพลเมืองที่ดีของสังคมได้เหมาะสมมากที่สุด",
+            "choices": [
+              {
+                "text": "นายดำเสียภาษีครบถ้วน",
+                "isCorrect": false
+              },
+              {
+                "text": "นายโอค้าขายอย่างสุจริต",
+                "isCorrect": false
+              },
+              {
+                "text": "นายโทนี่ปฏิบัติตามกฎหมายบ้านเมืองอย่างเคร่งครัด",
+                "isCorrect": true
+              },
+              {
+                "text": "นายป้อมเมื่อได้ยินเสียงเพลงชาติจึงหยุดยืนนิ่ง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 17,
+            "text": "ข้อใดแสดงถึงบรรทัดฐานทางสังคมมากที่สุด",
+            "choices": [
+              {
+                "text": "ทำอะไรตามใจคือไทยแท้",
+                "isCorrect": false
+              },
+              {
+                "text": "รู้แพ้ รู้ชนะ รู้อภัย",
+                "isCorrect": true
+              },
+              {
+                "text": "น้ำขึ้นให้รีบตัก",
+                "isCorrect": false
+              },
+              {
+                "text": "เดินตามหลังผู้ใหญ่หมาไม่กัด",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 18,
+            "text": "หากนักศึกษากับเพื่อนเดินไปเจอผู้หญิงคนหนึ่งยืนซื้อของอยู่ แล้วจู่ ๆ เพื่อนของนักศึกษาสะกิดพร้อมกระซิบข้างหู วิจารณ์ถึงเรื่องการแต่งตัวของผู้หญิงคนนั้นว่าค่อนข้างแย่ เลือกเสื้อผ้าไม่เหมาะสมกับตนเอง จากสถานการณ์ดังกล่าวนักศึกษาควรทำอย่างไร",
+            "choices": [
+              {
+                "text": "ต่อว่าต่อขานเพื่อน รู้สึกผิดหลังที่เพื่อนมีความคิดแบบนี้แล้วเดินจากเพื่อนไป",
+                "isCorrect": false
+              },
+              {
+                "text": "ชวนเพื่อนเดินเข้าไปทักทายผู้หญิงคนนั้น พูดคุยกันอย่างตรงไปตรงมา พร้อมทั้งแนะนำวิธีการแต่งตัวให้ผู้หญิงคนนั้น",
+                "isCorrect": false
+              },
+              {
+                "text": "อธิบายให้เพื่อนฟังถึงเรื่องมารยาทและการให้เกียรติ การเคารพรสนิยมความชอบ และเคารพสิทธิของผู้อื่น ไม่ยึดตัวเองเป็นใหญ่ในการตัดสินผู้อื่น อธิบายให้เพื่อเข้าใจเหตุผลด้วยความใจเย็น",
+                "isCorrect": true
+              },
+              {
+                "text": "แม้จะไม่เห็นด้วยกับเพื่อน แต่คุณก็เลือกที่จะเออออคล้อยตามเพื่อนไป เพื่อป้องกันความขัดแย้งระหว่างกันที่อาจเกิดขึ้นเป็นปัญหาใหญ่โต",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 19,
+            "text": "ใครถือเป็นพลเมืองได้ดีที่สุด ถ้าพิจารณาจากหลักเหตุและผล",
+            "choices": [
+              {
+                "text": "ดำเป็นชาวประมงออกเรือหาปลาในทุกตอนเช้า เมื่อถึงเวลาหาปลาเสร็จดำจึงรีบกลับบ้านเพื่อที่จะนำปลาที่ได้ไปขายในตลาดหมู่บ้าน แต่ในขณะที่ดำได้เดินทางกลับบ้าน ได้เห็นเด็กชายวัย 14 ปีใจกล้ากระโดดลงน้ำ แต่ดำกลับมองไปเห็นเด็กชายวัย 14 ปีกำลังร้องขอความช่วยเหลือ ดำจึงขับรถผ่านไปเหมือนไม่มีอะไรเกิดขึ้น",
+                "isCorrect": false
+              },
+              {
+                "text": "ดีได้พบเห็นทรัพย์สินที่สาธารณะเป็นกระเป๋าสตางค์ไม่มีเจ้าของวางอยู่บนเก้าอี้ที่นั่งพัก จึงรีบวิ่งเข้าไปขโมยโดยทันทีและรีบขึ้นรถหลบหนีไป",
+                "isCorrect": false
+              },
+              {
+                "text": "แดงมีฐานะยากจนเห็นพนักงานส่งอาหารได้จอดซื้ออาหารที่ลูกค้าสั่งไว้ ซึ่งเป็นรถจักรยานยนต์ แดงได้เข้าไปถอดกล่องใส่อาหารแล้ววิ่งหนีไปอย่างรวดเร็วและพบว่าด้านในกล่องมีอาหารหลากหลายชนิด ในขณะนั้นมีตำรวจคนหนึ่งได้เห็นเหตุการณ์เช่นนี้ ก็ได้นิ่งเฉยทำเหมือนไม่สนใจ",
+                "isCorrect": false
+              },
+              {
+                "text": "ฟ้าเป็นพยาบาลทำหน้าที่ช่วยเหลือผู้ป่วยในโรงพยาบาล เมื่อฟ้าได้เลิกงานจึงเดินทางกลับบ้าน ได้มีคนชราขับรถจักรยายนต์ล้มคว่ำนอนขวางอยู่บนถนนได้รับบาดเจ็บอย่างรุนแรง ฟ้าจึงลงจากรถไปช่วยเหลือปฐมพยาบาลคนชรา และนำส่งโรงพยาบาลจนทำให้คนชรามีอาการดีขึ้น",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 20,
+            "text": "บุคคลใดต่อไปนี้ปฏิบัติตนตามวิถีประชาได้ถูกต้องที่สุด",
+            "choices": [
+              {
+                "text": "ปุ๋ยใส่ชุดสีแดงไปงานศพญาติ",
+                "isCorrect": false
+              },
+              {
+                "text": "เทสเซิ้งโปงลางในประเพณีทำบุญบั้งไฟ",
+                "isCorrect": true
+              },
+              {
+                "text": "นิวไม่กินเนื้อหมูในวันพระ",
+                "isCorrect": false
+              },
+              {
+                "text": "กิ่งเรียนจบแล้วกลับมาทำงานเลี้ยงดูพ่อแม่",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 21,
+            "text": "ข้อใดกล่าวไม่ถูกต้องเกี่ยวกับบรรทัดฐานทางสังคม (Social Norm)",
+            "choices": [
+              {
+                "text": "จารีต เป็นแบบแผนที่มีความเคร่งครัดน้อยกว่าวิถีประชา หากผู้ใดฝ่าฝืนมักไม่มีโทษร้ายแรง",
+                "isCorrect": true
+              },
+              {
+                "text": "กฎหมายหรือข้อบังคับเป็นบัญญัติที่เป็นลายลักษณ์อักษรและได้รับการรับรองจากภาครัฐ",
+                "isCorrect": false
+              },
+              {
+                "text": "วิถีประชา เป็นแนวทางการปฏิบัติของบุคคลในชุมชน ซึ่งปฏิบัติตามความเคยชิน และเป็นที่ยอมรับในสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "หากผู้ที่ไม่ปฏิบัติตามวิถีประชาจะได้รับการติเตียน เยาะเย้ย ถากถางหรือการนินทาจากผู้อื่น",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 22,
+            "text": "สถานการณ์ใดต่อไปนี้ถือได้ว่าเป็น Role conflict (บทบาทที่ขัดแย้งกัน)",
+            "choices": [
+              {
+                "text": "ยุทธนา เป็นตำรวจยศผู้กำกับ มีหน้าที่คอยจัดการคดีต่าง ๆ แต่วันหนึ่งมีสายแจ้งว่าลูกชายของเขาได้ไปมั่วสุมเสพยาเสพติดในโรงแรมม่านรูดกับกลุ่มเพื่อน",
+                "isCorrect": true
+              },
+              {
+                "text": "นิต้า เป็นดาราสาวสุดฮอต มีรายได้จากการทำงานเป็นจำนวนมาก เธอได้แบ่งรายได้ส่วนหนึ่งนำไปสร้างบ้านใดม่ให้พ่อและแม่ของเธออยู่อย่างสบาย",
+                "isCorrect": false
+              },
+              {
+                "text": "บอย เป็นวินมอเตอร์ไซต์ หาเช้ากินค่ำ รับ-ส่งลูกค้าประจำ เมื่อมีเวลาว่างจากการทำงาน บอยกก็กลับบ้านที่ต่างจังหวัดเพื่อไปเยี่ยมพ่อแม่อยู่เป็นประจำ",
+                "isCorrect": false
+              },
+              {
+                "text": "สมหญิง เป็นครูสอนหนังสือและคอยให้คำปรึกษาแก้นักเรียนอยู่อย่างสม่ำเสมอเมื่อกลับถึงบ้าน เธอเป็นภรรยาที่ดี เธอคอยดูแลสามีของเธอเป็นอย่างดี ทั้งทำกับข้าวและดูแลเรื่องงานบ้าน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 23,
+            "text": "เนสเป็นเด็กผู้ชายที่รักสวยรักงาม ด้วยความที่เนสเป็นคนที่หน้าตาดีและมีความสามารถ ทำให้เขาชนะในการประกวดนางงามสาวสองเขาได้รางวัลชนะเลิศมาและนำเงินที่ได้มาให้พ่อและแม่ สถานภาพที่ได้มาแต่กำเนิดของ เนสคืออะไร",
+            "choices": [
+              {
+                "text": "ผู้เข้าประกวดนางงาม",
+                "isCorrect": false
+              },
+              {
+                "text": "ผู้ได้รางวัลชนะเลิกการประกวดนางงาม",
+                "isCorrect": false
+              },
+              {
+                "text": "เพศชาย",
+                "isCorrect": true
+              },
+              {
+                "text": "เพศหญิง",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 24,
+            "text": "บุคคลใดในข้อต่อไปนี้ปฏิบัติตนเป็นพลเมืองที่ดีในวิถีทางสังคมชัดเจนที่สุด",
+            "choices": [
+              {
+                "text": "คิมบริจาคเงินให้แก่มูลนิธิกระจกเงาทุกปี เนื่องจากเป็นสัญญาผูกมัดระหว่างบริษัทของคิมและลี",
+                "isCorrect": false
+              },
+              {
+                "text": "พีไม่ใส่หน้ากากอนามัยออกจากบ้านในช่วงสถานการณ์โควิท 19 และไปเที่ยวทะเล ซึ่งในขณะที่พีไปเที่ยวก็ได้ช่วยเหลือเด็กที่กำลังจมน้ำที่ไม่มีใครเข้าไปช่วย",
+                "isCorrect": false
+              },
+              {
+                "text": "จินทำงานเป็นหัวหน้าบริษัทแห่งหนึ่งเมื่อลูกน้องเสนองาน จินจะรับฟังแล้วเลือกงานที่ชื่นชอบไปเสนอแก่ท่านประธาน",
+                "isCorrect": false
+              },
+              {
+                "text": "ฟางเป็นประธานบริษัทแห่งหนึ่ง เมื่อลูกน้องมีปัญหาฟางจะลงไปช่วยเหลือลูกน้องทุกคน และเมื่อพักเที่ยงฟางจะช่วยคุณยายเร่ขายขนมที่ข้างตึก",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 25,
+            "text": "แม่เป็นครู และจับได้ว่าลูกลอกการบ้านของเพื่อนมาส่งต่อหน้านักเรียนคนอื่น ๆ ในห้อง ซึ่งก่อนหน้านี้มีกฎว่าหากลอกการบ้านจะต้องหักคะแนนความประพฤติ -3 คะแนน แม่ควรทำอย่างไร",
+            "choices": [
+              {
+                "text": "ตีลูกต่อหน้าคนอื่น เพราะเด็กคนอื่นจะได้ไม่กล้าลอกการบ้านอีก",
+                "isCorrect": false
+              },
+              {
+                "text": "หักคะแนนเพียง -2 คะแนน เพราะกลัวลูกได้คะแนนน้อย",
+                "isCorrect": false
+              },
+              {
+                "text": "ปล่อยไป เพราะลูกของเราคงทำการบ้านไม่ทัน",
+                "isCorrect": false
+              },
+              {
+                "text": "ไม่ลำเอียงใด ๆ หัก –3 คะแนนตามปกติ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 26,
+            "text": "ข้อใดต่อไปนี้ทำบทบาทหน้าที่ไม่ถูกต้อง",
+            "choices": [
+              {
+                "text": "อาจารย์เอกเตรียมการเรียนการสอนก่อนที่จะสอนในวันพรุ่งนี้",
+                "isCorrect": false
+              },
+              {
+                "text": "ฟอดเป็นตำรวจทำหน้าที่เป็นจราจรตั้งแต่เช้า",
+                "isCorrect": false
+              },
+              {
+                "text": "นุเอาเงินที่พ่อแม่ส่งให้ไปเรียนไปเล่นการพนันบอล",
+                "isCorrect": true
+              },
+              {
+                "text": "หมอโทพยายามที่จะช่วยคนไข้ที่หมดสติในห้อง ICU",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 27,
+            "text": "หากไม่ปฏิบัติตามวิถีประชาและจารีตประเพณีจะส่งผลให้เกิดเหตุการณ์ใดขึ้นตามลำดับ",
+            "choices": [
+              {
+                "text": "โดนดูถูกและบอยคอต",
+                "isCorrect": true
+              },
+              {
+                "text": "บอยคอตและได้รับโทษทางกฎหมาย",
+                "isCorrect": false
+              },
+              {
+                "text": "ได้รับบทลงโทษทางกฎหมายทั้งสองกรณี",
+                "isCorrect": false
+              },
+              {
+                "text": "โดนประนามและโดนดูถูก",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 28,
+            "text": "ประโยชน์ของบรรทัดฐานทางสังคมคือข้อใด",
+            "choices": [
+              {
+                "text": "สังคมมีความเป็นระเบียบเรียบร้อย",
+                "isCorrect": true
+              },
+              {
+                "text": "สังคมมีความก้าวหน้าทางกฎหมาย",
+                "isCorrect": false
+              },
+              {
+                "text": "คนในสังคมได้รับการศึกษาอย่างเท่าเทียมกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "คนในสังคมได้พัฒนาศักยภาพอย่างเต็มที่",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 29,
+            "text": "กลุ่มวัยรุ่นนิยมแข่งขันขับขี่จักรยานยนต์บนถนนหลายสาย (เด็กแว้น) การกระทำดังกล่าวสอดคล้องกับข้อใด",
+            "choices": [
+              {
+                "text": "ลดความขัดแย้งระหว่างกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "ปกป้องเสรีภาพของตนเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "การใช้เสรีภาพเกินขอบเขต",
+                "isCorrect": true
+              },
+              {
+                "text": "การใช้สิทธิและเสรีภาพในการทำงาน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 30,
+            "text": "เด็กหญิงมาลีเป็นเพื่อนกับเด็กหญิงดวงใจ ทั้งสองคนสนิทกันมากและเป็นเพื่อนที่ดีต่อกัน อยู่มาวันหนึ่งเด็กหญิงมาลีทำกระจกในห้องเรียนแตก ซึ่งเด็กหญิงดวงใจเป็นผู้เห็นเหตุการณ์ คุณครูประจำชั้นเดินเข้ามาและถามเหตุการณ์ทั้งหมดกับเด็กหญิงดวงใจ เด็กหญิงดวงใจควรจะตอบครูประจำชั้นว่าอย่างไรจึงจะเป็นการกระทำที่ถูกต้องที่สุด",
+            "choices": [
+              {
+                "text": "เด็กหญิงดวงใจตอบครูประจำชั้นว่าเด็กหญิงมาลีเป็นคนทำกระจกแตก และบอกกับเด็กหญิงมาลีว่าถ้าหากทำผิดก็ต้องยอมรับผิด",
+                "isCorrect": true
+              },
+              {
+                "text": "เด็กหญิงดวงใจตอบครูประจำชั้นว่าเด็กชายภาณุวัฒน์เป็นคนทำ เด็กหญิงมาลีไม่ได้เกี่ยวข้องเพื่อช่วยเด็กหญิงมาลีในฐานะเพื่อน",
+                "isCorrect": false
+              },
+              {
+                "text": "เด็กหญิงดวงใจตอบครูประจำชั้นว่าไม่เห็นเหตุการณ์ที่เกิดขึ้น",
+                "isCorrect": false
+              },
+              {
+                "text": "เด็กหญิงดวงใจตอบครูประจำชั้นว่าเด็กหญิงมาลีไม่ได้เป็นคนทำ เพื่อช่วยเด็กหญิงมาลีในฐานนะเพื่อน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 31,
+            "text": "เมื่อมีคนทะเลาะกันในที่สาธารณะ สิ่งใดเป็นสิ่งที่พลเมืองดีควรทำ",
+            "choices": [
+              {
+                "text": "ปล่อยให้ทะเลาะกัน เพราะเป็นปัญหาของคนสองคนไม่เกี่ยวกับคนนอก",
+                "isCorrect": false
+              },
+              {
+                "text": "ชวนเพื่อน ๆ ไปยืนดู เพื่อให้คนที่ทะเลาะกันอับอายและหยุดไปเอง",
+                "isCorrect": false
+              },
+              {
+                "text": "ถ่ายคลิปโพสต์ประจารณ์ในพฤติกรรมที่ไม่เหมาะสมนี้ เพื่อให้ไม่ทำอีก",
+                "isCorrect": false
+              },
+              {
+                "text": "แจ้งเจ้าหน้าที่ที่ดูแลบริเวณนั้นให้เข้าไปช่วยห้ามปราม",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 32,
+            "text": "เอมมี่เกิดมาเป็นเด็กผู้หญิง เธอเป็นลูกชาวนา เธอตั้งใจเรียนจนจบปริญญาโทจากต่างประเทศ จากเหตุการณ์จัดเป็นสถานภาพอะไรบ้างตามลำดับ",
+            "choices": [
+              {
+                "text": "สถานภาพเพศ สถานภาพตระกูล สถานภาพเชื้อชาติ",
+                "isCorrect": false
+              },
+              {
+                "text": "สถานภาพเพศ สถานภาพการศึกษา",
+                "isCorrect": false
+              },
+              {
+                "text": "สถานภาพตระกูล สถานภาพการศึกษา",
+                "isCorrect": false
+              },
+              {
+                "text": "สถานภาพเพศ สถานภาพตระกูล สถานภาพการศึกษา",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 33,
+            "text": "ใครมีลักษณะของความเป็นพลเมืองที่ดีในสังคม",
+            "choices": [
+              {
+                "text": "นายเขียวทิ้งขยะเรี่ยราดบนถนน",
+                "isCorrect": false
+              },
+              {
+                "text": "นายบลูหยุดรถเมื่อสัญญาณไฟจราจรเป็นสีแดง",
+                "isCorrect": true
+              },
+              {
+                "text": "นางแดงพูดจากหยาบคายกับคุณครู",
+                "isCorrect": false
+              },
+              {
+                "text": "นางดำเหยียดบุคคลที่มีรูปร่างอ้วน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 34,
+            "text": "สมพงษ์คบหาดูใจกับสมหญิงจนแต่งงานมีลูกด้วยกัน 2 คน ต่อมาวันหนึ่งสมหมายซึ่งเป็นแฟนเก่าของสมหญิงกลับมาร้องขอคืนดี แต่สมหญิงได้เลิกรักสมหมายไปแล้วจึงปฏิเสธไป สมหมายไม่ยอมจึงใช้กำลังพาสมหญิงไปอยู่ด้วยในระหว่างยื้อกันอยู่นั้น สมพงษ์ได้เข้ามาเจอพอดี และคิดว่าภรรยาของตนกำลังนอกใจ ด้วยความหึงหวงและขาดสติจึงหยิบมีดมาแทงสมหมายจนเสียชีวิต จากเหตุการณ์ดังกล่าวผิดตามบรรทัดฐานทางสังคมอะไรบ้าง",
+            "choices": [
+              {
+                "text": "วิถีประชา และ จารีต",
+                "isCorrect": false
+              },
+              {
+                "text": "วิถีประชา และ กฎหมาย",
+                "isCorrect": false
+              },
+              {
+                "text": "จารีต และ กฎหมาย",
+                "isCorrect": true
+              },
+              {
+                "text": "ไม่มีข้อใดถูก",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 35,
+            "text": "หากในกลุ่มเพื่อนสนิทมีการคุยกันเรื่อง ๆ หนึ่ง แต่เพื่อนบางคนมีความเห็นต่างจากนักศึกษา การกระทำใดไม่เหมาะสม",
+            "choices": [
+              {
+                "text": "ไม่ยอมรับความเห็นต่าง แสดงท่าทางหงุดหงิด",
+                "isCorrect": true
+              },
+              {
+                "text": "เปิดโอกาสให้ผู้อื่นแสดงความคิดเห็นอย่างเสรี",
+                "isCorrect": false
+              },
+              {
+                "text": "เคารพในความเห็นที่แตกต่าง",
+                "isCorrect": false
+              },
+              {
+                "text": "ยึดหลักเสียงส่วนมากเพื่อหาข้อยุติและเคารพเสียงส่วนน้อย",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 36,
+            "text": "แม่ลูกคู่หนึ่งเดินไปพบพนักงานทำความสะอาดถนนกำลังทำงานอยู่ คำพูดใดของแม่ต่อไปนี้ไม่เหมาะสม",
+            "choices": [
+              {
+                "text": "“ลูกอย่างทิ้งขยะลงบนถนนนะ พี่พนักงานจะได้ไม่เหนื่อย”",
+                "isCorrect": false
+              },
+              {
+                "text": "“ถ้ามีวันหยุดว่าง ๆ เราลองไปทำจิตอาสาเก้บขยะกันดูไหมจ๊ะ”",
+                "isCorrect": false
+              },
+              {
+                "text": "“เพราะมีพนักงานคอยช่วยทำความสะอาดถนนหนทางเลยดูสะอาดตานะลูก”",
+                "isCorrect": false
+              },
+              {
+                "text": "“ถ้าเกิดลกไม่ตั้งใจเรียน และไม่ขยันเรียนระวังจะเป็นแบบเขานะ”",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 37,
+            "text": "การที่สังคมจะสงบสุขได้นั้นประชาชนต้องมีคุณธรรมข้อใดเป็นสำคัญ",
+            "choices": [
+              {
+                "text": "ความรับผิดชอบ",
+                "isCorrect": false
+              },
+              {
+                "text": "เห็นแก่ประโยชน์ส่วนรวม",
+                "isCorrect": true
+              },
+              {
+                "text": "ความขยันอดทน",
+                "isCorrect": false
+              },
+              {
+                "text": "ความมีระเบียบวินัย",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 38,
+            "text": "อิงฟ้าและเพื่อน ๆ ทำงานกลุ่มร่วมกันอย่างสนุกสนาน สมาชิกทุกคนแบ่งหน้าที่กันอย่างทั่วถึง เมื่องานกลุ่มเสร็จสิ้นลงมีผลงานที่ได้รับความชมเชยจากสมาชิกกลุ่มอื่น ๆ การกระทำของอิงฟ้าและเพื่อน ๆ สอดคล้องกับแนวทางการปฏิบัติตนในข้อใด",
+            "choices": [
+              {
+                "text": "การเคารพซึ่งกันและกัน และความรับผิดชอบ",
+                "isCorrect": true
+              },
+              {
+                "text": "ความมีเหตุผล การเคารพซึ่งกันและกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "ความรับผิดชอบ การตกลงกันอย่างสันติ",
+                "isCorrect": false
+              },
+              {
+                "text": "ความมีเหตุผล การติดตามงานอย่างเป็นระเบียบ",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 39,
+            "text": "การปฏิบัติตนตามบทบาทของพลเมืองดีในข้อใดที่มีผลต่ความเป็นระเบียบเรียบร้อยของสังคม",
+            "choices": [
+              {
+                "text": "ปฏิบัติตนตามค่านิยมที่ดี",
+                "isCorrect": false
+              },
+              {
+                "text": "รับการศึกษาอบรม",
+                "isCorrect": false
+              },
+              {
+                "text": "การปฏิบัติตนตามพิธีกรรมทางศาสนาอย่างเคร่งครัด",
+                "isCorrect": false
+              },
+              {
+                "text": "ปฏิบัติตนตามกฎหมาย",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 40,
+            "text": "ข้อใดกล่าวถึงหน้าที่และบทบาทของพ่อแม่ที่ดีได้ถูกต้อง",
+            "choices": [
+              {
+                "text": "ไม่ปล่อยให้ลูกทำสิ่งใหม่ ๆ ด้วยตนเองเด็ดขาด เพราะอาจเป็นอันตรายได้",
+                "isCorrect": false
+              },
+              {
+                "text": "กล่าวตักเตือนอย่างรุนแรงเมื่อลูกทำผิด เพื่อให้จำและไม่ทำอีก",
+                "isCorrect": false
+              },
+              {
+                "text": "เป็นแบบอย่างที่ดีให้แก่ลูก",
+                "isCorrect": true
+              },
+              {
+                "text": "ตามใจลูกทุกอย่างที่ต้องการ",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 40
+      },
+      {
+        "filename": "ข้อสอบหน่วยที่ 4.html",
+        "type": "pdf",
+        "questions": [],
+        "pdfInfo": {
+          "driveFileId": "13JoZMN4AXDHk0v0mbXp25F7e3CyzusCy",
+          "driveUrl": "https://drive.google.com/file/d/13JoZMN4AXDHk0v0mbXp25F7e3CyzusCy/preview",
+          "hasPin": true,
+          "pin": "123456"
+        }
+      },
+      {
+        "filename": "ข้อสอบหน่วยที่5.html",
+        "type": "quiz",
+        "questions": [
+          {
+            "id": 1,
+            "text": "กระบวนการกลืนกลายทางวัฒนธรรมที่จัดว่าสมบูรณ์ที่สุด คือ",
+            "choices": [
+              {
+                "text": "กระบวนการกลืนกลายทางชีวภาพ",
+                "isCorrect": true
+              },
+              {
+                "text": "กระบวนการกลืนกลายทางสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "การบูรณาการทางวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "การสังสรรค์ทางวัฒนธรรม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "text": "การที่วัฒนธรรมจากกลุ่มหนึ่งถ่ายทอดไปสู่กลุ่มอื่นเรียกว่าการแพร่กระจายทางวัฒนธรรม",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "text": "ข้อใดไม่ใช่ลักษณะพื้นฐานที่สำคัญของวัฒนธรรม",
+            "choices": [
+              {
+                "text": "วัฒนธรรมเป็นสิ่งที่ไม่หยุดนิ่ง และวัฒนธรรมเป็นสิ่งที่มนุษย์เรียนรู้ทีละเล็กน้อย",
+                "isCorrect": false
+              },
+              {
+                "text": "วัฒนธรรมเป็นเรื่องของกิจกรรมที่กำหนดขึ้นโดยองค์กรภาครัฐ มีจุดเริ่มต้นและการกำหนดวันสิ้นสุด มีลักษณะชั่วคราว",
+                "isCorrect": true
+              },
+              {
+                "text": "วัฒนธรรมเป็นความคิดร่วม และวัฒนธรรมมีพื้นฐานมาจากการใช้สัญลักษณ์",
+                "isCorrect": false
+              },
+              {
+                "text": "วัฒนธรรมเป็นองค์รวมของความรู้และภูมิปัญญา",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "text": "การสื่อสารภายใต้มิติความหลากหลายทางวัฒนธรรมต้องให้ความสำคัญกับการศึกษาลักษณะเฉพาะข้อใด",
+            "choices": [
+              {
+                "text": "ความแตกต่างในเรื่องของบทบาทพฤติกรรมที่เหมาะสมระหว่างผู้ชายและผู้หญิงในแต่ละวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "ช่องว่างของอำนาจ ความเป็นส่วนตัว และการรวมเป็นกลุ่ม",
+                "isCorrect": false
+              },
+              {
+                "text": "การหลีกเลี่ยงความไม่แน่นอน เช่น เหตุการณ์ที่อาจจะก่อให้เกิดความไม่มั่นใจ ซึ่งความไม่มั่นใจนั้นเป็นบ่อเกิดของความกังวลใจ และแน่นอนว่าบุคคลจะแสดงออกถึงความไม่มั่นใจในรูปแบบที่แตกต่างกัน",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 5,
+            "text": "วัฒนธรรมมีหน้าที่สนองตอบความต้องการพื้นฐานของมนุษย์ เช่น สอนให้มนุษย์รู้จักหาอาหารอย่างมีประสิทธิภาพ วางกฎเกณฑ์ให้มนุษย์ดำเนินชีวิตอย่างมีระเบียบแบบแผน เพื่อให้สังคมทำงานได้อย่างมีระบบ หมายถึงสิ่งใด",
+            "choices": [
+              {
+                "text": "วัฒนธรรมเป็นองค์รวมของความรู้",
+                "isCorrect": true
+              },
+              {
+                "text": "วัฒนธรรมมีพื้นฐานมาจากการใช้สัญลักษณ์",
+                "isCorrect": false
+              },
+              {
+                "text": "วัฒนธรรมเป็นสิ่งที่ไม่หยุดนิ่ง",
+                "isCorrect": false
+              },
+              {
+                "text": "การแพร่วัฒนธรรม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "text": "\"เมื่อกลุ่มชนที่มีวัฒนธรรมต่างกันมีการแพร่กระจายและการรับวัฒนธรรมกันขึ้น ส่งผลให้เกิดการเปลี่ยนแปลงขึ้นกับฝ่ายใดฝ่ายหนึ่งหรือทั้งสองฝ่ายก็ได้ เช่น ชาวไทยมีความสัมพันธ์อย่างใกล้ชิดกับชาวจีนจึงรับอาหารจีนมาบริโภค\" ข้อความดังเป็นเรื่องการสังสรรค์วัฒนธรรม",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "text": "ข้อใดกล่าวไม่ถูกต้องเกี่ยวกับ ความสำคัญของวัฒนธรรม",
+            "choices": [
+              {
+                "text": "วัฒนธรรมคือสิ่งที่อยู่เหนือมนุษย์",
+                "isCorrect": true
+              },
+              {
+                "text": "วัฒนธรรมเป็นเครื่องแสดงเอกลักษณ์ของชาติ",
+                "isCorrect": false
+              },
+              {
+                "text": "แสดงถึงเอกลักษณ์ของสังคม",
+                "isCorrect": false
+              },
+              {
+                "text": "วัฒนธรรมเป็นตัวกำหนดรูปแบบของสถาบัน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 8,
+            "text": "ข้อใดเป็นลักษณะหรืออาการของบุคคลที่ไม่สามารถที่จะปรับตัวให้สอดคล้องหรือเข้ากับวัฒนธรรมใหม่ที่ไม่คุ้นเคย ซึ่งอาจมีอาการ ตื่นเต้น วิตกกังวล ประหม่า และอาจถึงขั้นเป็นลมหมดสติ หรือหัวใจวายจนถึงแก่ชีวิต",
+            "choices": [
+              {
+                "text": "การตื่นตระหนกทางวัฒนธรรม",
+                "isCorrect": true
+              },
+              {
+                "text": "ความรู้สึกสอดคล้องทางวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "การปรับตัวทางวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "การแพร่กระจายและการยืมวัฒนธรรม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 9,
+            "text": "วัฒนธรรมคือ วิถีการดำเนินชีวิต ความคิด ความเชื่อ ค่านิยม จารีตประเพณี พิธีกรรม และภูมิปัญญา ซึ่งกลุ่มชนและสังคมได้ร่วมสร้างสรรค์สั่งสม ปลูกฝัง สืบทอด เรียนรู้ ปรับปรุง และ เปลี่ยนแปลง เพื่อให้เกิดความเจริญงอกงามทั้งด้านจิตใจและวัตถุอย่างสันติสุขและยั่งยืน",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 10,
+            "text": "อัตราในการตื่นตระหนกทางวัฒนธรรมของบุคคล จะมากหรือน้อยขึ้นอยู่กับสิ่งใด",
+            "choices": [
+              {
+                "text": "ขบวนการปลูกฝังสั่งสอนวัฒนธรรมเดิม มีความนิยมในวัฒนธรรมของตนเองมากเกินไป",
+                "isCorrect": true
+              },
+              {
+                "text": "การส่งเสริมให้เกิดการยอมรับในความแตกต่างหลายทางวัฒนธรรมอย่างเท่าเทียม",
+                "isCorrect": false
+              },
+              {
+                "text": "การฟื้นตัวและการเรียนรู้วัฒนธรรมใหม่",
+                "isCorrect": false
+              },
+              {
+                "text": "การฟักตัวและวิกฤติของวัฒนธรรมใหม่",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 11,
+            "text": "ข้อใดไม่ใช่เป็นสาเหตุของความแตกต่างทางวัฒนธรรม ท่ามกลางการเปลี่ยนแปลงของสังคมยุคใหม่ที่มีการพัฒนาอย่างก้าวกระโดดของนวัตกรรม เทคโนโลยี ความรู้ใหม่ และการสื่อสารที่ไร้พรมแดน",
+            "choices": [
+              {
+                "text": "เป็นสภาวะที่เกิดขึ้นทางจิตใจ อารมณ์ และความรู้สึกที่มีต่อพฤติกรรมที่แตกต่างไปจากพฤติกรรมเดิมที่บุคคลเคยรับรู้ เคยเห็น เคยปฏิบัติ และมีประสบการณ์มาก่อน",
+                "isCorrect": true
+              },
+              {
+                "text": "การท่องเที่ยวเป็นอีกกิจกรรมหนึ่งที่ทำให้ผู้อาศัยอยู่ในประเทศต่าง ๆ ได้เดินทางไปมาหาสู่",
+                "isCorrect": false
+              },
+              {
+                "text": "ความสัมพันธ์ในระดับรัฐกับกลุ่มนักลงทุน อันเป็นเรื่องของการค้า การลงทุน การทำธุรกิจ เพื่อหวังผลตอบแทน ในด้านเศรษฐกิจ หรือการศึกษาและการเมืองเป็นสำคัญ",
+                "isCorrect": false
+              },
+              {
+                "text": "การอพยพจากสภาพสังคมแบบชนบทไปสู่สังคมเมืองภายในประเทศเดียวกันหรือต่างประเทศ เพื่อการศึกษาหาความรู้ การทำงาน หรือการประกอบอาชีพ อันเป็นส่วนหนึ่งของการเคลื่อนย้ายแรงงาน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 12,
+            "text": "ข้อใดเป็นองค์ประกอบของบุคคลที่มีความรู้สึกสอดคล้องกลมกลืนในการดำเนินชีวิตท่ามกลางความหลากหลายทางวัฒนธรรม ได้เป็นอย่างดี",
+            "choices": [
+              {
+                "text": "การรับรู้และประเมินของบุคคลว่าปัญหาหรือสิ่งที่เกิดขึ้นในชีวิตเป็นสิ่งที่มีความหมาย มีคุณค่าและตนมีกําลังความสามารถเพียงพอที่จะเข้าไปจัดการ โดยมองปัญหาที่เกิดขึ้นว่าเป็นสิ่งที่ท้าท้าย คุ้มค่าที่จะจัดการมากกว่าที่จะมองว่าเป็นปัญหา",
+                "isCorrect": false
+              },
+              {
+                "text": "เมื่อบุคคลต้องเผชิญเหตุการณ์ต่าง ๆ บุคคลสามารถเข้าใจความหมายของสิ่งที่เกิดขึ้นนั้น ๆ ได้ โดยใช้สติปัญญาในการทําความเข้าใจ ว่าเป็นสิ่งธรรมดาที่บุคคลอาจจะต้องพบเจอ",
+                "isCorrect": false
+              },
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              },
+              {
+                "text": "การรับรู้และประเมินของบุคคลว่าตนมีแหล่งทรัพยากรเพียงพอที่จะใช้ตอบสนอง หรือจัดการกับปัญหาที่รุมเร้าตนอยู่ ซึ่งสิ่งที่นํามาจัดการนั้นอาจนํามาจากความสามารถภายในตนเอง เช่น สติปัญญา การค้นคว้าหาความรู้ หรือจากความสามารถภายนอกจากแหล่งอื่น เช่นกลุ่มเพื่อน",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 13,
+            "text": "ลักษณะบุคคลที่พยายามใช้องค์ความรู้ทางวัฒนธรรมเพื่อให้เข้าใจแก่นแท้ มีความยินดีและพยายามที่จะมีปฏิสัมพันธ์กับผู้ที่มีวัฒนธรรมแตกต่างที่อยู่ในวัฒนธรรมที่แตกต่างด้วยความตั้งใจ ใฝ่รู้และเคารพ มีความสามารถในการปรับตัวเองไปมาระหว่างสองวัฒนธรรมได้อย่างเหมาะสมกลมกลืน พร้อมทั้งมีความเชื่อในวีถีของตนเองว่าเป็นวิถีสากลหรือวิถีทางปกติ เป็นลักษณะกลุ่มใด",
+            "choices": [
+              {
+                "text": "กลุ่มปรับตัว (adjusting)",
+                "isCorrect": false
+              },
+              {
+                "text": "กลุ่มเข้าใจ (understanding)",
+                "isCorrect": false
+              },
+              {
+                "text": "กลุ่มไม่ปรับตัว (no adapt)",
+                "isCorrect": false
+              },
+              {
+                "text": "กลุ่มเรียนรู้ (learning)",
+                "isCorrect": true
+              }
+            ]
+          },
+          {
+            "id": 14,
+            "text": "กระบวนการที่เกิดขึ้นเมื่อคนสองกลุ่มที่มีวัฒนธรรมที่ต่างกันติดต่อกันยาวนานและต่อเนื่อง จนกระทั่ง ได้มีการเปลี่ยนแปลงวัฒนธรรมเดิมและหันไปรับวัฒนธรรมใหม่ทั้งหมด หมายถึงสิ่งใด",
+            "choices": [
+              {
+                "text": "กระบวนการกลืนกลายทางวัฒนธรรม",
+                "isCorrect": true
+              },
+              {
+                "text": "ความร่วมมือทางวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "การยืมวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "ความซับซ้อนของวัฒนธรรม",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 15,
+            "text": "ข้อใดกล่าวถึงแนวคิดพื้นฐานเกี่ยวกับความแตกต่างและความหลากหลายทางวัฒนธรรมได้อย่างถูกต้อง",
+            "choices": [
+              {
+                "text": "ถูกทุกข้อ",
+                "isCorrect": true
+              },
+              {
+                "text": "การยืนยันอัตลักษณ์ทางวัฒนธรรมของกลุ่มตนเอง และเรียนรู้คุณค่าของมรดกทางวัฒนธรรม ของกลุ่มตน",
+                "isCorrect": false
+              },
+              {
+                "text": "การให้คุณค่าความหลากหลายทางวัฒนธรรม เอาใจใส่ต่อการดำรงอยู่ของกลุ่มวัฒนธรรมที่แตกต่าง โดยมีวัตถุประสงค์ให้ผู้คนมีความเคารพวัฒนธรรมที่แตกต่างในพื้นที่ต่าง ๆ ที่มีกลุ่มวัฒนธรรมดำรงอยู่",
+                "isCorrect": false
+              },
+              {
+                "text": "การเคารพและมีความปรารถนาที่จะเรียนรู้เพื่อทำความเข้าใจและเรียนรู้วัฒนธรรมของคนอื่น",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "text": "อุดมการณ์ ค่านิยม แนวคิด ภาษา ความเชื่อทางศาสนา ขนมธรรมเนียมประเพณี ลัทธิการเมือง กฎหมาย วิธีการกระทำ และแบบแผนในการดำเนินชีวิต อันเป็นวัฒนธรรมในรูปแบบใด",
+            "choices": [
+              {
+                "text": "วัฒนธรรมเชิงกระบวนการ",
+                "isCorrect": false
+              },
+              {
+                "text": "วัฒนธรรมที่ไม่ใช่วัตถุ",
+                "isCorrect": true
+              },
+              {
+                "text": "การยืมวัฒนธรรม",
+                "isCorrect": false
+              },
+              {
+                "text": "วัฒนธรรมร่วมสมัย",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 17,
+            "text": "การปรับตัวแบบ W-curve ในส่วนที่ 3 หมายถึงสิ่งใด",
+            "choices": [
+              {
+                "text": "ช่วงเปลี่ยนถิ่นฐาน",
+                "isCorrect": false
+              },
+              {
+                "text": "ภาวะความเครียด",
+                "isCorrect": false
+              },
+              {
+                "text": "ช่วงที่บุคคลรู้สึกเข้าที่เข้าทางมากขึ้น",
+                "isCorrect": true
+              },
+              {
+                "text": "ช่วงที่บุคคลรู้สึกเข้าที่เข้าทางกับสภาพแวดล้อมใหม่มากขึ้น",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 18,
+            "text": "บุคคลที่สามารถปรับตัวต่อการ เปลี่ยนแปลงของสภาพแวดล้อมทั้งทางกายภาพและทางจิตวิทยาได้ดีนั้น จะนํามาซึ่งความสงบสุขทั้ง ทางกาย และทางใจ รวมทั้งส่งผลดีต่อบุคคลรอบข้าง คนใกล้ชิด ตลอดจนคนที่อยู่ในสังคมนั้นด้วย",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 19,
+            "text": "ความคิดและพฤติกรรมที่ติดตัวบุคคล เมื่อบุคคลไปถึงที่ใดวัฒนธรรมก็จะไปถึงที่นั้นด้วย ดังนั้นการแพร่กระจายของวัฒนธรรมจะ ขึ้นอยู่กับปัจจัยหลักภูมิศาสตร์ ปัจจัยทางเศรษฐกิจ ปัจจัยทางสังคม การคมนาคมขนส่ง",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          },
+          {
+            "id": 20,
+            "text": "หากต้องการที่จะประสบความสำเร็จทางการสื่อสารระหว่างวัฒนธรรมนั้น ก่อนอื่นบุคคลควรจะมีการเรียนรู้และทำความเข้าใจถึงวัฒนธรรมที่มีความหลากหลายแตกต่างกันของคู่สื่อสารก่อน",
+            "choices": [
+              {
+                "text": "True",
+                "isCorrect": true
+              },
+              {
+                "text": "False",
+                "isCorrect": false
+              }
+            ]
+          }
+        ],
+        "answersFound": 20
+      }
+    ]
+  }
+}

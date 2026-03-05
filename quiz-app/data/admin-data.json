@@ -1,0 +1,35 @@
+{
+  "courseSettings": {
+    "good-citizen": {
+      "isActive": false,
+      "scheduleStart": "2026-02-27T16:16:00.000Z",
+      "scheduleEnd": "2026-03-14T16:14:00.000Z",
+      "order": 0
+    },
+    "save-earth": {
+      "isActive": false,
+      "scheduleStart": null,
+      "scheduleEnd": null,
+      "order": 1
+    },
+    "natural-therapy": {
+      "isActive": true,
+      "scheduleStart": null,
+      "scheduleEnd": null,
+      "order": 2
+    },
+    "digital-technology": {
+      "isActive": false,
+      "scheduleStart": null,
+      "scheduleEnd": null,
+      "order": 3
+    },
+    "everyday-english": {
+      "isActive": false,
+      "scheduleStart": null,
+      "scheduleEnd": null,
+      "order": 4
+    }
+  },
+  "adminPasswordHash": "0043f8ca8cfe9162b50ac1ba4a528c54369ac1e564e5a45548f051f63d933b6b"
+}

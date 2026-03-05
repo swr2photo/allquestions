@@ -1,0 +1,13 @@
+{
+  "courses": [],
+  "courseOverrides": [
+    {
+      "courseId": "natural-therapy",
+      "title": "ธรรมชาติบำบัด",
+      "description": "เรียนรู้เกี่ยวกับการบำบัดด้วยธรรมชาติ สมุนไพร อโรมาเธอราพี และศาสตร์แพทย์ทางเลือก",
+      "icon": "🌿",
+      "color": "from-green-500 to-emerald-700"
+    }
+  ],
+  "quizOverrides": []
+}
