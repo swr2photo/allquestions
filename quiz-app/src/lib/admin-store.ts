@@ -157,29 +157,82 @@ export function createSessionToken(): string {
   return crypto.randomBytes(32).toString("hex");
 }
 
-// In-memory session store with user info (resets on server restart)
+// File-based session store (persists across server restarts)
+const SESSIONS_FILE = path.join(process.cwd(), "data", "sessions.json");
+const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8 hours
+
 interface SessionInfo {
   email: string;
   name: string;
   picture: string;
 }
 
-const sessions = new Map<string, SessionInfo>();
+interface StoredSession extends SessionInfo {
+  createdAt: number;
+}
+
+function loadSessions(): Record<string, StoredSession> {
+  ensureDataDir();
+  try {
+    if (fs.existsSync(SESSIONS_FILE)) {
+      const raw = fs.readFileSync(SESSIONS_FILE, "utf-8");
+      const sessions: Record<string, StoredSession> = JSON.parse(raw);
+
+      // Clean up expired sessions
+      const now = Date.now();
+      let changed = false;
+      for (const token of Object.keys(sessions)) {
+        if (now - sessions[token].createdAt > SESSION_MAX_AGE_MS) {
+          delete sessions[token];
+          changed = true;
+        }
+      }
+      if (changed) {
+        saveSessions(sessions);
+      }
+
+      return sessions;
+    }
+  } catch {
+    // If file is corrupted, start fresh
+  }
+  return {};
+}
+
+function saveSessions(sessions: Record<string, StoredSession>): void {
+  ensureDataDir();
+  fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2), "utf-8");
+}
 
 export function addSession(token: string, info: SessionInfo): void {
-  sessions.set(token, info);
+  const sessions = loadSessions();
+  sessions[token] = {
+    ...info,
+    createdAt: Date.now(),
+  };
+  saveSessions(sessions);
 }
 
 export function removeSession(token: string): void {
-  sessions.delete(token);
+  const sessions = loadSessions();
+  delete sessions[token];
+  saveSessions(sessions);
 }
 
 export function isValidSession(token: string | null | undefined): boolean {
   if (!token) return false;
-  return sessions.has(token);
+  const sessions = loadSessions();
+  return token in sessions;
 }
 
 export function getSessionInfo(token: string | null | undefined): SessionInfo | null {
   if (!token) return null;
-  return sessions.get(token) || null;
+  const sessions = loadSessions();
+  const session = sessions[token];
+  if (!session) return null;
+  return {
+    email: session.email,
+    name: session.name,
+    picture: session.picture,
+  };
 }
