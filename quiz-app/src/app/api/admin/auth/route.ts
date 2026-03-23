@@ -3,8 +3,6 @@ import {
   verifyGoogleToken,
   isAllowedAdminEmail,
   createSessionToken,
-  addSession,
-  removeSession,
   isValidSession,
   getSessionInfo,
 } from "@/lib/admin-store";
@@ -41,8 +39,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = createSessionToken();
-    addSession(token, {
+    const token = createSessionToken({
       email: userInfo.email,
       name: userInfo.name,
       picture: userInfo.picture,
@@ -76,11 +73,6 @@ export async function POST(request: NextRequest) {
 
 // DELETE /api/admin/auth - Logout
 export async function DELETE(request: NextRequest) {
-  const token = request.cookies.get("admin-session")?.value;
-  if (token) {
-    removeSession(token);
-  }
-
   const response = NextResponse.json({ success: true });
   response.cookies.delete("admin-session");
   return response;
@@ -97,3 +89,4 @@ export async function GET(request: NextRequest) {
     user: valid ? user : null,
   });
 }
+

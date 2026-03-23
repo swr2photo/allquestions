@@ -20,18 +20,20 @@ export async function GET(request: NextRequest) {
   const courseId = request.nextUrl.searchParams.get("courseId");
 
   if (courseId) {
-    const quizzes = getCustomQuizzesForCourse(courseId);
+    const quizzes = await getCustomQuizzesForCourse(courseId);
     return NextResponse.json({ success: true, quizzes });
   }
 
   // Return all custom quizzes grouped by course
-  const allQuizzes: Record<string, ReturnType<typeof getCustomQuizzesForCourse>> = {};
-  for (const course of courses) {
-    const cq = getCustomQuizzesForCourse(course.id);
-    if (cq.length > 0) {
-      allQuizzes[course.id] = cq;
-    }
-  }
+  const allQuizzes: Record<string, any> = {};
+  await Promise.all(
+    courses.map(async (course) => {
+      const cq = await getCustomQuizzesForCourse(course.id);
+      if (cq.length > 0) {
+        allQuizzes[course.id] = cq;
+      }
+    })
+  );
 
   return NextResponse.json({ success: true, quizzes: allQuizzes });
 }
@@ -67,7 +69,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const quiz = createCustomQuiz({
+      const quiz = await createCustomQuiz({
         courseId,
         title,
         type: "pdf",
@@ -108,7 +110,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const quiz = createCustomQuiz({
+    const quiz = await createCustomQuiz({
       courseId,
       title,
       type: "quiz",

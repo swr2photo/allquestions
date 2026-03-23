@@ -28,6 +28,10 @@ import {
   Plus,
   Trash2,
   PenLine,
+  Sparkles,
+  RefreshCw,
+  User,
+  Loader2,
 } from "lucide-react";
 import type { CourseSettings } from "@/types";
 
@@ -42,6 +46,12 @@ interface CourseWithSettings {
   pdfCount: number;
   isCustomCourse?: boolean;
   settings: CourseSettings;
+}
+
+interface AIQuota {
+  email: string;
+  usage: number;
+  limit: number;
 }
 
 type ToastType = "success" | "error";
@@ -59,8 +69,10 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [courses, setCourses] = useState<CourseWithSettings[]>([]);
   const [customQuizzes, setCustomQuizzes] = useState<CustomQuizItem[]>([]);
+  const [aiQuotas, setAiQuotas] = useState<AIQuota[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [resettingQuota, setResettingQuota] = useState<string | null>(null);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
@@ -72,11 +84,26 @@ export default function AdminDashboard() {
     setTimeout(() => setToast(null), 3000);
   }, []);
 
+  const fetchAIQuotas = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/ai/quotas");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          setAiQuotas(data.quotas);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
   const fetchCourses = useCallback(async () => {
     try {
       const [coursesRes, quizzesRes] = await Promise.all([
         fetch("/api/admin/courses"),
         fetch("/api/admin/quizzes"),
+        fetchAIQuotas(),
       ]);
 
       if (coursesRes.status === 401) {
@@ -314,6 +341,26 @@ export default function AdminDashboard() {
       }
     } catch {
       showToast("ลบไม่สำเร็จ", "error");
+    }
+  }
+
+  // Reset AI quota for a user
+  async function resetAIQuota(email: string) {
+    if (!confirm(`ต้องการรีเซ็ตโควตาของ ${email} ใช่หรือไม่?`)) return;
+    
+    setResettingQuota(email);
+    try {
+      const res = await fetch(`/api/admin/ai/quotas?email=${encodeURIComponent(email)}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setAiQuotas(prev => prev.filter(q => q.email !== email));
+        showToast(`รีเซ็ตโควตาของ ${email} สำเร็จ`, "success");
+      }
+    } catch {
+      showToast("รีเซ็ตไม่สำเร็จ", "error");
+    } finally {
+      setResettingQuota(null);
     }
   }
 
@@ -790,6 +837,76 @@ export default function AdminDashboard() {
           })}
         </div>
       )}
+      {/* AI Usage Section */}
+      <div className="mt-10 space-y-3 pb-10">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-violet-500" />
+            การใช้งาน AI ของผู้ใช้ ({aiQuotas.length})
+          </h2>
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="text-xs text-gray-500 gap-1.5"
+            onClick={fetchAIQuotas}
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            โหลดข้อมูลใหม่
+          </Button>
+        </div>
+
+        {aiQuotas.length === 0 ? (
+          <div className="bg-white rounded-xl p-8 text-center border border-dashed border-gray-200">
+            <p className="text-sm text-gray-400">ยังไม่มีข้อมูลการใช้งาน AI ในขณะนี้</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {aiQuotas.map((quota) => (
+              <Card key={quota.email} className="border-gray-200 hover:shadow-sm transition-shadow">
+                <CardHeader className="py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+                      <User className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{quota.email}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden max-w-[150px]">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              quota.usage >= quota.limit ? "bg-red-500" : "bg-violet-500"
+                            }`}
+                            style={{ width: `${Math.min(100, (quota.usage / quota.limit) * 100)}%` }}
+                          />
+                        </div>
+                        <span className={`text-[10px] font-bold ${
+                          quota.usage >= quota.limit ? "text-red-500" : "text-violet-600"
+                        }`}>
+                          {quota.usage} / {quota.limit}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 gap-1.5 px-2 h-8"
+                      onClick={() => resetAIQuota(quota.email)}
+                      disabled={resettingQuota === quota.email}
+                    >
+                      {resettingQuota === quota.email ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-3 w-3" />
+                      )}
+                      <span className="hidden sm:inline">รีเซ็ต</span>
+                    </Button>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

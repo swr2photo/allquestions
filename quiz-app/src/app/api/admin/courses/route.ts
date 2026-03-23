@@ -19,41 +19,44 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const adminData = loadAdminData();
-  const customCourseData = loadCustomCourseData();
+  const adminData = await loadAdminData();
+  const customCourseData = await loadCustomCourseData();
 
   // Static courses with overrides applied
-  const staticCoursesWithSettings = courses.map((course) => {
-    const customQuizzes = getCustomQuizzesForCourse(course.id);
-    const allQuizzes = [...course.quizzes, ...customQuizzes];
+  const staticCoursesWithSettings = await Promise.all(
+    courses.map(async (course) => {
+      const customQuizzes = await getCustomQuizzesForCourse(course.id);
+      const allQuizzes = [...course.quizzes, ...customQuizzes];
 
-    // Apply course override if exists
-    const override = customCourseData.courseOverrides.find(
-      (o) => o.courseId === course.id
-    );
+      // Apply course override if exists
+      const override = customCourseData.courseOverrides.find(
+        (o) => o.courseId === course.id
+      );
 
-    return {
-      id: course.id,
-      title: override?.title ?? course.title,
-      description: override?.description ?? course.description,
-      icon: override?.icon ?? course.icon,
-      color: override?.color ?? course.color,
-      quizCount: allQuizzes.length,
-      questionCount: allQuizzes.reduce((sum, q) => sum + q.questions.length, 0),
-      pdfCount: allQuizzes.filter((q) => q.type === "pdf").length,
-      customQuizCount: customQuizzes.length,
-      isCustomCourse: false,
-      settings: adminData.courseSettings[course.id] || {
-        isActive: true,
-        scheduleStart: null,
-        scheduleEnd: null,
-        order: 0,
-      },
-    };
-  });
+      return {
+        id: course.id,
+        title: override?.title ?? course.title,
+        description: override?.description ?? course.description,
+        icon: override?.icon ?? course.icon,
+        color: override?.color ?? course.color,
+        quizCount: allQuizzes.length,
+        questionCount: allQuizzes.reduce((sum, q) => sum + q.questions.length, 0),
+        pdfCount: allQuizzes.filter((q) => q.type === "pdf").length,
+        customQuizCount: customQuizzes.length,
+        isCustomCourse: false,
+        settings: adminData.courseSettings[course.id] || {
+          isActive: true,
+          scheduleStart: null,
+          scheduleEnd: null,
+          order: 0,
+        },
+      };
+    })
+  );
 
   // Custom courses
-  const customCourses = getAllCustomCourses().map((cc) => ({
+  const allCustomCourses = await getAllCustomCourses();
+  const customCourses = allCustomCourses.map((cc) => ({
     id: cc.id,
     title: cc.title,
     description: cc.description,
@@ -68,7 +71,7 @@ export async function GET(request: NextRequest) {
       isActive: true,
       scheduleStart: null,
       scheduleEnd: null,
-      order: staticCoursesWithSettings.length + getAllCustomCourses().indexOf(cc),
+      order: staticCoursesWithSettings.length + allCustomCourses.indexOf(cc),
     },
   }));
 
@@ -94,7 +97,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newCourse = createCustomCourse({
+    const newCourse = await createCustomCourse({
       title: title.trim(),
       description: description?.trim() || "",
       icon: icon || "📚",
@@ -102,12 +105,14 @@ export async function POST(request: NextRequest) {
       quizzes: [],
     });
 
+    const allCustomCourses = await getAllCustomCourses();
+
     // Auto-create course settings
-    updateCourseSettings(newCourse.id, {
+    await updateCourseSettings(newCourse.id, {
       isActive: true,
       scheduleStart: null,
       scheduleEnd: null,
-      order: courses.length + getAllCustomCourses().length - 1,
+      order: courses.length + allCustomCourses.length - 1,
     });
 
     return NextResponse.json({ success: true, course: newCourse });
@@ -139,7 +144,7 @@ export async function PATCH(request: NextRequest) {
     for (const update of updates) {
       const { courseId, ...settings } = update;
       if (courseId) {
-        results[courseId] = updateCourseSettings(courseId, settings);
+        results[courseId] = await updateCourseSettings(courseId, settings);
       }
     }
 

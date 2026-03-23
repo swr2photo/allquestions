@@ -1,22 +1,11 @@
-import fs from "fs";
-import path from "path";
+import { kv } from "@/lib/kv";
 import type {
   CustomCourse,
   CustomCourseData,
   CourseOverride,
   QuizOverride,
   Quiz,
-  Question,
 } from "@/types";
-
-const DATA_FILE = path.join(process.cwd(), "data", "custom-courses.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
 
 function getDefaultData(): CustomCourseData {
   return {
@@ -26,12 +15,10 @@ function getDefaultData(): CustomCourseData {
   };
 }
 
-export function loadCustomCourseData(): CustomCourseData {
-  ensureDataDir();
+export async function loadCustomCourseData(): Promise<CustomCourseData> {
   try {
-    if (fs.existsSync(DATA_FILE)) {
-      const raw = fs.readFileSync(DATA_FILE, "utf-8");
-      const data: CustomCourseData = JSON.parse(raw);
+    const data = await kv.get<CustomCourseData>("custom-courses");
+    if (data) {
       // Ensure all fields exist
       if (!data.courses) data.courses = [];
       if (!data.courseOverrides) data.courseOverrides = [];
@@ -39,32 +26,33 @@ export function loadCustomCourseData(): CustomCourseData {
       return data;
     }
   } catch {
-    // corrupted, recreate
+    // corrupted, empty, or kv failed
   }
   const defaultData = getDefaultData();
-  saveCustomCourseData(defaultData);
+  await saveCustomCourseData(defaultData);
   return defaultData;
 }
 
-export function saveCustomCourseData(data: CustomCourseData): void {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
+export async function saveCustomCourseData(data: CustomCourseData): Promise<void> {
+  await kv.set("custom-courses", data);
 }
 
 // ============ Custom Course CRUD ============
 
-export function getAllCustomCourses(): CustomCourse[] {
-  return loadCustomCourseData().courses;
+export async function getAllCustomCourses(): Promise<CustomCourse[]> {
+  const data = await loadCustomCourseData();
+  return data.courses;
 }
 
-export function getCustomCourse(courseId: string): CustomCourse | undefined {
-  return loadCustomCourseData().courses.find((c) => c.id === courseId);
+export async function getCustomCourse(courseId: string): Promise<CustomCourse | undefined> {
+  const data = await loadCustomCourseData();
+  return data.courses.find((c) => c.id === courseId);
 }
 
-export function createCustomCourse(
+export async function createCustomCourse(
   course: Omit<CustomCourse, "id" | "createdAt" | "updatedAt">
-): CustomCourse {
-  const data = loadCustomCourseData();
+): Promise<CustomCourse> {
+  const data = await loadCustomCourseData();
   const now = new Date().toISOString();
 
   const newCourse: CustomCourse = {
@@ -75,15 +63,15 @@ export function createCustomCourse(
   };
 
   data.courses.push(newCourse);
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return newCourse;
 }
 
-export function updateCustomCourse(
+export async function updateCustomCourse(
   courseId: string,
   updates: Partial<Omit<CustomCourse, "id" | "createdAt">>
-): CustomCourse | null {
-  const data = loadCustomCourseData();
+): Promise<CustomCourse | null> {
+  const data = await loadCustomCourseData();
   const index = data.courses.findIndex((c) => c.id === courseId);
   if (index === -1) return null;
 
@@ -93,23 +81,23 @@ export function updateCustomCourse(
     updatedAt: new Date().toISOString(),
   };
 
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return data.courses[index];
 }
 
-export function deleteCustomCourse(courseId: string): boolean {
-  const data = loadCustomCourseData();
+export async function deleteCustomCourse(courseId: string): Promise<boolean> {
+  const data = await loadCustomCourseData();
   const index = data.courses.findIndex((c) => c.id === courseId);
   if (index === -1) return false;
 
   data.courses.splice(index, 1);
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return true;
 }
 
 // Add quiz to custom course
-export function addQuizToCustomCourse(courseId: string, quiz: Quiz): CustomCourse | null {
-  const data = loadCustomCourseData();
+export async function addQuizToCustomCourse(courseId: string, quiz: Quiz): Promise<CustomCourse | null> {
+  const data = await loadCustomCourseData();
   const index = data.courses.findIndex((c) => c.id === courseId);
   if (index === -1) return null;
 
@@ -120,17 +108,17 @@ export function addQuizToCustomCourse(courseId: string, quiz: Quiz): CustomCours
 
   data.courses[index].quizzes.push(quizWithId);
   data.courses[index].updatedAt = new Date().toISOString();
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return data.courses[index];
 }
 
 // Update quiz in custom course
-export function updateQuizInCustomCourse(
+export async function updateQuizInCustomCourse(
   courseId: string,
   quizId: string,
   updates: Partial<Quiz>
-): Quiz | null {
-  const data = loadCustomCourseData();
+): Promise<Quiz | null> {
+  const data = await loadCustomCourseData();
   const courseIndex = data.courses.findIndex((c) => c.id === courseId);
   if (courseIndex === -1) return null;
 
@@ -142,13 +130,13 @@ export function updateQuizInCustomCourse(
     ...updates,
   };
   data.courses[courseIndex].updatedAt = new Date().toISOString();
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return data.courses[courseIndex].quizzes[quizIndex];
 }
 
 // Delete quiz from custom course
-export function deleteQuizFromCustomCourse(courseId: string, quizId: string): boolean {
-  const data = loadCustomCourseData();
+export async function deleteQuizFromCustomCourse(courseId: string, quizId: string): Promise<boolean> {
+  const data = await loadCustomCourseData();
   const courseIndex = data.courses.findIndex((c) => c.id === courseId);
   if (courseIndex === -1) return false;
 
@@ -157,19 +145,19 @@ export function deleteQuizFromCustomCourse(courseId: string, quizId: string): bo
 
   data.courses[courseIndex].quizzes.splice(quizIndex, 1);
   data.courses[courseIndex].updatedAt = new Date().toISOString();
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return true;
 }
 
 // ============ Course Override (edit static course metadata) ============
 
-export function getCourseOverride(courseId: string): CourseOverride | undefined {
-  const data = loadCustomCourseData();
+export async function getCourseOverride(courseId: string): Promise<CourseOverride | undefined> {
+  const data = await loadCustomCourseData();
   return data.courseOverrides.find((o) => o.courseId === courseId);
 }
 
-export function setCourseOverride(courseId: string, override: Omit<CourseOverride, "courseId">): CourseOverride {
-  const data = loadCustomCourseData();
+export async function setCourseOverride(courseId: string, override: Omit<CourseOverride, "courseId">): Promise<CourseOverride> {
+  const data = await loadCustomCourseData();
   const index = data.courseOverrides.findIndex((o) => o.courseId === courseId);
 
   const fullOverride: CourseOverride = { courseId, ...override };
@@ -180,33 +168,33 @@ export function setCourseOverride(courseId: string, override: Omit<CourseOverrid
     data.courseOverrides[index] = fullOverride;
   }
 
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return fullOverride;
 }
 
-export function removeCourseOverride(courseId: string): boolean {
-  const data = loadCustomCourseData();
+export async function removeCourseOverride(courseId: string): Promise<boolean> {
+  const data = await loadCustomCourseData();
   const index = data.courseOverrides.findIndex((o) => o.courseId === courseId);
   if (index === -1) return false;
 
   data.courseOverrides.splice(index, 1);
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return true;
 }
 
 // ============ Quiz Override (edit static quiz content) ============
 
-export function getQuizOverride(courseId: string, quizId: string): QuizOverride | undefined {
-  const data = loadCustomCourseData();
+export async function getQuizOverride(courseId: string, quizId: string): Promise<QuizOverride | undefined> {
+  const data = await loadCustomCourseData();
   return data.quizOverrides.find((o) => o.courseId === courseId && o.quizId === quizId);
 }
 
-export function setQuizOverride(
+export async function setQuizOverride(
   courseId: string,
   quizId: string,
   override: Partial<Omit<QuizOverride, "courseId" | "quizId">>
-): QuizOverride {
-  const data = loadCustomCourseData();
+): Promise<QuizOverride> {
+  const data = await loadCustomCourseData();
   const index = data.quizOverrides.findIndex(
     (o) => o.courseId === courseId && o.quizId === quizId
   );
@@ -227,24 +215,25 @@ export function setQuizOverride(
     };
   }
 
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return data.quizOverrides[index === -1 ? data.quizOverrides.length - 1 : index];
 }
 
-export function removeQuizOverride(courseId: string, quizId: string): boolean {
-  const data = loadCustomCourseData();
+export async function removeQuizOverride(courseId: string, quizId: string): Promise<boolean> {
+  const data = await loadCustomCourseData();
   const index = data.quizOverrides.findIndex(
     (o) => o.courseId === courseId && o.quizId === quizId
   );
   if (index === -1) return false;
 
   data.quizOverrides.splice(index, 1);
-  saveCustomCourseData(data);
+  await saveCustomCourseData(data);
   return true;
 }
 
 // Get all quiz overrides for a course
-export function getQuizOverridesForCourse(courseId: string): QuizOverride[] {
-  const data = loadCustomCourseData();
+export async function getQuizOverridesForCourse(courseId: string): Promise<QuizOverride[]> {
+  const data = await loadCustomCourseData();
   return data.quizOverrides.filter((o) => o.courseId === courseId);
 }
+

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidSession, updateCourseSettings, getCourseSettings } from "@/lib/admin-store";
+import { isValidSession, updateCourseSettings, getCourseSettings, loadAdminData } from "@/lib/admin-store";
 import { getCourse } from "@/data/courses";
 import {
   getCustomCourse,
@@ -26,10 +26,13 @@ export async function GET(
 
   const { courseId } = await params;
 
+  const adminData = await loadAdminData();
+  const quizSettings = adminData.quizSettings || {};
+
   // Check custom course first
-  const customCourse = getCustomCourse(courseId);
+  const customCourse = await getCustomCourse(courseId);
   if (customCourse) {
-    const settings = getCourseSettings(courseId);
+    const settings = await getCourseSettings(courseId);
     return NextResponse.json({
       success: true,
       course: {
@@ -50,6 +53,7 @@ export async function GET(
         })),
       },
       settings,
+      quizSettings,
     });
   }
 
@@ -59,9 +63,9 @@ export async function GET(
     return NextResponse.json({ error: "ไม่พบรายวิชา" }, { status: 404 });
   }
 
-  const settings = getCourseSettings(courseId);
-  const override = getCourseOverride(courseId);
-  const customCourseData = loadCustomCourseData();
+  const settings = await getCourseSettings(courseId);
+  const override = await getCourseOverride(courseId);
+  const customCourseData = await loadCustomCourseData();
   const quizOverrides = customCourseData.quizOverrides.filter(
     (o) => o.courseId === courseId
   );
@@ -89,6 +93,7 @@ export async function GET(
       }),
     },
     settings,
+    quizSettings,
   });
 }
 
@@ -109,7 +114,7 @@ export async function PATCH(
 
     // Update settings if provided
     if (isActive !== undefined || scheduleStart !== undefined || scheduleEnd !== undefined || order !== undefined) {
-      updateCourseSettings(courseId, {
+      await updateCourseSettings(courseId, {
         ...(isActive !== undefined && { isActive }),
         ...(scheduleStart !== undefined && { scheduleStart }),
         ...(scheduleEnd !== undefined && { scheduleEnd }),
@@ -119,10 +124,10 @@ export async function PATCH(
 
     // Update metadata if provided
     if (title !== undefined || description !== undefined || icon !== undefined || color !== undefined) {
-      const customCourse = getCustomCourse(courseId);
+      const customCourse = await getCustomCourse(courseId);
       if (customCourse) {
         // Custom course: update directly
-        updateCustomCourse(courseId, {
+        await updateCustomCourse(courseId, {
           ...(title !== undefined && { title }),
           ...(description !== undefined && { description }),
           ...(icon !== undefined && { icon }),
@@ -130,8 +135,8 @@ export async function PATCH(
         });
       } else {
         // Static course: create/update override
-        const existing = getCourseOverride(courseId);
-        setCourseOverride(courseId, {
+        const existing = await getCourseOverride(courseId);
+        await setCourseOverride(courseId, {
           title: title ?? existing?.title,
           description: description ?? existing?.description,
           icon: icon ?? existing?.icon,
@@ -161,7 +166,7 @@ export async function DELETE(
   const { courseId } = await params;
 
   // Only custom courses can be deleted
-  const customCourse = getCustomCourse(courseId);
+  const customCourse = await getCustomCourse(courseId);
   if (!customCourse) {
     return NextResponse.json(
       { error: "ไม่สามารถลบรายวิชาระบบได้ สามารถแก้ไขได้เท่านั้น" },
@@ -169,6 +174,6 @@ export async function DELETE(
     );
   }
 
-  deleteCustomCourse(courseId);
+  await deleteCustomCourse(courseId);
   return NextResponse.json({ success: true });
 }

@@ -1,17 +1,7 @@
-import fs from "fs";
-import path from "path";
 import crypto from "crypto";
-import type { AdminData, CourseSettings } from "@/types";
+import { kv } from "@/lib/kv";
+import type { AdminData, CourseSettings, QuizSettings } from "@/types";
 import { courses } from "@/data/courses";
-
-const DATA_FILE = path.join(process.cwd(), "data", "admin-data.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
 
 function getDefaultData(): AdminData {
   const courseSettings: Record<string, CourseSettings> = {};
@@ -26,6 +16,7 @@ function getDefaultData(): AdminData {
 
   return {
     courseSettings,
+    quizSettings: {},
     adminEmails: getAdminEmailsFromEnv(),
   };
 }
@@ -42,15 +33,19 @@ export function isAllowedAdminEmail(email: string): boolean {
   return allowed.includes(email.toLowerCase().trim());
 }
 
-export function loadAdminData(): AdminData {
-  ensureDataDir();
+export async function loadAdminData(): Promise<AdminData> {
   try {
-    if (fs.existsSync(DATA_FILE)) {
-      const raw = fs.readFileSync(DATA_FILE, "utf-8");
-      const data: AdminData = JSON.parse(raw);
-
+    const data = await kv.get<AdminData>("admin-data");
+    if (data) {
       // Ensure all courses have settings (in case new courses were added)
       let updated = false;
+
+      // Ensure quizSettings object exists for backwards compatibility
+      if (!data.quizSettings) {
+        data.quizSettings = {};
+        updated = true;
+      }
+
       courses.forEach((course, index) => {
         if (!data.courseSettings[course.id]) {
           data.courseSettings[course.id] = {
@@ -63,23 +58,22 @@ export function loadAdminData(): AdminData {
         }
       });
       if (updated) {
-        saveAdminData(data);
+        await saveAdminData(data);
       }
 
       return data;
     }
   } catch {
-    // If file is corrupted, recreate
+    // If kv fails or corrupted
   }
 
   const defaultData = getDefaultData();
-  saveAdminData(defaultData);
+  await saveAdminData(defaultData);
   return defaultData;
 }
 
-export function saveAdminData(data: AdminData): void {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), "utf-8");
+export async function saveAdminData(data: AdminData): Promise<void> {
+  await kv.set("admin-data", data);
 }
 
 // Verify Google ID token via Google's tokeninfo endpoint
@@ -111,16 +105,16 @@ export async function verifyGoogleToken(
   }
 }
 
-export function getCourseSettings(courseId: string): CourseSettings | undefined {
-  const data = loadAdminData();
+export async function getCourseSettings(courseId: string): Promise<CourseSettings | undefined> {
+  const data = await loadAdminData();
   return data.courseSettings[courseId];
 }
 
-export function updateCourseSettings(
+export async function updateCourseSettings(
   courseId: string,
   settings: Partial<CourseSettings>
-): CourseSettings {
-  const data = loadAdminData();
+): Promise<CourseSettings> {
+  const data = await loadAdminData();
   const current = data.courseSettings[courseId] || {
     isActive: true,
     scheduleStart: null,
@@ -130,12 +124,12 @@ export function updateCourseSettings(
 
   const updated = { ...current, ...settings };
   data.courseSettings[courseId] = updated;
-  saveAdminData(data);
+  await saveAdminData(data);
   return updated;
 }
 
-export function isCourseVisible(courseId: string): boolean {
-  const settings = getCourseSettings(courseId);
+export async function isCourseVisible(courseId: string): Promise<boolean> {
+  const settings = await getCourseSettings(courseId);
   if (!settings) return true;
   if (!settings.isActive) return false;
 
@@ -152,14 +146,53 @@ export function isCourseVisible(courseId: string): boolean {
   return true;
 }
 
-// Generate a session token
-export function createSessionToken(): string {
-  return crypto.randomBytes(32).toString("hex");
+export async function getQuizSettings(quizId: string): Promise<QuizSettings | undefined> {
+  const data = await loadAdminData();
+  return data.quizSettings?.[quizId];
 }
 
-// File-based session store (persists across server restarts)
-const SESSIONS_FILE = path.join(process.cwd(), "data", "sessions.json");
+export async function updateQuizSettings(
+  quizId: string,
+  settings: Partial<QuizSettings>
+): Promise<QuizSettings> {
+  const data = await loadAdminData();
+  if (!data.quizSettings) {
+    data.quizSettings = {};
+  }
+  
+  const current = data.quizSettings[quizId] || {
+    isActive: true,
+    scheduleStart: null,
+    scheduleEnd: null,
+  };
+
+  const updated = { ...current, ...settings };
+  data.quizSettings[quizId] = updated;
+  await saveAdminData(data);
+  return updated;
+}
+
+export async function isQuizVisible(quizId: string): Promise<boolean> {
+  const settings = await getQuizSettings(quizId);
+  if (!settings) return true; // Default to visible if no settings configured
+  if (!settings.isActive) return false;
+
+  const now = new Date();
+  if (settings.scheduleStart) {
+    const start = new Date(settings.scheduleStart);
+    if (now < start) return false;
+  }
+  if (settings.scheduleEnd) {
+    const end = new Date(settings.scheduleEnd);
+    if (now > end) return false;
+  }
+
+  return true;
+}
+
+// Stateless JWT-like Session Store
 const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8 hours
+const SECRET_KEY = process.env.SESSION_SECRET || "default-quiz-app-secret-key-please-change-it";
 
 interface SessionInfo {
   email: string;
@@ -168,71 +201,55 @@ interface SessionInfo {
 }
 
 interface StoredSession extends SessionInfo {
-  createdAt: number;
+  expiresAt: number;
 }
 
-function loadSessions(): Record<string, StoredSession> {
-  ensureDataDir();
-  try {
-    if (fs.existsSync(SESSIONS_FILE)) {
-      const raw = fs.readFileSync(SESSIONS_FILE, "utf-8");
-      const sessions: Record<string, StoredSession> = JSON.parse(raw);
-
-      // Clean up expired sessions
-      const now = Date.now();
-      let changed = false;
-      for (const token of Object.keys(sessions)) {
-        if (now - sessions[token].createdAt > SESSION_MAX_AGE_MS) {
-          delete sessions[token];
-          changed = true;
-        }
-      }
-      if (changed) {
-        saveSessions(sessions);
-      }
-
-      return sessions;
-    }
-  } catch {
-    // If file is corrupted, start fresh
-  }
-  return {};
+function signSession(data: StoredSession): string {
+  const payload = Buffer.from(JSON.stringify(data)).toString("base64url");
+  const signature = crypto
+    .createHmac("sha256", SECRET_KEY)
+    .update(payload)
+    .digest("base64url");
+  return `${payload}.${signature}`;
 }
 
-function saveSessions(sessions: Record<string, StoredSession>): void {
-  ensureDataDir();
-  fs.writeFileSync(SESSIONS_FILE, JSON.stringify(sessions, null, 2), "utf-8");
-}
-
-export function addSession(token: string, info: SessionInfo): void {
-  const sessions = loadSessions();
-  sessions[token] = {
+// Generate a signed session token
+export function createSessionToken(info: SessionInfo): string {
+  const sessionData: StoredSession = {
     ...info,
-    createdAt: Date.now(),
+    expiresAt: Date.now() + SESSION_MAX_AGE_MS,
   };
-  saveSessions(sessions);
-}
-
-export function removeSession(token: string): void {
-  const sessions = loadSessions();
-  delete sessions[token];
-  saveSessions(sessions);
+  return signSession(sessionData);
 }
 
 export function isValidSession(token: string | null | undefined): boolean {
-  if (!token) return false;
-  const sessions = loadSessions();
-  return token in sessions;
+  return getSessionInfo(token) !== null;
 }
 
 export function getSessionInfo(token: string | null | undefined): SessionInfo | null {
   if (!token) return null;
-  const sessions = loadSessions();
-  const session = sessions[token];
-  if (!session) return null;
-  return {
-    email: session.email,
-    name: session.name,
-    picture: session.picture,
-  };
+  
+  const parts = token.split(".");
+  if (parts.length !== 2) return null;
+  const [payload, signature] = parts;
+  
+  const expectedSignature = crypto
+    .createHmac("sha256", SECRET_KEY)
+    .update(payload)
+    .digest("base64url");
+    
+  if (signature !== expectedSignature) return null;
+  
+  try {
+    const data: StoredSession = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8"));
+    if (Date.now() > data.expiresAt) return null;
+    return {
+      email: data.email,
+      name: data.name,
+      picture: data.picture,
+    };
+  } catch {
+    return null;
+  }
 }
+

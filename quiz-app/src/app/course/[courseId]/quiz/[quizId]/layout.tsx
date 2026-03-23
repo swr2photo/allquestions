@@ -7,10 +7,16 @@ export async function generateMetadata({
   params: Promise<{ courseId: string; quizId: string }>;
 }): Promise<Metadata> {
   const { courseId, quizId } = await params;
-  const course = getCourseWithCustom(courseId);
-  const quiz = getQuizWithCustom(courseId, quizId);
+  const course = await getCourseWithCustom(courseId);
+  const quiz = await getQuizWithCustom(courseId, quizId);
 
-  if (!course || !quiz) {
+  // --- newly added check ---
+  const { isCourseVisible, isQuizVisible } = await import("@/lib/admin-store");
+  const isVisible = await isCourseVisible(courseId);
+  const isQVisible = await isQuizVisible(quizId);
+  // -------------------------
+
+  if (!course || !quiz || !isVisible || !isQVisible) {
     return { title: "ไม่พบข้อสอบ | Allquiz" };
   }
 

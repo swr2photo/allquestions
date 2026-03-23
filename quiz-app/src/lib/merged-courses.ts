@@ -11,9 +11,9 @@ import {
 import type { Course, Quiz } from "@/types";
 
 // Apply course overrides and quiz overrides to a static course
-function applyCourseOverrides(course: Course): Course {
+async function applyCourseOverrides(course: Course): Promise<Course> {
   try {
-    const data = loadCustomCourseData();
+    const data = await loadCustomCourseData();
 
     // Apply course metadata override
     const courseOverride = data.courseOverrides.find((o) => o.courseId === course.id);
@@ -49,9 +49,9 @@ function applyCourseOverrides(course: Course): Course {
   }
 }
 
-export function getCourseWithCustom(courseId: string): Course | undefined {
+export async function getCourseWithCustom(courseId: string): Promise<Course | undefined> {
   // Check custom courses first
-  const customCourse = getCustomCourse(courseId);
+  const customCourse = await getCustomCourse(courseId);
   if (customCourse) {
     return {
       id: customCourse.id,
@@ -68,8 +68,8 @@ export function getCourseWithCustom(courseId: string): Course | undefined {
   if (!course) return undefined;
 
   try {
-    const merged = applyCourseOverrides(course);
-    const customQuizzes = getCustomQuizzesAsQuiz(courseId);
+    const merged = await applyCourseOverrides(course);
+    const customQuizzes = await getCustomQuizzesAsQuiz(courseId);
     if (customQuizzes.length === 0) return merged;
 
     return {
@@ -81,26 +81,29 @@ export function getCourseWithCustom(courseId: string): Course | undefined {
   }
 }
 
-export function getQuizWithCustom(courseId: string, quizId: string) {
-  const course = getCourseWithCustom(courseId);
+export async function getQuizWithCustom(courseId: string, quizId: string): Promise<Quiz | undefined> {
+  const course = await getCourseWithCustom(courseId);
   return course?.quizzes.find((q) => q.id === quizId);
 }
 
-export function getAllCoursesWithCustom(): Course[] {
+export async function getAllCoursesWithCustom(): Promise<Course[]> {
   try {
     // Static courses with overrides and custom quizzes
-    const mergedStatic = staticCourses.map((course) => {
-      const merged = applyCourseOverrides(course);
-      const customQuizzes = getCustomQuizzesAsQuiz(course.id);
-      if (customQuizzes.length === 0) return merged;
-      return {
-        ...merged,
-        quizzes: [...merged.quizzes, ...customQuizzes],
-      };
-    });
+    const mergedStatic = await Promise.all(
+      staticCourses.map(async (course) => {
+        const merged = await applyCourseOverrides(course);
+        const customQuizzes = await getCustomQuizzesAsQuiz(course.id);
+        if (customQuizzes.length === 0) return merged;
+        return {
+          ...merged,
+          quizzes: [...merged.quizzes, ...customQuizzes],
+        };
+      })
+    );
 
     // Custom courses
-    const customCourses = getAllCustomCourses().map((cc) => ({
+    const allCustom = await getAllCustomCourses();
+    const customCourses = allCustom.map((cc) => ({
       id: cc.id,
       title: cc.title,
       description: cc.description,
@@ -115,8 +118,8 @@ export function getAllCoursesWithCustom(): Course[] {
   }
 }
 
-export function getTotalQuestionsWithCustom(): number {
-  const all = getAllCoursesWithCustom();
+export async function getTotalQuestionsWithCustom(): Promise<number> {
+  const all = await getAllCoursesWithCustom();
   return all.reduce(
     (total, course) =>
       total +
@@ -125,13 +128,13 @@ export function getTotalQuestionsWithCustom(): number {
   );
 }
 
-export function getTotalQuizzesWithCustom(): number {
-  const all = getAllCoursesWithCustom();
+export async function getTotalQuizzesWithCustom(): Promise<number> {
+  const all = await getAllCoursesWithCustom();
   return all.reduce((total, course) => total + course.quizzes.length, 0);
 }
 
-export function getTotalPdfQuizzesWithCustom(): number {
-  const all = getAllCoursesWithCustom();
+export async function getTotalPdfQuizzesWithCustom(): Promise<number> {
+  const all = await getAllCoursesWithCustom();
   return all.reduce(
     (total, course) =>
       total + course.quizzes.filter((q) => q.type === "pdf").length,

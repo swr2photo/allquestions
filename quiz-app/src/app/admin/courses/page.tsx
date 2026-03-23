@@ -26,6 +26,11 @@ import {
   ChevronDown,
   ChevronUp,
   FolderOpen,
+  Power,
+  PowerOff,
+  Calendar,
+  Clock,
+  RotateCcw,
 } from "lucide-react";
 import type { Question, Choice } from "@/types";
 
@@ -108,6 +113,8 @@ function CourseManagementContent() {
   // Course quizzes (for editing existing course)
   const [quizzes, setQuizzes] = useState<QuizItem[]>([]);
   const [editingQuiz, setEditingQuiz] = useState<string | null>(null);
+  const [expandedQuiz, setExpandedQuiz] = useState<string | null>(null);
+  const [quizSettings, setQuizSettings] = useState<Record<string, { isActive: boolean; scheduleStart: string | null; scheduleEnd: string | null }>>({});
 
   // Quiz edit form
   const [quizTitle, setQuizTitle] = useState("");
@@ -154,6 +161,7 @@ function CourseManagementContent() {
           setCourseColor(c.color);
           setIsCustomCourse(c.isCustomCourse);
           setQuizzes(c.quizzes);
+          setQuizSettings(data.quizSettings || {});
         }
       } catch {
         showToast("โหลดข้อมูลไม่สำเร็จ", "error");
@@ -424,6 +432,134 @@ function CourseManagementContent() {
     } catch {
       showToast("เกิดข้อผิดพลาด", "error");
     }
+  }
+
+  // ============ Quiz Settings Actions ============
+
+  async function toggleQuiz(quizId: string) {
+    if (!editCourseId) return;
+    const settings = quizSettings[quizId] || { isActive: true, scheduleStart: null, scheduleEnd: null };
+    const newActive = !settings.isActive;
+
+    try {
+      const res = await fetch(`/api/admin/courses/${editCourseId}/quizzes/${quizId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: newActive }),
+      });
+
+      if (res.status === 401) {
+        router.push("/admin");
+        return;
+      }
+
+      if (res.ok) {
+        setQuizSettings((prev) => ({
+          ...prev,
+          [quizId]: { ...settings, isActive: newActive },
+        }));
+        showToast(
+          `การแสดงผลข้อสอบ: ${newActive ? "เปิดใช้งาน" : "ปิดใช้งาน"}แล้ว`,
+          "success"
+        );
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาด", "error");
+    }
+  }
+
+  function updateQuizSchedule(quizId: string, field: "scheduleStart" | "scheduleEnd", value: string) {
+    const settings = quizSettings[quizId] || { isActive: true, scheduleStart: null, scheduleEnd: null };
+    setQuizSettings((prev) => ({
+      ...prev,
+      [quizId]: { ...settings, [field]: value || null },
+    }));
+  }
+
+  async function saveQuizSchedule(quizId: string) {
+    if (!editCourseId) return;
+    const settings = quizSettings[quizId] || { isActive: true, scheduleStart: null, scheduleEnd: null };
+
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/admin/courses/${editCourseId}/quizzes/${quizId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduleStart: settings.scheduleStart,
+          scheduleEnd: settings.scheduleEnd,
+        }),
+      });
+
+      if (res.ok) {
+        showToast(`บันทึกเวลาข้อสอบสำเร็จ`, "success");
+      } else {
+        showToast("บันทึกไม่สำเร็จ", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาด", "error");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function clearQuizSchedule(quizId: string) {
+    if (!editCourseId) return;
+    try {
+      const res = await fetch(`/api/admin/courses/${editCourseId}/quizzes/${quizId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scheduleStart: null,
+          scheduleEnd: null,
+        }),
+      });
+
+      if (res.ok) {
+        setQuizSettings((prev) => {
+          const s = prev[quizId] || { isActive: true };
+          return {
+            ...prev,
+            [quizId]: { ...s, scheduleStart: null, scheduleEnd: null },
+          };
+        });
+        showToast(`ล้างเวลาข้อสอบสำเร็จ`, "success");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาด", "error");
+    }
+  }
+
+  function getQuizVisibilityStatus(quizId: string): {
+    text: string;
+    variant: "success" | "destructive" | "warning" | "secondary";
+  } {
+    const settings = quizSettings[quizId] || { isActive: true, scheduleStart: null, scheduleEnd: null };
+    if (!settings.isActive) {
+      return { text: "ปิดใช้งาน", variant: "destructive" };
+    }
+
+    const now = new Date();
+    if (settings.scheduleStart) {
+      const start = new Date(settings.scheduleStart);
+      if (now < start) {
+        return { text: "รอเปิด", variant: "warning" };
+      }
+    }
+    if (settings.scheduleEnd) {
+      const end = new Date(settings.scheduleEnd);
+      if (now > end) {
+        return { text: "หมดเวลา", variant: "secondary" };
+      }
+    }
+
+    return { text: "แสดงอยู่", variant: "success" };
+  }
+
+  function formatDatetimeLocal(isoString: string | null): string {
+    if (!isoString) return "";
+    const d = new Date(isoString);
+    return d.toISOString().slice(0, 16);
   }
 
   // ============ Question Helpers ============
@@ -733,13 +869,18 @@ function CourseManagementContent() {
           </div>
 
           {/* Quiz List */}
-          {quizzes.map((quiz) => (
-            <Card
-              key={quiz.id}
-              className={`border-gray-200 ${
-                editingQuiz === quiz.id ? "ring-2 ring-emerald-300" : ""
-              }`}
-            >
+          {quizzes.map((quiz) => {
+            const isExpanded = expandedQuiz === quiz.id;
+            const status = getQuizVisibilityStatus(quiz.id);
+            const settings = quizSettings[quiz.id] || { isActive: true, scheduleStart: null, scheduleEnd: null };
+
+            return (
+              <Card
+                key={quiz.id}
+                className={`transition-all duration-200 ${
+                  !settings.isActive ? "opacity-60 bg-gray-50 border-gray-200" : "border-gray-200"
+                } ${editingQuiz === quiz.id ? "ring-2 ring-emerald-300" : ""}`}
+              >
               <CardHeader className="py-3">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">
@@ -752,6 +893,9 @@ function CourseManagementContent() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <CardTitle className="text-sm">{quiz.title}</CardTitle>
+                      <Badge variant={status.variant} className="text-[10px] px-1.5 py-0">
+                        {status.text}
+                      </Badge>
                       <Badge
                         variant={quiz.type === "pdf" ? "warning" : "info"}
                         className="text-[10px] px-1.5 py-0"
@@ -767,11 +911,49 @@ function CourseManagementContent() {
                       </p>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5 mt-2 sm:mt-0 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                    <Button
+                      size="sm"
+                      variant={settings.isActive ? "default" : "outline"}
+                      className={`gap-1.5 text-xs ${
+                        settings.isActive
+                          ? "bg-emerald-600 hover:bg-emerald-700"
+                          : "text-gray-500"
+                      }`}
+                      onClick={() => toggleQuiz(quiz.id)}
+                    >
+                      {settings.isActive ? (
+                        <>
+                          <Power className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">เปิด</span>
+                        </>
+                      ) : (
+                        <>
+                          <PowerOff className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">ปิด</span>
+                        </>
+                      )}
+                    </Button>
+
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-8 w-8 p-0 text-gray-400 hover:text-emerald-600"
+                      className="gap-1 text-xs px-2"
+                      onClick={() => setExpandedQuiz(isExpanded ? null : quiz.id)}
+                    >
+                      <Calendar className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">ตั้งเวลา</span>
+                      {isExpanded ? (
+                        <ChevronUp className="h-3 w-3" />
+                      ) : (
+                        <ChevronDown className="h-3 w-3" />
+                      )}
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 text-gray-400 hover:text-emerald-600 shrink-0"
                       onClick={() =>
                         editingQuiz === quiz.id
                           ? cancelQuizEdit()
@@ -784,7 +966,7 @@ function CourseManagementContent() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-600"
+                        className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 shrink-0"
                         onClick={() => deleteQuiz(quiz.id)}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -793,6 +975,92 @@ function CourseManagementContent() {
                   </div>
                 </div>
               </CardHeader>
+
+              {/* Schedule Form */}
+              {isExpanded && !editingQuiz && (
+                <CardContent className="pt-0 pb-4">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      ตั้งเวลาข้อสอบ
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">
+                          เริ่มทำข้อสอบได้
+                        </label>
+                        <Input
+                          type="datetime-local"
+                          className="bg-white text-sm"
+                          value={formatDatetimeLocal(settings.scheduleStart)}
+                          onChange={(e) =>
+                            updateQuizSchedule(
+                              quiz.id,
+                              "scheduleStart",
+                              e.target.value ? new Date(e.target.value).toISOString() : ""
+                            )
+                          }
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 mb-1 block">
+                          ปิดรับข้อสอบ
+                        </label>
+                        <Input
+                          type="datetime-local"
+                          className="bg-white text-sm"
+                          value={formatDatetimeLocal(settings.scheduleEnd)}
+                          onChange={(e) =>
+                            updateQuizSchedule(
+                              quiz.id,
+                              "scheduleEnd",
+                              e.target.value ? new Date(e.target.value).toISOString() : ""
+                            )
+                          }
+                        />
+                      </div>
+                    </div>
+
+                    {(settings.scheduleStart || settings.scheduleEnd) && (
+                      <div className="mt-3 text-xs text-gray-500 bg-white rounded-lg px-3 py-2 border">
+                        {settings.scheduleStart && (
+                          <p>
+                            เริ่ม:{" "}
+                            {new Date(settings.scheduleStart).toLocaleString("th-TH")}
+                          </p>
+                        )}
+                        {settings.scheduleEnd && (
+                          <p>
+                            สิ้นสุด:{" "}
+                            {new Date(settings.scheduleEnd).toLocaleString("th-TH")}
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 mt-3">
+                      <Button
+                        size="sm"
+                        className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-xs"
+                        onClick={() => saveQuizSchedule(quiz.id)}
+                        disabled={saving}
+                      >
+                        <Save className="h-3 w-3" />
+                        {saving ? "กำลังบันทึก..." : "บันทึกเวลา"}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="gap-1.5 text-xs"
+                        onClick={() => clearQuizSchedule(quiz.id)}
+                      >
+                        <RotateCcw className="h-3 w-3" />
+                        ล้างเวลา
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              )}
 
               {/* Expanded quiz editor */}
               {editingQuiz === quiz.id && (
@@ -821,7 +1089,7 @@ function CourseManagementContent() {
                 </CardContent>
               )}
             </Card>
-          ))}
+          )})}
 
           {/* New Quiz Editor */}
           {showNewQuiz && (
