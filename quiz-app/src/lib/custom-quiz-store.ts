@@ -1,57 +1,43 @@
-import fs from "fs";
-import path from "path";
+import { kv } from "@/lib/kv";
 import type { CustomQuiz, CustomQuizData, Quiz } from "@/types";
-
-const CUSTOM_QUIZ_FILE = path.join(process.cwd(), "data", "custom-quizzes.json");
-
-function ensureDataDir() {
-  const dir = path.dirname(CUSTOM_QUIZ_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-}
 
 function getDefaultData(): CustomQuizData {
   return { quizzes: [] };
 }
 
-export function loadCustomQuizzes(): CustomQuizData {
-  ensureDataDir();
+export async function loadCustomQuizzes(): Promise<CustomQuizData> {
   try {
-    if (fs.existsSync(CUSTOM_QUIZ_FILE)) {
-      const raw = fs.readFileSync(CUSTOM_QUIZ_FILE, "utf-8");
-      return JSON.parse(raw);
-    }
+    const data = await kv.get<CustomQuizData>("custom-quizzes");
+    if (data) return data;
   } catch {
-    // If file is corrupted, recreate
+    // If kv fails or empty
   }
   const defaultData = getDefaultData();
-  saveCustomQuizzes(defaultData);
+  await saveCustomQuizzes(defaultData);
   return defaultData;
 }
 
-export function saveCustomQuizzes(data: CustomQuizData): void {
-  ensureDataDir();
-  fs.writeFileSync(CUSTOM_QUIZ_FILE, JSON.stringify(data, null, 2), "utf-8");
+export async function saveCustomQuizzes(data: CustomQuizData): Promise<void> {
+  await kv.set("custom-quizzes", data);
 }
 
 // Get all custom quizzes for a specific course
-export function getCustomQuizzesForCourse(courseId: string): CustomQuiz[] {
-  const data = loadCustomQuizzes();
+export async function getCustomQuizzesForCourse(courseId: string): Promise<CustomQuiz[]> {
+  const data = await loadCustomQuizzes();
   return data.quizzes.filter((q) => q.courseId === courseId);
 }
 
 // Get a specific custom quiz
-export function getCustomQuiz(quizId: string): CustomQuiz | undefined {
-  const data = loadCustomQuizzes();
+export async function getCustomQuiz(quizId: string): Promise<CustomQuiz | undefined> {
+  const data = await loadCustomQuizzes();
   return data.quizzes.find((q) => q.id === quizId);
 }
 
 // Create a new custom quiz
-export function createCustomQuiz(
+export async function createCustomQuiz(
   quiz: Omit<CustomQuiz, "id" | "createdAt" | "updatedAt">
-): CustomQuiz {
-  const data = loadCustomQuizzes();
+): Promise<CustomQuiz> {
+  const data = await loadCustomQuizzes();
   const now = new Date().toISOString();
 
   const newQuiz: CustomQuiz = {
@@ -62,16 +48,16 @@ export function createCustomQuiz(
   };
 
   data.quizzes.push(newQuiz);
-  saveCustomQuizzes(data);
+  await saveCustomQuizzes(data);
   return newQuiz;
 }
 
 // Update an existing custom quiz
-export function updateCustomQuiz(
+export async function updateCustomQuiz(
   quizId: string,
   updates: Partial<Omit<CustomQuiz, "id" | "createdAt">>
-): CustomQuiz | null {
-  const data = loadCustomQuizzes();
+): Promise<CustomQuiz | null> {
+  const data = await loadCustomQuizzes();
   const index = data.quizzes.findIndex((q) => q.id === quizId);
   if (index === -1) return null;
 
@@ -81,18 +67,18 @@ export function updateCustomQuiz(
     updatedAt: new Date().toISOString(),
   };
 
-  saveCustomQuizzes(data);
+  await saveCustomQuizzes(data);
   return data.quizzes[index];
 }
 
 // Delete a custom quiz
-export function deleteCustomQuiz(quizId: string): boolean {
-  const data = loadCustomQuizzes();
+export async function deleteCustomQuiz(quizId: string): Promise<boolean> {
+  const data = await loadCustomQuizzes();
   const index = data.quizzes.findIndex((q) => q.id === quizId);
   if (index === -1) return false;
 
   data.quizzes.splice(index, 1);
-  saveCustomQuizzes(data);
+  await saveCustomQuizzes(data);
   return true;
 }
 
@@ -110,6 +96,8 @@ export function customQuizToQuiz(cq: CustomQuiz): Quiz {
 }
 
 // Get all custom quizzes as Quiz[] for a course
-export function getCustomQuizzesAsQuiz(courseId: string): Quiz[] {
-  return getCustomQuizzesForCourse(courseId).map(customQuizToQuiz);
+export async function getCustomQuizzesAsQuiz(courseId: string): Promise<Quiz[]> {
+  const quizzes = await getCustomQuizzesForCourse(courseId);
+  return quizzes.map(customQuizToQuiz);
 }
+

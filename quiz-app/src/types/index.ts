@@ -45,8 +45,15 @@ export interface CourseSettings {
   order: number;
 }
 
+export interface QuizSettings {
+  isActive: boolean;
+  scheduleStart: string | null; // ISO date string
+  scheduleEnd: string | null;   // ISO date string
+}
+
 export interface AdminData {
   courseSettings: Record<string, CourseSettings>;
+  quizSettings: Record<string, QuizSettings>;
   adminPasswordHash?: string; // legacy, no longer used
   adminEmails?: string[]; // Google emails allowed as admin
 }

@@ -5,11 +5,15 @@ import { getAllCoursesWithCustom } from "@/lib/merged-courses";
 // GET /api/courses - Get publicly visible courses
 export async function GET() {
   try {
-    const adminData = loadAdminData();
-    const allCourses = getAllCoursesWithCustom();
+    const adminData = await loadAdminData();
+    const allCourses = await getAllCoursesWithCustom();
+
+    const visibilityResults = await Promise.all(
+      allCourses.map((c) => isCourseVisible(c.id))
+    );
 
     const visibleCourses = allCourses
-      .filter((course) => isCourseVisible(course.id))
+      .filter((_, i) => visibilityResults[i])
       .map((course) => {
         const settings = adminData.courseSettings[course.id];
         return {
@@ -25,7 +29,7 @@ export async function GET() {
     });
   } catch {
     // Fallback: return all courses if admin data fails
-    const allCourses = getAllCoursesWithCustom();
+    const allCourses = await getAllCoursesWithCustom();
     return NextResponse.json({
       success: true,
       courses: allCourses,

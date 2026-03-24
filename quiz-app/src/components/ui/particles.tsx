@@ -75,6 +75,7 @@ type Circle = {
   dx: number
   dy: number
   magnetism: number
+  targetNode?: { x: number; y: number }
 }
 
 export const Particles: React.FC<ParticlesProps> = ({
@@ -99,6 +100,9 @@ export const Particles: React.FC<ParticlesProps> = ({
   const dpr = typeof window !== "undefined" ? window.devicePixelRatio : 1
   const rafID = useRef<number | null>(null)
   const resizeTimeout = useRef<NodeJS.Timeout | null>(null)
+  
+  const textNodes = useRef<{ x: number; y: number }[]>([])
+  const isHovering = useRef(false)
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -152,6 +156,9 @@ export const Particles: React.FC<ParticlesProps> = ({
       if (inside) {
         mouse.current.x = x
         mouse.current.y = y
+        isHovering.current = true
+      } else {
+        isHovering.current = false
       }
     }
   }
@@ -166,6 +173,8 @@ export const Particles: React.FC<ParticlesProps> = ({
       canvasRef.current.style.width = `${canvasSize.current.w}px`
       canvasRef.current.style.height = `${canvasSize.current.h}px`
       context.current.scale(dpr, dpr)
+
+      initTextNodes()
 
       // Clear existing particles and create new ones with exact quantity
       circles.current = []
@@ -187,6 +196,12 @@ export const Particles: React.FC<ParticlesProps> = ({
     const dx = (Math.random() - 0.5) * 0.1
     const dy = (Math.random() - 0.5) * 0.1
     const magnetism = 0.1 + Math.random() * 4
+    
+    let targetNode = undefined
+    if (textNodes.current.length > 0) {
+      targetNode = textNodes.current[Math.floor(Math.random() * textNodes.current.length)]
+    }
+
     return {
       x,
       y,
@@ -198,7 +213,43 @@ export const Particles: React.FC<ParticlesProps> = ({
       dx,
       dy,
       magnetism,
+      targetNode,
     }
+  }
+
+  const initTextNodes = () => {
+    const { w, h } = canvasSize.current
+    if (w === 0 || h === 0) return
+
+    const tempCanvas = document.createElement("canvas")
+    const ctx = tempCanvas.getContext("2d", { willReadFrequently: true })
+    if (!ctx) return
+    
+    tempCanvas.width = w
+    tempCanvas.height = h
+
+    ctx.fillStyle = "white"
+    const fontSize = Math.min(w * 0.15, 120) 
+    ctx.font = `bold ${fontSize}px Inter, sans-serif`
+    ctx.textAlign = "center"
+    ctx.textBaseline = "middle"
+    ctx.fillText("Doralaikon", w / 2, h / 2)
+
+    const imgData = ctx.getImageData(0, 0, w, h).data
+    const dots = []
+    const step = 6
+
+    for (let y = 0; y < h; y += step) {
+      for (let x = 0; x < w; x += step) {
+        const index = (y * w + x) * 4
+        const a = imgData[index + 3]
+        if (a > 128) {
+          dots.push({ x, y })
+        }
+      }
+    }
+    
+    textNodes.current = dots
   }
 
   const rgb = hexToRgb(color)
@@ -273,14 +324,27 @@ export const Particles: React.FC<ParticlesProps> = ({
       } else {
         circle.alpha = circle.targetAlpha * remapClosestEdge
       }
-      circle.x += circle.dx + vx
-      circle.y += circle.dy + vy
-      circle.translateX +=
-        (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
-        ease
-      circle.translateY +=
-        (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
-        ease
+      
+      if (isHovering.current && circle.targetNode) {
+        // Form the text "Doralaikon"
+        const targetTx = circle.targetNode.x - circle.x
+        const targetTy = circle.targetNode.y - circle.y
+        circle.translateX += (targetTx - circle.translateX) * 0.1
+        circle.translateY += (targetTy - circle.translateY) * 0.1
+        
+        // Boost opacity when forming shape
+        circle.alpha += (1 - circle.alpha) * 0.1;
+      } else {
+        // Normal wander and mouse repel
+        circle.x += circle.dx + vx
+        circle.y += circle.dy + vy
+        circle.translateX +=
+          (mouse.current.x / (staticity / circle.magnetism) - circle.translateX) /
+          ease
+        circle.translateY +=
+          (mouse.current.y / (staticity / circle.magnetism) - circle.translateY) /
+          ease
+      }
 
       drawCircle(circle, true)
 

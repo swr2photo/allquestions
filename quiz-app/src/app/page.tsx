@@ -9,12 +9,18 @@ import { Particles } from "@/components/ui/particles";
 
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const allCourses = getAllCoursesWithCustom();
-  const visibleCourses = allCourses.filter((c) => isCourseVisible(c.id));
-  const totalQuestions = getTotalQuestionsWithCustom();
-  const totalQuizzes = getTotalQuizzesWithCustom();
-  const totalPdf = getTotalPdfQuizzesWithCustom();
+export default async function HomePage() {
+  const allCourses = await getAllCoursesWithCustom();
+  
+  // Await each isCourseVisible call since it's async now
+  const visibilityResults = await Promise.all(
+    allCourses.map((c) => isCourseVisible(c.id))
+  );
+  const visibleCourses = allCourses.filter((_, i) => visibilityResults[i]);
+
+  const totalQuestions = await getTotalQuestionsWithCustom();
+  const totalQuizzes = await getTotalQuizzesWithCustom();
+  const totalPdf = await getTotalPdfQuizzesWithCustom();
 
   const stats = [
     {
@@ -46,38 +52,16 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-linear-to-br from-emerald-600 via-green-600 to-teal-700 text-white">
+      <section className="relative overflow-hidden bg-linear-to-br from-emerald-600 via-green-600 to-teal-700 text-white cursor-crosshair">
         <Particles
           className="absolute inset-0 z-0"
-          quantity={60}
+          quantity={800}
           color="#ffffff"
-          size={0.5}
-          staticity={30}
+          size={0.6}
+          staticity={40}
           ease={50}
         />
-        <div className="container mx-auto px-4 py-16 sm:py-24 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-sm mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400"></span>
-              </span>
-              <AnimatedShinyText className="text-white/90" shimmerWidth={120}>
-                ระบบพร้อมใช้งาน
-              </AnimatedShinyText>
-            </div>
-            <SparklesText
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 text-white"
-              sparklesCount={12}
-              colors={{ first: "#86efac", second: "#34d399" }}
-            >
-              Allquiz
-            </SparklesText>
-            <p className="text-lg sm:text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
-              ระบบจัดการข้อสอบออนไลน์ ครบทุกวิชา พร้อมโหมดฝึกซ้อมและสอบจริง
-            </p>
-          </div>
-        </div>
+        <div className="py-16 sm:py-24" />
       </section>
 
       {/* Stats */}

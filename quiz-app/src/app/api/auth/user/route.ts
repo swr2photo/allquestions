@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   verifyGoogleToken,
-  isAllowedAdminEmail,
   createSessionToken,
   isValidSession,
   getSessionInfo,
 } from "@/lib/admin-store";
 
-// POST /api/admin/auth - Google Sign-In
+// POST /api/auth/user - General User Google Sign-In
 export async function POST(request: NextRequest) {
   try {
     const { credential } = await request.json();
@@ -28,17 +27,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if the email is allowed
-    if (!isAllowedAdminEmail(userInfo.email)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: `อีเมล ${userInfo.email} ไม่ได้รับอนุญาตให้เข้าสู่ระบบ`,
-        },
-        { status: 403 }
-      );
-    }
-
+    // Notice: We do NOT check isAllowedAdminEmail here because any user can use AI
+    
     const token = createSessionToken({
       email: userInfo.email,
       name: userInfo.name,
@@ -54,11 +44,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("admin-session", token, {
+    // Set as "user-session" cookie
+    response.cookies.set("user-session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 8, // 8 hours
+      maxAge: 60 * 60 * 24 * 7, // 1 week
       path: "/",
     });
 
@@ -71,16 +62,20 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE /api/admin/auth - Logout
+// DELETE /api/auth/user - Logout
 export async function DELETE(request: NextRequest) {
   const response = NextResponse.json({ success: true });
-  response.cookies.delete("admin-session");
+  response.cookies.delete("user-session");
   return response;
 }
 
-// GET /api/admin/auth - Check session
+// GET /api/auth/user - Check session
 export async function GET(request: NextRequest) {
-  const token = request.cookies.get("admin-session")?.value;
+  // Check both user-session and admin-session (admins can also use AI)
+  const userToken = request.cookies.get("user-session")?.value;
+  const adminToken = request.cookies.get("admin-session")?.value;
+  
+  const token = userToken || adminToken;
   const valid = isValidSession(token);
   const user = getSessionInfo(token);
 
@@ -89,4 +84,3 @@ export async function GET(request: NextRequest) {
     user: valid ? user : null,
   });
 }
-

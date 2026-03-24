@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidSession, updateQuizSettings } from "@/lib/admin-store";
 import { getCourse } from "@/data/courses";
 import {
   getCustomCourse,
@@ -27,7 +27,7 @@ export async function GET(
   const { courseId, quizId } = await params;
 
   // Check custom course
-  const customCourse = getCustomCourse(courseId);
+  const customCourse = await getCustomCourse(courseId);
   if (customCourse) {
     const quiz = customCourse.quizzes.find((q) => q.id === quizId);
     if (!quiz) {
@@ -48,7 +48,7 @@ export async function GET(
   }
 
   // Apply override if exists
-  const override = getQuizOverride(courseId, quizId);
+  const override = await getQuizOverride(courseId, quizId);
   const mergedQuiz = override
     ? {
         ...quiz,
@@ -77,9 +77,9 @@ export async function PUT(
     const { title, description, questions, pdfInfo } = body;
 
     // Check custom course
-    const customCourse = getCustomCourse(courseId);
+    const customCourse = await getCustomCourse(courseId);
     if (customCourse) {
-      const result = updateQuizInCustomCourse(courseId, quizId, {
+      const result = await updateQuizInCustomCourse(courseId, quizId, {
         ...(title !== undefined && { title }),
         ...(description !== undefined && { description }),
         ...(questions !== undefined && { questions }),
@@ -104,13 +104,47 @@ export async function PUT(
     }
 
     // Save as override
-    const override = setQuizOverride(courseId, quizId, {
+    const override = await setQuizOverride(courseId, quizId, {
       ...(title !== undefined && { title }),
       ...(description !== undefined && { description }),
       ...(questions !== undefined && { questions }),
     });
 
     return NextResponse.json({ success: true, override });
+  } catch {
+    return NextResponse.json(
+      { error: "เกิดข้อผิดพลาด" },
+      { status: 500 }
+    );
+  }
+}
+
+// PATCH /api/admin/courses/[courseId]/quizzes/[quizId] - Update quiz settings
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ courseId: string; quizId: string }> }
+) {
+  if (!checkAuth(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { quizId } = await params;
+
+  try {
+    const body = await request.json();
+    const { isActive, scheduleStart, scheduleEnd } = body;
+
+    // Update settings if provided
+    if (isActive !== undefined || scheduleStart !== undefined || scheduleEnd !== undefined) {
+      const updated = await updateQuizSettings(quizId, {
+        ...(isActive !== undefined && { isActive }),
+        ...(scheduleStart !== undefined && { scheduleStart }),
+        ...(scheduleEnd !== undefined && { scheduleEnd }),
+      });
+      return NextResponse.json({ success: true, settings: updated });
+    }
+
+    return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json(
       { error: "เกิดข้อผิดพลาด" },
@@ -131,7 +165,7 @@ export async function DELETE(
   const { courseId, quizId } = await params;
 
   // Only custom course quizzes can be deleted
-  const customCourse = getCustomCourse(courseId);
+  const customCourse = await getCustomCourse(courseId);
   if (!customCourse) {
     return NextResponse.json(
       { error: "ไม่สามารถลบข้อสอบของรายวิชาระบบได้" },
@@ -139,7 +173,7 @@ export async function DELETE(
     );
   }
 
-  const result = deleteQuizFromCustomCourse(courseId, quizId);
+  const result = await deleteQuizFromCustomCourse(courseId, quizId);
   if (!result) {
     return NextResponse.json({ error: "ไม่พบข้อสอบ" }, { status: 404 });
   }
@@ -159,7 +193,7 @@ export async function POST(
   const { courseId } = await params;
 
   // Only custom courses can have quizzes added directly
-  const customCourse = getCustomCourse(courseId);
+  const customCourse = await getCustomCourse(courseId);
   if (!customCourse) {
     return NextResponse.json(
       { error: "ใช้ระบบเพิ่มข้อสอบ (custom quiz) สำหรับรายวิชาระบบ" },
@@ -175,7 +209,7 @@ export async function POST(
       return NextResponse.json({ error: "กรุณากรอกชื่อข้อสอบ" }, { status: 400 });
     }
 
-    const result = addQuizToCustomCourse(courseId, {
+    const result = await addQuizToCustomCourse(courseId, {
       id: "",
       title: title.trim(),
       type: type || "quiz",

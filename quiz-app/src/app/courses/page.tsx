@@ -10,9 +10,12 @@ export const metadata: Metadata = {
   description: "เลือกรายวิชาเพื่อดูข้อสอบและเริ่มฝึกซ้อม",
 };
 
-export default function CoursesPage() {
-  const allCourses = getAllCoursesWithCustom();
-  const visibleCourses = allCourses.filter((c) => isCourseVisible(c.id));
+export default async function CoursesPage() {
+  const allCourses = await getAllCoursesWithCustom();
+  const visibilityResults = await Promise.all(
+    allCourses.map((c) => isCourseVisible(c.id))
+  );
+  const visibleCourses = allCourses.filter((_, i) => visibilityResults[i]);
 
   return (
     <div className="container mx-auto px-4 py-8">

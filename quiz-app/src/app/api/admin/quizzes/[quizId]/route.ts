@@ -21,7 +21,7 @@ export async function GET(
   }
 
   const { quizId } = await params;
-  const quiz = getCustomQuiz(quizId);
+  const quiz = await getCustomQuiz(quizId);
 
   if (!quiz) {
     return NextResponse.json({ error: "ไม่พบข้อสอบ" }, { status: 404 });
@@ -69,7 +69,7 @@ export async function PATCH(
       }
     }
 
-    const updated = updateCustomQuiz(quizId, updates);
+    const updated = await updateCustomQuiz(quizId, updates);
 
     if (!updated) {
       return NextResponse.json({ error: "ไม่พบข้อสอบ" }, { status: 404 });
@@ -94,7 +94,7 @@ export async function DELETE(
   }
 
   const { quizId } = await params;
-  const deleted = deleteCustomQuiz(quizId);
+  const deleted = await deleteCustomQuiz(quizId);
 
   if (!deleted) {
     return NextResponse.json({ error: "ไม่พบข้อสอบ" }, { status: 404 });
