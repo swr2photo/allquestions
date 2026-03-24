@@ -937,6 +937,7 @@ export default function AIChatPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<"none" | "webSearch" | "generateImage">("none");
+  const [searchingUrls, setSearchingUrls] = useState<string[]>([]);
   const modelPickerRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
 
@@ -1373,7 +1374,7 @@ export default function AIChatPage() {
       let fullText = "";
       let collectedImages: string[] = [];
       let collectedSources: SearchSource[] = [];
-      let searchingUrls: string[] = [];
+      setSearchingUrls([]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1413,7 +1414,7 @@ export default function AIChatPage() {
                   try { return new URL(s.url).hostname.replace("www.", ""); } catch { return s.title; }
                 });
                 setGeneratingStatus(`กำลังอ่านข้อมูลจาก ${siteNames.join(", ")}...`);
-                searchingUrls = siteNames;
+                setSearchingUrls(siteNames);
               }
 
               // Update session with all collected data
@@ -1462,6 +1463,7 @@ export default function AIChatPage() {
     } finally {
       clearTimeout(timeoutId);
       setLoading(false);
+      setSearchingUrls([]);
     }
   };
 
@@ -1679,7 +1681,7 @@ export default function AIChatPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-background overflow-hidden">
+    <div className="flex h-[100dvh] md:h-[calc(100vh-64px)] bg-background overflow-hidden">
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div
@@ -1692,7 +1694,7 @@ export default function AIChatPage() {
         className={`${
           isSidebarOpen ? "w-64" : "w-0"
         } transition-all duration-200 border-r border-gray-200 bg-white flex flex-col h-full overflow-hidden z-30 ${
-          isSidebarOpen ? "fixed md:relative inset-y-0 left-0" : ""
+          isSidebarOpen ? "fixed md:relative inset-y-0 left-0 shadow-xl md:shadow-none" : ""
         }`}
       >
         <div className="p-2 flex flex-col h-full w-64 shrink-0">
@@ -1945,9 +1947,9 @@ export default function AIChatPage() {
                 )}
               </div>
 
-              <div className={`flex flex-col max-w-[90%] sm:max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}>
+              <div className={`flex flex-col max-w-[85%] sm:max-w-[80%] min-w-0 ${m.role === "user" ? "items-end" : "items-start"}`}>
                 <div
-                  className={`px-3 py-2 rounded-lg text-sm ${
+                  className={`px-3 py-2 rounded-lg text-sm overflow-hidden break-words ${
                     m.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-foreground"
@@ -1998,7 +2000,7 @@ export default function AIChatPage() {
                                 {m.images.map((img, imgIdx) => (
                                   <a key={imgIdx} href={img} target="_blank" rel="noopener noreferrer" download={`generated-${imgIdx}.png`}
                                     className="block rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                                    <img src={img} alt={`Generated ${imgIdx + 1}`} className="max-w-[250px] sm:max-w-xs max-h-48 sm:max-h-64 object-contain" />
+                                    <img src={img} alt={`Generated ${imgIdx + 1}`} className="w-full max-w-[200px] sm:max-w-xs max-h-48 sm:max-h-64 object-contain" />
                                   </a>
                                 ))}
                               </div>
@@ -2037,11 +2039,21 @@ export default function AIChatPage() {
                             <span className="text-xs text-muted-foreground">{generatingStatus}</span>
                           </div>
                         ) : activeTool === "webSearch" ? (
-                          <div className="flex flex-col gap-1.5 py-1">
+                          <div className="flex flex-col gap-1.5 py-1 min-w-[200px]">
                             <div className="flex items-center gap-2">
-                              <Globe className="h-3.5 w-3.5 animate-pulse text-blue-500" />
+                              <Globe className="h-3.5 w-3.5 animate-pulse text-blue-500 shrink-0" />
                               <span className="text-sm text-muted-foreground">{generatingStatus}</span>
                             </div>
+                            {searchingUrls.length > 0 && (
+                              <div className="flex flex-wrap gap-1 ml-5">
+                                {searchingUrls.map((url, idx) => (
+                                  <span key={idx} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-50 text-[10px] text-blue-600">
+                                    <Globe className="h-2.5 w-2.5" />
+                                    {url}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <>
@@ -2190,7 +2202,7 @@ export default function AIChatPage() {
                     </Button>
 
                     {isToolsMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-1.5 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 z-50">
+                      <div className="absolute bottom-full left-0 mb-1.5 w-52 sm:w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 z-50 max-h-[60vh] overflow-y-auto">
                         <button
                           onClick={() => { fileInputRef.current?.click(); setIsToolsMenuOpen(false); }}
                           className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
@@ -2274,7 +2286,7 @@ export default function AIChatPage() {
                     </button>
 
                     {isModelPickerOpen && (
-                      <div className="absolute bottom-full left-0 mb-1.5 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
+                      <div className="absolute bottom-full left-0 mb-1.5 w-44 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
                         <div className="px-2 py-1">
                           <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Model</span>
                         </div>

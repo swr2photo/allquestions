@@ -348,7 +348,7 @@ ${quizContext}`;
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: "สร้างรูปภาพเรียบร้อยแล้ว" })}\n\n`));
               }
               controller.enqueue(encoder.encode("data: [DONE]\n\n"));
-              kv.incr(usageKey).then(() => kv.expire(usageKey, secondsUntilMidnight())).catch((err: unknown) => console.error("Quota error:", err));
+              kv.incr(usageKey).then(() => { kv.expire(usageKey, secondsUntilMidnight()); }).catch((err: unknown) => console.error("Quota error:", err));
               controller.close();
             },
           });
