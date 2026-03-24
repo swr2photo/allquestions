@@ -6,6 +6,15 @@ const token = process.env.allquiz_KV_REST_API_TOKEN || process.env.KV_REST_API_T
 // In-memory fallback when KV is not configured
 const memoryStore = new Map<string, { value: unknown; expiresAt?: number }>();
 
+function cleanExpired() {
+  const now = Date.now();
+  for (const [key, entry] of memoryStore) {
+    if (entry.expiresAt && now > entry.expiresAt) {
+      memoryStore.delete(key);
+    }
+  }
+}
+
 const memoryKv = {
   async get<T>(key: string): Promise<T | null> {
     const entry = memoryStore.get(key);
@@ -31,9 +40,24 @@ const memoryKv = {
       entry.expiresAt = Date.now() + seconds * 1000;
     }
   },
+  async keys(pattern: string): Promise<string[]> {
+    cleanExpired();
+    const prefix = pattern.replace("*", "");
+    return Array.from(memoryStore.keys()).filter(k => k.startsWith(prefix));
+  },
+  async mget<T>(...keys: string[]): Promise<(T | null)[]> {
+    return Promise.all(keys.map(k => this.get<T>(k)));
+  },
+  async del(key: string): Promise<number> {
+    const existed = memoryStore.has(key);
+    memoryStore.delete(key);
+    return existed ? 1 : 0;
+  },
 };
 
-let kv: ReturnType<typeof createClient> | typeof memoryKv;
+type MemoryKv = typeof memoryKv;
+
+let kv: ReturnType<typeof createClient> | MemoryKv;
 
 if (url && token) {
   kv = createClient({ url, token });
