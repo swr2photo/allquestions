@@ -16,15 +16,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: true, quotas: [] });
     }
 
-    // 2. Multi-get values
-    const values = await kv.mget<number[]>(...keys);
-    
-    // 3. Map to objects
-    const quotas = keys.map((key, index) => ({
-      email: key.replace("ai_usage:", ""),
-      usage: values[index] || 0,
-      limit: 20, // Updated per requirements
-    }));
+    // 2. Get values individually
+    const quotas = await Promise.all(
+      keys.map(async (key) => ({
+        email: key.replace("ai_usage:", ""),
+        usage: (await kv.get<number>(key)) || 0,
+        limit: 20,
+      }))
+    );
 
     // Sort by usage descending
     quotas.sort((a, b) => b.usage - a.usage);
