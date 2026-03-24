@@ -1691,7 +1691,7 @@ export default function AIChatPage() {
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-0"
-        } transition-all duration-200 border-r border-gray-200 bg-sidebar flex flex-col h-full overflow-hidden z-30 ${
+        } transition-all duration-200 border-r border-gray-200 bg-white flex flex-col h-full overflow-hidden z-30 ${
           isSidebarOpen ? "fixed md:relative inset-y-0 left-0" : ""
         }`}
       >

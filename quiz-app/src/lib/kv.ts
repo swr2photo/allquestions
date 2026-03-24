@@ -3,11 +3,43 @@ import { createClient } from "@vercel/kv";
 const url = process.env.allquiz_KV_REST_API_URL || process.env.KV_REST_API_URL || "";
 const token = process.env.allquiz_KV_REST_API_TOKEN || process.env.KV_REST_API_TOKEN || "";
 
-if (!url || !token) {
-  console.warn("KV_REST_API_URL or KV_REST_API_TOKEN is missing. Please ensure your Vercel KV environment variables are configured correctly.");
+// In-memory fallback when KV is not configured
+const memoryStore = new Map<string, { value: unknown; expiresAt?: number }>();
+
+const memoryKv = {
+  async get<T>(key: string): Promise<T | null> {
+    const entry = memoryStore.get(key);
+    if (!entry) return null;
+    if (entry.expiresAt && Date.now() > entry.expiresAt) {
+      memoryStore.delete(key);
+      return null;
+    }
+    return entry.value as T;
+  },
+  async set(key: string, value: unknown) {
+    memoryStore.set(key, { value });
+  },
+  async incr(key: string): Promise<number> {
+    const current = ((await this.get<number>(key)) || 0) + 1;
+    const entry = memoryStore.get(key);
+    memoryStore.set(key, { value: current, expiresAt: entry?.expiresAt });
+    return current;
+  },
+  async expire(key: string, seconds: number) {
+    const entry = memoryStore.get(key);
+    if (entry) {
+      entry.expiresAt = Date.now() + seconds * 1000;
+    }
+  },
+};
+
+let kv: ReturnType<typeof createClient> | typeof memoryKv;
+
+if (url && token) {
+  kv = createClient({ url, token });
+} else {
+  console.warn("KV not configured - using in-memory fallback (quota resets on redeploy)");
+  kv = memoryKv;
 }
 
-export const kv = createClient({
-  url,
-  token,
-});
+export { kv };
