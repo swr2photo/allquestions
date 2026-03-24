@@ -600,11 +600,28 @@ function SettingsModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 animate-fade-in" onClick={onClose}>
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[80vh] flex overflow-hidden animate-scale-in"
+        className="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[85vh] sm:max-h-[80vh] flex flex-col sm:flex-row overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Sidebar */}
-        <div className="w-48 bg-gray-50 border-r border-gray-200 py-4 shrink-0">
+        {/* Mobile tab bar */}
+        <div className="sm:hidden flex border-b border-gray-200 bg-gray-50 overflow-x-auto shrink-0">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-xs whitespace-nowrap transition-colors border-b-2 ${
+                activeTab === tab.id
+                  ? "border-primary text-gray-900 font-medium"
+                  : "border-transparent text-gray-500"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {/* Desktop sidebar */}
+        <div className="hidden sm:block w-48 bg-gray-50 border-r border-gray-200 py-4 shrink-0">
           <div className="px-4 mb-4">
             <h2 className="text-base font-semibold text-gray-900">{t("settings", lang)}</h2>
           </div>
@@ -1067,10 +1084,44 @@ export default function AIChatPage() {
     }
   }, []);
 
-  // Save sessions to localStorage
+  // Save sessions to localStorage (strip large base64 images to avoid QuotaExceededError)
   useEffect(() => {
     if (sessions.length > 0) {
-      localStorage.setItem("allquiz_ai_sessions", JSON.stringify(sessions));
+      try {
+        // Strip base64 image data from generated images before saving
+        const sessionsToSave = sessions.map(s => ({
+          ...s,
+          messages: s.messages.map(m => ({
+            ...m,
+            // Replace large base64 images with placeholder URLs
+            images: m.images?.map(img =>
+              img.length > 1000 ? `[image-placeholder-${img.slice(-20)}]` : img
+            ),
+            // Also limit file data size in saved messages
+            files: m.files?.map(f => ({
+              ...f,
+              data: f.data.length > 50000 ? `[file-too-large:${f.name}]` : f.data,
+            })),
+          })),
+        }));
+        localStorage.setItem("allquiz_ai_sessions", JSON.stringify(sessionsToSave));
+      } catch (e) {
+        console.warn("Failed to save sessions to localStorage:", e);
+        // If still too large, try saving without file data at all
+        try {
+          const minimalSessions = sessions.map(s => ({
+            ...s,
+            messages: s.messages.map(m => ({
+              role: m.role,
+              content: m.content,
+              sources: m.sources,
+            })),
+          }));
+          localStorage.setItem("allquiz_ai_sessions", JSON.stringify(minimalSessions));
+        } catch {
+          console.error("Cannot save sessions - localStorage full");
+        }
+      }
     }
   }, [sessions]);
 
@@ -1322,6 +1373,7 @@ export default function AIChatPage() {
       let fullText = "";
       let collectedImages: string[] = [];
       let collectedSources: SearchSource[] = [];
+      let searchingUrls: string[] = [];
 
       while (true) {
         const { done, value } = await reader.read();
@@ -1347,9 +1399,21 @@ export default function AIChatPage() {
                 collectedImages = [...collectedImages, parsed.image];
               }
 
+              // Show search queries being executed
+              if (parsed.searchQueries) {
+                const queries = parsed.searchQueries.slice(0, 2).join(", ");
+                setGeneratingStatus(`กำลังค้นหา: "${queries}"`);
+              }
+
               // Collect search sources
               if (parsed.sources) {
                 collectedSources = parsed.sources;
+                // Update status to show which sites are being searched
+                const siteNames = parsed.sources.slice(0, 3).map((s: SearchSource) => {
+                  try { return new URL(s.url).hostname.replace("www.", ""); } catch { return s.title; }
+                });
+                setGeneratingStatus(`กำลังอ่านข้อมูลจาก ${siteNames.join(", ")}...`);
+                searchingUrls = siteNames;
               }
 
               // Update session with all collected data
@@ -1616,11 +1680,20 @@ export default function AIChatPage() {
 
   return (
     <div className="flex h-[calc(100vh-64px)] bg-background overflow-hidden">
+      {/* Mobile sidebar overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-20 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
       {/* Sidebar */}
       <aside
         className={`${
           isSidebarOpen ? "w-64" : "w-0"
-        } transition-all duration-200 border-r border-gray-200 bg-sidebar flex flex-col h-full overflow-hidden z-30`}
+        } transition-all duration-200 border-r border-gray-200 bg-sidebar flex flex-col h-full overflow-hidden z-30 ${
+          isSidebarOpen ? "fixed md:relative inset-y-0 left-0" : ""
+        }`}
       >
         <div className="p-2 flex flex-col h-full w-64 shrink-0">
           {/* New Chat + Close */}
@@ -1681,7 +1754,7 @@ export default function AIChatPage() {
                   {groupSessions.map((s) => (
                     <div
                       key={s.id}
-                      onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); }}
+                      onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
                       className={`group/item relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
                         activeSessionId === s.id
                           ? "bg-accent text-accent-foreground"
@@ -1872,7 +1945,7 @@ export default function AIChatPage() {
                 )}
               </div>
 
-              <div className={`flex flex-col max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}>
+              <div className={`flex flex-col max-w-[90%] sm:max-w-[85%] ${m.role === "user" ? "items-end" : "items-start"}`}>
                 <div
                   className={`px-3 py-2 rounded-lg text-sm ${
                     m.role === "user"
@@ -1903,6 +1976,7 @@ export default function AIChatPage() {
                         const { thinking, answer } = parseThinking(m.content);
                         const isStreaming = loading && i === messages.length - 1;
                         const isStillThinking = isStreaming && !m.content.includes("</think>");
+                        const isWebSearching = isStreaming && activeTool === "webSearch";
                         return (
                           <div className="w-full overflow-hidden text-left">
                             {(thinking || isStillThinking) && (
@@ -1924,7 +1998,7 @@ export default function AIChatPage() {
                                 {m.images.map((img, imgIdx) => (
                                   <a key={imgIdx} href={img} target="_blank" rel="noopener noreferrer" download={`generated-${imgIdx}.png`}
                                     className="block rounded-lg overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
-                                    <img src={img} alt={`Generated ${imgIdx + 1}`} className="max-w-xs max-h-64 object-contain" />
+                                    <img src={img} alt={`Generated ${imgIdx + 1}`} className="max-w-[250px] sm:max-w-xs max-h-48 sm:max-h-64 object-contain" />
                                   </a>
                                 ))}
                               </div>
@@ -1961,6 +2035,13 @@ export default function AIChatPage() {
                               </div>
                             </div>
                             <span className="text-xs text-muted-foreground">{generatingStatus}</span>
+                          </div>
+                        ) : activeTool === "webSearch" ? (
+                          <div className="flex flex-col gap-1.5 py-1">
+                            <div className="flex items-center gap-2">
+                              <Globe className="h-3.5 w-3.5 animate-pulse text-blue-500" />
+                              <span className="text-sm text-muted-foreground">{generatingStatus}</span>
+                            </div>
                           </div>
                         ) : (
                           <>

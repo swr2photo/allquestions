@@ -472,6 +472,12 @@ ${quizContext}`;
 
               // Handle grounding metadata (search results)
               const grounding = parsed.candidates?.[0]?.groundingMetadata;
+              // Send search queries so client can show what's being searched
+              if (grounding?.webSearchQueries && grounding.webSearchQueries.length > 0) {
+                controller.enqueue(
+                  encoder.encode(`data: ${JSON.stringify({ searchQueries: grounding.webSearchQueries })}\n\n`)
+                );
+              }
               if (grounding?.searchEntryPoint?.renderedContent) {
                 controller.enqueue(
                   encoder.encode(`data: ${JSON.stringify({ searchWidget: grounding.searchEntryPoint.renderedContent })}\n\n`)
