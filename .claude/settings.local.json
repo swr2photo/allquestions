@@ -1,7 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls -la /d/allquestions/quiz-app/*.json)",
+      "Bash(ls -la /d/allquestions/quiz-app/tsconfig*)",
+      "Bash(find /d/allquestions/quiz-app/src/components/ui -name *.tsx -type f)",
+      "Bash(grep -r \"canvas\\\\|draw\\\\|sketch\\\\|tool\" /d/allquestions/quiz-app/src --include=*.tsx --include=*.ts)",
+      "Bash(npx next:*)",
+      "Bash(netstat -ano)",
+      "Bash(findstr :3000)",
+      "Bash(findstr LISTENING)",
+      "Bash(\"C:/Users/This PC/AppData/Local/Programs/Python/Python310/python.exe\" \"D:/allquestions/quiz-app/.claude/worktrees/pedantic-kapitsa/quiz-app/scripts/generate_doc.py\")",
+      "Bash(\"C:/Users/THISPC~1/AppData/Local/Programs/Python/Python310/python.exe\" \"D:/allquestions/quiz-app/.claude/worktrees/pedantic-kapitsa/quiz-app/scripts/generate_doc.py\")",
+      "Read(//d/allquestions/quiz-app/.claude/worktrees/pedantic-kapitsa/$HOME/**)",
+      "Read(//d/allquestions/quiz-app/.claude/worktrees/pedantic-kapitsa/**)",
+      "Bash(npm list:*)",
+      "Bash(npx --yes notebooklm-mcp-server --help)",
+      "Bash(node -e \"const os = require\\(''os''\\); const path = require\\(''path''\\); const fs = require\\(''fs''\\); const p = path.join\\(os.homedir\\(\\), ''.notebooklm-mcp'', ''auth.json''\\); console.log\\(''path:'', p\\); console.log\\(''exists:'', fs.existsSync\\(p\\)\\); if \\(fs.existsSync\\(p\\)\\) { const d = JSON.parse\\(fs.readFileSync\\(p, ''utf-8''\\)\\); console.log\\(''updatedAt:'', d.updatedAt\\); console.log\\(''cookies len:'', \\(d.cookies||''''\\).length\\); }\")",
+      "Bash(node -e \":*)",
+      "Bash(curl -s -w \"\\\\nHTTP_CODE:%{http_code}\" http://localhost:3000/api/ai/notebooklm)"
     ]
   }
 }

@@ -1,10 +1,10 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        // Allow Google Sign-In popup to communicate with the page
         source: "/admin/:path*",
         headers: [
           {
@@ -17,4 +17,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  org: "your-org-slug",
+  project: "your-project-slug",
+});
