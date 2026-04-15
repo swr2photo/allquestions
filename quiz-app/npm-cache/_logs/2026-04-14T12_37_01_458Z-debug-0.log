@@ -1,0 +1,26 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\This PC\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.5.1
+2 info using node@v24.11.1
+3 silly config load:file:C:\Users\This PC\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:D:\allquestions\quiz-app\.claude\worktrees\pedantic-kapitsa\quiz-app\.npmrc
+5 silly config load:file:C:\Users\This PC\.npmrc
+6 silly config load:file:C:\Users\This PC\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm run dev
+8 verbose argv "run" "dev"
+9 verbose logfile logs-max:10 dir:D:\allquestions\quiz-app\.claude\worktrees\pedantic-kapitsa\quiz-app\npm-cache\_logs\2026-04-14T12_37_01_458Z-
+10 verbose logfile D:\allquestions\quiz-app\.claude\worktrees\pedantic-kapitsa\quiz-app\npm-cache\_logs\2026-04-14T12_37_01_458Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 http fetch GET 200 https://registry.npmjs.org/npm 11835ms
+14 verbose cwd D:\allquestions\quiz-app\.claude\worktrees\pedantic-kapitsa\quiz-app
+15 verbose os Windows_NT 10.0.26300
+16 verbose node v24.11.1
+17 verbose npm  v11.5.1
+18 notice
+18 notice New [33mminor[39m version of npm available! [33m11.5.1[39m -> [34m11.12.1[39m
+18 notice Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.12.1[39m
+18 notice To update run: [4mnpm install -g npm@11.12.1[24m
+18 notice  { force: true, Symbol(proc-log.meta): true }
+19 verbose exit 1
+20 verbose code 1
+21 error A complete log of this run can be found in: D:\allquestions\quiz-app\.claude\worktrees\pedantic-kapitsa\quiz-app\npm-cache\_logs\2026-04-14T12_37_01_458Z-debug-0.log

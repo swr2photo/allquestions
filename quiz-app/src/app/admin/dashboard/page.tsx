@@ -32,6 +32,9 @@ import {
   RefreshCw,
   User,
   Loader2,
+  Coins,
+  Ticket,
+  Copy,
 } from "lucide-react";
 import type { CourseSettings } from "@/types";
 
@@ -52,6 +55,19 @@ interface AIQuota {
   email: string;
   usage: number;
   limit: number;
+}
+
+interface PromoCode {
+  code: string;
+  credits: number;
+  maxUses: number;
+  usedBy: string[];
+  createdAt: number;
+}
+
+interface UserCredits {
+  email: string;
+  credits: number;
 }
 
 type ToastType = "success" | "error";
@@ -76,6 +92,17 @@ export default function AdminDashboard() {
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: ToastType } | null>(null);
 
+  // Promo code & credit management state
+  const [promos, setPromos] = useState<PromoCode[]>([]);
+  const [userCredits, setUserCredits] = useState<UserCredits[]>([]);
+  const [newPromoCredits, setNewPromoCredits] = useState(10);
+  const [newPromoMaxUses, setNewPromoMaxUses] = useState(1);
+  const [newPromoCode, setNewPromoCode] = useState("");
+  const [creatingPromo, setCreatingPromo] = useState(false);
+  const [addCreditEmail, setAddCreditEmail] = useState("");
+  const [addCreditAmount, setAddCreditAmount] = useState(10);
+  const [addingCredits, setAddingCredits] = useState(false);
+
   // User info state (Google account)
   const [userInfo, setUserInfo] = useState<{ email: string; name: string; picture: string } | null>(null);
 
@@ -98,12 +125,97 @@ export default function AdminDashboard() {
     }
   }, []);
 
+  const fetchPromos = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/ai/promos");
+      if (res.ok) {
+        const data = await res.json();
+        setPromos(data.promos || []);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const fetchUserCredits = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/ai/credits");
+      if (res.ok) {
+        const data = await res.json();
+        setUserCredits(data.users || []);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const createPromo = async () => {
+    setCreatingPromo(true);
+    try {
+      const res = await fetch("/api/admin/ai/promos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: newPromoCode || undefined,
+          credits: newPromoCredits,
+          maxUses: newPromoMaxUses,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`สร้างรหัส ${data.code} สำเร็จ (${data.credits} เครดิต)`, "success");
+        setNewPromoCode("");
+        fetchPromos();
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาด", "error");
+    } finally {
+      setCreatingPromo(false);
+    }
+  };
+
+  const deletePromo = async (code: string) => {
+    try {
+      const res = await fetch(`/api/admin/ai/promos?code=${encodeURIComponent(code)}`, { method: "DELETE" });
+      if (res.ok) {
+        showToast(`ลบรหัส ${code} แล้ว`, "success");
+        fetchPromos();
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาด", "error");
+    }
+  };
+
+  const addCreditsToUser = async () => {
+    if (!addCreditEmail.trim()) return;
+    setAddingCredits(true);
+    try {
+      const res = await fetch("/api/admin/ai/credits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: addCreditEmail.trim(), amount: addCreditAmount }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`เพิ่ม ${addCreditAmount} เครดิต ให้ ${addCreditEmail} (คงเหลือ ${data.credits})`, "success");
+        setAddCreditEmail("");
+        fetchUserCredits();
+      } else {
+        showToast(data.error || "เกิดข้อผิดพลาด", "error");
+      }
+    } catch {
+      showToast("เกิดข้อผิดพลาด", "error");
+    } finally {
+      setAddingCredits(false);
+    }
+  };
+
   const fetchCourses = useCallback(async () => {
     try {
       const [coursesRes, quizzesRes] = await Promise.all([
         fetch("/api/admin/courses"),
         fetch("/api/admin/quizzes"),
         fetchAIQuotas(),
+        fetchPromos(),
+        fetchUserCredits(),
       ]);
 
       if (coursesRes.status === 401) {
@@ -837,6 +949,179 @@ export default function AdminDashboard() {
           })}
         </div>
       )}
+      {/* Promo Code Management */}
+      <div className="mt-10 space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Ticket className="h-5 w-5 text-amber-500" />
+            จัดการรหัสโปรโมชั่น ({promos.length})
+          </h2>
+          <Button size="sm" variant="ghost" className="text-xs text-gray-500 gap-1.5" onClick={fetchPromos}>
+            <RefreshCw className="h-3.5 w-3.5" />
+            โหลดใหม่
+          </Button>
+        </div>
+
+        {/* Create new promo */}
+        <Card className="border-gray-200">
+          <CardContent className="pt-4 pb-4">
+            <p className="text-sm font-medium text-gray-700 mb-3">สร้างรหัสโปรโมชั่นใหม่</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <Input
+                placeholder="รหัส (อัตโนมัติ)"
+                value={newPromoCode}
+                onChange={(e) => setNewPromoCode(e.target.value.toUpperCase())}
+                className="text-sm"
+              />
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  max={10000}
+                  value={newPromoCredits}
+                  onChange={(e) => setNewPromoCredits(Number(e.target.value))}
+                  className="text-sm"
+                />
+                <span className="text-xs text-gray-500 whitespace-nowrap">เครดิต</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={1}
+                  max={10000}
+                  value={newPromoMaxUses}
+                  onChange={(e) => setNewPromoMaxUses(Number(e.target.value))}
+                  className="text-sm"
+                />
+                <span className="text-xs text-gray-500 whitespace-nowrap">ครั้ง</span>
+              </div>
+              <Button
+                size="sm"
+                onClick={createPromo}
+                disabled={creatingPromo}
+                className="gap-1.5"
+              >
+                {creatingPromo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+                สร้างรหัส
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Promo list */}
+        {promos.length > 0 && (
+          <div className="space-y-2">
+            {promos.map((promo) => (
+              <Card key={promo.code} className="border-gray-200 hover:shadow-sm transition-shadow">
+                <CardHeader className="py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+                      <Ticket className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <code className="text-sm font-bold text-gray-900 bg-gray-100 px-2 py-0.5 rounded">{promo.code}</code>
+                        <button
+                          className="text-gray-400 hover:text-gray-600"
+                          onClick={() => { navigator.clipboard.writeText(promo.code); showToast("คัดลอกแล้ว", "success"); }}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {promo.credits} เครดิต · ใช้แล้ว {promo.usedBy.length}/{promo.maxUses === 0 ? "∞" : promo.maxUses} ครั้ง
+                        {promo.usedBy.length > 0 && (
+                          <span className="ml-1 text-gray-400">({promo.usedBy.slice(0, 3).join(", ")}{promo.usedBy.length > 3 ? "..." : ""})</span>
+                        )}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-xs text-red-600 hover:text-red-700 hover:bg-red-50 px-2 h-8"
+                      onClick={() => deletePromo(promo.code)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Credit Management */}
+      <div className="mt-10 space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Coins className="h-5 w-5 text-emerald-500" />
+            จัดการเครดิตผู้ใช้ ({userCredits.length})
+          </h2>
+          <Button size="sm" variant="ghost" className="text-xs text-gray-500 gap-1.5" onClick={fetchUserCredits}>
+            <RefreshCw className="h-3.5 w-3.5" />
+            โหลดใหม่
+          </Button>
+        </div>
+
+        {/* Add credits form */}
+        <Card className="border-gray-200">
+          <CardContent className="pt-4 pb-4">
+            <p className="text-sm font-medium text-gray-700 mb-3">เพิ่มเครดิตให้ผู้ใช้</p>
+            <div className="grid grid-cols-3 gap-2">
+              <Input
+                placeholder="อีเมลผู้ใช้"
+                type="email"
+                value={addCreditEmail}
+                onChange={(e) => setAddCreditEmail(e.target.value)}
+                className="text-sm col-span-1"
+              />
+              <div className="flex items-center gap-1">
+                <Input
+                  type="number"
+                  min={-10000}
+                  max={10000}
+                  value={addCreditAmount}
+                  onChange={(e) => setAddCreditAmount(Number(e.target.value))}
+                  className="text-sm"
+                />
+                <span className="text-xs text-gray-500 whitespace-nowrap">เครดิต</span>
+              </div>
+              <Button
+                size="sm"
+                onClick={addCreditsToUser}
+                disabled={addingCredits || !addCreditEmail.trim()}
+                className="gap-1.5"
+              >
+                {addingCredits ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Coins className="h-3.5 w-3.5" />}
+                เพิ่มเครดิต
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* User credit list */}
+        {userCredits.length > 0 && (
+          <div className="space-y-2">
+            {userCredits.map((uc) => (
+              <Card key={uc.email} className="border-gray-200 hover:shadow-sm transition-shadow">
+                <CardHeader className="py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                      <Coins className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">{uc.email}</p>
+                      <p className="text-xs text-gray-500">{uc.credits} เครดิต</p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
       {/* AI Usage Section */}
       <div className="mt-10 space-y-3 pb-10">
         <div className="flex items-center justify-between">

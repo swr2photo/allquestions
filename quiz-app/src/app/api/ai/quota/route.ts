@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@/lib/kv";
 import { getSessionInfo, isValidSession } from "@/lib/admin-store";
+import { MODEL_CREDITS } from "@/lib/credits";
 
 export const dynamic = "force-dynamic";
 
@@ -8,7 +9,7 @@ export async function GET(request: NextRequest) {
   const userToken = request.cookies.get("user-session")?.value;
   const adminToken = request.cookies.get("admin-session")?.value;
   const token = userToken || adminToken;
-  
+
   if (!isValidSession(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
@@ -19,10 +20,13 @@ export async function GET(request: NextRequest) {
   }
 
   const usage = await kv.get<number>(`ai_usage:${user.email}`) || 0;
-  
+  const credits = await kv.get<number>(`ai_credits:${user.email}`) ?? 0;
+
   return NextResponse.json({
     usage,
-    limit: 20,
-    remaining: Math.max(0, 20 - usage)
+    limit: 100,
+    remaining: Math.max(0, 100 - usage),
+    credits,
+    pricing: MODEL_CREDITS,
   });
 }

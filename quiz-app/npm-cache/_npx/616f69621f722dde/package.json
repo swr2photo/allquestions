@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "notebooklm-mcp-server": "^3.0.7"
+  },
+  "_npx": {
+    "packages": [
+      "notebooklm-mcp-server"
+    ]
+  }
+}

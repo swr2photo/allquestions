@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { isValidSession } from "@/lib/admin-store";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get("user-session")?.value || cookieStore.get("admin-session")?.value;
+  if (!token || !isValidSession(token)) {
+    return NextResponse.json({ models: [] });
+  }
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json({ error: "No API key" }, { status: 500 });
