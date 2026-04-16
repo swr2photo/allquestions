@@ -6,6 +6,7 @@ import { getSessionInfo, isValidSession } from "@/lib/admin-store";
 import { kv } from "@/lib/kv";
 import { getModelCreditCost, addCreditLog, creditsKey } from "@/lib/credits";
 import { getProviderHealth, pickAutoModel } from "@/lib/ai-health";
+import { recordAiCall } from "@/lib/ai-stats";
 import { webSearchWithContent } from "@/lib/web-search";
 
 export const dynamic = "force-dynamic";
@@ -214,6 +215,9 @@ export async function POST(request: NextRequest) {
     };
     modelToUse = modelMap[modelToUse] || (isClaudeModel ? "claude-sonnet-4-6" : "gemini-2.5-flash");
   }
+
+  // Record call against provider/model counters (fire-and-forget, treat as ok)
+  recordAiCall(modelToUse, true).catch(() => {});
 
   // 3. Check Credits for pro models
   const creditCost = getModelCreditCost(requestedModel || "auto", !!generateImage);

@@ -1,39 +1,66 @@
 // Shared AI provider health check with caching
 // Used by both /api/ai/health and /api/ai/chat for auto mode
 
+export type ProviderId = "gemini" | "claude" | "openrouter";
+
+export interface ProviderDetail {
+  id: ProviderId;
+  name: string;
+  configured: boolean;
+  online: boolean;
+  latencyMs: number | null;
+  credits: number | null;      // remaining paid credits (OpenRouter only)
+  message: string;             // short human-readable status message (Thai)
+  checkedAt: number;           // timestamp ms
+}
+
 interface HealthResult {
   gemini: boolean;
   claude: boolean;
   openrouter: boolean;
   openrouterCredits: number; // remaining credits on OpenRouter
+  providers: ProviderDetail[];
 }
 
 let cachedResult: { data: HealthResult; timestamp: number } | null = null;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-async function checkGemini(apiKey: string): Promise<boolean> {
+async function timedFetch(url: string, init: RequestInit, timeoutMs: number): Promise<{ res: Response | null; latencyMs: number; error?: string }> {
+  const start = Date.now();
   try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: "hi" }] }],
-          generationConfig: { maxOutputTokens: 1 },
-        }),
-        signal: AbortSignal.timeout(8000),
-      }
-    );
-    return res.status === 200 || res.status === 400;
-  } catch {
-    return false;
+    const res = await fetch(url, { ...init, signal: AbortSignal.timeout(timeoutMs) });
+    return { res, latencyMs: Date.now() - start };
+  } catch (err) {
+    return { res: null, latencyMs: Date.now() - start, error: err instanceof Error ? err.message : String(err) };
   }
 }
 
-async function checkClaude(apiKey: string): Promise<boolean> {
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
+async function checkGemini(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: "hi" }] }],
+        generationConfig: { maxOutputTokens: 1 },
+      }),
+    },
+    8000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  const ok = res.status === 200 || res.status === 400;
+  return {
+    ok,
+    latency: latencyMs,
+    msg: ok ? `ปกติ (HTTP ${res.status})` : `ผิดพลาด (HTTP ${res.status})`,
+  };
+}
+
+async function checkClaude(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "https://api.anthropic.com/v1/messages",
+    {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -45,26 +72,32 @@ async function checkClaude(apiKey: string): Promise<boolean> {
         max_tokens: 1,
         messages: [{ role: "user", content: "hi" }],
       }),
-      signal: AbortSignal.timeout(8000),
-    });
-    return res.status === 200 || res.status === 400;
-  } catch {
-    return false;
-  }
+    },
+    8000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  const ok = res.status === 200 || res.status === 400;
+  return {
+    ok,
+    latency: latencyMs,
+    msg: ok ? `ปกติ (HTTP ${res.status})` : `ผิดพลาด (HTTP ${res.status})`,
+  };
 }
 
-async function checkOpenRouter(apiKey: string): Promise<{ ok: boolean; credits: number }> {
+async function checkOpenRouter(apiKey: string): Promise<{ ok: boolean; credits: number; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "https://openrouter.ai/api/v1/auth/key",
+    { headers: { "Authorization": `Bearer ${apiKey}` } },
+    5000
+  );
+  if (!res) return { ok: false, credits: 0, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  if (!res.ok) return { ok: false, credits: 0, latency: latencyMs, msg: `ผิดพลาด (HTTP ${res.status})` };
   try {
-    const res = await fetch("https://openrouter.ai/api/v1/auth/key", {
-      headers: { "Authorization": `Bearer ${apiKey}` },
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!res.ok) return { ok: false, credits: 0 };
     const data = await res.json() as { data?: { limit_remaining?: number; usage?: number; limit?: number } };
     const remaining = data.data?.limit_remaining ?? 0;
-    return { ok: true, credits: remaining };
+    return { ok: true, credits: remaining, latency: latencyMs, msg: `ปกติ · คงเหลือ ${remaining.toFixed(3)} credits` };
   } catch {
-    return { ok: false, credits: 0 };
+    return { ok: true, credits: 0, latency: latencyMs, msg: "ปกติ แต่ไม่สามารถอ่านเครดิตได้" };
   }
 }
 
@@ -77,22 +110,61 @@ export async function getProviderHealth(): Promise<HealthResult> {
   const geminiKey = process.env.GEMINI_API_KEY;
   const claudeKey = process.env.ANTHROPIC_API_KEY;
   const openRouterKey = process.env.OPENROUTER_API_KEY;
+  const now = Date.now();
 
-  const [geminiOk, claudeOk, orResult] = await Promise.all([
-    geminiKey ? checkGemini(geminiKey) : Promise.resolve(false),
-    claudeKey ? checkClaude(claudeKey) : Promise.resolve(false),
-    openRouterKey ? checkOpenRouter(openRouterKey) : Promise.resolve({ ok: false, credits: 0 }),
+  const [geminiResult, claudeResult, orResult] = await Promise.all([
+    geminiKey ? checkGemini(geminiKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
+    claudeKey ? checkClaude(claudeKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
+    openRouterKey ? checkOpenRouter(openRouterKey) : Promise.resolve({ ok: false, credits: 0, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
   ]);
 
+  const providers: ProviderDetail[] = [
+    {
+      id: "gemini",
+      name: "Google Gemini",
+      configured: !!geminiKey,
+      online: geminiResult.ok,
+      latencyMs: geminiKey ? geminiResult.latency : null,
+      credits: null,
+      message: geminiResult.msg,
+      checkedAt: now,
+    },
+    {
+      id: "claude",
+      name: "Anthropic Claude",
+      configured: !!claudeKey,
+      online: claudeResult.ok,
+      latencyMs: claudeKey ? claudeResult.latency : null,
+      credits: null,
+      message: claudeResult.msg,
+      checkedAt: now,
+    },
+    {
+      id: "openrouter",
+      name: "OpenRouter",
+      configured: !!openRouterKey,
+      online: orResult.ok,
+      latencyMs: openRouterKey ? orResult.latency : null,
+      credits: openRouterKey ? orResult.credits : null,
+      message: orResult.msg,
+      checkedAt: now,
+    },
+  ];
+
   const result: HealthResult = {
-    gemini: geminiOk,
-    claude: claudeOk,
+    gemini: geminiResult.ok,
+    claude: claudeResult.ok,
     openrouter: orResult.ok,
     openrouterCredits: orResult.credits,
+    providers,
   };
 
-  cachedResult = { data: result, timestamp: Date.now() };
+  cachedResult = { data: result, timestamp: now };
   return result;
+}
+
+export function invalidateProviderHealthCache(): void {
+  cachedResult = null;
 }
 
 // For use in auto mode: pick the best working model

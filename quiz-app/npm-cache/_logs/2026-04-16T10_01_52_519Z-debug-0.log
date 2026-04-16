@@ -1,0 +1,345 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\This PC\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@11.5.1
+2 info using node@v24.11.1
+3 silly config load:file:C:\Users\This PC\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config load:file:D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\.npmrc
+5 silly config load:file:C:\Users\This PC\.npmrc
+6 silly config load:file:C:\Users\This PC\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm exec tsx -e 
+7 verbose title import { getGenedCourses, getGenedCategories, summarizeCourses } from './src/lib/gened';
+7 verbose title (async () => {
+7 verbose title   const cats = await getGenedCategories();
+7 verbose title   console.log('Categories:', cats.length);
+7 verbose title   const courses = await getGenedCourses();
+7 verbose title   console.log('Courses:', courses.length);
+7 verbose title   const summary = summarizeCourses(courses);
+7 verbose title   console.log('Summary:', JSON.stringify(summary, null, 2));
+7 verbose title   console.log('Sample:', JSON.stringify(courses.slice(0,2), null, 2));
+7 verbose title })();
+8 verbose argv "exec" "--" "tsx" "-e" "\nimport { getGenedCourses, getGenedCategories, summarizeCourses } from './src/lib/gened';\n(async () => {\n  const cats = await getGenedCategories();\n  console.log('Categories:', cats.length);\n  const courses = await getGenedCourses();\n  console.log('Courses:', courses.length);\n  const summary = summarizeCourses(courses);\n  console.log('Summary:', JSON.stringify(summary, null, 2));\n  console.log('Sample:', JSON.stringify(courses.slice(0,2), null, 2));\n})();\n"
+9 verbose logfile logs-max:10 dir:D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_logs\2026-04-16T10_01_52_519Z-
+10 verbose logfile D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_logs\2026-04-16T10_01_52_519Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+14 http fetch GET 200 https://registry.npmjs.org/tsx 435ms (cache miss)
+15 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+16 silly packumentCache heap:4496293888 maxSize:1124073472 maxEntrySize:562036736
+17 warn exec The following package was not found and will be installed: tsx@4.21.0
+18 silly idealTree buildDeps
+19 silly fetch manifest tsx@4.21.0
+20 silly packumentCache full:https://registry.npmjs.org/tsx cache-miss
+21 http fetch GET 200 https://registry.npmjs.org/tsx 159ms (cache miss)
+22 silly packumentCache full:https://registry.npmjs.org/tsx set size:undefined disposed:false
+23 silly placeDep ROOT tsx@4.21.0 OK for:  want: 4.21.0
+24 silly fetch manifest esbuild@~0.27.0
+25 silly packumentCache full:https://registry.npmjs.org/esbuild cache-miss
+26 silly fetch manifest get-tsconfig@^4.7.5
+27 silly packumentCache full:https://registry.npmjs.org/get-tsconfig cache-miss
+28 silly fetch manifest fsevents@~2.3.3
+29 silly packumentCache full:https://registry.npmjs.org/fsevents cache-miss
+30 http fetch GET 200 https://registry.npmjs.org/esbuild 169ms (cache miss)
+31 silly packumentCache full:https://registry.npmjs.org/esbuild set size:undefined disposed:false
+32 http fetch GET 200 https://registry.npmjs.org/fsevents 293ms (cache revalidated)
+33 silly packumentCache full:https://registry.npmjs.org/fsevents set size:182472 disposed:false
+34 http fetch GET 200 https://registry.npmjs.org/get-tsconfig 297ms (cache updated)
+35 silly packumentCache full:https://registry.npmjs.org/get-tsconfig set size:undefined disposed:false
+36 silly placeDep ROOT esbuild@0.27.7 OK for: tsx@4.21.0 want: ~0.27.0
+37 silly placeDep ROOT fsevents@2.3.3 OK for: tsx@4.21.0 want: ~2.3.3
+38 silly placeDep ROOT get-tsconfig@4.14.0 OK for: tsx@4.21.0 want: ^4.7.5
+39 silly fetch manifest @esbuild/aix-ppc64@0.27.7
+40 silly packumentCache full:https://registry.npmjs.org/@esbuild%2faix-ppc64 cache-miss
+41 silly fetch manifest @esbuild/linux-arm@0.27.7
+42 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm cache-miss
+43 silly fetch manifest @esbuild/linux-x64@0.27.7
+44 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-x64 cache-miss
+45 silly fetch manifest @esbuild/sunos-x64@0.27.7
+46 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fsunos-x64 cache-miss
+47 silly fetch manifest @esbuild/win32-x64@0.27.7
+48 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-x64 cache-miss
+49 silly fetch manifest @esbuild/darwin-x64@0.27.7
+50 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-x64 cache-miss
+51 silly fetch manifest @esbuild/linux-ia32@0.27.7
+52 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ia32 cache-miss
+53 http fetch GET 200 https://registry.npmjs.org/@esbuild%2faix-ppc64 143ms (cache miss)
+54 silly packumentCache full:https://registry.npmjs.org/@esbuild%2faix-ppc64 set size:undefined disposed:false
+55 silly fetch manifest @esbuild/netbsd-x64@0.27.7
+56 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-x64 cache-miss
+57 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-arm 155ms (cache miss)
+58 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm set size:undefined disposed:false
+59 silly fetch manifest @esbuild/win32-ia32@0.27.7
+60 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-ia32 cache-miss
+61 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-x64 198ms (cache miss)
+62 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-x64 set size:undefined disposed:false
+63 silly fetch manifest @esbuild/android-arm@0.27.7
+64 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm cache-miss
+65 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fsunos-x64 288ms (cache miss)
+66 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fsunos-x64 set size:undefined disposed:false
+67 silly fetch manifest @esbuild/android-x64@0.27.7
+68 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-x64 cache-miss
+69 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fnetbsd-x64 170ms (cache miss)
+70 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-x64 set size:undefined disposed:false
+71 silly fetch manifest @esbuild/freebsd-x64@0.27.7
+72 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-x64 cache-miss
+73 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-ia32 177ms (cache miss)
+74 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-ia32 set size:undefined disposed:false
+75 silly fetch manifest @esbuild/linux-arm64@0.27.7
+76 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm64 cache-miss
+77 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-ia32 356ms (cache miss)
+78 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ia32 set size:undefined disposed:false
+79 silly fetch manifest @esbuild/linux-ppc64@0.27.7
+80 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ppc64 cache-miss
+81 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-arm 183ms (cache miss)
+82 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm set size:undefined disposed:false
+83 silly fetch manifest @esbuild/linux-s390x@0.27.7
+84 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-s390x cache-miss
+85 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fdarwin-x64 388ms (cache miss)
+86 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-x64 set size:undefined disposed:false
+87 silly fetch manifest @esbuild/openbsd-x64@0.27.7
+88 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-x64 cache-miss
+89 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-x64 125ms (cache miss)
+90 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-x64 set size:undefined disposed:false
+91 silly fetch manifest @esbuild/win32-arm64@0.27.7
+92 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-arm64 cache-miss
+93 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-x64 434ms (cache miss)
+94 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-x64 set size:undefined disposed:false
+95 silly fetch manifest @esbuild/darwin-arm64@0.27.7
+96 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-arm64 cache-miss
+97 http fetch GET 200 https://registry.npmjs.org/@esbuild%2ffreebsd-x64 144ms (cache miss)
+98 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-x64 set size:undefined disposed:false
+99 silly fetch manifest @esbuild/netbsd-arm64@0.27.7
+100 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-arm64 cache-miss
+101 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-arm64 143ms (cache miss)
+102 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-arm64 set size:undefined disposed:false
+103 silly fetch manifest @esbuild/android-arm64@0.27.7
+104 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm64 cache-miss
+105 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-ppc64 125ms (cache miss)
+106 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-ppc64 set size:undefined disposed:false
+107 silly fetch manifest @esbuild/freebsd-arm64@0.27.7
+108 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 cache-miss
+109 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-s390x 130ms (cache miss)
+110 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-s390x set size:undefined disposed:false
+111 silly fetch manifest @esbuild/linux-loong64@0.27.7
+112 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-loong64 cache-miss
+113 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenbsd-x64 129ms (cache miss)
+114 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-x64 set size:undefined disposed:false
+115 silly fetch manifest @esbuild/linux-riscv64@0.27.7
+116 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-riscv64 cache-miss
+117 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fwin32-arm64 132ms (cache miss)
+118 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fwin32-arm64 set size:undefined disposed:false
+119 silly fetch manifest @esbuild/openbsd-arm64@0.27.7
+120 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-arm64 cache-miss
+121 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fdarwin-arm64 135ms (cache miss)
+122 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fdarwin-arm64 set size:undefined disposed:false
+123 silly fetch manifest @esbuild/linux-mips64el@0.27.7
+124 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-mips64el cache-miss
+125 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fnetbsd-arm64 193ms (cache miss)
+126 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fnetbsd-arm64 set size:undefined disposed:false
+127 silly fetch manifest @esbuild/openharmony-arm64@0.27.7
+128 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenharmony-arm64 cache-miss
+129 http fetch GET 200 https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 177ms (cache miss)
+130 silly packumentCache full:https://registry.npmjs.org/@esbuild%2ffreebsd-arm64 set size:undefined disposed:false
+131 silly fetch manifest resolve-pkg-maps@^1.0.0
+132 silly packumentCache full:https://registry.npmjs.org/resolve-pkg-maps cache-miss
+133 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fandroid-arm64 186ms (cache miss)
+134 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fandroid-arm64 set size:undefined disposed:false
+135 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenbsd-arm64 131ms (cache miss)
+136 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenbsd-arm64 set size:undefined disposed:false
+137 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-riscv64 174ms (cache miss)
+138 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-riscv64 set size:undefined disposed:false
+139 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-loong64 182ms (cache miss)
+140 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-loong64 set size:undefined disposed:false
+141 http fetch GET 200 https://registry.npmjs.org/@esbuild%2flinux-mips64el 142ms (cache miss)
+142 silly packumentCache full:https://registry.npmjs.org/@esbuild%2flinux-mips64el set size:undefined disposed:false
+143 http fetch GET 200 https://registry.npmjs.org/resolve-pkg-maps 104ms (cache revalidated)
+144 silly packumentCache full:https://registry.npmjs.org/resolve-pkg-maps set size:11615 disposed:false
+145 http fetch GET 200 https://registry.npmjs.org/@esbuild%2fopenharmony-arm64 112ms (cache miss)
+146 silly packumentCache full:https://registry.npmjs.org/@esbuild%2fopenharmony-arm64 set size:undefined disposed:false
+147 silly placeDep ROOT @esbuild/aix-ppc64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+148 silly placeDep ROOT @esbuild/android-arm@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+149 silly placeDep ROOT @esbuild/android-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+150 silly placeDep ROOT @esbuild/android-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+151 silly placeDep ROOT @esbuild/darwin-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+152 silly placeDep ROOT @esbuild/darwin-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+153 silly placeDep ROOT @esbuild/freebsd-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+154 silly placeDep ROOT @esbuild/freebsd-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+155 silly placeDep ROOT @esbuild/linux-arm@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+156 silly placeDep ROOT @esbuild/linux-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+157 silly placeDep ROOT @esbuild/linux-ia32@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+158 silly placeDep ROOT @esbuild/linux-loong64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+159 silly placeDep ROOT @esbuild/linux-mips64el@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+160 silly placeDep ROOT @esbuild/linux-ppc64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+161 silly placeDep ROOT @esbuild/linux-riscv64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+162 silly placeDep ROOT @esbuild/linux-s390x@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+163 silly placeDep ROOT @esbuild/linux-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+164 silly placeDep ROOT @esbuild/netbsd-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+165 silly placeDep ROOT @esbuild/netbsd-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+166 silly placeDep ROOT @esbuild/openbsd-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+167 silly placeDep ROOT @esbuild/openbsd-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+168 silly placeDep ROOT @esbuild/openharmony-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+169 silly placeDep ROOT @esbuild/sunos-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+170 silly placeDep ROOT @esbuild/win32-arm64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+171 silly placeDep ROOT @esbuild/win32-ia32@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+172 silly placeDep ROOT @esbuild/win32-x64@0.27.7 OK for: esbuild@0.27.7 want: 0.27.7
+173 silly placeDep ROOT resolve-pkg-maps@1.0.0 OK for: get-tsconfig@4.14.0 want: ^1.0.0
+174 silly reify moves {}
+175 silly audit bulk request {
+175 silly audit   tsx: [ '4.21.0' ],
+175 silly audit   esbuild: [ '0.27.7' ],
+175 silly audit   fsevents: [ '2.3.3' ],
+175 silly audit   'get-tsconfig': [ '4.14.0' ],
+175 silly audit   '@esbuild/aix-ppc64': [ '0.27.7' ],
+175 silly audit   '@esbuild/android-arm': [ '0.27.7' ],
+175 silly audit   '@esbuild/android-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/android-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/darwin-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/darwin-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/freebsd-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/freebsd-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-arm': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-ia32': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-loong64': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-mips64el': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-ppc64': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-riscv64': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-s390x': [ '0.27.7' ],
+175 silly audit   '@esbuild/linux-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/netbsd-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/netbsd-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/openbsd-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/openbsd-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/openharmony-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/sunos-x64': [ '0.27.7' ],
+175 silly audit   '@esbuild/win32-arm64': [ '0.27.7' ],
+175 silly audit   '@esbuild/win32-ia32': [ '0.27.7' ],
+175 silly audit   '@esbuild/win32-x64': [ '0.27.7' ],
+175 silly audit   'resolve-pkg-maps': [ '1.0.0' ]
+175 silly audit }
+176 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\win32-ia32
+177 silly reify mark deleted [
+177 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\win32-ia32'
+177 silly reify ]
+178 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\win32-arm64
+179 silly reify mark deleted [
+179 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\win32-arm64'
+179 silly reify ]
+180 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\sunos-x64
+181 silly reify mark deleted [
+181 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\sunos-x64'
+181 silly reify ]
+182 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\openharmony-arm64
+183 silly reify mark deleted [
+183 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\openharmony-arm64'
+183 silly reify ]
+184 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\openbsd-x64
+185 silly reify mark deleted [
+185 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\openbsd-x64'
+185 silly reify ]
+186 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\openbsd-arm64
+187 silly reify mark deleted [
+187 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\openbsd-arm64'
+187 silly reify ]
+188 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\netbsd-x64
+189 silly reify mark deleted [
+189 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\netbsd-x64'
+189 silly reify ]
+190 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\netbsd-arm64
+191 silly reify mark deleted [
+191 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\netbsd-arm64'
+191 silly reify ]
+192 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-x64
+193 silly reify mark deleted [
+193 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-x64'
+193 silly reify ]
+194 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-s390x
+195 silly reify mark deleted [
+195 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-s390x'
+195 silly reify ]
+196 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-riscv64
+197 silly reify mark deleted [
+197 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-riscv64'
+197 silly reify ]
+198 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-ppc64
+199 silly reify mark deleted [
+199 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-ppc64'
+199 silly reify ]
+200 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-mips64el
+201 silly reify mark deleted [
+201 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-mips64el'
+201 silly reify ]
+202 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-loong64
+203 silly reify mark deleted [
+203 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-loong64'
+203 silly reify ]
+204 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-ia32
+205 silly reify mark deleted [
+205 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-ia32'
+205 silly reify ]
+206 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-arm64
+207 silly reify mark deleted [
+207 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-arm64'
+207 silly reify ]
+208 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\linux-arm
+209 silly reify mark deleted [
+209 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\linux-arm'
+209 silly reify ]
+210 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\freebsd-x64
+211 silly reify mark deleted [
+211 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\freebsd-x64'
+211 silly reify ]
+212 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\freebsd-arm64
+213 silly reify mark deleted [
+213 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\freebsd-arm64'
+213 silly reify ]
+214 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\darwin-x64
+215 silly reify mark deleted [
+215 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\darwin-x64'
+215 silly reify ]
+216 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\darwin-arm64
+217 silly reify mark deleted [
+217 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\darwin-arm64'
+217 silly reify ]
+218 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\android-x64
+219 silly reify mark deleted [
+219 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\android-x64'
+219 silly reify ]
+220 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\android-arm64
+221 silly reify mark deleted [
+221 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\android-arm64'
+221 silly reify ]
+222 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\android-arm
+223 silly reify mark deleted [
+223 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\android-arm'
+223 silly reify ]
+224 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\@esbuild\aix-ppc64
+225 silly reify mark deleted [
+225 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\@esbuild\\aix-ppc64'
+225 silly reify ]
+226 verbose reify failed optional dependency D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app\npm-cache\_npx\fd45a72a545557e9\node_modules\fsevents
+227 silly reify mark deleted [
+227 silly reify   'D:\\allquestions\\quiz-app\\.claude\\worktrees\\sad-hodgkin\\quiz-app\\npm-cache\\_npx\\fd45a72a545557e9\\node_modules\\fsevents'
+227 silly reify ]
+228 http cache resolve-pkg-maps@https://registry.npmjs.org/resolve-pkg-maps/-/resolve-pkg-maps-1.0.0.tgz 0ms (cache hit)
+229 http cache @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.7.tgz 0ms (cache hit)
+230 http cache esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz 0ms (cache hit)
+231 http cache tsx@https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz 0ms (cache hit)
+232 http cache get-tsconfig@https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.0.tgz 0ms (cache hit)
+233 silly tarball no local data for @esbuild/win32-x64@https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.7.tgz. Extracting by manifest.
+234 silly tarball no local data for esbuild@https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz. Extracting by manifest.
+235 silly tarball no local data for tsx@https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz. Extracting by manifest.
+236 silly tarball no local data for get-tsconfig@https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.0.tgz. Extracting by manifest.
+237 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 275ms
+238 silly audit report {}
+239 http fetch GET 200 https://registry.npmjs.org/esbuild/-/esbuild-0.27.7.tgz 333ms (cache miss)
+240 http fetch GET 200 https://registry.npmjs.org/get-tsconfig/-/get-tsconfig-4.14.0.tgz 338ms (cache miss)
+241 http fetch GET 200 https://registry.npmjs.org/tsx/-/tsx-4.21.0.tgz 1242ms (cache miss)
+242 http fetch GET 200 https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.27.7.tgz 1282ms (cache miss)
+243 info run esbuild@0.27.7 postinstall node_modules/esbuild node install.js
+244 info run esbuild@0.27.7 postinstall { code: 0, signal: null }
+245 verbose cwd D:\allquestions\quiz-app\.claude\worktrees\sad-hodgkin\quiz-app
+246 verbose os Windows_NT 10.0.26300
+247 verbose node v24.11.1
+248 verbose npm  v11.5.1
+249 verbose exit 0
+250 info ok

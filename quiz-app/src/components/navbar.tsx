@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, Home, BookOpen, Menu, X, Shield, Search, Sparkles } from "lucide-react";
+import { GraduationCap, Home, BookOpen, Menu, X, Shield, Search, Sparkles, Library } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -15,6 +15,7 @@ export function Navbar() {
   const links = [
     { href: "/", label: "หน้าแรก", icon: Home },
     { href: "/courses", label: "รายวิชา", icon: BookOpen },
+    { href: "/gened", label: "วิชาเลือกเสรี", icon: Library },
     { href: "/search", label: "ค้นหา", icon: Search },
     { href: "/ai", label: "AI Chat", icon: Sparkles },
     { href: "/admin", label: "ผู้ดูแลระบบ", icon: Shield },

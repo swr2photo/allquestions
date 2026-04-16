@@ -5,7 +5,14 @@ import {
   createSessionToken,
   isValidSession,
   getSessionInfo,
+  refreshSessionToken,
+  ADMIN_SESSION_MAX_AGE_MS,
+  ADMIN_SESSION_MAX_AGE_SEC,
+  USER_SESSION_MAX_AGE_MS,
+  USER_SESSION_MAX_AGE_SEC,
 } from "@/lib/admin-store";
+
+const isProd = process.env.NODE_ENV === "production";
 
 // POST /api/admin/auth - Google Sign-In
 export async function POST(request: NextRequest) {
@@ -39,11 +46,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = createSessionToken({
-      email: userInfo.email,
-      name: userInfo.name,
-      picture: userInfo.picture,
-    });
+    const adminToken = createSessionToken(
+      {
+        email: userInfo.email,
+        name: userInfo.name,
+        picture: userInfo.picture,
+      },
+      ADMIN_SESSION_MAX_AGE_MS
+    );
+
+    // Issue a user-session too, so admins don't need to log in a second time
+    // when visiting user-facing pages like /ai.
+    const userToken = createSessionToken(
+      {
+        email: userInfo.email,
+        name: userInfo.name,
+        picture: userInfo.picture,
+      },
+      USER_SESSION_MAX_AGE_MS
+    );
 
     const response = NextResponse.json({
       success: true,
@@ -54,11 +75,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    response.cookies.set("admin-session", token, {
+    response.cookies.set("admin-session", adminToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProd,
       sameSite: "lax",
-      maxAge: 60 * 60 * 8, // 8 hours
+      maxAge: ADMIN_SESSION_MAX_AGE_SEC,
+      path: "/",
+    });
+
+    response.cookies.set("user-session", userToken, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: "lax",
+      maxAge: USER_SESSION_MAX_AGE_SEC,
       path: "/",
     });
 
@@ -72,21 +101,41 @@ export async function POST(request: NextRequest) {
 }
 
 // DELETE /api/admin/auth - Logout
-export async function DELETE(request: NextRequest) {
+// Admin login sets both admin-session and user-session, so logout clears both.
+export async function DELETE() {
   const response = NextResponse.json({ success: true });
   response.cookies.delete("admin-session");
+  response.cookies.delete("user-session");
   return response;
 }
 
-// GET /api/admin/auth - Check session
+// GET /api/admin/auth - Check session + sliding refresh
+//
+// If the token is still valid, we re-issue the cookie with a fresh TTL on
+// every call. That means actively-using admins never get kicked out — the
+// expiration window slides forward with each request.
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
   const valid = isValidSession(token);
-  const user = getSessionInfo(token);
+  const user = valid ? getSessionInfo(token) : null;
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     authenticated: valid,
-    user: valid ? user : null,
+    user,
   });
-}
 
+  if (valid) {
+    const refreshed = refreshSessionToken(token, ADMIN_SESSION_MAX_AGE_MS);
+    if (refreshed) {
+      response.cookies.set("admin-session", refreshed, {
+        httpOnly: true,
+        secure: isProd,
+        sameSite: "lax",
+        maxAge: ADMIN_SESSION_MAX_AGE_SEC,
+        path: "/",
+      });
+    }
+  }
+
+  return response;
+}

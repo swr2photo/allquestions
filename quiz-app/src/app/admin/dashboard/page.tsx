@@ -563,6 +563,16 @@ export default function AdminDashboard() {
           </div>
         </div>
         <div className="flex gap-2">
+          <Link href="/admin/ai">
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-2 text-violet-600 hover:text-violet-700 hover:bg-violet-50 border-violet-200"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">จัดการ AI</span>
+            </Button>
+          </Link>
           <Link href="/admin/quiz">
             <Button
               size="sm"
@@ -1124,20 +1134,28 @@ export default function AdminDashboard() {
 
       {/* AI Usage Section */}
       <div className="mt-10 space-y-3 pb-10">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-500" />
             การใช้งาน AI ของผู้ใช้ ({aiQuotas.length})
           </h2>
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="text-xs text-gray-500 gap-1.5"
-            onClick={fetchAIQuotas}
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            โหลดข้อมูลใหม่
-          </Button>
+          <div className="flex items-center gap-1.5">
+            <Link href="/admin/ai">
+              <Button size="sm" variant="outline" className="text-xs gap-1.5 text-violet-600 hover:bg-violet-50 border-violet-200">
+                <Sparkles className="h-3.5 w-3.5" />
+                สถานะ API
+              </Button>
+            </Link>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="text-xs text-gray-500 gap-1.5"
+              onClick={fetchAIQuotas}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              โหลดใหม่
+            </Button>
+          </div>
         </div>
 
         {aiQuotas.length === 0 ? (

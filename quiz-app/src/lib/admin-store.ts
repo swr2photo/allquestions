@@ -191,7 +191,22 @@ export async function isQuizVisible(quizId: string): Promise<boolean> {
 }
 
 // Stateless JWT-like Session Store
-const SESSION_MAX_AGE_MS = 8 * 60 * 60 * 1000; // 8 hours
+//
+// Session lifetime policy:
+// - Admin: 7 days (slightly shorter because of higher privilege)
+// - User:  30 days
+// Both sessions support sliding refresh — every time the auth endpoint is
+// hit with a valid token we re-issue a fresh cookie, so actively-using
+// users never get kicked out mid-session.
+export const ADMIN_SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;   // 7 days
+export const USER_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;   // 30 days
+export const ADMIN_SESSION_MAX_AGE_SEC = Math.floor(ADMIN_SESSION_MAX_AGE_MS / 1000);
+export const USER_SESSION_MAX_AGE_SEC = Math.floor(USER_SESSION_MAX_AGE_MS / 1000);
+
+// Legacy alias kept for back-compat with any external callers.
+// Defaults to the admin TTL — callers that care should pass maxAgeMs explicitly.
+const DEFAULT_SESSION_MAX_AGE_MS = ADMIN_SESSION_MAX_AGE_MS;
+
 const SECRET_KEY = process.env.SESSION_SECRET || "default-quiz-app-secret-key-please-change-it";
 
 interface SessionInfo {
@@ -202,6 +217,7 @@ interface SessionInfo {
 
 interface StoredSession extends SessionInfo {
   expiresAt: number;
+  issuedAt?: number;
 }
 
 function signSession(data: StoredSession): string {
@@ -213,11 +229,16 @@ function signSession(data: StoredSession): string {
   return `${payload}.${signature}`;
 }
 
-// Generate a signed session token
-export function createSessionToken(info: SessionInfo): string {
+// Generate a signed session token. Pass `maxAgeMs` to override the default TTL.
+export function createSessionToken(
+  info: SessionInfo,
+  maxAgeMs: number = DEFAULT_SESSION_MAX_AGE_MS
+): string {
+  const now = Date.now();
   const sessionData: StoredSession = {
     ...info,
-    expiresAt: Date.now() + SESSION_MAX_AGE_MS,
+    issuedAt: now,
+    expiresAt: now + maxAgeMs,
   };
   return signSession(sessionData);
 }
@@ -228,18 +249,18 @@ export function isValidSession(token: string | null | undefined): boolean {
 
 export function getSessionInfo(token: string | null | undefined): SessionInfo | null {
   if (!token) return null;
-  
+
   const parts = token.split(".");
   if (parts.length !== 2) return null;
   const [payload, signature] = parts;
-  
+
   const expectedSignature = crypto
     .createHmac("sha256", SECRET_KEY)
     .update(payload)
     .digest("base64url");
-    
+
   if (signature !== expectedSignature) return null;
-  
+
   try {
     const data: StoredSession = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8"));
     if (Date.now() > data.expiresAt) return null;
@@ -251,5 +272,20 @@ export function getSessionInfo(token: string | null | undefined): SessionInfo | 
   } catch {
     return null;
   }
+}
+
+/**
+ * Sliding refresh — if the token is still valid, return a fresh token
+ * with a full new TTL. Returns null if the existing token is invalid/expired.
+ *
+ * The caller is expected to re-set the cookie with the returned token.
+ */
+export function refreshSessionToken(
+  token: string | null | undefined,
+  maxAgeMs: number
+): string | null {
+  const info = getSessionInfo(token);
+  if (!info) return null;
+  return createSessionToken(info, maxAgeMs);
 }
 
