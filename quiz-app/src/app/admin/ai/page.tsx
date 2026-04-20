@@ -21,7 +21,6 @@ import {
   Users,
   History,
   Shield,
-  Search,
 } from "lucide-react";
 
 interface ProviderRow {

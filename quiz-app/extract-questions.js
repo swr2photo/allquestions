@@ -17,7 +17,7 @@ function extractPdfInfo(htmlContent) {
   };
 }
 
-function extractQuizQuestions(htmlContent, filePath) {
+function extractQuizQuestions(htmlContent) {
   // Check if PDF viewer
   if ((htmlContent.includes('pdf-viewer') || htmlContent.includes('pdfjsLib') || 
        htmlContent.includes('renderPage')) && !htmlContent.includes('answer-container')) {
@@ -98,7 +98,7 @@ courseFolders.forEach(folder => {
     
     const filePath = path.join(folderPath, file);
     const content = fs.readFileSync(filePath, 'utf8');
-    const extracted = extractQuizQuestions(content, filePath);
+    const extracted = extractQuizQuestions(content);
     
     if (extracted.type === 'quiz') {
       totalQuestions += extracted.questions.length;
