@@ -24,7 +24,7 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-gray-50 animate-pulse" />
-});
+}) as any;
 import "react-quill-new/dist/quill.snow.css";
 
 import { Artifact } from "../types/canvas";
