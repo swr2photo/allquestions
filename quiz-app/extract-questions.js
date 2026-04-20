@@ -113,7 +113,7 @@ courseFolders.forEach(folder => {
   });
 });
 
-// Print summary to stderr
+// Summary
 console.error('\n=== EXTRACTION SUMMARY ===');
 Object.keys(results).forEach(course => {
   console.error(`\n${course}:`);

@@ -12,15 +12,12 @@ import {
   Plus,
   Trash2,
   Save,
-  CheckCircle2,
   HelpCircle,
-  ImagePlus,
   FileText,
   BookOpen,
   X,
   AlertTriangle,
   Check,
-  GripVertical,
   Palette,
   PenLine,
   ChevronDown,
@@ -32,7 +29,7 @@ import {
   Clock,
   RotateCcw,
 } from "lucide-react";
-import type { Question, Choice } from "@/types";
+import type { Question } from "@/types";
 
 // ============ Types ============
 

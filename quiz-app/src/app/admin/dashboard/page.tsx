@@ -254,7 +254,7 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [router, showToast]);
+  }, [router, showToast, fetchAIQuotas, fetchPromos, fetchUserCredits]);
 
   useEffect(() => {
     fetchCourses();
