@@ -7,10 +7,14 @@ import type { ProviderId } from "@/lib/ai-health";
 const PROVIDER_PREFIX = "ai_provider_calls:";
 const MODEL_PREFIX = "ai_model_calls:";
 const ERROR_PREFIX = "ai_provider_errors:";
+const HISTORY_PREFIX = "ai_chat_history:";
 
 export function resolveProvider(model: string): ProviderId {
   if (model.startsWith("openrouter/")) return "openrouter";
   if (model.startsWith("claude-")) return "claude";
+  if (model.startsWith("thaillm/")) return "thaillm";
+  if (model.startsWith("groq/")) return "groq";
+  if (model.startsWith("github/")) return "github";
   return "gemini";
 }
 
@@ -35,7 +39,7 @@ export interface ProviderStats {
 }
 
 export async function getProviderStats(): Promise<ProviderStats[]> {
-  const providers: ProviderId[] = ["gemini", "claude", "openrouter"];
+  const providers: ProviderId[] = ["gemini", "claude", "openrouter", "thaillm", "groq", "github"];
   return Promise.all(
     providers.map(async (p) => {
       const [calls, errors] = await Promise.all([
@@ -81,12 +85,47 @@ export async function resetProviderStats(provider: ProviderId): Promise<void> {
 }
 
 export async function resetAllStats(): Promise<void> {
-  const providers: ProviderId[] = ["gemini", "claude", "openrouter"];
+  const providers: ProviderId[] = ["gemini", "claude", "openrouter", "thaillm", "groq", "github"];
   await Promise.all(providers.map(resetProviderStats));
   try {
     const modelKeys = await kv.keys(`${MODEL_PREFIX}*`);
     await Promise.all(modelKeys.map((k) => kv.del(k)));
   } catch {
     // ignore
+  }
+}
+
+export interface ChatHistoryLog {
+  id: string;
+  email: string;
+  model: string;
+  prompt: string;
+  response: string;
+  timestamp: number;
+}
+
+export async function recordChatHistory(email: string, model: string, prompt: string, response: string): Promise<void> {
+  try {
+    const id = `hist_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const log: ChatHistoryLog = { id, email, model, prompt, response, timestamp: Date.now() };
+    
+    // Store in global history list (latest 100)
+    const GLOBAL_HISTORY_KEY = "ai_global_chat_history";
+    let history = await kv.get<ChatHistoryLog[]>(GLOBAL_HISTORY_KEY) || [];
+    if (typeof history === "string") history = JSON.parse(history);
+    history.unshift(log);
+    if (history.length > 100) history = history.slice(0, 100);
+    await kv.set(GLOBAL_HISTORY_KEY, history);
+  } catch (err) {
+    console.error("[History] Failed to save chat history", err);
+  }
+}
+
+export async function getGlobalChatHistory(): Promise<ChatHistoryLog[]> {
+  try {
+    const history = await kv.get<ChatHistoryLog[]>("ai_global_chat_history") || [];
+    return typeof history === "string" ? JSON.parse(history) : history;
+  } catch {
+    return [];
   }
 }

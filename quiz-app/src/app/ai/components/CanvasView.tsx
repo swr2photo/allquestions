@@ -143,12 +143,16 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
       setPrevArtifactId(artifact?.id);
       setActiveTab(isDocType ? "document" : "preview");
     }
-    if (isDocType) setDocumentContent(artifact?.content || "");
-  }, [artifact, isDocType, prevArtifactId]);
+    if (isDocType && documentContent !== artifact?.content) {
+      setDocumentContent(artifact?.content || "");
+    }
+  }, [artifact, isDocType, prevArtifactId, documentContent]);
 
   useEffect(() => {
-    setIsPreviewReady(isComplete);
-  }, [isComplete]);
+    if (isPreviewReady !== isComplete) {
+      setIsPreviewReady(isComplete);
+    }
+  }, [isComplete, isPreviewReady]);
 
   useEffect(() => {
     if (activeTab === "code" && codeEndRef.current) {

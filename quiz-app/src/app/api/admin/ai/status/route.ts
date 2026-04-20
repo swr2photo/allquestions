@@ -70,7 +70,7 @@ export async function DELETE(request: NextRequest) {
   const provider = searchParams.get("provider");
 
   try {
-    if (provider === "gemini" || provider === "claude" || provider === "openrouter") {
+    if (provider === "gemini" || provider === "claude" || provider === "openrouter" || provider === "thaillm" || provider === "groq" || provider === "github") {
       await resetProviderStats(provider);
     } else {
       await resetAllStats();

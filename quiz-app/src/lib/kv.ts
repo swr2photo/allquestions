@@ -40,6 +40,14 @@ const memoryKv = {
       entry.expiresAt = Date.now() + seconds * 1000;
     }
   },
+  async persist(key: string): Promise<number> {
+    const entry = memoryStore.get(key);
+    if (entry) {
+      entry.expiresAt = undefined;
+      return 1;
+    }
+    return 0;
+  },
   async keys(pattern: string): Promise<string[]> {
     cleanExpired();
     const prefix = pattern.replace("*", "");

@@ -10,6 +10,12 @@ export const MODEL_CREDITS: Record<string, number> = {
   "openrouter/google/gemini-3-flash-preview": 0,
   "openrouter/meta-llama/llama-4-maverick": 0,
   "openrouter/meta-llama/llama-4-scout": 0,
+  "thaillm/typhoon-v1.5x-70b-instruct": 0,
+  "groq/llama-3.3-70b-versatile": 0,
+  "groq/llama-3.1-8b-instant": 0,
+  "github/gpt-4o": 0,
+  "github/gpt-4o-mini": 0,
+  "github/llama-3.3-70b-instruct": 0,
 
   // Standard models (1 credit)
   "claude-sonnet": 1,

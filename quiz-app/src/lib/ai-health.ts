@@ -1,7 +1,7 @@
 // Shared AI provider health check with caching
 // Used by both /api/ai/health and /api/ai/chat for auto mode
 
-export type ProviderId = "gemini" | "claude" | "openrouter";
+export type ProviderId = "gemini" | "claude" | "openrouter" | "thaillm" | "groq" | "github";
 
 export interface ProviderDetail {
   id: ProviderId;
@@ -18,6 +18,9 @@ interface HealthResult {
   gemini: boolean;
   claude: boolean;
   openrouter: boolean;
+  thaillm: boolean;
+  groq: boolean;
+  github: boolean;
   openrouterCredits: number; // remaining credits on OpenRouter
   providers: ProviderDetail[];
 }
@@ -37,7 +40,7 @@ async function timedFetch(url: string, init: RequestInit, timeoutMs: number): Pr
 
 async function checkGemini(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
   const { res, latencyMs, error } = await timedFetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,11 +52,18 @@ async function checkGemini(apiKey: string): Promise<{ ok: boolean; latency: numb
     8000
   );
   if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
-  const ok = res.status === 200 || res.status === 400;
+  
+  if (res.status === 403) {
+    const text = await res.text();
+    if (text.includes("leaked")) return { ok: false, latency: latencyMs, msg: "API Key ถูกรายงานว่าหลุด (Leaked)" };
+    return { ok: false, latency: latencyMs, msg: "ไม่มีสิทธิ์เข้าถึง (403)" };
+  }
+  
+  const ok = res.status === 200;
   return {
     ok,
     latency: latencyMs,
-    msg: ok ? `ปกติ (HTTP ${res.status})` : `ผิดพลาด (HTTP ${res.status})`,
+    msg: ok ? `ปกติ` : `ผิดพลาด (HTTP ${res.status})`,
   };
 }
 
@@ -68,7 +78,7 @@ async function checkClaude(apiKey: string): Promise<{ ok: boolean; latency: numb
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-6",
+        model: "claude-3-5-sonnet-20240620",
         max_tokens: 1,
         messages: [{ role: "user", content: "hi" }],
       }),
@@ -76,11 +86,17 @@ async function checkClaude(apiKey: string): Promise<{ ok: boolean; latency: numb
     8000
   );
   if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
-  const ok = res.status === 200 || res.status === 400;
+  
+  if (res.status === 400) {
+    const data = await res.json().catch(() => ({}));
+    if (data.error?.message?.includes("credit")) return { ok: false, latency: latencyMs, msg: "เครดิตใน Anthropic หมด" };
+  }
+  
+  const ok = res.status === 200;
   return {
     ok,
     latency: latencyMs,
-    msg: ok ? `ปกติ (HTTP ${res.status})` : `ผิดพลาด (HTTP ${res.status})`,
+    msg: ok ? `ปกติ` : `ผิดพลาด (HTTP ${res.status})`,
   };
 }
 
@@ -88,7 +104,7 @@ async function checkOpenRouter(apiKey: string): Promise<{ ok: boolean; credits: 
   const { res, latencyMs, error } = await timedFetch(
     "https://openrouter.ai/api/v1/auth/key",
     { headers: { "Authorization": `Bearer ${apiKey}` } },
-    5000
+    10000
   );
   if (!res) return { ok: false, credits: 0, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
   if (!res.ok) return { ok: false, credits: 0, latency: latencyMs, msg: `ผิดพลาด (HTTP ${res.status})` };
@@ -101,6 +117,55 @@ async function checkOpenRouter(apiKey: string): Promise<{ ok: boolean; credits: 
   }
 }
 
+async function checkThaiLLM(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "http://thaillm.or.th/api/openthaigpt/v1/chat/completions",
+    { 
+      method: "POST",
+      headers: { "Content-Type": "application/json", "apikey": apiKey },
+      body: JSON.stringify({ model: "/model", messages: [{role: "user", content: "hi"}], max_tokens: 1 })
+    },
+    10000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  const ok = res.status === 200;
+  return {
+    ok,
+    latency: latencyMs,
+    msg: ok ? `ปกติ (HTTP ${res.status})` : `ผิดพลาด (HTTP ${res.status})`,
+  };
+}
+
+async function checkGroq(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{ role: "user", content: "hi" }], max_tokens: 1 }),
+    },
+    8000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  const ok = res.status === 200;
+  return { ok, latency: latencyMs, msg: ok ? "ปกติ" : `ผิดพลาด (HTTP ${res.status})` };
+}
+
+async function checkGitHub(token: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "https://models.inference.ai.azure.com/chat/completions",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+      body: JSON.stringify({ model: "gpt-4o", messages: [{ role: "user", content: "hi" }], max_tokens: 1 }),
+    },
+    8000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  const ok = res.status === 200;
+  return { ok, latency: latencyMs, msg: ok ? "ปกติ" : `ผิดพลาด (HTTP ${res.status})` };
+}
+
 export async function getProviderHealth(): Promise<HealthResult> {
   // Return cached if fresh
   if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
@@ -110,12 +175,18 @@ export async function getProviderHealth(): Promise<HealthResult> {
   const geminiKey = process.env.GEMINI_API_KEY;
   const claudeKey = process.env.ANTHROPIC_API_KEY;
   const openRouterKey = process.env.OPENROUTER_API_KEY;
+  const thaillmKey = process.env.THAILLM_API_KEY;
+  const groqKey = process.env.GROQ_API_KEY;
+  const githubToken = process.env.GITHUB_TOKEN;
   const now = Date.now();
 
-  const [geminiResult, claudeResult, orResult] = await Promise.all([
+  const [geminiResult, claudeResult, orResult, thaillmResult, groqResult, githubResult] = await Promise.all([
     geminiKey ? checkGemini(geminiKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     claudeKey ? checkClaude(claudeKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     openRouterKey ? checkOpenRouter(openRouterKey) : Promise.resolve({ ok: false, credits: 0, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
+    thaillmKey ? checkThaiLLM(thaillmKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
+    groqKey ? checkGroq(groqKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
+    githubToken ? checkGitHub(githubToken) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า GitHub Token" }),
   ]);
 
   const providers: ProviderDetail[] = [
@@ -149,12 +220,45 @@ export async function getProviderHealth(): Promise<HealthResult> {
       message: orResult.msg,
       checkedAt: now,
     },
+    {
+      id: "thaillm",
+      name: "Thai LLM",
+      configured: !!thaillmKey,
+      online: thaillmResult.ok,
+      latencyMs: thaillmKey ? thaillmResult.latency : null,
+      credits: null,
+      message: thaillmResult.msg,
+      checkedAt: now,
+    },
+    {
+      id: "groq",
+      name: "Groq Cloud",
+      configured: !!groqKey,
+      online: groqResult.ok,
+      latencyMs: groqKey ? groqResult.latency : null,
+      credits: null,
+      message: groqResult.msg,
+      checkedAt: now,
+    },
+    {
+      id: "github",
+      name: "GitHub Models",
+      configured: !!githubToken,
+      online: githubResult.ok,
+      latencyMs: githubToken ? githubResult.latency : null,
+      credits: null,
+      message: githubResult.msg,
+      checkedAt: now,
+    },
   ];
 
   const result: HealthResult = {
     gemini: geminiResult.ok,
     claude: claudeResult.ok,
     openrouter: orResult.ok,
+    thaillm: thaillmResult.ok,
+    groq: groqResult.ok,
+    github: githubResult.ok,
     openrouterCredits: orResult.credits,
     providers,
   };
@@ -174,40 +278,58 @@ export function pickAutoModel(
   hasOpenRouterKey: boolean,
   hasGeminiKey: boolean,
   hasClaudeKey: boolean,
+  hasThaiLLMKey: boolean,
+  hasGroqKey: boolean = false,
+  hasGitHubToken: boolean = false,
 ): string {
-  // Strategy: prefer free models that actually work
-  // OpenRouter has free models (gemini-2.5-flash, llama) even with 0 credits
+  // === STRATEGY: Prioritize FREE (0-credit) models first ===
+  
+  // 1. ThaiLLM (Typhoon) - Excellent Thai support & Free
+  if (hasThaiLLMKey && health.thaillm) {
+    return "thaillm/typhoon-v1.5x-70b-instruct";
+  }
 
+  // 2. Groq (Llama 3) - Extremely fast
+  if (hasGroqKey && health.groq) {
+    return "groq/llama-3.3-70b-versatile";
+  }
+
+  // 3. GitHub Models (GPT-4o/Llama)
+  if (hasGitHubToken && health.github) {
+    return "github/gpt-4o";
+  }
+
+  // 4. Gemini Flash (Direct) - Very fast & Free
+  if (hasGeminiKey && health.gemini) {
+    return "gemini-2.5-flash";
+  }
+
+  // 5. OpenRouter Free Models
   if (hasOpenRouterKey && health.openrouter) {
-    if (isComplex) {
-      // If OpenRouter has paid credits, use pro model
-      if (health.openrouterCredits > 0.01) {
-        return "openrouter/google/gemini-2.5-pro-preview";
-      }
-      // No paid credits — use free model even for complex tasks
-      return "openrouter/google/gemini-2.5-flash";
-    }
     return "openrouter/google/gemini-2.5-flash";
   }
 
-  if (hasGeminiKey && health.gemini) {
-    return isComplex ? "gemini-2.5-flash" : "gemini-2.5-flash";
+  // === STRATEGY: If no free models are online, then consider models with credits ===
+
+  if (hasOpenRouterKey && health.openrouter) {
+    if (isComplex && health.openrouterCredits > 0.01) {
+      return "openrouter/google/gemini-2.5-pro-preview";
+    }
+    return "openrouter/google/gemini-2.5-flash";
   }
 
   if (hasClaudeKey && health.claude) {
     return "claude-sonnet";
   }
 
-  // Nothing confirmed working — try OpenRouter free models as best effort
-  if (hasOpenRouterKey) {
-    return "openrouter/google/gemini-2.5-flash";
-  }
-  if (hasGeminiKey) {
-    return "gemini-2.5-flash";
-  }
-  if (hasClaudeKey) {
-    return "claude-sonnet";
-  }
+  // Fallback chain (Best effort)
+  if (hasThaiLLMKey) return "thaillm/typhoon-v1.5x-70b-instruct";
+  if (hasGroqKey) return "groq/llama-3.3-70b-versatile";
+  if (hasGitHubToken) return "github/gpt-4o";
+  if (hasGeminiKey) return "gemini-2.5-flash";
+  if (hasOpenRouterKey) return "openrouter/google/gemini-2.5-flash";
+  if (hasClaudeKey) return "claude-sonnet";
 
   return "gemini-2.5-flash"; // last resort
 }
+
