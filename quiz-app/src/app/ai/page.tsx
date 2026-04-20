@@ -749,12 +749,14 @@ function QuotaExceededPopup({
 function CreditNeededPopup({
   needed,
   have,
+  model,
   onClose,
   onOpenSettings,
   lang,
 }: {
   needed: number;
   have: number;
+  model: string;
   onClose: () => void;
   onOpenSettings: () => void;
   lang: string;
@@ -762,7 +764,7 @@ function CreditNeededPopup({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 animate-fade-in" onClick={onClose}>
       <div
-        className="bg-white rounded-xl shadow-2xl w-full max-w-sm mx-4 p-6 animate-scale-in"
+        className="bg-white rounded-xl shadow-2xl w-full max-sm mx-4 p-6 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-center mb-4">
@@ -773,6 +775,9 @@ function CreditNeededPopup({
         <h3 className="text-lg font-semibold text-center text-gray-900 mb-2">
           {lang === "th" ? "เครดิตไม่เพียงพอ" : lang === "zh" ? "积分不足" : lang === "ja" ? "クレジット不足" : lang === "ko" ? "크레딧 부족" : "Insufficient Credits"}
         </h3>
+        <p className="text-[10px] text-center text-gray-400 mb-1 uppercase tracking-widest font-bold">
+          {model}
+        </p>
         <p className="text-sm text-gray-500 text-center mb-3">
           {lang === "th"
             ? `โมเดลนี้ใช้ ${needed} เครดิต แต่คุณมี ${have} เครดิต`
