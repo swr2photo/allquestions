@@ -2093,8 +2093,6 @@ const SUGGESTIONS = [
 ];
 
 export default function AIChatPage() {
-  const router = useRouter();
-
   // Core state definitions (Moved to top to avoid TDZ issues)
   const [user, setUser] = useState<{ email: string; name: string; picture: string; isAdmin?: boolean } | null>(null);
   const [quota, setQuota] = useState<{ usage: number; limit: number; remaining: number; credits?: number; pricing?: Record<string, number> } | null>(null);
@@ -2138,6 +2136,7 @@ export default function AIChatPage() {
     "groq": true,
     "github": true
   });
+
 
   // Load Admin Model Config
   useEffect(() => {
