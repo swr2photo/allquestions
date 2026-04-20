@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       if (sessions) pipeline.set(`${HISTORY_PREFIX}${email}`, sessions);
       if (folders) pipeline.set(`${FOLDERS_PREFIX}${email}`, folders);
       await pipeline.exec();
-    } catch (e) {
+    } catch {
       // Fallback for memoryKv or if pipeline fails
       if (sessions) await kv.set(`${HISTORY_PREFIX}${email}`, sessions);
       if (folders) await kv.set(`${FOLDERS_PREFIX}${email}`, folders);
@@ -84,7 +84,7 @@ export async function DELETE(req: NextRequest) {
       kv.del(`${FOLDERS_PREFIX}${email}`)
     ]);
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete history" }, { status: 500 });
   }
 }

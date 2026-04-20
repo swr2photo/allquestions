@@ -61,6 +61,23 @@ const memoryKv = {
     memoryStore.delete(key);
     return existed ? 1 : 0;
   },
+  pipeline() {
+    const commands: (() => Promise<void>)[] = [];
+    const p = {
+      set: (key: string, value: unknown) => {
+        commands.push(async () => { await this.set(key, value); });
+        return p;
+      },
+      del: (key: string) => {
+        commands.push(async () => { await this.del(key); });
+        return p;
+      },
+      exec: async () => {
+        for (const cmd of commands) await cmd();
+      }
+    };
+    return p as any;
+  }
 };
 
 type MemoryKv = typeof memoryKv;
