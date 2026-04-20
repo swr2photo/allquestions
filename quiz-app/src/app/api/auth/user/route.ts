@@ -9,6 +9,7 @@ import {
   USER_SESSION_MAX_AGE_SEC,
   ADMIN_SESSION_MAX_AGE_MS,
   ADMIN_SESSION_MAX_AGE_SEC,
+  isAllowedAdminEmail,
 } from "@/lib/admin-store";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Notice: We do NOT check isAllowedAdminEmail here because any user can use AI
+    const isAdmin = isAllowedAdminEmail(userInfo.email);
 
     const token = createSessionToken(
       {
@@ -51,6 +53,7 @@ export async function POST(request: NextRequest) {
         email: userInfo.email,
         name: userInfo.name,
         picture: userInfo.picture,
+        isAdmin,
       },
     });
 
@@ -91,11 +94,16 @@ export async function GET(request: NextRequest) {
   const adminValid = isValidSession(adminToken);
 
   const activeToken = userValid ? userToken : adminValid ? adminToken : undefined;
-  const user = userValid
+  const sessionInfo = userValid
     ? getSessionInfo(userToken)
     : adminValid
       ? getSessionInfo(adminToken)
       : null;
+
+  const user = sessionInfo ? {
+    ...sessionInfo,
+    isAdmin: isAllowedAdminEmail(sessionInfo.email)
+  } : null;
 
   const response = NextResponse.json({
     authenticated: Boolean(activeToken),

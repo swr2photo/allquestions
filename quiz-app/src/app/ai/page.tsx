@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { toast } from "sonner";
 import CanvasView from "./components/CanvasView";
 import { parseArtifacts } from "./utils/canvasParser";
 import { Artifact } from "./types/canvas";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import hljs from "highlight.js/lib/core";
 import javascript from "highlight.js/lib/languages/javascript";
 import typescript from "highlight.js/lib/languages/typescript";
@@ -73,6 +76,22 @@ import {
   Brain,
   Mic,
   MicOff,
+  ArrowUpRight,
+  Folder as FolderIcon,
+  FolderPlus,
+  FolderInput,
+  Share2,
+  RefreshCw,
+  Calendar,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+  Volume2,
+  VolumeX,
+  ShieldCheck,
+  Github,
+  Code2,
+  Maximize2,
 } from "lucide-react";
 
 // Register highlight.js languages
@@ -109,19 +128,171 @@ hljs.registerLanguage("markdown", markdown);
 hljs.registerLanguage("md", markdown);
 hljs.registerLanguage("diff", diff);
 
+// Move renderMarkdown outside to be used by other components
+const renderMarkdown = (text: string) => {
+  if (!text) return "";
+  
+  // Storage for blocks to protect them from inline processing
+  const blocks: { type: "MATH" | "CODE" | "TABLE"; html: string }[] = [];
+  
+  const addBlock = (type: "MATH" | "CODE" | "TABLE", html: string) => {
+    const id = blocks.length;
+    blocks.push({ type, html });
+    return `__BLOCK_PLACEHOLDER_${type}_${id}__`;
+  };
+
+  let processed = text;
+
+  // 0. Extract blocks in priority order
+
+  // Fenced Code Blocks
+  processed = processed.replace(/```(\w*)\n([\s\S]*?)(?:```|$)/g, (_m, lang: string, code: string) => {
+    const trimmed = code.replace(/\n$/, "");
+    const langLower = (lang || "").toLowerCase();
+    const langLabel = langLower || "code";
+
+    let highlighted: string;
+    if (langLower && hljs.getLanguage(langLower)) {
+      highlighted = hljs.highlight(trimmed, { language: langLower, ignoreIllegals: true }).value;
+    } else if (trimmed.length > 20) {
+      try {
+        const auto = hljs.highlightAuto(trimmed);
+        highlighted = auto.value;
+      } catch {
+        highlighted = trimmed.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+    } else {
+      highlighted = trimmed.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    const html = 
+      `<div class="aq-code my-3 rounded-xl overflow-hidden border border-gray-700/50 bg-[#1e1e2e] shadow-lg">` +
+      `<div class="flex items-center justify-between px-4 py-2 bg-[#181825] border-b border-gray-700/50">` +
+      `<div class="flex items-center gap-2"><div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-[#f38ba8]"></span><span class="w-3 h-3 rounded-full bg-[#f9e2af]"></span><span class="w-3 h-3 rounded-full bg-[#a6e3a1]"></span></div>` +
+      `<span class="text-[11px] text-gray-400 font-medium ml-2">${langLabel}</span></div>` +
+      `<button onclick="(function(b){var p=b.closest('.aq-code');var c=p&&p.querySelector('code');if(c){navigator.clipboard.writeText(c.textContent||'');b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><polyline points=\\'20 6 9 17 4 12\\'></polyline></svg> Copied';setTimeout(function(){b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><rect x=\\'9\\' y=\\'9\\' width=\\'13\\' height=\\'13\\' rx=\\'2\\' ry=\\'2\\'></rect><path d=\\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\\'></path></svg> Copy'},1500)}})(this)" class="flex items-center gap-1.5 text-gray-400 hover:text-gray-200 text-xs px-2.5 py-1 rounded-md hover:bg-white/10 transition-all"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button>` +
+      `</div>` +
+      `<pre class="p-4 text-[13px] leading-relaxed overflow-x-auto" style="word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap"><code class="hljs">${highlighted}</code></pre>` +
+      `</div>`;
+    
+    return addBlock("CODE", html);
+  });
+
+  // Block Math (including environments)
+  const blockMathRegex = /(?:\$\$([\s\S]*?)\$\$)|(?:\\\[([\s\S]*?)\\\])|(?:\\begin\{([a-z*]+)\}([\s\S]*?)\\end\{\3\})/gi;
+  processed = processed.replace(blockMathRegex, (_m, tex1, tex2, env, tex3) => {
+    let tex = "";
+    if (tex1) tex = tex1;
+    else if (tex2) tex = tex2;
+    else if (env && tex3) tex = `\\begin{${env}}${tex3}\\end{${env}}`;
+    
+    tex = tex.trim();
+    if (!tex) return _m;
+    try {
+      const html = katex.renderToString(tex, { displayMode: true, throwOnError: false, output: "html" });
+      return addBlock("MATH", `<div class="my-4 overflow-x-auto">${html}</div>`);
+    } catch {
+      return addBlock("MATH", `<div class="text-red-500 text-sm font-mono my-2 border border-red-200 p-2 rounded bg-red-50">${tex}</div>`);
+    }
+  });
+
+  // Inline Math
+  const inlineMathRegex = /(?:\$([^\$\n]+?)\$)|(?:\\\(([\s\S]*?)\\\))/g;
+  processed = processed.replace(inlineMathRegex, (_m, tex1, tex2) => {
+    const tex = (tex1 || tex2 || "").trim();
+    if (!tex) return _m;
+    try {
+      const html = katex.renderToString(tex, { displayMode: false, throwOnError: false, output: "html" });
+      return addBlock("MATH", html);
+    } catch {
+      return addBlock("MATH", `<code class="text-red-500">${tex}</code>`);
+    }
+  });
+
+  // Tables
+  processed = processed.replace(/(?:^|\n)((?:\|[^\n]+\|\s*\n){2,})/g, (_m, tableBlock: string) => {
+    const rows = tableBlock.trim().split("\n").filter(r => r.trim());
+    if (rows.length < 2) return _m;
+    const isSep = (row: string) => /^\|[\s\-:\|]+\|\s*$/.test(row);
+    const hasSeparator = isSep(rows[1]);
+    const parseRow = (row: string) => row.split("|").filter((_, i, arr) => i > 0 && i < arr.length - 1).map(c => c.trim());
+    
+    let html = '<div class="my-4 overflow-x-auto rounded-xl border border-gray-200 shadow-sm"><table class="w-full text-sm border-collapse">';
+    const startIdx = hasSeparator ? 2 : 0;
+    
+    if (hasSeparator) {
+      const headerCells = parseRow(rows[0]);
+      html += '<thead><tr class="bg-gradient-to-r from-gray-50 to-gray-100">';
+      for (const cell of headerCells) {
+        html += `<th class="px-4 py-2.5 text-left font-semibold text-gray-700 border-b-2 border-gray-200 text-xs uppercase tracking-wider">${cell}</th>`;
+      }
+      html += "</tr></thead>";
+    }
+    
+    html += "<tbody>";
+    for (let i = startIdx; i < rows.length; i++) {
+      if (isSep(rows[i])) continue;
+      const cells = parseRow(rows[i]);
+      const stripe = (i - startIdx) % 2 === 1 ? " bg-gray-50/60" : "";
+      html += `<tr class="border-b border-gray-100 hover:bg-emerald-50/30 transition-colors${stripe}">`;
+      for (const cell of cells) {
+        html += `<td class="px-4 py-2.5 text-gray-600">${cell}</td>`;
+      }
+      html += "</tr>";
+    }
+    html += "</tbody></table></div>";
+    
+    return addBlock("TABLE", html);
+  });
+
+  // 1. Inline formatting
+  processed = processed
+    .replace(/\*\*\*(.*?)\*\*\*/g, "<strong><em>$1</em></strong>")
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+    .replace(/`([^`]+)`/g, '<code class="bg-violet-50 text-violet-700 px-1.5 py-0.5 rounded-md text-[13px] font-mono border border-violet-200/50">$1</code>')
+    .replace(/^### (.*$)/gm, '<h3 class="font-bold text-base mt-4 mb-2 text-gray-900">$1</h3>')
+    .replace(/^## (.*$)/gm, '<h2 class="font-bold text-lg mt-5 mb-2 text-gray-900 border-b border-gray-100 pb-1">$1</h2>')
+    .replace(/^# (.*$)/gm, '<h1 class="font-bold text-xl mt-6 mb-3 text-gray-900">$1</h1>')
+    .replace(/^- (.*$)/gm, '<li class="ml-4 list-disc my-1">$1</li>')
+    .replace(/^(\d+)\. (.*$)/gm, '<li class="ml-4 list-decimal my-1">$1. $2</li>')
+    .replace(/✓/g, '<span class="text-emerald-600 font-bold">✓</span>')
+    .replace(/✗/g, '<span class="text-red-400">✗</span>')
+    .replace(/\n/g, "<br/>");
+
+  // 2. Restore blocks - Use function to avoid pattern issues
+  blocks.forEach((block, idx) => {
+    const placeholder = `__BLOCK_PLACEHOLDER_${block.type}_${idx}__`;
+    processed = processed.replace(placeholder, () => block.html);
+  });
+
+  return processed;
+};
+
 function parseThinking(content: string): { thinking: string; answer: string } {
-  const thinkMatch = content.match(/<think>([\s\S]*?)(<\/think>|$)/);
-  if (!thinkMatch) return { thinking: "", answer: content };
-
-  // Strip MEMORY_SAVE tags from thinking content
-  let thinking = thinkMatch[1].trim();
-  thinking = thinking.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
-
-  let afterThink = content.replace(/<think>[\s\S]*?(<\/think>|$)/, "").trim();
-  // Also strip MEMORY_SAVE from answer
-  afterThink = afterThink.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
-
-  return { thinking, answer: afterThink };
+  if (!content) return { thinking: "", answer: "" };
+  
+  const thinkStartTag = "<think>";
+  const thinkEndTag = "</think>";
+  
+  const startIndex = content.indexOf(thinkStartTag);
+  if (startIndex === -1) return { thinking: "", answer: content };
+  
+  const endIndex = content.indexOf(thinkEndTag);
+  
+  if (endIndex === -1) {
+    // Thinking is still in progress
+    const thinking = content.slice(startIndex + thinkStartTag.length).trim();
+    return { thinking: thinking.replace(/\[MEMORY_SAVE:\s*.+?\]/g, ""), answer: "" };
+  }
+  
+  const thinking = content.slice(startIndex + thinkStartTag.length, endIndex).trim();
+  const answer = (content.slice(0, startIndex) + content.slice(endIndex + thinkEndTag.length)).trim();
+  
+  return { 
+    thinking: thinking.replace(/\[MEMORY_SAVE:\s*.+?\]/g, ""), 
+    answer: answer.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "") 
+  };
 }
 
 function ThinkingBlock({ 
@@ -138,40 +309,58 @@ function ThinkingBlock({
   // Keep it open while streaming reasoning
   useEffect(() => {
     if (isStreaming && thinking) {
-      setOpen(true);
+      const timer = setTimeout(() => setOpen(true), 0);
+      return () => clearTimeout(timer);
     }
   }, [isStreaming, thinking]);
 
   if (!thinking && !isStreaming) return null;
   
   return (
-    <div className="mb-2">
+    <div className="mb-3 animate-in fade-in slide-in-from-top-1 duration-300">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
+        className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-emerald-600 hover:opacity-80 transition-all px-2 py-1 rounded-lg bg-emerald-50/50 border border-emerald-100/50"
       >
-        <Zap className="h-3 w-3" />
+        <Zap className={`h-3 w-3 ${isStreaming ? "animate-pulse" : ""}`} />
         {isStreaming ? (
           <span className="flex items-center gap-1.5">
-            <Loader2 className="h-3 w-3 animate-spin" />
-            {thinking ? "กำลังคิด..." : status}
+            <Loader2 className="h-2.5 w-2.5 animate-spin" />
+            {thinking ? "กำลังประมวลผลความคิด..." : status}
           </span>
         ) : (
-          <span>ดูกระบวนการคิด</span>
+          <span>กระบวนการคิด</span>
         )}
         {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
       </button>
       {open && (thinking || isStreaming) && (
-        <div className="mt-1.5 ml-1 pl-3 border-l-2 border-gray-200 text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap">
-          {thinking || (isStreaming && !thinking && <span className="italic opacity-70">กำลังประมวลผล...</span>)}
-        </div>
+        <div 
+          className="mt-2 ml-1 pl-4 border-l-2 border-emerald-200/50 text-xs text-muted-foreground/80 leading-relaxed italic prose prose-sm max-w-none transition-all duration-300"
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(thinking || (isStreaming ? "กำลังเชื่อมต่อฐานข้อมูลความรู้..." : "")) }}
+        />
       )}
     </div>
   );
 }
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
+function MessageSkeleton() {
+  return (
+    <div className="flex flex-row gap-4 w-full animate-in fade-in duration-500">
+      <div className="shrink-0 pt-1">
+        <div className="h-9 w-9 rounded-xl bg-gray-200 animate-pulse" />
+      </div>
+      <div className="flex flex-col gap-2 w-full max-w-[80%]">
+        <div className="h-4 w-24 bg-gray-200 rounded-lg animate-pulse" />
+        <div className="space-y-2 p-4 rounded-2xl bg-white/40 backdrop-blur-md border border-white/20 shadow-sm">
+          <div className="h-3 w-full bg-gray-200/60 rounded animate-pulse" />
+          <div className="h-3 w-[90%] bg-gray-200/60 rounded animate-pulse" />
+          <div className="h-3 w-[95%] bg-gray-200/60 rounded animate-pulse" />
+          <div className="h-3 w-[40%] bg-gray-200/60 rounded animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+}
 // ===== Settings Types =====
 interface AISettings {
   defaultModel: string;
@@ -332,7 +521,7 @@ const UI_STRINGS: Record<string, Record<string, string>> = {
     creditsPerUse: "เครดิต/ครั้ง",
     creditsInsufficient: "เครดิตไม่เพียงพอ",
     creditsTopupDesc: "เติมเครดิตเพื่อใช้โมเดลระดับโปร",
-    creditsCostInfo: "โมเดลฟรีใช้งานได้ไม่จำกัด โมเดลโปรใช้เครดิต",
+    creditsCostInfo: "โมเดลฟรีใช้งานได้ 100 ครั้งต่อวัน โมเดลโปรใช้เครดิต",
     creditsUsage: "ใช้งาน",
     creditsTopupBonus: "เติมเครดิต",
     creditsRefund: "คืนเครดิต",
@@ -459,349 +648,10 @@ const UI_STRINGS: Record<string, Record<string, string>> = {
     creditsPerUse: "credits/use",
     creditsInsufficient: "Insufficient credits",
     creditsTopupDesc: "Top up credits to use pro models",
-    creditsCostInfo: "Free models are unlimited. Pro models use credits.",
+    creditsCostInfo: "Free models have 100/day limit. Pro models use credits.",
     creditsUsage: "Usage",
     creditsTopupBonus: "Top up",
     creditsRefund: "Refund",
-  },
-  zh: {
-    settings: "设置",
-    general: "通用",
-    personalization: "个性化",
-    dataControl: "数据管理",
-    account: "账户",
-    defaultModel: "默认模型",
-    defaultModelDesc: "选择默认的AI模型",
-    autoDesc: "根据复杂度自动选择模型",
-    proDesc: "高精度，适合复杂问题",
-    flashDesc: "快速，适合一般问题",
-    claudeDesc: "Anthropic 的 Claude Sonnet",
-    fontSize: "字体大小",
-    fontSizeDesc: "调整聊天文字大小",
-    fontSmall: "小",
-    fontMedium: "中",
-    fontLarge: "大",
-    sendWithEnter: "按Enter发送",
-    sendWithEnterDesc: "按Enter发送消息（Shift+Enter换行）",
-    language: "语言",
-    languageDesc: "更改AI和界面语言",
-    responseStyle: "回复风格",
-    responseStyleDesc: "选择简洁或详细的AI回复",
-    concise: "简洁",
-    conciseDesc: "简短直接",
-    detailed: "详细",
-    detailedDesc: "详尽并附有示例",
-    customInstructions: "自定义指令",
-    customInstructionsDesc: "告诉AI关于你的信息或你想要的回复方式",
-    customInstructionsPlaceholder: "例如：我是软件工程专业大三学生，喜欢带代码示例的解释...",
-    exportHistory: "导出聊天记录",
-    exportHistoryDesc: "下载所有聊天为JSON文件",
-    export: "导出",
-    clearHistory: "清除所有聊天记录",
-    chatsCount: "个聊天将被永久删除",
-    cancel: "取消",
-    confirmDelete: "确认删除",
-    deleteAll: "全部删除",
-    quota: "使用配额",
-    times: "次",
-    remaining: "剩余",
-    quotaReset: "配额每天午夜重置",
-    logout: "退出登录",
-    save: "保存",
-    newChat: "新聊天",
-    search: "搜索...",
-    noHistory: "暂无历史记录",
-    noSearchResult: "未找到聊天",
-    sendMessage: "发送消息或粘贴图片...",
-    dropFiles: "将文件拖放到这里",
-    dropFilesDesc: "支持图片、PDF、文档（最大4MB）",
-    quotaExhausted: "配额已用完",
-    quotaExhaustedMsg: "次已使用",
-    quotaResetIn: "小时",
-    quotaResetDaily: "每天午夜重置",
-    understood: "知道了",
-    askAI: "提问或发送试卷照片让AI分析",
-    preparing: "准备中...",
-    loginTitle: "使用Google账号登录AI聊天",
-    loginLimit: "每个账户限20次",
-    loginNote: "任何Google账户均可即时登录",
-    loading: "加载中...",
-    today: "今天",
-    yesterday: "昨天",
-    last7days: "最近7天",
-    last30days: "最近30天",
-    memory: "记忆",
-    memoryDesc: "允许AI在回复时参考和使用保存的记忆",
-    memoryEnabled: "启用记忆",
-    memoryManage: "管理记忆",
-    memoryEmpty: "还没有记忆",
-    memoryEmptyDesc: "AI会自动记住对话中的重要信息",
-    memoryAdd: "添加记忆",
-    memoryAddPlaceholder: "例如：我是软件工程专业大三学生",
-    memoryClearAll: "清除所有记忆",
-    memoryClearConfirm: "确认清除全部",
-    memoryCount: "条记忆",
-    memoryAuto: "自动",
-    memoryManual: "手动",
-    memoryImport: "导入",
-    memoryExport: "导出",
-    clearTTSCache: "清除TTS缓存",
-    clearAllChats: "清除所有聊天",
-    importJSON: "从JSON文件导入对话",
-    revokePersonalization: "撤销所有用户个性化数据",
-    revoke: "撤销",
-    importMemory: "导入记忆",
-    importMemoryDesc: "从其他AI平台导入记忆",
-    importMethodPrompt: "通过提示词导入",
-    importMethodPromptDesc: "复制提示词到其他AI，然后将回复粘贴回来",
-    importMethodFile: "从文件导入",
-    importMethodFileDesc: "上传ChatGPT或Claude的导出文件（.json, .zip）",
-    importFrom: "导入自",
-    importPromptCopy: "复制提示词",
-    importPromptCopied: "已复制！",
-    importPromptInstruction: "将此提示词粘贴到其他AI的聊天中，然后将回复复制回来",
-    importPasteHere: "在此粘贴其他AI的回复...",
-    importParseMemories: "提取记忆",
-    importParsing: "正在提取记忆...",
-    importReview: "查看记忆",
-    importReviewDesc: "选择要导入的记忆",
-    importSelectAll: "全选",
-    importDeselectAll: "取消全选",
-    importSelected: "导入所选",
-    importSuccess: "导入成功！",
-    importNoMemories: "未在文本中找到记忆",
-    importBack: "返回",
-    importUploadFile: "选择文件",
-    importProcessing: "处理中...",
-    importDragDrop: "拖放文件到这里，或点击浏览",
-    importSupported: "支持 .json 和 .zip（最大50MB）",
-    credits: "积分", creditsBalance: "积分余额", creditsTopup: "充值", creditsPromo: "促销码", creditsPromoPlaceholder: "输入促销码", creditsRedeem: "兑换", creditsHistory: "使用记录", creditsFree: "免费", creditsPerUse: "积分/次", creditsInsufficient: "积分不足", creditsTopupDesc: "充值积分以使用专业模型", creditsCostInfo: "免费模型无限使用，专业模型消耗积分", creditsUsage: "使用", creditsTopupBonus: "充值", creditsRefund: "退款",
-  },
-  ja: {
-    settings: "設定",
-    general: "一般",
-    personalization: "カスタマイズ",
-    dataControl: "データ管理",
-    account: "アカウント",
-    defaultModel: "デフォルトモデル",
-    defaultModelDesc: "デフォルトのAIモデルを選択",
-    autoDesc: "複雑さに応じて自動選択",
-    proDesc: "高精度、複雑な質問向け",
-    flashDesc: "高速、一般的な質問向け",
-    claudeDesc: "AnthropicのClaude Sonnet",
-    fontSize: "フォントサイズ",
-    fontSizeDesc: "チャットのテキストサイズを調整",
-    fontSmall: "小",
-    fontMedium: "中",
-    fontLarge: "大",
-    sendWithEnter: "Enterで送信",
-    sendWithEnterDesc: "Enterで送信（Shift+Enterで改行）",
-    language: "言語",
-    languageDesc: "AIとインターフェースの言語を変更",
-    responseStyle: "回答スタイル",
-    responseStyleDesc: "簡潔または詳細なAI回答を選択",
-    concise: "簡潔",
-    conciseDesc: "短く要点を押さえた回答",
-    detailed: "詳細",
-    detailedDesc: "例を含む詳しい回答",
-    customInstructions: "カスタム指示",
-    customInstructionsDesc: "AIにあなたの情報や希望する回答方法を伝えましょう",
-    customInstructionsPlaceholder: "例：ソフトウェア工学科3年生です。コード例付きの説明が好みです...",
-    exportHistory: "チャット履歴をエクスポート",
-    exportHistoryDesc: "全チャットをJSONでダウンロード",
-    export: "エクスポート",
-    clearHistory: "全チャット履歴を削除",
-    chatsCount: "件のチャットが完全に削除されます",
-    cancel: "キャンセル",
-    confirmDelete: "削除を確認",
-    deleteAll: "全て削除",
-    quota: "使用クォータ",
-    times: "回",
-    remaining: "残り",
-    quotaReset: "クォータは毎日午前0時にリセット",
-    logout: "ログアウト",
-    save: "保存",
-    newChat: "新しいチャット",
-    search: "検索...",
-    noHistory: "履歴がありません",
-    noSearchResult: "チャットが見つかりません",
-    sendMessage: "メッセージを送信、または画像を貼り付け...",
-    dropFiles: "ファイルをここにドロップ",
-    dropFilesDesc: "画像、PDF、ドキュメント対応（最大4MB）",
-    quotaExhausted: "クォータ超過",
-    quotaExhaustedMsg: "回使用済み",
-    quotaResetIn: "時間",
-    quotaResetDaily: "毎日午前0時にリセット",
-    understood: "了解",
-    askAI: "質問や試験の写真を送ってAIに分析してもらう",
-    preparing: "準備中...",
-    loginTitle: "GoogleアカウントでAIチャットにログイン",
-    loginLimit: "アカウントあたり20回まで",
-    loginNote: "Googleアカウントで即座にログイン可能",
-    loading: "読み込み中...",
-    today: "今日",
-    yesterday: "昨日",
-    last7days: "過去7日間",
-    last30days: "過去30日間",
-    memory: "メモリー",
-    memoryDesc: "AIが保存されたメモリーを参照して回答に使用することを許可",
-    memoryEnabled: "メモリーを有効化",
-    memoryManage: "メモリーを管理",
-    memoryEmpty: "メモリーがありません",
-    memoryEmptyDesc: "AIは会話から重要な情報を自動的に記憶します",
-    memoryAdd: "メモリーを追加",
-    memoryAddPlaceholder: "例：ソフトウェア工学科3年生です",
-    memoryClearAll: "全メモリーを削除",
-    memoryClearConfirm: "全削除を確認",
-    memoryCount: "件のメモリー",
-    memoryAuto: "自動",
-    memoryManual: "手動",
-    memoryImport: "インポート",
-    memoryExport: "エクスポート",
-    clearTTSCache: "TTSキャッシュを削除",
-    clearAllChats: "全チャットを削除",
-    importJSON: "JSONファイルから会話をインポート",
-    revokePersonalization: "全ユーザーパーソナライズデータを取消",
-    revoke: "取消",
-    importMemory: "メモリーをインポート",
-    importMemoryDesc: "他のAIプラットフォームからメモリーをインポート",
-    importMethodPrompt: "プロンプトでインポート",
-    importMethodPromptDesc: "プロンプトを他のAIにコピーし、回答をここに貼り付け",
-    importMethodFile: "ファイルからインポート",
-    importMethodFileDesc: "ChatGPTやClaudeのエクスポートファイルをアップロード",
-    importFrom: "インポート元",
-    importPromptCopy: "プロンプトをコピー",
-    importPromptCopied: "コピー済み！",
-    importPromptInstruction: "このプロンプトを他のAIに貼り付け、回答をコピーして戻ってください",
-    importPasteHere: "他のAIからの回答をここに貼り付け...",
-    importParseMemories: "メモリーを抽出",
-    importParsing: "メモリーを抽出中...",
-    importReview: "メモリーを確認",
-    importReviewDesc: "インポートするメモリーを選択",
-    importSelectAll: "全選択",
-    importDeselectAll: "全解除",
-    importSelected: "選択をインポート",
-    importSuccess: "インポート成功！",
-    importNoMemories: "テキスト内にメモリーが見つかりません",
-    importBack: "戻る",
-    importUploadFile: "ファイルを選択",
-    importProcessing: "処理中...",
-    importDragDrop: "ファイルをドラッグ＆ドロップ、またはクリックして選択",
-    importSupported: ".json と .zip に対応（最大50MB）",
-    credits: "クレジット", creditsBalance: "クレジット残高", creditsTopup: "チャージ", creditsPromo: "プロモコード", creditsPromoPlaceholder: "プロモコードを入力", creditsRedeem: "引換", creditsHistory: "利用履歴", creditsFree: "無料", creditsPerUse: "クレジット/回", creditsInsufficient: "クレジット不足", creditsTopupDesc: "プロモデルを使うにはクレジットをチャージ", creditsCostInfo: "無料モデルは無制限、プロモデルはクレジット消費", creditsUsage: "利用", creditsTopupBonus: "チャージ", creditsRefund: "返金",
-  },
-  ko: {
-    settings: "설정",
-    general: "일반",
-    personalization: "개인화",
-    dataControl: "데이터 관리",
-    account: "계정",
-    defaultModel: "기본 모델",
-    defaultModelDesc: "기본 AI 모델 선택",
-    autoDesc: "복잡도에 따라 자동 선택",
-    proDesc: "높은 정확도, 복잡한 질문에 적합",
-    flashDesc: "빠름, 일반 질문에 적합",
-    claudeDesc: "Anthropic의 Claude Sonnet",
-    fontSize: "글꼴 크기",
-    fontSizeDesc: "채팅 텍스트 크기 조정",
-    fontSmall: "작게",
-    fontMedium: "보통",
-    fontLarge: "크게",
-    sendWithEnter: "Enter로 전송",
-    sendWithEnterDesc: "Enter를 눌러 전송 (Shift+Enter로 줄바꿈)",
-    language: "언어",
-    languageDesc: "AI 및 인터페이스 언어 변경",
-    responseStyle: "응답 스타일",
-    responseStyleDesc: "간결하거나 상세한 AI 응답 선택",
-    concise: "간결",
-    conciseDesc: "짧고 핵심적인 답변",
-    detailed: "상세",
-    detailedDesc: "예시를 포함한 자세한 답변",
-    customInstructions: "사용자 지정 지침",
-    customInstructionsDesc: "AI에게 당신에 대한 정보나 원하는 응답 방식을 알려주세요",
-    customInstructionsPlaceholder: "예: 소프트웨어 공학과 3학년입니다. 코드 예시가 포함된 설명을 선호합니다...",
-    exportHistory: "채팅 기록 내보내기",
-    exportHistoryDesc: "모든 채팅을 JSON으로 다운로드",
-    export: "내보내기",
-    clearHistory: "모든 채팅 기록 삭제",
-    chatsCount: "개의 채팅이 영구 삭제됩니다",
-    cancel: "취소",
-    confirmDelete: "삭제 확인",
-    deleteAll: "모두 삭제",
-    quota: "사용 할당량",
-    times: "회",
-    remaining: "남음",
-    quotaReset: "할당량은 매일 자정에 초기화",
-    logout: "로그아웃",
-    save: "저장",
-    newChat: "새 채팅",
-    search: "검색...",
-    noHistory: "기록 없음",
-    noSearchResult: "채팅을 찾을 수 없음",
-    sendMessage: "메시지를 보내거나 이미지를 붙여넣기...",
-    dropFiles: "여기에 파일을 놓으세요",
-    dropFilesDesc: "이미지, PDF, 문서 지원 (최대 4MB)",
-    quotaExhausted: "할당량 초과",
-    quotaExhaustedMsg: "회 사용됨",
-    quotaResetIn: "시간",
-    quotaResetDaily: "매일 자정에 초기화",
-    understood: "알겠습니다",
-    askAI: "질문하거나 시험 사진을 보내 AI 분석을 받으세요",
-    preparing: "준비 중...",
-    loginTitle: "Google 계정으로 AI 채팅에 로그인",
-    loginLimit: "계정당 20회 제한",
-    loginNote: "모든 Google 계정으로 즉시 로그인 가능",
-    loading: "로딩 중...",
-    today: "오늘",
-    yesterday: "어제",
-    last7days: "지난 7일",
-    last30days: "지난 30일",
-    memory: "메모리",
-    memoryDesc: "AI가 저장된 메모리를 참조하여 응답에 사용하도록 허용",
-    memoryEnabled: "메모리 활성화",
-    memoryManage: "메모리 관리",
-    memoryEmpty: "메모리가 없습니다",
-    memoryEmptyDesc: "AI가 대화에서 중요한 정보를 자동으로 기억합니다",
-    memoryAdd: "메모리 추가",
-    memoryAddPlaceholder: "예: 소프트웨어 공학과 3학년입니다",
-    memoryClearAll: "모든 메모리 삭제",
-    memoryClearConfirm: "전체 삭제 확인",
-    memoryCount: "개의 메모리",
-    memoryAuto: "자동",
-    memoryManual: "수동",
-    memoryImport: "가져오기",
-    memoryExport: "내보내기",
-    clearTTSCache: "TTS 캐시 삭제",
-    clearAllChats: "모든 채팅 삭제",
-    importJSON: "JSON 파일에서 대화 가져오기",
-    revokePersonalization: "모든 사용자 개인화 데이터 철회",
-    revoke: "철회",
-    importMemory: "메모리 가져오기",
-    importMemoryDesc: "다른 AI 플랫폼에서 메모리 가져오기",
-    importMethodPrompt: "프롬프트로 가져오기",
-    importMethodPromptDesc: "프롬프트를 다른 AI에 복사하고 응답을 여기에 붙여넣기",
-    importMethodFile: "파일에서 가져오기",
-    importMethodFileDesc: "ChatGPT 또는 Claude 내보내기 파일 업로드",
-    importFrom: "가져오기 소스",
-    importPromptCopy: "프롬프트 복사",
-    importPromptCopied: "복사됨!",
-    importPromptInstruction: "이 프롬프트를 다른 AI에 붙여넣고 응답을 복사해 오세요",
-    importPasteHere: "다른 AI의 응답을 여기에 붙여넣기...",
-    importParseMemories: "메모리 추출",
-    importParsing: "메모리 추출 중...",
-    importReview: "메모리 확인",
-    importReviewDesc: "가져올 메모리를 선택하세요",
-    importSelectAll: "전체 선택",
-    importDeselectAll: "전체 해제",
-    importSelected: "선택 항목 가져오기",
-    importSuccess: "가져오기 성공!",
-    importNoMemories: "텍스트에서 메모리를 찾을 수 없습니다",
-    importBack: "뒤로",
-    importUploadFile: "파일 선택",
-    importProcessing: "처리 중...",
-    importDragDrop: "파일을 드래그 앤 드롭하거나 클릭하여 선택",
-    importSupported: ".json 및 .zip 지원 (최대 50MB)",
-    credits: "크레딧", creditsBalance: "크레딧 잔액", creditsTopup: "충전", creditsPromo: "프로모 코드", creditsPromoPlaceholder: "프로모 코드 입력", creditsRedeem: "사용", creditsHistory: "사용 내역", creditsFree: "무료", creditsPerUse: "크레딧/회", creditsInsufficient: "크레딧 부족", creditsTopupDesc: "프로 모델 사용을 위해 크레딧 충전", creditsCostInfo: "무료 모델은 무제한, 프로 모델은 크레딧 소모", creditsUsage: "사용", creditsTopupBonus: "충전", creditsRefund: "환불",
   },
 };
 
@@ -959,7 +809,7 @@ function CreditNeededPopup({
 }
 
 // ===== Settings Modal =====
-type SettingsTab = "general" | "personalization" | "data" | "account";
+type SettingsTab = "general" | "personalization" | "data" | "account" | "admin";
 
 function SettingsModal({
   open,
@@ -975,12 +825,15 @@ function SettingsModal({
   sessions,
   memories,
   onMemoriesChange,
+  adminModelConfig,
+  onAdminModelConfigChange,
+  initialTab = "general",
 }: {
   open: boolean;
   onClose: () => void;
   settings: AISettings;
   onSave: (s: AISettings) => void;
-  user: { email: string; name: string; picture: string } | null;
+  user: { email: string; name: string; picture: string; isAdmin?: boolean } | null;
   quota: { usage: number; limit: number; remaining: number; credits?: number; pricing?: Record<string, number> } | null;
   onLogout: () => void;
   onClearHistory: () => void;
@@ -989,8 +842,23 @@ function SettingsModal({
   sessions: ChatSession[];
   memories: MemoryItem[];
   onMemoriesChange: () => void;
+  adminModelConfig: Record<string, boolean>;
+  onAdminModelConfigChange: (config: Record<string, boolean>) => void;
+  initialTab?: SettingsTab;
 }) {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("general");
+  const [activeTab, setActiveTab] = useState<SettingsTab | "admin">(initialTab);
+  
+  // Sync activeTab when modal opens with a specific initialTab
+  useEffect(() => {
+    if (open) {
+      if (initialTab === "admin" && !user?.isAdmin) {
+        setActiveTab("general");
+      } else {
+        setActiveTab(initialTab);
+      }
+    }
+  }, [open, initialTab, user]);
+
   const [draft, setDraft] = useState<AISettings>(settings);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showMemoryClearConfirm, setShowMemoryClearConfirm] = useState(false);
@@ -1193,6 +1061,7 @@ function SettingsModal({
     { id: "personalization", label: t("personalization", lang), icon: <UserCircle className="h-4 w-4" /> },
     { id: "data", label: t("dataControl", lang), icon: <Database className="h-4 w-4" /> },
     { id: "account", label: t("account", lang), icon: <User className="h-4 w-4" /> },
+    ...(user?.isAdmin ? [{ id: "admin" as SettingsTab, label: lang === "th" ? "ผู้ดูแล" : "Admin", icon: <ShieldCheck className="h-4 w-4" /> }] : []),
   ];
 
   const handleSave = () => {
@@ -2106,6 +1975,46 @@ function SettingsModal({
                 </div>
               </>
             )}
+
+            {activeTab === "admin" && (
+              <div className="space-y-6">
+                <div>
+                  <label className="text-sm font-semibold text-gray-900 mb-1 block">
+                    {lang === "th" ? "จัดการการเข้าถึงโมเดล" : "Model Access Management"}
+                  </label>
+                  <p className="text-xs text-gray-500 mb-4">
+                    {lang === "th" ? "เปิด-ปิดโมเดลที่จะให้แสดงในหน้าแอป" : "Enable or disable models to be shown in the app"}
+                  </p>
+                  
+                  <div className="space-y-3">
+                    {Object.entries(adminModelConfig).map(([provider, enabled]) => (
+                      <div key={provider} className="flex items-center justify-between p-3 rounded-xl border border-gray-100 bg-white shadow-sm">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2 rounded-lg ${enabled ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-50 text-gray-400'}`}>
+                            {provider === 'gemini' ? <Zap className="h-4 w-4" /> : 
+                             provider === 'claude' ? <Brain className="h-4 w-4" /> : 
+                             provider === 'thaillm' ? <Sparkles className="h-4 w-4" /> :
+                             provider === 'groq' ? <Zap className="h-4 w-4" /> :
+                             provider === 'github' ? <Github className="h-4 w-4" /> :
+                             <Database className="h-4 w-4" />}
+                          </div>
+                          <div>
+                            <span className="text-sm font-bold text-gray-900 capitalize">{provider}</span>
+                            <p className="text-[10px] text-gray-400">{enabled ? 'Active' : 'Disabled'}</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => onAdminModelConfigChange({ ...adminModelConfig, [provider]: !enabled })}
+                          className={`relative w-11 h-6 rounded-full transition-all duration-200 ${enabled ? "bg-emerald-500" : "bg-gray-200"}`}
+                        >
+                          <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform duration-200 ${enabled ? "translate-x-5" : "translate-x-0"}`} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {(activeTab === "general" || activeTab === "personalization") && (
@@ -2145,6 +2054,14 @@ interface ChatSession {
   messages: Message[];
   createdAt: number;
   updatedAt?: number;
+  folderId?: string;
+}
+
+interface Folder {
+  id: string;
+  name: string;
+  sessionIds: string[];
+  isOpen?: boolean;
 }
 
 function generateTitle(firstMessage: string): string {
@@ -2191,7 +2108,10 @@ export default function AIChatPage() {
   const router = useRouter();
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const messages = useMemo(() => {
+    if (!activeSessionId) return [];
+    return sessions.find(s => s.id === activeSessionId)?.messages || [];
+  }, [activeSessionId, sessions]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [attachments, setAttachments] = useState<FileData[]>([]);
@@ -2199,23 +2119,214 @@ export default function AIChatPage() {
   const [sidebarSearch, setSidebarSearch] = useState("");
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [editingTitle, setEditingTitle] = useState("");
+
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState("");
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
+  const [movingSession, setMovingSession] = useState<ChatSession | null>(null);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [sharingSession, setSharingSession] = useState<ChatSession | null>(null);
+  const [draggedSessionId, setDraggedSessionId] = useState<string | null>(null);
+  const [hoveredFolderId, setHoveredFolderId] = useState<string | null>(null);
+
+  // TTS State
+  const [speakingIndex, setSpeakingIndex] = useState<number | null>(null);
+  
+  // Admin Model Management State
+  const [adminModelConfig, setAdminModelConfig] = useState<Record<string, boolean>>({
+    "gemini": true,
+    "claude": true,
+    "openrouter": true,
+    "thaillm": true,
+    "groq": true,
+    "github": true
+  });
+
+  // Load Admin Model Config
+  useEffect(() => {
+    const saved = localStorage.getItem("allquiz_admin_models");
+    if (saved) {
+      try {
+        setAdminModelConfig(JSON.parse(saved));
+      } catch (e) {}
+    }
+  }, []);
+
+  // Save Admin Model Config
+  useEffect(() => {
+    localStorage.setItem("allquiz_admin_models", JSON.stringify(adminModelConfig));
+  }, [adminModelConfig]);
+
+  const handleSpeak = useCallback((text: string, index: number) => {
+    if (speakingIndex === index) {
+      window.speechSynthesis.cancel();
+      setSpeakingIndex(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    
+    // Clean text: strip thinking blocks and markdown
+    const { answer } = parseThinking(text);
+    const cleanText = (answer || text)
+      .replace(/```[\s\S]*?```/g, "") // Remove code blocks
+      .replace(/<[^>]*>?/gm, "") // Remove HTML tags
+      .replace(/\[.*?\]/g, "") // Remove references
+      .replace(/\*|_|#/g, "") // Remove markdown
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanText);
+    
+    // Auto-detect language
+    const hasThai = /[\u0E00-\u0E7F]/.test(cleanText);
+    utterance.lang = hasThai ? "th-TH" : "en-US";
+    utterance.rate = 1.0;
+    
+    utterance.onend = () => setSpeakingIndex(null);
+    utterance.onerror = () => setSpeakingIndex(null);
+    
+    setSpeakingIndex(index);
+    window.speechSynthesis.speak(utterance);
+  }, [speakingIndex]);
+
+  const showToast = useCallback((msg: string, type: "success" | "error" | "info" | "warning" = "info") => {
+    if (type === "success") toast.success(msg);
+    else if (type === "error") toast.error(msg);
+    else if (type === "warning") toast.warning(msg);
+    else toast.info(msg);
+  }, []);
+
+  const isFreeModel = useCallback((modelValue: string) => {
+    const cost = quota?.pricing?.[modelValue];
+    return cost === 0;
+  }, [quota]);
+
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    variant?: "destructive" | "primary";
+    onConfirm: () => void;
+  } | null>(null);
+
+  const askConfirm = useCallback((params: {
+    title: string;
+    message: string;
+    confirmText?: string;
+    cancelText?: string;
+    variant?: "destructive" | "primary";
+    onConfirm: () => void;
+  }) => {
+    setConfirmDialog({ ...params, isOpen: true });
+  }, []);
+
+  const moveSessionToFolder = (sessionId: string, folderId: string | null) => {
+    setSessions(prev => prev.map(s =>
+      s.id === sessionId ? { ...s, folderId: folderId || undefined } : s
+    ));
+
+    setFolders(prev => prev.map(f => {
+      const updatedSessionIds = f.sessionIds.filter(id => id !== sessionId);
+      if (f.id === folderId) {
+        if (!updatedSessionIds.includes(sessionId)) {
+          return { ...f, sessionIds: [...updatedSessionIds, sessionId] };
+        }
+      }
+      return { ...f, sessionIds: updatedSessionIds };
+    }));
+  };
+
+  const createFolder = () => {
+    const newFolder: Folder = {
+      id: Date.now().toString(),
+      name: aiSettings.language === "th" ? "โฟลเดอร์ใหม่" : "New Folder",
+      sessionIds: [],
+      isOpen: true
+    };
+    setFolders(prev => [...prev, newFolder]);
+  };
+
+  const toggleFolder = (folderId: string) => {
+    setFolders(prev => prev.map(f =>
+      f.id === folderId ? { ...f, isOpen: !f.isOpen } : f
+    ));
+  };
+
+  const deleteFolder = (folderId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    askConfirm({
+      title: aiSettings.language === "th" ? "ยืนยันการลบโฟลเดอร์" : "Confirm Delete Folder",
+      message: aiSettings.language === "th" 
+        ? "คุณแน่ใจหรือไม่ว่าต้องการลบโฟลเดอร์นี้? แชทภายในจะถูกย้ายออกไปอยู่ข้างนอก และข้อมูลโฟลเดอร์จะกู้คืนไม่ได้" 
+        : "Are you sure you want to delete this folder? Chats inside will be moved out, and this folder cannot be recovered.",
+      confirmText: aiSettings.language === "th" ? "ลบโฟลเดอร์" : "Delete Folder",
+      variant: "destructive",
+      onConfirm: () => {
+        const folder = folders.find(f => f.id === folderId);
+        if (folder) {
+          setSessions(prev => prev.map(s =>
+            folder.sessionIds.includes(s.id) ? { ...s, folderId: undefined } : s
+          ));
+        }
+        setFolders(prev => prev.filter(f => f.id !== folderId));
+        showToast(aiSettings.language === "th" ? "ลบโฟลเดอร์เรียบร้อยแล้ว" : "Folder deleted", "success");
+      }
+    });
+  };
+
+  const renameFolder = (folderId: string) => {
+    if (!editingFolderName.trim()) {
+      setEditingFolderId(null);
+      return;
+    }
+    setFolders(prev => prev.map(f =>
+      f.id === folderId ? { ...f, name: editingFolderName.trim() } : f
+    ));
+    setEditingFolderId(null);
+  };
+
+  const startEditingFolder = (folder: Folder, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingFolderId(folder.id);
+    setEditingFolderName(folder.name);
+  };
+
   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
   const [showCreditPopup, setShowCreditPopup] = useState<{ needed: number; have: number; model: string } | null>(null);
   const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_SETTINGS);
-  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true });
+  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true, groq: true, github: true });
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<"none" | "webSearch" | "generateImage" | "canvas" | "summarize">("none");
   const [searchingUrls, setSearchingUrls] = useState<string[]>([]);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+
+  // Close menus on click outside
+  useEffect(() => {
+    const handleClickOutside = () => setOpenMenuId(null);
+    if (openMenuId !== null) {
+      window.addEventListener("click", handleClickOutside);
+      return () => window.removeEventListener("click", handleClickOutside);
+    }
+  }, [openMenuId]);
+
   const [isCanvasOpen, setIsCanvasOpen] = useState(false);
   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
   const [artifactVersions, setArtifactVersions] = useState<Artifact[]>([]);
   const [isArtifactComplete, setIsArtifactComplete] = useState(false);
-  const [canvasWidth, setCanvasWidth] = useState(Math.max(550, typeof window !== "undefined" ? Math.floor(window.innerWidth * 0.45) : 600));
+  const [canvasWidth, setCanvasWidth] = useState(600);
+  useEffect(() => {
+    setCanvasWidth(Math.max(550, Math.floor(window.innerWidth * 0.45)));
+  }, []);
   const [isResizingCanvas, setIsResizingCanvas] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [memories, setMemories] = useState<MemoryItem[]>([]);
@@ -2224,10 +2335,38 @@ export default function AIChatPage() {
   const toolsMenuRef = useRef<HTMLDivElement>(null);
 
   // Auth & Quota state
-  const [user, setUser] = useState<{ email: string; name: string; picture: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; name: string; picture: string; isAdmin?: boolean } | null>(null);
   const [quota, setQuota] = useState<{ usage: number; limit: number; remaining: number; credits?: number; pricing?: Record<string, number> } | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [gsiReady, setGsiReady] = useState(false);
+
+  // Fetch real health status from API
+  const fetchHealth = useCallback(async () => {
+    try {
+      const res = await fetch("/api/ai/health");
+      if (res.ok) {
+        const data = await res.json();
+        setApiHealth({
+          gemini: data.gemini,
+          claude: data.claude,
+          openrouter: data.openrouter,
+          thaillm: data.thaillm,
+          groq: data.groq,
+          github: data.github
+        });
+      }
+    } catch (e) {
+      console.warn("Failed to fetch API health:", e);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchHealth();
+    // Refresh health every 5 minutes
+    const timer = setInterval(fetchHealth, 5 * 60 * 1000);
+    return () => clearInterval(timer);
+  }, [fetchHealth]);
+
   const [selectedModel, setSelectedModel] = useState("auto"); // auto, gemini-1.5-pro, gemini-1.5-flash
   const [generatingStatus, setGeneratingStatus] = useState("กำลังวิเคราะห์...");
   const googleBtnRef = useRef<HTMLDivElement>(null);
@@ -2236,29 +2375,110 @@ export default function AIChatPage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const MODEL_OPTIONS = [
-    { value: "auto", label: "Auto", icon: <Sparkles className="h-3.5 w-3.5 text-amber-500" />, desc: "อัตโนมัติ" },
-    { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <Zap className="h-3.5 w-3.5 text-violet-500" />, desc: "Gemini Direct", provider: "gemini" },
-    { value: "gemini-2.5-flash", label: "Flash 2.5", icon: <Loader2 className="h-3.5 w-3.5 text-sky-500" />, desc: "Gemini Direct", provider: "gemini" },
-    { value: "claude-sonnet", label: "Claude", icon: <Brain className="h-3.5 w-3.5 text-orange-500" />, desc: "Anthropic", provider: "claude" },
-    { value: "openrouter/google/gemini-2.5-pro-preview", label: "Gemini 2.5 Pro", icon: <Zap className="h-3.5 w-3.5 text-emerald-500" />, desc: "OpenRouter", provider: "openrouter" },
-    { value: "openrouter/google/gemini-2.5-flash", label: "Gemini 2.5 Flash", icon: <Loader2 className="h-3.5 w-3.5 text-emerald-500" />, desc: "OpenRouter", provider: "openrouter" },
-    { value: "openrouter/openai/gpt-4.1", label: "GPT-4.1", icon: <Brain className="h-3.5 w-3.5 text-green-500" />, desc: "OpenRouter", provider: "openrouter" },
-    { value: "openrouter/openai/o4-mini", label: "o4-mini", icon: <Brain className="h-3.5 w-3.5 text-green-500" />, desc: "OpenRouter", provider: "openrouter" },
-    { value: "openrouter/deepseek/deepseek-r1", label: "DeepSeek R1", icon: <Brain className="h-3.5 w-3.5 text-blue-500" />, desc: "OpenRouter", provider: "openrouter" },
-    { value: "openrouter/meta-llama/llama-4-maverick", label: "Llama 4", icon: <Brain className="h-3.5 w-3.5 text-indigo-500" />, desc: "OpenRouter", provider: "openrouter" },
-  ];
+  // Categorized Model Options
+  const MODEL_CATEGORIES = useMemo(() => {
+    const cats = [
+      {
+        name: aiSettings.language === "th" ? "แนะนำ" : "Recommended",
+        models: [
+          { value: "auto", label: "Auto Select", icon: <Sparkles className="h-3.5 w-3.5 text-amber-500" />, desc: "ดีที่สุดตามสถานะ", provider: "all" },
+          { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <Zap className="h-3.5 w-3.5 text-violet-500" />, desc: "Gemini Direct", provider: "gemini" },
+        ]
+      },
+      {
+        name: aiSettings.language === "th" ? "โมเดลไทย" : "Thai Models",
+        models: [
+          { value: "thaillm/typhoon-v1.5x-70b-instruct", label: "Typhoon 1.5X", icon: <Sparkles className="h-3.5 w-3.5 text-red-500" />, desc: "Thai LLM", provider: "thaillm" },
+        ]
+      },
+      {
+        name: "Claude & DeepSeek (OpenRouter)",
+        models: [
+          { value: "claude-sonnet", label: "Claude", icon: <Brain className="h-3.5 w-3.5 text-orange-500" />, desc: "Anthropic", provider: "claude" },
+          { value: "openrouter/deepseek/deepseek-r1", label: "DeepSeek R1", icon: <Brain className="h-3.5 w-3.5 text-blue-500" />, desc: "OpenRouter", provider: "openrouter" },
+          { value: "openrouter/meta-llama/llama-4-maverick", label: "Llama 4", icon: <Brain className="h-3.5 w-3.5 text-indigo-500" />, desc: "OpenRouter", provider: "openrouter" },
+        ]
+      },
+      {
+          name: "Others",
+          models: [
+            { value: "groq/llama-3.3-70b-versatile", label: "Llama 3.3 70B", icon: <Zap className="h-3.5 w-3.5 text-orange-500" />, desc: "Groq (Fast)", provider: "groq" },
+            { value: "github/gpt-4o", label: "GPT-4o", icon: <Brain className="h-3.5 w-3.5 text-gray-700" />, desc: "GitHub Models", provider: "github" },
+          ]
+      }
+    ];
 
-  // Check if a model is available based on API health
+    // Filter categories and models based on admin config
+    return cats.map(cat => ({
+      ...cat,
+      models: cat.models.filter(m => m.provider === "all" || (adminModelConfig as Record<string, boolean>)[m.provider] !== false)
+    })).filter(cat => cat.models.length > 0);
+  }, [aiSettings.language, adminModelConfig]);
+
+  const ALL_MODELS = useMemo(() => MODEL_CATEGORIES.flatMap(c => c.models), [MODEL_CATEGORIES]);
+
+  // Ensure selectedModel is always valid when admin configuration changes
+  useEffect(() => {
+    if (selectedModel !== "auto") {
+      const exists = ALL_MODELS.some(m => m.value === selectedModel);
+      if (!exists) {
+        setSelectedModel("auto");
+      }
+    }
+  }, [ALL_MODELS, selectedModel]);
+
+  // Check if a model is available based on API health AND Admin configuration
   const isModelAvailable = useCallback((modelValue: string): boolean => {
-    if (modelValue === "auto") return apiHealth.openrouter || apiHealth.gemini || apiHealth.claude;
-    if (modelValue.startsWith("openrouter/")) return apiHealth.openrouter;
-    if (modelValue.startsWith("claude-")) return apiHealth.claude;
-    // Gemini direct models
-    return apiHealth.gemini;
-  }, [apiHealth]);
+    if (modelValue === "auto") {
+      return (adminModelConfig.gemini && apiHealth.gemini) || 
+             (adminModelConfig.thaillm && apiHealth.thaillm) || 
+             (adminModelConfig.openrouter && apiHealth.openrouter) || 
+             (adminModelConfig.claude && apiHealth.claude) || 
+             (adminModelConfig.groq && apiHealth.groq) || 
+             (adminModelConfig.github && apiHealth.github);
+    }
+    const model = ALL_MODELS.find(m => m.value === modelValue);
+    if (!model) return false;
+    
+    // Check if provider is enabled by admin
+    if (model.provider !== "all" && (adminModelConfig as Record<string, boolean>)[model.provider] === false) return false;
+    
+    return (apiHealth as Record<string, boolean>)[model.provider] ?? false;
+  }, [apiHealth, ALL_MODELS, adminModelConfig]);
 
-  const currentModel = MODEL_OPTIONS.find(m => m.value === selectedModel) || MODEL_OPTIONS[0];
+  // Smart Auto-Fallback Logic
+  const getEffectiveModel = useCallback((requestedModel: string): string => {
+    if (requestedModel !== "auto") {
+      if (isModelAvailable(requestedModel)) return requestedModel;
+
+      // If requested model is down or disabled, show a toast and find fallback
+      const modelName = ALL_MODELS.find(m => m.value === requestedModel)?.label || requestedModel;
+      showToast(
+        aiSettings.language === "th"
+          ? `โมเดล ${modelName} ไม่พร้อมใช้งาน กำลังสลับไปใช้โมเดลที่ดีที่สุดแทน`
+          : `Model ${modelName} is unavailable. Switching to best fallback.`,
+        "warning"
+      );
+    }
+
+    // Auto-selection priority (respecting admin disabled models): Gemini -> ThaiLLM -> OpenRouter
+    if (adminModelConfig.gemini && apiHealth.gemini) return "gemini-3.1-pro";
+    if (adminModelConfig.thaillm && apiHealth.thaillm) return "thaillm/typhoon-v1.5x-70b-instruct";
+    if (adminModelConfig.openrouter && apiHealth.openrouter) return "openrouter/deepseek/deepseek-r1";
+    if (adminModelConfig.claude && apiHealth.claude) return "claude-sonnet";
+    if (adminModelConfig.groq && apiHealth.groq) return "groq/llama-3.3-70b-versatile";
+    if (adminModelConfig.github && apiHealth.github) return "github/gpt-4o";
+
+    return requestedModel; // Last resort
+  }, [apiHealth, isModelAvailable, ALL_MODELS, aiSettings.language, showToast, adminModelConfig]);
+
+  const currentModel = ALL_MODELS.find(m => m.value === selectedModel) || ALL_MODELS[0];
+
+  const handleCanvasResizeStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    canvasResizeRef.current = { startX: e.clientX, startWidth: canvasWidth };
+    setIsResizingCanvas(true);
+  };
 
   // Close model picker / tools menu on click outside
   useEffect(() => {
@@ -2422,84 +2642,115 @@ export default function AIChatPage() {
     loadMemories();
   }, [loadMemories]);
 
-  // Load sessions from localStorage
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load folders from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("allquiz_ai_sessions");
+    const saved = localStorage.getItem("allquiz_ai_folders");
     if (saved) {
       try {
-        const parsed = JSON.parse(saved);
-        setSessions(parsed);
-        if (parsed.length > 0) {
-          setActiveSessionId(parsed[0].id);
-          setMessages(parsed[0].messages);
-        }
+        setFolders(JSON.parse(saved));
       } catch (e) {
-        console.error("Failed to load chat history", e);
+        console.error("Failed to load folders", e);
       }
     }
   }, []);
 
-  // Save sessions to localStorage (strip large base64 images to avoid QuotaExceededError)
+  // Save folders to localStorage
   useEffect(() => {
-    if (sessions.length > 0) {
+    localStorage.setItem("allquiz_ai_folders", JSON.stringify(folders));
+  }, [folders]);
+
+  // Load sessions from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem("allquiz_ai_sessions");
+    // Try other common keys for migration if empty
+    const backupKeys = ["ai_sessions", "chat_sessions", "chat_history"];
+    
+    let parsedData: ChatSession[] = [];
+    
+    if (saved) {
       try {
-        // Strip base64 image data from generated images before saving
-        const sessionsToSave = sessions.map(s => ({
-          ...s,
-          messages: s.messages.map(m => ({
-            ...m,
-            // Replace large base64 images with placeholder URLs
-            images: m.images?.map(img =>
-              img.length > 1000 ? `[image-placeholder-${img.slice(-20)}]` : img
-            ),
-            // Also limit file data size in saved messages
-            files: m.files?.map(f => ({
-              ...f,
-              data: f.data.length > 50000 ? `[file-too-large:${f.name}]` : f.data,
-            })),
-          })),
-        }));
-        localStorage.setItem("allquiz_ai_sessions", JSON.stringify(sessionsToSave));
+        parsedData = JSON.parse(saved);
       } catch (e) {
-        console.warn("Failed to save sessions to localStorage:", e);
-        // If still too large, try saving without file data at all
-        try {
-          const minimalSessions = sessions.map(s => ({
-            ...s,
-            messages: s.messages.map(m => ({
-              role: m.role,
-              content: m.content,
-              sources: m.sources,
-            })),
-          }));
-          localStorage.setItem("allquiz_ai_sessions", JSON.stringify(minimalSessions));
-        } catch {
-          console.error("Cannot save sessions - localStorage full");
+        console.error("Failed to load chat history", e);
+      }
+    }
+    
+    if (parsedData.length === 0) {
+      for (const key of backupKeys) {
+        const backup = localStorage.getItem(key);
+        if (backup) {
+          try {
+            const data = JSON.parse(backup);
+            if (Array.isArray(data) && data.length > 0) {
+              parsedData = data;
+              console.log(`Migrated sessions from ${key}`);
+              break;
+            }
+          } catch (e) {}
         }
       }
     }
-  }, [sessions]);
 
-  // Sync messages with active session
-  useEffect(() => {
-    if (activeSessionId) {
-      const session = sessions.find((s) => s.id === activeSessionId);
-      if (session) {
-        setMessages(session.messages);
-      }
-    } else {
-      setMessages([]);
+    if (parsedData.length > 0) {
+      setSessions(parsedData);
+      setActiveSessionId(parsedData[0].id);
     }
-  }, [activeSessionId, sessions]);
+    
+    setIsLoaded(true);
+  }, []);
 
-  const createNewSession = () => {
+  // Save sessions to localStorage (strip large base64 images to avoid QuotaExceededError)
+  useEffect(() => {
+    if (!isLoaded) return;
+    
+    try {
+      // Strip base64 image data from generated images before saving
+      const sessionsToSave = sessions.map(s => ({
+        ...s,
+        messages: s.messages.map(m => ({
+          ...m,
+          // Replace large base64 images with placeholder URLs
+          images: m.images?.map(img =>
+            img.length > 1000 ? `[image-placeholder-${img.slice(-20)}]` : img
+          ),
+          // Also limit file data size in saved messages
+          files: m.files?.map(f => ({
+            ...f,
+            data: f.data.length > 50000 ? `[file-too-large:${f.name}]` : f.data,
+          })),
+        })),
+      }));
+      localStorage.setItem("allquiz_ai_sessions", JSON.stringify(sessionsToSave));
+    } catch (e) {
+      console.warn("Failed to save sessions to localStorage:", e);
+      // If still too large, try saving without file data at all
+      try {
+        const minimalSessions = sessions.map(s => ({
+          ...s,
+          messages: s.messages.map(m => ({
+            role: m.role,
+            content: m.content,
+            sources: m.sources,
+          })),
+        }));
+        localStorage.setItem("allquiz_ai_sessions", JSON.stringify(minimalSessions));
+      } catch {
+        console.error("Cannot save sessions - localStorage full");
+      }
+    }
+  }, [sessions, isLoaded]);
+
+  const createNewSession = (folderId?: string) => {
     const now = Date.now();
     const newSession: ChatSession = {
       id: now.toString(),
-      title: "แชทใหม่",
+      title: aiSettings.language === "th" ? "แชทใหม่" : "New Chat",
       messages: [],
       createdAt: now,
       updatedAt: now,
+      folderId: folderId
     };
     setSessions((prev) => [newSession, ...prev]);
     setActiveSessionId(newSession.id);
@@ -2507,15 +2758,27 @@ export default function AIChatPage() {
 
   const deleteSession = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    const updated = sessions.filter((s) => s.id !== id);
-    setSessions(updated);
-    if (activeSessionId === id) {
-      if (updated.length > 0) {
-        setActiveSessionId(updated[0].id);
-      } else {
-        setActiveSessionId(null);
+    
+    askConfirm({
+      title: aiSettings.language === "th" ? "ยืนยันการลบแชท" : "Confirm Delete Chat",
+      message: aiSettings.language === "th" 
+        ? "คุณแน่ใจหรือไม่ว่าต้องการลบแชทนี้? ข้อมูลจะไม่สามารถกู้คืนได้" 
+        : "Are you sure you want to delete this chat? This action cannot be undone.",
+      confirmText: aiSettings.language === "th" ? "ลบแชท" : "Delete",
+      variant: "destructive",
+      onConfirm: () => {
+        const updated = sessions.filter((s) => s.id !== id);
+        setSessions(updated);
+        if (activeSessionId === id) {
+          if (updated.length > 0) {
+            setActiveSessionId(updated[0].id);
+          } else {
+            setActiveSessionId(null);
+          }
+        }
+        showToast(aiSettings.language === "th" ? "ลบแชทเรียบร้อยแล้ว" : "Chat deleted", "success");
       }
-    }
+    });
   };
 
   const renameSession = (id: string) => {
@@ -2535,23 +2798,73 @@ export default function AIChatPage() {
     setEditingTitle(session.title);
   };
 
-  const filteredSessions = sidebarSearch.trim()
-    ? sessions.filter(s =>
-        s.title.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
-        s.messages.some(m => m.content.toLowerCase().includes(sidebarSearch.toLowerCase()))
-      )
-    : sessions;
+  const filteredSessions = useMemo(() => {
+    const list = sidebarSearch.trim()
+      ? sessions.filter(s =>
+          s.title.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
+          s.messages.some(m => m.content.toLowerCase().includes(sidebarSearch.toLowerCase()))
+        )
+      : sessions;
 
-  const groupedSessions = groupSessionsByDate(filteredSessions);
+    // Sort: Newest/Most recently active first
+    return [...list].sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
+  }, [sessions, sidebarSearch]);
 
-  const scrollToBottom = useCallback(() => {
-    setTimeout(() => {
-      scrollRef.current?.scrollTo({
-        top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    }, 100);
+  const groupedSessions = useMemo(() => {
+    // Only group sessions NOT in a folder
+    const sessionsNotInFolders = filteredSessions.filter(s => !s.folderId);
+    return groupSessionsByDate(sessionsNotInFolders);
+  }, [filteredSessions]);
+
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const [isAtBottom, setIsAtBottom] = useState(true);
+  const isAtBottomRef = useRef(true);
+
+  // Keep ref in sync with state for use in callbacks
+  useEffect(() => {
+    isAtBottomRef.current = isAtBottom;
+  }, [isAtBottom]);
+
+  const scrollToBottom = useCallback((force = false) => {
+    if (force || isAtBottomRef.current) {
+      setTimeout(() => {
+        if (!scrollRef.current) return;
+        scrollRef.current.scrollTo({
+          top: scrollRef.current.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 100);
+    } else {
+      setShowScrollButton(true);
+    }
   }, []);
+
+  // Handle scroll events to show/hide button
+  const handleScroll = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
+    const atBottom = scrollHeight - scrollTop - clientHeight < 100;
+    
+    setIsAtBottom(prev => {
+      if (prev !== atBottom) return atBottom;
+      return prev;
+    });
+    
+    if (atBottom) {
+      setShowScrollButton(prev => {
+        if (prev !== false) return false;
+        return prev;
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener("scroll", handleScroll);
+      return () => el.removeEventListener("scroll", handleScroll);
+    }
+  }, [handleScroll]);
 
   useEffect(() => {
     scrollToBottom();
@@ -2567,15 +2880,24 @@ export default function AIChatPage() {
       const file = files[i];
       // Max 4MB per file
       if (file.size > 4 * 1024 * 1024) {
-        alert(`ไฟล์ ${file.name} ใหญ่เกินไป (สูงสุด 4MB)`);
+        showToast(
+          aiSettings.language === "th" 
+            ? `ไฟล์ ${file.name} ใหญ่เกินไป (สูงสุด 4MB)` 
+            : `File ${file.name} is too large (max 4MB)`, 
+          "error"
+        );
         continue;
       }
 
       if (attachments.length + newFiles.length >= 5) {
-        alert("อัปโหลดได้สูงสุด 5 ไฟล์ต่อครั้ง");
+        showToast(
+          aiSettings.language === "th" 
+            ? "อัปโหลดได้สูงสุด 5 ไฟล์ต่อครั้ง" 
+            : "You can upload up to 5 files at once", 
+          "warning"
+        );
         break;
       }
-
       const reader = new FileReader();
       const filePromise = new Promise<FileData>((resolve) => {
         reader.onloadend = () => {
@@ -2611,7 +2933,12 @@ export default function AIChatPage() {
     const SpeechRecognition = (window as unknown as { SpeechRecognition?: typeof window.SpeechRecognition; webkitSpeechRecognition?: typeof window.SpeechRecognition }).SpeechRecognition
       || (window as unknown as { webkitSpeechRecognition?: typeof window.SpeechRecognition }).webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert(aiSettings.language === "th" ? "เบราว์เซอร์ไม่รองรับการรับเสียง" : "Browser does not support speech recognition");
+      showToast(
+        aiSettings.language === "th" 
+          ? "เบราว์เซอร์ไม่รองรับการรับเสียง" 
+          : "Browser does not support speech recognition", 
+        "error"
+      );
       return;
     }
 
@@ -2649,7 +2976,7 @@ export default function AIChatPage() {
 
     recognition.start();
     setIsRecording(true);
-  }, [isRecording, aiSettings.language]);
+  }, [isRecording, aiSettings.language, showToast]);
 
   const sendMessage = async (text?: string) => {
     const msg = text || input.trim();
@@ -2658,7 +2985,7 @@ export default function AIChatPage() {
     if ((!msg && !hasAttachments) || loading) return;
 
     // Check quota client-side for better UX
-    if (quota && quota.usage >= quota.limit) {
+    if (quota && quota.usage >= quota.limit && isFreeModel(selectedModel)) {
       setShowQuotaPopup(true);
       return;
     }
@@ -2816,20 +3143,6 @@ export default function AIChatPage() {
 
               if (parsed.text) {
                 fullText += parsed.text;
-                
-                // --- ARTIFACT PARSING ---
-                const { artifact: parsedArtifact, isComplete: artComplete } = parseArtifacts(fullText);
-                if (parsedArtifact) {
-                  setActiveArtifact(prev => {
-                    // Keep existing version number if same content is streaming
-                    if (prev && prev.title === parsedArtifact.title) {
-                      return { ...parsedArtifact, id: prev.id, version: prev.version };
-                    }
-                    return parsedArtifact;
-                  });
-                  setIsArtifactComplete(artComplete);
-                  if (!isCanvasOpen) setIsCanvasOpen(true);
-                }
               }
 
               // Collect generated images
@@ -2853,29 +3166,53 @@ export default function AIChatPage() {
                 setGeneratingStatus(`กำลังอ่านข้อมูลจาก ${siteNames.join(", ")}...`);
                 setSearchingUrls(siteNames);
               }
-
-              // Update session with all collected data
-              setSessions((prev) => prev.map(s => {
-                if (s.id === currentSessionId) {
-                  const updatedMessages = [...s.messages];
-                  const lastMsg = updatedMessages[updatedMessages.length - 1];
-                  if (lastMsg && lastMsg.role === "assistant") {
-                    updatedMessages[updatedMessages.length - 1] = {
-                      ...lastMsg,
-                      content: fullText,
-                      images: collectedImages.length > 0 ? collectedImages : undefined,
-                      sources: collectedSources.length > 0 ? collectedSources : undefined,
-                    };
-                  }
-                  return { ...s, messages: updatedMessages };
-                }
-                return s;
-              }));
-              scrollToBottom();
             } catch {
               // skip
             }
           }
+        }
+
+        // --- BATCHED STATE UPDATES (Once per read chunk to prevent update depth errors) ---
+        if (fullText) {
+          // 1. Artifact Update
+          const { artifact: parsedArtifact, isComplete: artComplete } = parseArtifacts(fullText);
+          if (parsedArtifact) {
+            setActiveArtifact(prev => {
+              if (prev && prev.content === parsedArtifact.content && prev.id === parsedArtifact.id) return prev;
+              if (prev && prev.title === parsedArtifact.title) {
+                return { ...parsedArtifact, id: prev.id, version: prev.version };
+              }
+              return parsedArtifact;
+            });
+            setIsArtifactComplete(artComplete);
+            if (!isCanvasOpen) setIsCanvasOpen(true);
+          }
+
+          // 2. Sessions/Messages Update
+          setSessions((prev) => prev.map(s => {
+            if (s.id === currentSessionId) {
+              const updatedMessages = [...s.messages];
+              const lastMsg = updatedMessages[updatedMessages.length - 1];
+              if (lastMsg && lastMsg.role === "assistant") {
+                // Optimization: Skip update if content is identical
+                if (lastMsg.content === fullText && 
+                    lastMsg.images?.length === collectedImages.length && 
+                    lastMsg.sources?.length === collectedSources.length) {
+                  return s;
+                }
+                updatedMessages[updatedMessages.length - 1] = {
+                  ...lastMsg,
+                  content: fullText,
+                  images: collectedImages.length > 0 ? collectedImages : undefined,
+                  sources: collectedSources.length > 0 ? collectedSources : undefined,
+                };
+              }
+              return { ...s, messages: updatedMessages };
+            }
+            return s;
+          }));
+          
+          scrollToBottom();
         }
       }
 
@@ -2954,136 +3291,6 @@ export default function AIChatPage() {
     }
   };
 
-  const renderMarkdown = useCallback((text: string) => {
-    // 0. KaTeX: render math formulas before anything else
-    // Block math: $$...$$
-    const mathBlocks: string[] = [];
-    let processed = text.replace(/\$\$([\s\S]*?)\$\$/g, (_m, tex) => {
-      const idx = mathBlocks.length;
-      try {
-        mathBlocks.push(katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false, output: "html" }));
-      } catch {
-        mathBlocks.push(`<div class="text-red-500 text-sm font-mono">${tex}</div>`);
-      }
-      return `\x00MATH${idx}\x00`;
-    });
-
-    // Inline math: $...$  (but not $$)
-    processed = processed.replace(/(?<!\$)\$(?!\$)([^\n$]+?)\$(?!\$)/g, (_m, tex) => {
-      try {
-        return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false, output: "html" });
-      } catch {
-        return `<code class="text-red-500">${tex}</code>`;
-      }
-    });
-
-    // Also handle \( ... \) and \[ ... \] LaTeX delimiters
-    processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_m, tex) => {
-      const idx = mathBlocks.length;
-      try {
-        mathBlocks.push(katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false, output: "html" }));
-      } catch {
-        mathBlocks.push(`<div class="text-red-500 text-sm font-mono">${tex}</div>`);
-      }
-      return `\x00MATH${idx}\x00`;
-    });
-    processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_m, tex) => {
-      try {
-        return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false, output: "html" });
-      } catch {
-        return `<code class="text-red-500">${tex}</code>`;
-      }
-    });
-
-    // 1. Extract fenced code blocks — apply syntax highlighting
-    const codeBlocks: string[] = [];
-    // Match both complete (```) and incomplete (streaming) code blocks
-    processed = processed.replace(/```(\w*)\n([\s\S]*?)(?:```|$)/g, (_m, lang: string, code: string) => {
-      const idx = codeBlocks.length;
-      const trimmed = code.replace(/\n$/, "");
-      const langLower = (lang || "").toLowerCase();
-      const langLabel = langLower || "code";
-
-      // Syntax highlight
-      let highlighted: string;
-      if (langLower && hljs.getLanguage(langLower)) {
-        highlighted = hljs.highlight(trimmed, { language: langLower, ignoreIllegals: true }).value;
-      } else if (trimmed.length > 20) {
-        const auto = hljs.highlightAuto(trimmed);
-        highlighted = auto.value;
-      } else {
-        highlighted = trimmed.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      }
-
-      codeBlocks.push(
-        `<div class="aq-code my-3 rounded-xl overflow-hidden border border-gray-700/50 bg-[#1e1e2e] shadow-lg">` +
-        `<div class="flex items-center justify-between px-4 py-2 bg-[#181825] border-b border-gray-700/50">` +
-        `<div class="flex items-center gap-2"><div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-[#f38ba8]"></span><span class="w-3 h-3 rounded-full bg-[#f9e2af]"></span><span class="w-3 h-3 rounded-full bg-[#a6e3a1]"></span></div>` +
-        `<span class="text-[11px] text-gray-400 font-medium ml-2">${langLabel}</span></div>` +
-        `<button onclick="(function(b){var p=b.closest('.aq-code');var c=p&&p.querySelector('code');if(c){navigator.clipboard.writeText(c.textContent||'');b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><polyline points=\\'20 6 9 17 4 12\\'></polyline></svg> Copied';setTimeout(function(){b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><rect x=\\'9\\' y=\\'9\\' width=\\'13\\' height=\\'13\\' rx=\\'2\\' ry=\\'2\\'></rect><path d=\\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\\'></path></svg> Copy'},1500)}})(this)" class="flex items-center gap-1.5 text-gray-400 hover:text-gray-200 text-xs px-2.5 py-1 rounded-md hover:bg-white/10 transition-all"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button>` +
-        `</div>` +
-        `<pre class="p-4 text-[13px] leading-relaxed overflow-x-auto" style="word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap"><code class="hljs">${highlighted}</code></pre>` +
-        `</div>`
-      );
-      return `\x00CODE${idx}\x00`;
-    });
-
-    // 2. Parse tables
-    processed = processed.replace(
-      /(?:^|\n)((?:\|[^\n]+\|\s*\n){2,})/g,
-      (_m, tableBlock: string) => {
-        const rows = tableBlock.trim().split("\n").filter(r => r.trim());
-        if (rows.length < 2) return _m;
-        const isSep = (row: string) => /^\|[\s\-:]+(\|[\s\-:]+)+\|?\s*$/.test(row);
-        const hasSeparator = isSep(rows[1]);
-        const parseRow = (row: string) => row.split("|").slice(1, -1).map(c => c.trim());
-        let html = '\n<div class="my-3 overflow-x-auto rounded-xl border border-gray-200 shadow-sm"><table class="w-full text-sm border-collapse">';
-        const startIdx = hasSeparator ? 2 : 0;
-        if (hasSeparator) {
-          const headerCells = parseRow(rows[0]);
-          html += '<thead><tr class="bg-gradient-to-r from-gray-50 to-gray-100">';
-          for (const cell of headerCells) {
-            html += `<th class="px-4 py-2.5 text-left font-semibold text-gray-700 border-b-2 border-gray-200 text-xs uppercase tracking-wider">${cell}</th>`;
-          }
-          html += "</tr></thead>";
-        }
-        html += "<tbody>";
-        for (let i = startIdx; i < rows.length; i++) {
-          if (isSep(rows[i])) continue;
-          const cells = parseRow(rows[i]);
-          const stripe = (i - startIdx) % 2 === 1 ? " bg-gray-50/60" : "";
-          html += `<tr class="border-b border-gray-100 hover:bg-blue-50/40 transition-colors${stripe}">`;
-          for (const cell of cells) {
-            html += `<td class="px-4 py-2.5 text-gray-600">${cell}</td>`;
-          }
-          html += "</tr>";
-        }
-        html += "</tbody></table></div>\n";
-        return html;
-      }
-    );
-
-    // 3. Inline formatting
-    processed = processed
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      .replace(/`([^`]+)`/g, '<code class="bg-violet-50 text-violet-700 px-1.5 py-0.5 rounded-md text-[13px] font-mono border border-violet-200/50">$1</code>')
-      .replace(/^### (.*$)/gm, '<h3 class="font-bold text-base mt-3 mb-1">$1</h3>')
-      .replace(/^## (.*$)/gm, '<h2 class="font-bold text-lg mt-3 mb-1">$1</h2>')
-      .replace(/^# (.*$)/gm, '<h1 class="font-bold text-xl mt-3 mb-1">$1</h1>')
-      .replace(/^- (.*$)/gm, '<li class="ml-4 list-disc">$1</li>')
-      .replace(/^(\d+)\. (.*$)/gm, '<li class="ml-4 list-decimal">$1. $2</li>')
-      .replace(/✓/g, '<span class="text-emerald-600 font-bold">✓</span>')
-      .replace(/✗/g, '<span class="text-red-400">✗</span>')
-      .replace(/\n/g, "<br/>");
-
-    // 4. Restore code blocks and math blocks
-    processed = processed.replace(/\x00CODE(\d+)\x00/g, (_m, idx) => codeBlocks[Number(idx)]);
-    processed = processed.replace(/\x00MATH(\d+)\x00/g, (_m, idx) => mathBlocks[Number(idx)] || "");
-
-    return processed;
-  }, []);
-
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/user", { method: "DELETE" });
@@ -3149,9 +3356,20 @@ export default function AIChatPage() {
   };
 
   const handleClearHistory = () => {
-    setSessions([]);
-    setActiveSessionId(null);
-    localStorage.removeItem("allquiz_ai_sessions");
+    askConfirm({
+      title: aiSettings.language === "th" ? "ยืนยันการล้างประวัติ" : "Confirm Clear History",
+      message: aiSettings.language === "th" 
+        ? "คุณแน่ใจหรือไม่ว่าต้องการลบประวัติการแชททั้งหมด? ข้อมูลทั้งหมดจะถูกลบถาวรและไม่สามารถกู้คืนได้" 
+        : "Are you sure you want to clear all chat history? This will permanently delete all your chats and cannot be undone.",
+      confirmText: aiSettings.language === "th" ? "ล้างทั้งหมด" : "Clear All",
+      variant: "destructive",
+      onConfirm: () => {
+        setSessions([]);
+        setActiveSessionId(null);
+        localStorage.removeItem("allquiz_ai_sessions");
+        showToast(aiSettings.language === "th" ? "ล้างประวัติเรียบร้อยแล้ว" : "History cleared", "success");
+      }
+    });
   };
 
   const handleDownloadImage = useCallback((dataUrl: string, filename?: string) => {
@@ -3262,7 +3480,7 @@ export default function AIChatPage() {
           <h1 className="text-lg font-semibold text-foreground mb-1">Allquiz AI</h1>
           <p className="text-sm text-muted-foreground mb-6">
             เข้าสู่ระบบด้วย Google เพื่อใช้งาน AI Chat<br/>
-            <span className="text-xs">(จำกัด 20 ครั้งต่อบัญชี)</span>
+            <span className="text-xs">(จำกัด 100 ครั้งต่อวัน สำหรับบริการฟรี)</span>
           </p>
 
           <div className="flex flex-col items-center gap-3">
@@ -3285,70 +3503,230 @@ export default function AIChatPage() {
   }
 
   return (
-    <div className="flex h-[100dvh] md:h-[calc(100vh-64px)] bg-background overflow-hidden">
+    <div className="flex h-[100dvh] md:h-[calc(100vh-64px)] bg-[#fcfcfd]  overflow-hidden transition-colors duration-500">
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-20 md:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[40] md:hidden animate-in fade-in duration-300"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
+      
       {/* Sidebar */}
       <aside
         className={`${
-          isSidebarOpen ? "w-64" : "w-0"
-        } transition-all duration-200 border-r border-gray-200 bg-white flex flex-col h-full overflow-hidden z-30 ${
-          isSidebarOpen ? "fixed md:relative inset-y-0 left-0 shadow-xl md:shadow-none" : ""
+          isSidebarOpen ? "w-68" : "w-0"
+        } transition-all duration-300 border-r border-gray-200/50  bg-white  flex flex-col h-full overflow-hidden z-[45] ${
+          isSidebarOpen ? "fixed md:relative inset-y-0 left-0 shadow-2xl md:shadow-none" : ""
         }`}
       >
-        <div className="p-2 flex flex-col h-full w-64 shrink-0">
+        <div className="p-3 flex flex-col h-full w-68 shrink-0">
           {/* New Chat + Close */}
-          <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-2 mb-4">
             <Button
-              onClick={createNewSession}
+              onClick={() => createNewSession()}
               variant="outline"
-              className="flex-1 justify-start gap-2 h-9 text-sm"
+              className="flex-1 justify-start gap-2.5 h-10 text-sm rounded-xl border-gray-200  bg-gray-50/50  hover:bg-white  shadow-sm transition-all"
             >
-              <Plus className="h-4 w-4" />
-              แชทใหม่
+              <div className="p-1 rounded-lg bg-emerald-500 text-white">
+                <Plus className="h-3.5 w-3.5" />
+              </div>
+              <span className="font-semibold">{aiSettings.language === "th" ? "แชทใหม่" : "New Chat"}</span>
             </Button>
             <Button
-              variant="ghost"
+              onClick={createFolder}
+              variant="outline"
               size="icon"
-              className="h-9 w-9 shrink-0 text-muted-foreground"
-              onClick={() => setIsSidebarOpen(false)}
+              className="h-10 w-10 rounded-xl border-gray-200  text-muted-foreground hover:text-emerald-600 transition-all"
+              title={aiSettings.language === "th" ? "สร้างโฟลเดอร์" : "New Folder"}
             >
-              <PanelLeftClose className="h-4 w-4" />
+              <FolderPlus className="h-4 w-4" />
             </Button>
           </div>
 
           {/* Search */}
-          <div className="relative mb-2">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <div className="relative mb-4 group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground group-focus-within:text-emerald-500 transition-colors" />
             <input
               type="text"
               value={sidebarSearch}
               onChange={(e) => setSidebarSearch(e.target.value)}
-              placeholder="ค้นหา..."
-              className="w-full pl-8 pr-8 py-1.5 text-sm bg-transparent border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+              placeholder="ค้นหาบทสนทนา..."
+              className="w-full pl-9 pr-8 py-2 text-sm bg-gray-50/50  border border-gray-200  rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 text-foreground placeholder:text-muted-foreground transition-all"
             />
             {sidebarSearch && (
               <button
                 onClick={() => setSidebarSearch("")}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
               >
-                <X className="h-3 w-3" />
+                <XCircle className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
 
           {/* Session List */}
-          <div className="flex-1 overflow-y-auto space-y-0.5">
-            {filteredSessions.length === 0 ? (
+          <div className="flex-1 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+            {!sidebarSearch && folders.length > 0 && (
+              <div className="mb-4">
+                {folders.map(folder => (
+                  <div
+                    key={folder.id}
+                    className="mb-1"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setHoveredFolderId(folder.id);
+                    }}
+                    onDragLeave={() => setHoveredFolderId(null)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const sessionId = e.dataTransfer.getData("sessionId");
+                      if (sessionId) moveSessionToFolder(sessionId, folder.id);
+                      setHoveredFolderId(null);
+                    }}
+                  >
+                    <div
+                      className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer hover:bg-accent/50 group transition-colors ${
+                        hoveredFolderId === folder.id ? 'bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''
+                      }`}
+                      onClick={() => toggleFolder(folder.id)}
+                    >
+                      {folder.isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+                      <FolderIcon className={`h-3.5 w-3.5 ${folder.isOpen ? 'text-emerald-500' : 'text-muted-foreground'}`} />
+
+                      {editingFolderId === folder.id ? (
+                        <form
+                          className="flex-1 flex items-center gap-1"
+                          onSubmit={(e) => { e.preventDefault(); renameFolder(folder.id); }}
+                        >
+                          <input
+                            autoFocus
+                            value={editingFolderName}
+                            onChange={(e) => setEditingFolderName(e.target.value)}
+                            onBlur={() => renameFolder(folder.id)}
+                            onKeyDown={(e) => { if (e.key === "Escape") setEditingFolderId(null); }}
+                            className="flex-1 text-sm bg-transparent border-b border-ring focus:outline-none text-foreground py-0"
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <button type="submit" onClick={(e) => e.stopPropagation()} className="p-0.5 text-primary">
+                            <Check className="h-3.5 w-3.5" />
+                          </button>
+                        </form>
+                      ) : (
+                        <>
+                          <span className="text-sm flex-1 truncate font-medium">{folder.name}</span>
+                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={(e) => startEditingFolder(folder, e)}
+                              className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-md transition-all"
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); deleteFolder(folder.id, e); }}
+                              className="p-1 hover:text-destructive rounded-md transition-all"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {folder.isOpen && (
+                      <div className="ml-4 pl-2 border-l border-gray-100 space-y-0.5 mt-0.5">
+                        {sessions.filter(s => s.folderId === folder.id).map(s => (
+                          <div
+                            key={s.id}
+                            draggable
+                            onDragStart={(e) => {
+                              setDraggedSessionId(s.id);
+                              e.dataTransfer.setData("sessionId", s.id);
+                            }}
+                            onDragEnd={() => setDraggedSessionId(null)}
+                            onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+                            className={`group/item relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                              activeSessionId === s.id
+                                ? "bg-accent text-accent-foreground"
+                                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                            } ${draggedSessionId === s.id ? 'opacity-40' : ''}`}
+                          >
+                            <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+
+                            {editingSessionId === s.id ? (
+                              <form
+                                className="flex-1 flex items-center gap-1"
+                                onSubmit={(e) => { e.preventDefault(); renameSession(s.id); }}
+                              >
+                                <input
+                                  autoFocus
+                                  value={editingTitle}
+                                  onChange={(e) => setEditingTitle(e.target.value)}
+                                  onBlur={() => renameSession(s.id)}
+                                  onKeyDown={(e) => { if (e.key === "Escape") setEditingSessionId(null); }}
+                                  className="flex-1 text-sm bg-transparent border-b border-ring focus:outline-none text-foreground py-0"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <button type="submit" onClick={(e) => e.stopPropagation()} className="p-0.5 text-primary">
+                                  <Check className="h-3.5 w-3.5" />
+                                </button>
+                              </form>
+                            ) : (
+                              <>
+                                <span className="text-sm truncate block flex-1">{s.title}</span>
+                                <div className="relative flex items-center shrink-0">
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setOpenMenuId(openMenuId === s.id ? null : s.id);
+                                    }}
+                                    className={`p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-all ${openMenuId === s.id ? 'bg-accent text-foreground' : ''}`}
+                                  >
+                                    <MoreHorizontal className="h-3 w-3" />
+                                  </button>
+
+                                  {/* Sidebar Session Menu */}
+                                  {openMenuId === s.id && (
+                                    <div 
+                                      className="absolute top-full right-0 mt-1 z-[60] w-32 bg-white  border border-gray-200  rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-200"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <button onClick={(e) => { startEditing(s, e); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-600  hover:bg-gray-50  transition-colors">
+                                        <Pencil className="h-3 w-3" /> {aiSettings.language === "th" ? "เปลี่ยนชื่อ" : "Rename"}
+                                      </button>
+                                      <button onClick={(e) => { e.stopPropagation(); setMovingSession(s); setIsMoveModalOpen(true); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-600  hover:bg-gray-50  transition-colors">
+                                        <FolderInput className="h-3 w-3" /> {aiSettings.language === "th" ? "ย้าย" : "Move"}
+                                      </button>
+                                      <button onClick={(e) => { e.stopPropagation(); setSharingSession(s); setIsShareModalOpen(true); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-600  hover:bg-gray-50  transition-colors">
+                                        <Share2 className="h-3 w-3" /> {aiSettings.language === "th" ? "แชร์" : "Share"}
+                                      </button>
+                                      <div className="h-px bg-gray-100  my-1" />
+                                      <button onClick={(e) => { deleteSession(s.id, e); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-red-500 hover:bg-red-50  transition-colors">
+                                        <Trash2 className="h-3 w-3" /> {aiSettings.language === "th" ? "ลบ" : "Delete"}
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                        {sessions.filter(s => s.folderId === folder.id).length === 0 && (
+                          <div className="py-2 px-2 text-[11px] text-muted-foreground italic">
+                            {aiSettings.language === "th" ? "ว่างเปล่า (ลากแชทมาวางที่นี่)" : "Empty (drag sessions here)"}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {filteredSessions.length === 0 && folders.length === 0 ? (
               <div className="px-2 py-10 text-center text-muted-foreground">
                 <MessageSquare className="h-6 w-6 mx-auto mb-2 opacity-40" />
                 <p className="text-xs">
-                  {sidebarSearch ? "ไม่พบแชทที่ค้นหา" : "ยังไม่มีประวัติ"}
+                  {sidebarSearch ? (aiSettings.language === "th" ? "ไม่พบแชทที่ค้นหา" : "No chats found") : (aiSettings.language === "th" ? "ยังไม่มีประวัติ" : "No history yet")}
                 </p>
               </div>
             ) : (
@@ -3360,12 +3738,18 @@ export default function AIChatPage() {
                   {groupSessions.map((s) => (
                     <div
                       key={s.id}
+                      draggable
+                      onDragStart={(e) => {
+                        setDraggedSessionId(s.id);
+                        e.dataTransfer.setData("sessionId", s.id);
+                      }}
+                      onDragEnd={() => setDraggedSessionId(null)}
                       onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
                       className={`group/item relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
                         activeSessionId === s.id
                           ? "bg-accent text-accent-foreground"
                           : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                      }`}
+                      } ${draggedSessionId === s.id ? 'opacity-40' : ''}`}
                     >
                       <MessageSquare className="h-3.5 w-3.5 shrink-0" />
 
@@ -3392,19 +3776,38 @@ export default function AIChatPage() {
                           <div className="flex-1 min-w-0">
                             <span className="text-sm truncate block">{s.title}</span>
                           </div>
-                          <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0">
-                            <button
-                              onClick={(e) => startEditing(s, e)}
-                              className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-colors"
+                          <div className="relative flex items-center shrink-0">
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenMenuId(openMenuId === s.id ? null : s.id);
+                              }}
+                              className={`p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-all ${openMenuId === s.id ? 'bg-accent text-foreground' : ''}`}
                             >
-                              <Pencil className="h-3 w-3" />
+                              <MoreHorizontal className="h-3 w-3" />
                             </button>
-                            <button
-                              onClick={(e) => deleteSession(s.id, e)}
-                              className="p-1 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-sm transition-colors"
-                            >
-                              <Trash2 className="h-3 w-3" />
-                            </button>
+
+                            {/* Sidebar Session Menu */}
+                            {openMenuId === s.id && (
+                              <div 
+                                className="absolute top-full right-0 mt-1 z-[60] w-32 bg-white  border border-gray-200  rounded-lg shadow-xl py-1 animate-in fade-in slide-in-from-top-1 duration-200"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <button onClick={(e) => { startEditing(s, e); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-600  hover:bg-gray-50  transition-colors">
+                                  <Pencil className="h-3 w-3" /> {aiSettings.language === "th" ? "เปลี่ยนชื่อ" : "Rename"}
+                                </button>
+                                <button onClick={(e) => { e.stopPropagation(); setMovingSession(s); setIsMoveModalOpen(true); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-600  hover:bg-gray-50  transition-colors">
+                                  <FolderInput className="h-3 w-3" /> {aiSettings.language === "th" ? "ย้าย" : "Move"}
+                                </button>
+                                <button onClick={(e) => { e.stopPropagation(); setSharingSession(s); setIsShareModalOpen(true); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-gray-600  hover:bg-gray-50  transition-colors">
+                                  <Share2 className="h-3 w-3" /> {aiSettings.language === "th" ? "แชร์" : "Share"}
+                                </button>
+                                <div className="h-px bg-gray-100  my-1" />
+                                <button onClick={(e) => { deleteSession(s.id, e); setOpenMenuId(null); }} className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] text-red-500 hover:bg-red-50  transition-colors">
+                                  <Trash2 className="h-3 w-3" /> {aiSettings.language === "th" ? "ลบ" : "Delete"}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </>
                       )}
@@ -3427,7 +3830,7 @@ export default function AIChatPage() {
                     {quota.remaining}<span className="text-muted-foreground font-normal">/{quota.limit}</span>
                   </span>
                 </div>
-                <div className="w-full h-1.5 bg-gray-200 dark:bg-neutral-700 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-gray-200  rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
                       quota.remaining <= 3 ? "bg-red-500" : "bg-emerald-500"
@@ -3437,17 +3840,17 @@ export default function AIChatPage() {
                 </div>
               </div>
             )}
-            <div className="flex items-center gap-1">
+            <div className="flex flex-col gap-1">
               <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground px-2 py-1 flex-1 transition-colors"
+                onClick={() => { setSettingsTab("general"); setIsSettingsOpen(true); }}
+                className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-foreground px-2 py-1.5 rounded-lg hover:bg-gray-100  transition-all w-full"
               >
                 <Settings className="h-3 w-3" />
                 ตั้งค่า
               </button>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-destructive px-2 py-1 transition-colors"
+                className="flex items-center gap-1.5 text-[11px] text-muted-foreground hover:text-destructive px-2 py-1.5 rounded-lg hover:bg-red-50  transition-all w-full"
               >
                 <LogOut className="h-3 w-3" />
                 ออกจากระบบ
@@ -3469,59 +3872,74 @@ export default function AIChatPage() {
 
       {/* Main Content Area */}
       <div
-        className="flex-1 flex flex-col min-w-0 relative h-full"
+        className="flex-1 flex flex-col min-w-0 relative h-full bg-[#fcfcfd] "
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
       >
         {/* Drag overlay with blur */}
         {isDragging && (
-          <div className="absolute inset-0 z-50 backdrop-blur-sm bg-white/60 border-2 border-dashed border-primary/50 rounded-lg flex items-center justify-center pointer-events-none">
-            <div className="text-center bg-white/80 rounded-xl px-8 py-6 shadow-lg">
-              <Paperclip className="h-8 w-8 text-primary mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-900">วางไฟล์ที่นี่</p>
-              <p className="text-xs text-gray-500 mt-1">รองรับรูปภาพ, PDF, เอกสาร (สูงสุด 4MB)</p>
+          <div className="absolute inset-4 z-[100] backdrop-blur-md bg-emerald-500/10 border-4 border-dashed border-emerald-500/40 rounded-3xl flex items-center justify-center pointer-events-none animate-in fade-in zoom-in-95 duration-300">
+            <div className="text-center bg-white  rounded-3xl p-10 shadow-2xl border border-emerald-500/20">
+              <div className="w-20 h-20 bg-emerald-100  rounded-full flex items-center justify-center mx-auto mb-4">
+                <Paperclip className="h-10 w-10 text-emerald-600" />
+              </div>
+              <p className="text-xl font-bold text-gray-900 ">วางไฟล์เพื่ออัปโหลด</p>
+              <p className="text-sm text-gray-500 mt-2">รูปภาพ, PDF, หรือเอกสาร (สูงสุด 4MB)</p>
             </div>
           </div>
         )}
-        {/* Sidebar Toggle */}
-        {!isSidebarOpen && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute left-3 top-3 z-50 h-8 w-8"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <PanelLeft className="h-4 w-4" />
-          </Button>
-        )}
 
-        <main className="flex-1 overflow-hidden flex flex-col">
-          <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 py-6 scroll-smooth ${
+        {/* Sidebar Toggle - Visible when closed, or on desktop when open */}
+        <div className={`absolute left-4 top-4 z-[40] transition-all duration-300 ${isSidebarOpen ? 'md:opacity-100 opacity-0 pointer-events-none md:pointer-events-auto' : 'opacity-100'}`}>
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-xl bg-white/80  backdrop-blur-md border-gray-200/50  shadow-sm hover:shadow-md transition-all"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          >
+            {isSidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+          </Button>
+        </div>
+
+        <main className="flex-1 overflow-hidden flex flex-col relative">
+          <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 pt-16 pb-40 scroll-smooth custom-scrollbar ${
             aiSettings.fontSize === "small" ? "text-xs" : aiSettings.fontSize === "large" ? "text-base" : "text-sm"
           }`}>
-            <div className="max-w-2xl mx-auto flex flex-col gap-6 pb-8">
+            <div className="max-w-3xl mx-auto flex flex-col gap-6">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="h-12 w-12 mb-4 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
-                <Sparkles className="h-6 w-6" />
+            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
+              <div className="relative h-20 w-20 mb-8">
+                <div className="absolute inset-0 bg-emerald-500 rounded-3xl rotate-6 animate-pulse opacity-20" />
+                <div className="absolute inset-0 bg-emerald-500 rounded-3xl -rotate-3 transition-transform hover:rotate-0 duration-500 shadow-xl shadow-emerald-500/20 flex items-center justify-center text-white">
+                  <Sparkles className="h-10 w-10" />
+                </div>
               </div>
-              <h2 className="text-xl font-semibold text-foreground mb-1">
-                Allquiz AI
+              <h2 className="text-3xl font-black text-gray-900  mb-3 tracking-tight">
+                สวัสดี, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">{user.name.split(' ')[0]}</span>
               </h2>
-              <p className="text-sm text-muted-foreground max-w-xs mx-auto mb-8">
-                ถามหรือส่งรูปข้อสอบเพื่อให้ AI ช่วยวิเคราะห์
+              <p className="text-base text-gray-500  max-w-sm mx-auto mb-12 font-medium">
+                ฉันคือผู้ช่วย AI ส่วนตัวของคุณ พร้อมตอบคำถามและวิเคราะห์ข้อมูลทุกรูปแบบ
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-lg">
-                {SUGGESTIONS.map((s) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl px-4">
+                {SUGGESTIONS.map((s, idx) => (
                   <button
                     key={s}
-                    disabled={!!(quota && quota.usage >= quota.limit)}
+                    disabled={!!(quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
                     onClick={() => s.includes("📷") ? fileInputRef.current?.click() : sendMessage(s)}
-                    className="group text-left px-3 py-2.5 rounded-md border border-gray-200 hover:bg-accent/50 transition-colors disabled:opacity-50"
+                    className="group text-left p-4 rounded-2xl border border-gray-200/60  bg-white  hover:bg-emerald-50  hover:border-emerald-200  transition-all shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{ animationDelay: `${idx * 100}ms` }}
                   >
-                    <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors">{s}</span>
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-gray-50  group-hover:bg-white  text-gray-400 group-hover:text-emerald-500 transition-colors">
+                        {s.includes("📝") ? <ClipboardList className="h-4 w-4" /> : 
+                         s.includes("📚") ? <GraduationCap className="h-4 w-4" /> :
+                         s.includes("📷") ? <Image className="h-4 w-4" /> :
+                         <MessageCircle className="h-4 w-4" />}
+                      </div>
+                      <span className="text-sm font-semibold text-gray-600  group-hover:text-gray-900  transition-colors">{s}</span>
+                    </div>
                   </button>
                 ))}
               </div>
@@ -3531,534 +3949,463 @@ export default function AIChatPage() {
           {messages.map((m, i) => (
             <div
               key={i}
-              className={`flex group ${
-                m.role === "user" ? "flex-row-reverse" : "flex-row"
-              } gap-3 w-full`}
+              className={`flex w-full animate-in fade-in slide-in-from-bottom-2 duration-500 ${
+                m.role === "user" ? "justify-end" : "justify-start"
+              }`}
             >
-              <div className="shrink-0 pt-0.5">
-                {m.role === "assistant" ? (
-                  <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-primary-foreground">
-                    <Zap className="h-4 w-4" />
-                  </div>
-                ) : (
-                  <div className="h-8 w-8 rounded-md overflow-hidden border border-gray-200">
-                    {user ? (
-                      <img src={user.picture} alt="" className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full bg-muted flex items-center justify-center"><User className="h-4 w-4 text-muted-foreground" /></div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className={`flex flex-col max-w-[85%] sm:max-w-[80%] min-w-0 ${m.role === "user" ? "items-end" : "items-start"}`}>
-                <div
-                  className={`px-3 py-2 rounded-lg text-sm overflow-hidden break-words ${
-                    m.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
-                  }`}
-                >
-                  {m.files && m.files.length > 0 && (
-                    <div className="mb-2 flex flex-wrap gap-1.5">
-                      {m.files.map((file, idx) => (
-                        <div key={idx} className="relative rounded-md overflow-hidden border border-gray-200">
-                          {file.type.startsWith("image/") ? (
-                            <img src={file.data} alt={file.name} className="h-20 w-20 object-cover" />
-                          ) : (
-                            <div className="h-20 w-20 flex flex-col items-center justify-center p-1.5 text-center bg-muted">
-                              <FileText className="h-6 w-6 text-muted-foreground mb-0.5" />
-                              <span className="text-[9px] line-clamp-2 break-all text-muted-foreground">{file.name}</span>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
+              <div className={`flex gap-3 w-full max-w-[95%] sm:max-w-[85%] ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                <div className="shrink-0 pt-1">
                   {m.role === "assistant" ? (
-                    m.content ? (
-                      (() => {
-                        const { thinking, answer: rawAnswer } = parseThinking(m.content);
-                        // Strip <canvas> tags from chat display — content shows in Canvas panel
-                        const { cleanedContent: answer, artifact: msgArtifact } = parseArtifacts(rawAnswer);
-                        const isStreaming = loading && i === messages.length - 1;
-                        const isStillThinking = isStreaming && !m.content.includes("</think>");
-                        const isWebSearching = isStreaming && activeTool === "webSearch";
-                        // Hide thinking for flash/small models — their thinking is too shallow to be useful
-                        const isProModel = selectedModel.includes("pro") || selectedModel.includes("opus") || selectedModel.includes("3.1");
-                        const isAutoMaybeFlash = selectedModel === "auto" && thinking && thinking.split("\n").filter(l => l.trim()).length <= 2;
-                        const showThinking = isProModel || (selectedModel === "auto" && !isAutoMaybeFlash);
-                        return (
-                          <div className="w-full overflow-hidden text-left">
-                            {showThinking && (thinking || isStillThinking) && (
-                              <ThinkingBlock
-                                thinking={thinking}
-                                isStreaming={isStillThinking}
-                                status={generatingStatus}
-                              />
-                            )}
-                            {answer && (
-                              <div
-                                className="text-sm leading-relaxed prose prose-sm dark:prose-invert prose-p:my-1 prose-headings:my-2 w-full max-w-none text-left"
-                                dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.replace(/\*\(Artifact generated in Canvas\)\*/g, "")) }}
-                              />
-                            )}
-                            {/* Open Canvas button */}
-                            {msgArtifact && (
-                              <button
-                                onClick={() => {
-                                  setActiveArtifact(msgArtifact);
-                                  setIsArtifactComplete(true);
-                                  setIsCanvasOpen(true);
-                                }}
-                                className="mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 hover:border-gray-300 shadow-sm transition-all text-sm text-gray-700 group"
-                              >
-                                <div className="p-1 rounded-md bg-emerald-50 group-hover:bg-emerald-100 transition-colors">
-                                  <SquarePen className="h-3.5 w-3.5 text-emerald-600" />
-                                </div>
-                                <span className="font-medium">{msgArtifact.title}</span>
-                                <span className="text-[10px] text-gray-400 uppercase">{msgArtifact.type}</span>
-                              </button>
-                            )}
-                            {/* Generated images */}
-                            {m.images && m.images.length > 0 && (
-                              <div className="mt-3 flex flex-wrap gap-3">
-                                {m.images.map((img, imgIdx) => (
-                                  <div key={imgIdx} className="relative group rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-lg transition-all duration-200">
-                                    <img
-                                      src={img}
-                                      alt={`Generated ${imgIdx + 1}`}
-                                      className="w-full max-w-[240px] sm:max-w-sm max-h-56 sm:max-h-72 object-contain cursor-pointer"
-                                      onClick={() => setPreviewImage(img)}
-                                    />
-                                    <div className="absolute bottom-0 left-0 right-0 flex gap-1 p-2 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                      <button
-                                        onClick={(e) => { e.stopPropagation(); setPreviewImage(img); }}
-                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg bg-white/90 hover:bg-white text-gray-800 text-xs font-medium transition-colors"
-                                      >
-                                        <Search className="h-3 w-3" />
-                                        {aiSettings.language === "th" ? "ดูรูป" : "Preview"}
-                                      </button>
-                                      <button
-                                        onClick={(e) => { e.stopPropagation(); handleDownloadImage(img, `generated-image-${imgIdx + 1}.png`); }}
-                                        className="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg bg-white/90 hover:bg-white text-gray-800 text-xs font-medium transition-colors"
-                                      >
-                                        <Download className="h-3 w-3" />
-                                        {aiSettings.language === "th" ? "ดาวน์โหลด" : "Download"}
-                                      </button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {/* Search sources */}
-                            {m.sources && m.sources.length > 0 && (
-                              <div className="mt-3 border-t border-gray-100 pt-2">
-                                <p className="text-[11px] font-medium text-gray-500 mb-1.5 flex items-center gap-1">
-                                  <Globe className="h-3 w-3" />
-                                  {aiSettings.language === "th" ? "แหล่งอ้างอิง" : "Sources"}
-                                </p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {m.sources.map((src, srcIdx) => (
-                                    <a key={srcIdx} href={src.url} target="_blank" rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-gray-50 hover:bg-gray-100 text-[11px] text-gray-600 hover:text-gray-900 transition-colors border border-gray-100">
-                                      <ExternalLink className="h-2.5 w-2.5" />
-                                      <span className="max-w-[180px] truncate">{src.title}</span>
-                                    </a>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()
-                    ) : (
-                      <div className="flex items-center gap-2 py-1">
-                        {activeTool === "generateImage" ? (
-                          <div className="flex flex-col items-center gap-2 py-3 px-6">
-                            <div className="relative h-10 w-10">
-                              <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-violet-400 to-pink-400 animate-pulse" />
-                              <div className="absolute inset-1 rounded-md bg-white flex items-center justify-center">
-                                <Image className="h-5 w-5 text-violet-500" />
-                              </div>
-                            </div>
-                            <span className="text-xs text-muted-foreground">{generatingStatus}</span>
-                          </div>
-                        ) : activeTool === "webSearch" ? (
-                          <div className="flex flex-col gap-1.5 py-1 min-w-[200px]">
-                            <div className="flex items-center gap-2">
-                              <Globe className="h-3.5 w-3.5 animate-pulse text-blue-500 shrink-0" />
-                              <span className="text-sm text-muted-foreground">{generatingStatus}</span>
-                            </div>
-                            {searchingUrls.length > 0 && (
-                              <div className="flex flex-wrap gap-1 ml-5">
-                                {searchingUrls.map((url, idx) => (
-                                  <span key={idx} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-50 text-[10px] text-blue-600">
-                                    <Globe className="h-2.5 w-2.5" />
-                                    {url}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        ) : (
-                          <>
-                            <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground" />
-                            <span className="text-sm text-muted-foreground">{generatingStatus}</span>
-                          </>
-                        )}
-                      </div>
-                    )
+                    <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+                      <Zap className="h-4 w-4" />
+                    </div>
                   ) : (
-                    <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
+                    <div className="h-8 w-8 rounded-xl overflow-hidden border-2 border-white  shadow-md">
+                      {user ? (
+                        <img src={user.picture} alt="" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full bg-muted flex items-center justify-center"><User className="h-4 w-4 text-muted-foreground" /></div>
+                      )}
+                    </div>
                   )}
                 </div>
 
-                {/* Message action toolbar */}
-                {!loading && m.content && (
-                  <div className={`flex items-center gap-0.5 mt-1 ${m.role === "user" ? "mr-1 flex-row-reverse" : "ml-1"} opacity-0 group-hover:opacity-100 transition-opacity`}>
-                    {/* Copy */}
-                    <button
-                      onClick={() => copyMessage(m.content, i)}
-                      className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
-                      title={aiSettings.language === "th" ? "คัดลอก" : "Copy"}
-                    >
-                      {copiedIndex === i ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-                    </button>
+                <div className={`flex flex-col min-w-0 ${m.role === "user" ? "items-end" : "items-start"} flex-1`}>
+                  <div
+                    className={`relative w-fit max-w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border flex items-center min-h-[44px] ${
+                      m.role === "user"
+                        ? "bg-emerald-600 text-white border-emerald-500 px-5 py-2.5"
+                        : "bg-white  border-gray-100  px-5 py-3.5"
+                    }`}
+                  >
+                    <div className="w-full">
+                      {m.files && m.files.length > 0 && (
+                        <div className="mb-4 flex flex-wrap gap-2">
+                          {m.files.map((file, idx) => (
+                            <div key={idx} className="relative group rounded-xl overflow-hidden border border-white/20  shadow-md">
+                              {file.type.startsWith("image/") ? (
+                                <img src={file.data} alt={file.name} className="h-28 w-28 object-cover transition-transform group-hover:scale-110 duration-500" />
+                              ) : (
+                                <div className="h-28 w-28 flex flex-col items-center justify-center p-3 text-center bg-gray-50/50  backdrop-blur-sm">
+                                  <div className="p-2 rounded-xl bg-white/30  mb-2">
+                                    <FileText className="h-6 w-6 text-emerald-500" />
+                                  </div>
+                                  <span className="text-[9px] font-bold line-clamp-2 break-all text-gray-500  uppercase tracking-tighter">{file.name}</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
 
-                    {/* Retry (assistant) / Edit (user) */}
-                    {m.role === "assistant" ? (
-                      <button
-                        onClick={() => retryMessage(i)}
-                        className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
-                        title={aiSettings.language === "th" ? "ลองอีกครั้ง" : "Retry"}
-                      >
-                        <RotateCcw className="h-3.5 w-3.5" />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => editMessage(i)}
-                        className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors"
-                        title={aiSettings.language === "th" ? "แก้ไข" : "Edit"}
-                      >
-                        <SquarePen className="h-3.5 w-3.5" />
-                      </button>
-                    )}
+                      {m.role === "assistant" ? (
+                        m.content ? (
+                          (() => {
+                            const { thinking, answer: rawAnswer } = parseThinking(m.content);
+                            const { cleanedContent: answer, artifact: msgArtifact } = parseArtifacts(rawAnswer);
+                            const isStreaming = loading && i === messages.length - 1;
+                            const isStillThinking = isStreaming && !m.content.includes("</think>");
+                            const isProModel = selectedModel.includes("pro") || selectedModel.includes("opus") || selectedModel.includes("3.1");
+                            const isAutoMaybeFlash = selectedModel === "auto" && thinking && thinking.split("\n").filter(l => l.trim()).length <= 2;
+                            const showThinking = isProModel || (selectedModel === "auto" && !isAutoMaybeFlash);
 
-                    {/* Thumbs (assistant only) */}
-                    {m.role === "assistant" && (
-                      <>
-                        <button className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors" title={aiSettings.language === "th" ? "ดี" : "Good"}>
-                          <ThumbsUp className="h-3.5 w-3.5" />
-                        </button>
-                        <button className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-gray-100 transition-colors" title={aiSettings.language === "th" ? "ไม่ดี" : "Bad"}>
-                          <ThumbsDown className="h-3.5 w-3.5" />
-                        </button>
-                      </>
-                    )}
+                            return (
+                              <div className="w-full relative z-10 text-left">
+                                {showThinking && (thinking || isStillThinking) && (
+                                  <ThinkingBlock
+                                    thinking={thinking}
+                                    isStreaming={isStillThinking}
+                                    status={generatingStatus}
+                                  />
+                                )}
+                                {answer && (
+                                  <div
+                                    className="text-[15px] leading-relaxed prose prose-neutral  prose-p:my-2 prose-headings:font-black prose-a:text-emerald-500 prose-strong:text-emerald-600  w-full max-w-none transition-all duration-300"
+                                    dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.replace(/\*\(Artifact generated in Canvas\)\*/g, "")) }}
+                                  />
+                                )}
+
+                                {/* Open Canvas card */}
+                                {msgArtifact && (
+                                  <div className="mt-4 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col sm:flex-row items-center gap-4 animate-in slide-in-from-left-2 duration-500">
+                                    <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0">
+                                      {msgArtifact.type === 'code' ? <Code2 className="h-6 w-6" /> : <FileText className="h-6 w-6" />}
+                                    </div>
+                                    <div className="flex-1 min-w-0 text-center sm:text-left">
+                                      <h4 className="font-bold text-gray-900  truncate">{msgArtifact.title}</h4>
+                                      <p className="text-xs text-emerald-600  font-bold uppercase tracking-widest">{msgArtifact.type} artifact</p>
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        setActiveArtifact(msgArtifact);
+                                        setIsArtifactComplete(true);
+                                        setIsCanvasOpen(true);
+                                      }}
+                                      className="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/10 active:scale-95 whitespace-nowrap"
+                                    >
+                                      เปิดในหน้าต่างเสริม
+                                    </button>
+                                  </div>
+                                )}
+
+                                {/* Generated images card */}
+                                {m.images && m.images.length > 0 && (
+                                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    {m.images.map((img, imgIdx) => (
+                                      <div key={imgIdx} className="relative group rounded-2xl overflow-hidden border border-gray-200/50  shadow-lg transition-all hover:scale-[1.02] duration-500">
+                                        <img
+                                          src={img}
+                                          alt={`Generated ${imgIdx + 1}`}
+                                          className="w-full aspect-square object-cover cursor-pointer"
+                                          onClick={() => setPreviewImage(img)}
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 backdrop-blur-[2px] transition-all flex items-center justify-center gap-3">
+                                          <button onClick={() => setPreviewImage(img)} className="p-3 rounded-full bg-white text-gray-900 hover:scale-110 transition-transform"><Maximize2 className="h-5 w-5" /></button>
+                                          <button onClick={() => handleDownloadImage(img)} className="p-3 rounded-full bg-white text-gray-900 hover:scale-110 transition-transform"><Download className="h-5 w-5" /></button>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+
+                                {/* Search sources bar */}
+                                {m.sources && m.sources.length > 0 && (
+                                  <div className="mt-6 pt-4 border-t border-gray-100/50 ">
+                                    <div className="flex items-center gap-2 mb-3">
+                                      <Globe className="h-3.5 w-3.5 text-blue-500" />
+                                      <span className="text-[10px] font-black text-gray-400  uppercase tracking-widest">ข้อมูลอ้างอิงจากเว็บไซต์</span>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      {m.sources.map((src, srcIdx) => (
+                                        <a key={srcIdx} href={src.url} target="_blank" rel="noopener noreferrer"
+                                          className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-gray-100/50  hover:bg-emerald-50  text-xs font-medium text-gray-600  hover:text-emerald-600 transition-all border border-transparent hover:border-emerald-200/50">
+                                          <img src={`https://www.google.com/s2/favicons?domain=${new URL(src.url).hostname}&sz=16`} alt="" className="w-3.5 h-3.5 opacity-70" />
+                                          <span className="max-w-[150px] truncate">{src.title}</span>
+                                        </a>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })()
+                        ) : (
+                          <div className="flex items-center gap-4 py-2">
+                            <div className="relative">
+                              <div className="h-10 w-10 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                                <Loader2 className="h-5 w-5 text-emerald-500 animate-spin" />
+                              </div>
+                              <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-500 rounded-full animate-ping" />
+                            </div>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-sm font-bold text-gray-900 ">{generatingStatus}</span>
+                              {activeTool === "webSearch" && searchingUrls.length > 0 && (
+                                <div className="flex items-center gap-1.5 overflow-hidden">
+                                  {searchingUrls.map((url, idx) => (
+                                    <span key={idx} className="text-[10px] text-blue-500 bg-blue-50  px-1.5 rounded uppercase font-bold animate-in fade-in slide-in-from-left-2">{url}</span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      ) : (
+                        <p className="whitespace-pre-wrap leading-relaxed font-medium">{m.content}</p>
+                      )}
+                    </div>
                   </div>
-                )}
+
+                  {/* Message action toolbar */}
+                  {!loading && m.content && (
+                    <div className={`flex items-center gap-1.5 mt-1.5 transition-all px-1 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                      <button
+                        onClick={() => {
+                          copyMessage(m.content, i);
+                          showToast(aiSettings.language === "th" ? "คัดลอกแล้ว" : "Copied", "success");
+                        }}
+                        className={`p-1.5 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100  transition-all`}
+                        title="คัดลอก"
+                      >
+                        {copiedIndex === i ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
+                      </button>
+
+                      {m.role === "assistant" && (
+                        <>
+                          <button
+                            onClick={() => handleSpeak(m.content, i)}
+                            className={`p-1.5 rounded-lg transition-all ${speakingIndex === i ? "text-emerald-500 bg-emerald-50" : "text-gray-400 hover:text-gray-900 hover:bg-gray-100 "}`}
+                            title="อ่านออกเสียง"
+                          >
+                            {speakingIndex === i ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+                          </button>
+                        </>
+                      )}
+
+                      {/* Edit Button - Show only for the LATEST user message in the history */}
+                      {m.role === "user" && i === messages.findLastIndex(msg => msg.role === "user") && (
+                        <button
+                          onClick={() => editMessage(i)}
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100  transition-all"
+                          title="แก้ไขข้อความ"
+                        >
+                          <SquarePen className="h-3.5 w-3.5" />
+                          <span className="text-[10px] font-bold">แก้ไข</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}
-        </div>
-      </div>
 
-        </main>
+          {/* Skeleton Loader when generating initial response */}
+          {loading && messages.length > 0 && messages[messages.length-1].role === "user" && (
+            <MessageSkeleton />
+          )}
+          </div>
+          </div>
 
-        {/* Input Area */}
-        <div className="border-t border-gray-200 bg-background px-4 py-3 shrink-0">
-          <div className="max-w-2xl mx-auto">
-            <div className="border border-gray-200 rounded-lg bg-background focus-within:ring-1 focus-within:ring-ring transition-shadow">
+          {/* Bottom Gradient Overlay */}
+          <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#fcfcfd] via-[#fcfcfd]/80 to-transparent    pointer-events-none z-30" />
+          </main>
+
+        {/* Floating Modern Input Area */}
+        <div className="absolute bottom-6 left-0 right-0 z-40 px-4 md:px-8 pointer-events-none">
+          <div className="max-w-3xl mx-auto relative group pointer-events-auto">
+            {/* Blur background behind input - Adjusted for softer glow */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-400/10 to-teal-400/10 rounded-3xl blur-2xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-500" />
+            
+            <div className="relative bg-white/95  border border-emerald-500/20  rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all focus-within:ring-4 focus-within:ring-emerald-500/5">
+              
               {attachments.length > 0 && (
-                <div className="px-3 pt-2.5 pb-1 border-b border-gray-200">
-                  <div className="flex flex-wrap gap-1.5">
-                    {attachments.map((file, idx) => (
-                      <div key={idx} className="relative group/file shrink-0">
-                        {file.type.startsWith("image/") ? (
-                          <img src={file.data} className="h-12 w-12 object-cover rounded-md border border-gray-200" />
-                        ) : (
-                          <div className="h-12 w-auto min-w-[48px] max-w-[120px] bg-muted rounded-md border border-gray-200 flex items-center gap-1.5 px-2 py-1">
-                            <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
-                            <span className="text-[10px] line-clamp-2 break-all text-muted-foreground">{file.name}</span>
-                          </div>
-                        )}
-                        <button
-                          onClick={() => removeAttachment(idx)}
-                          className="absolute -top-1 -right-1 h-4 w-4 bg-foreground text-background rounded-full flex items-center justify-center opacity-0 group-hover/file:opacity-100 transition-opacity"
-                        >
-                          <X className="h-2.5 w-2.5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  e.target.style.height = "auto";
-                  e.target.style.height = `${Math.min(e.target.scrollHeight, 200)}px`;
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey && aiSettings.sendWithEnter) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
-                }}
-                onPaste={handlePaste}
-                placeholder="ส่งข้อความ หรือวางรูปภาพ..."
-                rows={1}
-                className="w-full px-3 py-2.5 bg-transparent text-sm focus:outline-none resize-none min-h-[36px] max-h-[200px] text-foreground placeholder:text-muted-foreground"
-              />
-
-              {/* Active tool indicator */}
-              {activeTool !== "none" && (
-                <div className="flex items-center gap-1.5 px-3 pb-1">
-                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                    activeTool === "webSearch" ? "bg-blue-50 text-blue-700"
-                    : activeTool === "canvas" ? "bg-emerald-50 text-emerald-700"
-                    : "bg-violet-50 text-violet-700"
-                  }`}>
-                    {activeTool === "webSearch" ? <Globe className="h-3 w-3" />
-                      : activeTool === "canvas" ? <SquarePen className="h-3 w-3" />
-                      : <Image className="h-3 w-3" />}
-                    {activeTool === "webSearch"
-                      ? (aiSettings.language === "th" ? "ค้นหาเว็บ" : "Web search")
-                      : activeTool === "canvas"
-                      ? "Canvas"
-                      : (aiSettings.language === "th" ? "สร้างรูปภาพ" : "Image generation")
-                    }
-                    <button onClick={() => { setActiveTool("none"); if (activeTool === "canvas") setIsCanvasOpen(false); }} className="ml-0.5 hover:opacity-70">
-                      <X className="h-2.5 w-2.5" />
-                    </button>
-                  </span>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between px-2 pb-2">
-                <div className="flex items-center gap-0.5">
-                  {/* Tools Menu (+ button) */}
-                  <div className="relative" ref={toolsMenuRef}>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-7 w-7 text-muted-foreground"
-                      onClick={() => setIsToolsMenuOpen(!isToolsMenuOpen)}
-                      disabled={loading || !!(quota && quota.usage >= quota.limit)}
-                    >
-                      <Plus className={`h-4 w-4 transition-transform duration-200 ${isToolsMenuOpen ? "rotate-45" : ""}`} />
-                    </Button>
-
-                    {isToolsMenuOpen && (
-                      <div className="absolute bottom-full left-0 mb-1.5 w-52 sm:w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-1.5 z-50 max-h-[60vh] overflow-y-auto">
-                        <button
-                          onClick={() => { fileInputRef.current?.click(); setIsToolsMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
-                        >
-                          <Paperclip className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-900">{aiSettings.language === "th" ? "เพิ่มรูปภาพและไฟล์" : "Add images & files"}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTool(activeTool === "generateImage" ? "none" : "generateImage");
-                            setIsToolsMenuOpen(false);
-                            inputRef.current?.focus();
-                          }}
-                          className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${activeTool === "generateImage" ? "bg-violet-50 text-violet-700" : "hover:bg-gray-50"}`}
-                        >
-                          <Image className={`h-4 w-4 ${activeTool === "generateImage" ? "text-violet-500" : "text-gray-500"}`} />
-                          <span className="text-sm flex-1">{aiSettings.language === "th" ? "สร้างรูปภาพ" : "Generate image"}</span>
-                          {activeTool === "generateImage" && <Check className="h-3.5 w-3.5 text-violet-500" />}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTool(activeTool === "canvas" ? "none" : "canvas");
-                            setIsToolsMenuOpen(false);
-                            inputRef.current?.focus();
-                          }}
-                          className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${activeTool === "canvas" ? "bg-emerald-50 text-emerald-700" : "hover:bg-gray-50"}`}
-                        >
-                          <SquarePen className={`h-4 w-4 ${activeTool === "canvas" ? "text-emerald-500" : "text-gray-500"}`} />
-                          <span className="text-sm flex-1">Canvas</span>
-                          {activeTool === "canvas" && <Check className="h-3.5 w-3.5 text-emerald-500" />}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTool(activeTool === "webSearch" ? "none" : "webSearch");
-                            setIsToolsMenuOpen(false);
-                            inputRef.current?.focus();
-                          }}
-                          className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-colors ${activeTool === "webSearch" ? "bg-blue-50 text-blue-700" : "hover:bg-gray-50"}`}
-                        >
-                          <Globe className={`h-4 w-4 ${activeTool === "webSearch" ? "text-blue-500" : "text-gray-500"}`} />
-                          <span className="text-sm flex-1">{aiSettings.language === "th" ? "ค้นหาเว็บ" : "Web search"}</span>
-                          {activeTool === "webSearch" && <Check className="h-3.5 w-3.5 text-blue-500" />}
-                        </button>
-                        <div className="border-t border-gray-100 my-1" />
-                        <button
-                          onClick={() => {
-                            setInput(aiSettings.language === "th" ? "สรุปเนื้อหาวิชา " : "Summarize subject ");
-                            setIsToolsMenuOpen(false);
-                            inputRef.current?.focus();
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
-                        >
-                          <GraduationCap className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-900">{aiSettings.language === "th" ? "ศึกษาและเรียนรู้" : "Study & learn"}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setInput(aiSettings.language === "th" ? "สร้างแบบทดสอบจากเนื้อหา: " : "Create quiz from: ");
-                            setIsToolsMenuOpen(false);
-                            inputRef.current?.focus();
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
-                        >
-                          <ClipboardList className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-900">{aiSettings.language === "th" ? "แบบทดสอบ" : "Quiz"}</span>
-                        </button>
-                        <button
-                          onClick={() => {
-                            setActiveTool(activeTool === "webSearch" ? "none" : "webSearch");
-                            setInput(aiSettings.language === "th" ? "หาข้อมูลเชิงลึกเกี่ยวกับ: " : "Deep research about: ");
-                            setIsToolsMenuOpen(false);
-                            inputRef.current?.focus();
-                          }}
-                          className="w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-gray-50 transition-colors"
-                        >
-                          <SearchIcon className="h-4 w-4 text-gray-500" />
-                          <span className="text-sm text-gray-900">{aiSettings.language === "th" ? "การหาข้อมูลเชิงลึก" : "Deep research"}</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="h-4 w-px bg-gray-200 mx-1" />
-
-                  <div className="relative" ref={modelPickerRef}>
-                    <button
-                      onClick={() => setIsModelPickerOpen(!isModelPickerOpen)}
-                      className="flex items-center gap-1.5 h-7 px-2 rounded-md text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-                    >
-                      {currentModel.icon}
-                      <span>{currentModel.label}</span>
-                      <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${isModelPickerOpen ? "rotate-180" : ""}`} />
-                    </button>
-
-                    {isModelPickerOpen && (
-                      <div className="absolute bottom-full left-0 mb-1.5 w-44 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
-                        <div className="px-2 py-1">
-                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Model</span>
+                <div className="px-6 pt-4 pb-2 border-b border-gray-100  flex flex-wrap gap-2 animate-in slide-in-from-bottom-2 duration-300 overflow-hidden rounded-t-2xl">
+                  {attachments.map((file, idx) => (
+                    <div key={idx} className="relative group/file shrink-0 transition-transform hover:scale-105">
+                      {file.type.startsWith("image/") ? (
+                        <img src={file.data} className="h-12 w-12 object-cover rounded-xl border border-emerald-100  shadow-sm" />
+                      ) : (
+                        <div className="h-12 min-w-[48px] px-3 bg-emerald-50/50  rounded-xl border border-emerald-100  flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-emerald-500" />
+                          <span className="text-[9px] font-bold text-gray-500 max-w-[70px] truncate">{file.name}</span>
                         </div>
-                        {MODEL_OPTIONS.map((model) => {
-                          const available = isModelAvailable(model.value);
-                          const cost = quota?.pricing?.[model.value] ?? (model.value === "auto" ? 0 : undefined);
-                          const hasCredits = cost === undefined || cost === 0 || (quota?.credits ?? 0) >= cost;
-                          const canUse = available && hasCredits;
-                          return (
-                            <button
-                              key={model.value}
-                              onClick={() => { if (canUse) { setSelectedModel(model.value); setIsModelPickerOpen(false); } }}
-                              disabled={!canUse}
-                              className={`w-full flex items-center gap-2 px-2 py-1.5 text-left transition-colors ${
-                                !canUse ? "opacity-40 cursor-not-allowed" :
-                                selectedModel === model.value ? "bg-gray-100" : "hover:bg-gray-50"
-                              }`}
-                            >
-                              {model.icon}
-                              <span className="text-xs flex-1 text-gray-900">{model.label}</span>
-                              {!available ? (
-                                <span className="text-[9px] text-red-400 font-medium">ไม่พร้อม</span>
-                              ) : cost !== undefined && cost > 0 ? (
-                                <span className={`text-[9px] font-semibold tabular-nums ${hasCredits ? "text-amber-500" : "text-red-400"}`}>
-                                  {cost}cr
-                                </span>
-                              ) : cost === 0 ? (
-                                <span className="text-[9px] text-emerald-500 font-medium">FREE</span>
-                              ) : (
-                                <span className="text-[10px] text-muted-foreground">{model.desc}</span>
-                              )}
-                              {selectedModel === model.value && canUse && <Check className="h-3 w-3 text-primary" />}
-                            </button>
-                          );
-                        })}
+                      )}
+                      <button
+                        onClick={() => removeAttachment(idx)}
+                        className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white rounded-full flex items-center justify-center shadow-lg transform transition-transform active:scale-90"
+                      >
+                        <X className="h-2.5 w-2.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex flex-col">
+                {/* Tool info bar - Anchored to the top inner edge */}
+                {activeTool !== "none" && (
+                  <div className="px-4 pt-2 pb-1">
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                      activeTool === "webSearch" ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" :
+                      activeTool === "canvas" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" :
+                      "bg-violet-500 text-white shadow-lg shadow-violet-500/20"
+                    }`}>
+                      {activeTool === "webSearch" ? <Globe className="h-3 w-3" /> :
+                       activeTool === "canvas" ? <SquarePen className="h-3 w-3" /> : <Image className="h-3 w-3" />}
+                      {activeTool === "webSearch" ? "WEB SEARCH" : activeTool === "canvas" ? "CANVAS MODE" : "GENERATE IMAGE"}
+                      <button onClick={() => setActiveTool("none")} className="ml-1 hover:scale-125 transition-transform"><X className="h-2.5 w-2.5" /></button>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 p-2 sm:p-3">
+                  {/* Model Picker Trigger */}
+                  <div className="relative shrink-0 self-end mb-0.5">
+                    <button
+                      onClick={() => {
+                        setIsModelPickerOpen(!isModelPickerOpen);
+                        if (!isModelPickerOpen) setIsToolsMenuOpen(false);
+                      }}
+                      className={`h-10 w-10 rounded-xl flex items-center justify-center transition-all border ${
+                        isModelPickerOpen 
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" 
+                          : "bg-emerald-500/5  text-emerald-500 border-emerald-500/10 hover:bg-emerald-500/10 "
+                      }`}
+                      title="เลือกโมเดล AI"
+                    >
+                      <div className="relative">
+                        {currentModel.icon}
+                        <ChevronDown className={`absolute -bottom-1 -right-2 h-2.5 w-2.5 transition-transform duration-300 ${isModelPickerOpen ? 'rotate-180' : ''}`} />
+                      </div>
+                    </button>
+
+                    {/* Model Picker Popover */}
+                    {isModelPickerOpen && (
+                      <div className="absolute bottom-full left-0 mb-4 w-64 bg-white  border border-emerald-500/10  rounded-2xl shadow-xl z-50 overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-300">
+                        <div className="p-2 max-h-[50vh] overflow-y-auto custom-scrollbar">
+                          <div className="px-4 py-3 border-b border-gray-100  mb-2">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Select AI Model</span>
+                          </div>
+                          {MODEL_CATEGORIES.map((category) => (
+                            <div key={category.name} className="mb-4">
+                              <div className="px-4 py-1.5">
+                                <span className="text-[10px] font-black text-emerald-500/70 uppercase tracking-widest">{category.name}</span>
+                              </div>
+                              <div className="space-y-1">
+                                {category.models.map((model) => {
+                                  const available = isModelAvailable(model.value);
+                                  const cost = quota?.pricing?.[model.value];
+                                  const isAuto = model.value === "auto";
+                                  return (
+                                    <button
+                                      key={model.value}
+                                      disabled={!available}
+                                      onClick={() => { setSelectedModel(model.value); setIsModelPickerOpen(false); }}
+                                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
+                                        !available ? "opacity-30 grayscale cursor-not-allowed" :
+                                        selectedModel === model.value 
+                                          ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" 
+                                          : isAuto 
+                                            ? "bg-emerald-50/50  hover:bg-emerald-100  text-emerald-700 "
+                                            : "hover:bg-gray-100  text-gray-600 "
+                                      }`}
+                                    >
+                                      <div className={`p-2 rounded-lg ${selectedModel === model.value ? 'bg-white/20' : 'bg-white  shadow-sm'}`}>
+                                        {model.icon}
+                                      </div>
+                                      <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-sm font-bold truncate">{model.label}</span>
+                                          {cost !== undefined && <span className="text-[9px] opacity-70 font-black tracking-tighter">{cost}CR</span>}
+                                        </div>
+                                        <p className={`text-[10px] truncate ${selectedModel === model.value ? 'text-white/70' : 'text-gray-400'}`}>{model.desc}</p>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
-                </div>
 
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={toggleMic}
-                    className={`h-7 w-7 rounded-full flex items-center justify-center transition-colors ${isRecording ? "bg-red-500 text-white animate-pulse" : "text-gray-400 hover:text-gray-600 hover:bg-gray-100"}`}
-                    title={isRecording ? (aiSettings.language === "th" ? "หยุดฟัง" : "Stop listening") : (aiSettings.language === "th" ? "พูดข้อความ" : "Voice input")}
-                  >
-                    {isRecording ? <MicOff className="h-3.5 w-3.5" /> : <Mic className="h-3.5 w-3.5" />}
-                  </button>
-                  <Button
-                    size="icon"
-                    className="h-7 w-7 rounded-full"
-                    onClick={() => sendMessage()}
-                    disabled={(!input.trim() && attachments.length === 0) || loading || !!(quota && quota.usage >= quota.limit)}
-                  >
-                    {loading ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <ArrowUp className="h-3.5 w-3.5" />
+                  <div className="flex-1 relative flex items-center">
+                    <textarea
+                      ref={inputRef}
+                      value={input}
+                      disabled={!!(quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
+                      onChange={(e) => {
+                        setInput(e.target.value);
+                        e.target.style.height = "auto";
+                        e.target.style.height = `${Math.min(e.target.scrollHeight, 250)}px`;
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey && aiSettings.sendWithEnter) {
+                          e.preventDefault();
+                          sendMessage();
+                        }
+                      }}
+                      onPaste={handlePaste}
+                      placeholder={quota && quota.usage >= quota.limit && isFreeModel(selectedModel) 
+                        ? (aiSettings.language === "th" ? "โควตาฟรีวันนี้เต็มแล้ว..." : "Free quota reached for today...")
+                        : (aiSettings.language === "th" ? "ถามอะไรก็ได้..." : "Ask anything...")}
+                      className="w-full bg-transparent border-none focus:ring-0 outline-none text-[15px] py-2 px-1 min-h-[40px] max-h-[250px] resize-none text-gray-800  placeholder:text-gray-400  font-medium disabled:opacity-50"
+                      rows={1}
+                    />
+                    {input && (
+                      <button 
+                        onClick={() => { setInput(""); if (inputRef.current) { inputRef.current.style.height = "40px"; inputRef.current.focus(); } }}
+                        className="absolute right-1 p-1.5 rounded-lg text-gray-400 hover:text-gray-600  hover:bg-gray-100  transition-all"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
                     )}
-                  </Button>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 self-end mb-0.5">
+                    <button
+                      onClick={() => {
+                        setIsToolsMenuOpen(!isToolsMenuOpen);
+                        if (!isToolsMenuOpen) setIsModelPickerOpen(false);
+                      }}
+                      className={`h-10 w-10 rounded-xl flex items-center justify-center transition-all border ${
+                        isToolsMenuOpen 
+                          ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" 
+                          : "bg-gray-100  border-transparent text-gray-500 hover:bg-gray-200 "
+                      }`}
+                      title="เครื่องมือเพิ่มเติม"
+                    >
+                      <Plus className={`h-5 w-5 transition-transform duration-500 ${isToolsMenuOpen ? 'rotate-45' : ''}`} />
+                    </button>
+
+                    <button
+                      onClick={() => sendMessage()}
+                      disabled={loading || (!input.trim() && attachments.length === 0) || (!!quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
+                      className="h-10 w-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-100  text-white font-bold transition-all shadow-lg shadow-emerald-500/20 active:scale-90 flex items-center justify-center shrink-0"
+                    >
+                      {loading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                      ) : (
+                        <ArrowUp className="h-5 w-5" />
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <p className="text-[10px] text-center text-muted-foreground mt-2">
-              Allquiz AI can make mistakes. Check important info.
+              {/* Floating Tools Menu - Refined with Rounded Rectangle */}
+              {isToolsMenuOpen && (
+                <div className="absolute bottom-full right-0 mb-4 w-72 bg-white  border border-emerald-500/10  rounded-2xl shadow-xl p-3 z-50 animate-in slide-in-from-bottom-6 zoom-in-95 duration-300">
+                  <div className="grid grid-cols-2 gap-2">
+                    <button onClick={() => { fileInputRef.current?.click(); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-emerald-500/5  transition-all group">
+                      <div className="p-3 rounded-xl bg-gray-100  group-hover:bg-emerald-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-500/25 transition-all"><Paperclip className="h-5 w-5" /></div>
+                      <span className="text-[9px] font-black text-gray-400 group-hover:text-emerald-500 uppercase tracking-widest transition-colors">Upload</span>
+                    </button>
+                    <button onClick={() => { setActiveTool('webSearch'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-blue-500/5  transition-all group">
+                      <div className={`p-3 rounded-xl transition-all ${activeTool === 'webSearch' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25' : 'bg-gray-100  group-hover:bg-blue-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-500/25'}`}><Globe className="h-5 w-5" /></div>
+                      <span className="text-[9px] font-black text-gray-400 group-hover:text-blue-500 uppercase tracking-widest transition-colors">Search</span>
+                    </button>
+                    <button onClick={() => { setActiveTool('generateImage'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-violet-500/5  transition-all group">
+                      <div className={`p-3 rounded-xl transition-all ${activeTool === 'generateImage' ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/25' : 'bg-gray-100  group-hover:bg-violet-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-violet-500/25'}`}><Image className="h-5 w-5" /></div>
+                      <span className="text-[9px] font-black text-gray-400 group-hover:text-violet-500 uppercase tracking-widest transition-colors">Image</span>
+                    </button>
+                    <button onClick={() => { setActiveTool('canvas'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-emerald-500/5  transition-all group">
+                      <div className={`p-3 rounded-xl transition-all ${activeTool === 'canvas' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25' : 'bg-gray-100  group-hover:bg-emerald-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-500/25'}`}><SquarePen className="h-5 w-5" /></div>
+                      <span className="text-[9px] font-black text-gray-400 group-hover:text-emerald-500 uppercase tracking-widest transition-colors">Canvas</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Disclaimer */}
+            <p className="mt-4 text-[10px] text-center text-muted-foreground/60 px-4 font-medium uppercase tracking-widest">
+              {aiSettings.language === "th" 
+                ? "AI อาจให้ข้อมูลที่ไม่ถูกต้อง โปรดตรวจสอบข้อมูลสำคัญเสมอ" 
+                : "AI can make mistakes. Check important info."}
             </p>
           </div>
         </div>
       </div>
 
-      {/* Canvas Side Panel */}
+      {/* Canvas / Artifacts Panel */}
       {isCanvasOpen && activeArtifact && (
         <div
-          className="h-full flex-shrink-0 hidden md:flex relative"
-          style={{ width: canvasWidth }}
+          className="fixed md:relative inset-y-0 right-0 z-[100] md:z-auto w-full border-l border-gray-200  bg-white  flex flex-col transition-all duration-500 animate-in slide-in-from-right-full"
+          style={{ width: window.innerWidth < 768 ? "100%" : canvasWidth }}
         >
-          {/* Resize handle */}
+          {/* Desktop resize handle */}
           <div
-            className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 group hover:bg-primary/20 active:bg-primary/30 transition-colors"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              canvasResizeRef.current = { startX: e.clientX, startWidth: canvasWidth };
-              setIsResizingCanvas(true);
-            }}
-          >
-            <div className="absolute left-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 group-hover:bg-primary/50 transition-colors" />
-          </div>
-          <div className="flex-1 border-l border-gray-200 overflow-hidden">
-            <CanvasView
-              artifact={activeArtifact}
-              versions={artifactVersions}
-              onSelectVersion={(v) => setActiveArtifact(v)}
-              isOpen={isCanvasOpen}
-              isComplete={isArtifactComplete}
-              onClose={() => { setIsCanvasOpen(false); setActiveArtifact(null); }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Canvas Mobile Full-Screen */}
-      {isCanvasOpen && activeArtifact && (
-        <div className="fixed inset-0 z-[80] bg-white md:hidden">
+            onMouseDown={handleCanvasResizeStart}
+            className="hidden md:block absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-emerald-500/20 active:bg-emerald-500 transition-colors z-50"
+          />
+          
           <CanvasView
             artifact={activeArtifact}
+            versions={artifactVersions}
+            onSelectVersion={(v) => setActiveArtifact(v)}
             isOpen={isCanvasOpen}
             isComplete={isArtifactComplete}
             onClose={() => { setIsCanvasOpen(false); setActiveArtifact(null); }}
@@ -4081,6 +4428,9 @@ export default function AIChatPage() {
         sessions={sessions}
         memories={memories}
         onMemoriesChange={loadMemories}
+        adminModelConfig={adminModelConfig}
+        onAdminModelConfigChange={(newConfig) => setAdminModelConfig(newConfig)}
+        initialTab={settingsTab}
       />
 
       {/* Quota Exceeded Popup */}
@@ -4105,23 +4455,23 @@ export default function AIChatPage() {
 
       {/* Image Preview Modal */}
       {previewImage && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        <div 
+          className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-xl animate-in fade-in duration-300"
           onClick={() => setPreviewImage(null)}
         >
-          <div className="relative max-w-[90vw] max-h-[90vh] flex flex-col items-center gap-3" onClick={(e) => e.stopPropagation()}>
-            <img
-              src={previewImage}
-              alt="Preview"
-              className="max-w-full max-h-[80vh] object-contain rounded-xl shadow-2xl"
+          <div className="relative max-w-5xl w-full h-full p-4 flex flex-col items-center justify-center" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={previewImage} 
+              alt="Preview" 
+              className="max-w-full max-h-full object-contain rounded-xl shadow-2xl animate-in zoom-in-95 duration-500" 
             />
-            <div className="flex items-center gap-2">
-              <button
+            <div className="absolute top-6 right-6 flex gap-3">
+              <button 
                 onClick={() => handleDownloadImage(previewImage)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white hover:bg-gray-100 text-gray-800 text-sm font-medium shadow-lg transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white text-sm font-medium shadow-lg transition-colors"
               >
                 <Download className="h-4 w-4" />
-                {aiSettings.language === "th" ? "ดาวน์โหลดรูปภาพ" : "Download Image"}
+                {aiSettings.language === "th" ? "ดาวน์โหลด" : "Download"}
               </button>
               <button
                 onClick={() => setPreviewImage(null)}
@@ -4134,6 +4484,344 @@ export default function AIChatPage() {
           </div>
         </div>
       )}
+
+      {/* Move to Folder Modal */}
+      {isMoveModalOpen && movingSession && (
+        <MoveToFolderModal
+          session={movingSession}
+          folders={folders}
+          onMove={(folderId) => {
+            moveSessionToFolder(movingSession.id, folderId);
+            setIsMoveModalOpen(false);
+            setMovingSession(null);
+          }}
+          onClose={() => {
+            setIsMoveModalOpen(false);
+            setMovingSession(null);
+          }}
+          lang={aiSettings.language}
+        />
+      )}
+
+      {/* Share Modal */}
+      {isShareModalOpen && sharingSession && (
+        <ShareModal
+          session={sharingSession}
+          onClose={() => {
+            setIsShareModalOpen(false);
+            setSharingSession(null);
+          }}
+          lang={aiSettings.language}
+        />
+      )}
+
+      {/* Confirm Dialog */}
+      {confirmDialog && (
+        <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 overflow-hidden animate-in zoom-in-95">
+            <div className="p-5">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{confirmDialog.title}</h3>
+              <p className="text-sm text-gray-500 leading-relaxed">{confirmDialog.message}</p>
+            </div>
+            <div className="flex items-center justify-end gap-2 px-5 py-4 bg-gray-50 border-t border-gray-100">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setConfirmDialog(null)}
+              >
+                {confirmDialog.cancelText || (aiSettings.language === "th" ? "ยกเลิก" : "Cancel")}
+              </Button>
+              <Button
+                variant={confirmDialog.variant === "destructive" ? "destructive" : "default"}
+                size="sm"
+                onClick={() => {
+                  confirmDialog.onConfirm();
+                  setConfirmDialog(null);
+                }}
+              >
+                {confirmDialog.confirmText || (aiSettings.language === "th" ? "ตกลง" : "Confirm")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MoveToFolderModal({
+  session,
+  folders,
+  onMove,
+  onClose,
+  lang
+}: {
+  session: ChatSession;
+  folders: Folder[];
+  onMove: (folderId: string | null) => void;
+  onClose: () => void;
+  lang: string;
+}) {
+  return (
+    <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-sm mx-4 overflow-hidden animate-in zoom-in-95">
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900">
+            {lang === "th" ? "ย้ายเข้าโฟลเดอร์" : "Move to Folder"}
+          </h3>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+        <div className="p-2 max-h-[300px] overflow-y-auto">
+          <button
+            onClick={() => onMove(null)}
+            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+              !session.folderId ? "bg-accent text-accent-foreground font-medium" : "hover:bg-gray-50 text-gray-600"
+            }`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">
+              <MessageSquare className="h-4 w-4" />
+            </div>
+            <div className="flex-1 text-left">
+              <div className="font-medium">{lang === "th" ? "ไม่อยู่ในโฟลเดอร์" : "No Folder"}</div>
+            </div>
+          </button>
+
+          {folders.map(folder => (
+            <button
+              key={folder.id}
+              onClick={() => onMove(folder.id)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors mt-1 ${
+                session.folderId === folder.id ? "bg-emerald-50 text-emerald-700 font-medium ring-1 ring-emerald-200/50" : "hover:bg-gray-50 text-gray-600"
+              }`}
+            >
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                session.folderId === folder.id ? "bg-emerald-100 text-emerald-600" : "bg-gray-100 text-gray-500"
+              }`}>
+                <FolderIcon className="h-4 w-4" />
+              </div>
+              <div className="flex-1 text-left">
+                <div className="font-medium truncate">{folder.name}</div>
+                <div className="text-[11px] opacity-60">{folder.sessionIds.length} {lang === "th" ? "รายการ" : "items"}</div>
+              </div>
+            </button>
+          ))}
+        </div>
+        <div className="p-3 bg-gray-50 border-t border-gray-100 flex justify-end">
+          <Button variant="ghost" size="sm" onClick={onClose}>
+            {lang === "th" ? "ยกเลิก" : "Cancel"}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShareModal({
+  session,
+  onClose,
+  lang
+}: {
+  session: ChatSession;
+  onClose: () => void;
+  lang: string;
+}) {
+  const [days, setDays] = useState(7);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareExpiration, setShareExpiration] = useState<number | null>(null);
+
+  useEffect(() => {
+    const saved = localStorage.getItem(`share_url_${session.id}`);
+    const savedExp = localStorage.getItem(`share_exp_${session.id}`);
+    if (saved) setShareUrl(saved);
+    if (savedExp) setShareExpiration(Number(savedExp));
+  }, [session.id]);
+
+  const createShareLink = async (update = false) => {
+    if (update) setIsUpdating(true);
+    else setIsGenerating(true);
+
+    try {
+      const res = await fetch("/api/ai/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          session: session,
+          expiresInDays: days === 0 ? -1 : days
+        })
+      });
+
+      const data = await res.json();
+      if (data.url) {
+        const fullUrl = `${window.location.origin}${data.url}`;
+        setShareUrl(fullUrl);
+        
+        // Calculate expiration date for UI display
+        let expDate: number | null = null;
+        if (days > 0) {
+          expDate = Date.now() + (days * 24 * 60 * 60 * 1000);
+          setShareExpiration(expDate);
+          localStorage.setItem(`share_exp_${session.id}`, expDate.toString());
+        } else {
+          setShareExpiration(null);
+          localStorage.removeItem(`share_exp_${session.id}`);
+        }
+        
+        localStorage.setItem(`share_url_${session.id}`, fullUrl);
+      }
+    } catch (e) {
+      console.error("Share failed", e);
+    } finally {
+      setIsGenerating(false);
+      setIsUpdating(false);
+    }
+  };
+
+  const copyToClipboard = () => {
+    if (shareUrl) {
+      navigator.clipboard.writeText(shareUrl);
+      // Could add a small toast here if available in this scope
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[160] flex items-center justify-center bg-black/40 backdrop-blur-[2px] animate-in fade-in">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 overflow-hidden animate-in zoom-in-95 duration-200">
+        <div className="p-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+              <Share2 className="h-4 w-4" />
+            </div>
+            <h3 className="font-bold text-gray-900">
+              {lang === "th" ? "แชร์การสนทนา" : "Share Conversation"}
+            </h3>
+          </div>
+          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="p-6">
+          {!shareUrl ? (
+            <div className="space-y-6">
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 block">
+                  {lang === "th" ? "ระยะเวลาหมดอายุ" : "Expiration Period"}
+                </label>
+                <div className="grid grid-cols-4 gap-2">
+                  {[0, 1, 7, 30].map((d) => (
+                    <button
+                      key={d}
+                      onClick={() => setDays(d)}
+                      className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                        days === d
+                          ? "bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-100"
+                          : "bg-white border-gray-200 text-gray-500 hover:border-emerald-200 hover:bg-emerald-50"
+                      }`}
+                    >
+                      {d === 0 ? (lang === "th" ? "ไม่มี" : "Never") : `${d}${lang === "th" ? " วัน" : "d"}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-4 bg-amber-50 rounded-xl border border-amber-100 flex gap-3">
+                <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  {lang === "th"
+                    ? "ชื่อและข้อความของคุณจะเปิดเผยต่อสาธารณะสำหรับทุกคนที่มีลิงก์ โปรดตรวจสอบว่าไม่มีข้อมูลส่วนตัวที่สำคัญ"
+                    : "Your name and messages will be public to anyone with the link. Please ensure no sensitive information is included."}
+                </p>
+              </div>
+
+              <Button
+                onClick={() => createShareLink()}
+                disabled={isGenerating}
+                className="w-full h-11 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-lg shadow-emerald-100 transition-all"
+              >
+                {isGenerating ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Share2 className="h-4 w-4 mr-2" />
+                )}
+                {lang === "th" ? "สร้างลิงก์แชร์" : "Create Share Link"}
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-6 animate-in fade-in zoom-in-95 duration-300">
+              <div>
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">
+                  {lang === "th" ? "ลิงก์แชร์ปัจจุบัน" : "Current Share Link"}
+                </label>
+                <div className="bg-gray-50 p-1.5 rounded-xl border border-gray-200 flex items-center gap-2 group focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
+                  <input
+                    readOnly
+                    value={shareUrl}
+                    className="bg-transparent text-xs flex-1 outline-none text-gray-600 font-medium px-2"
+                  />
+                  <button
+                    onClick={copyToClipboard}
+                    className="p-2.5 bg-white hover:bg-emerald-50 text-gray-500 hover:text-emerald-600 rounded-lg border border-gray-200 hover:border-emerald-200 shadow-sm transition-all"
+                    title={lang === "th" ? "คัดลอก" : "Copy"}
+                  >
+                    <Copy className="h-4 w-4" />
+                  </button>
+                </div>
+                {shareExpiration && (
+                  <p className="text-[10px] text-gray-400 mt-2 flex items-center gap-1 px-1">
+                    <Calendar className="h-3 w-3" />
+                    {lang === "th" ? "หมดอายุวันที่: " : "Expires on: "}
+                    {new Date(shareExpiration).toLocaleDateString(lang === "th" ? "th-TH" : "en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <Button
+                  onClick={() => createShareLink(true)}
+                  disabled={isUpdating}
+                  variant="outline"
+                  className="w-full h-10 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-700 font-bold transition-all"
+                >
+                  {isUpdating ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                  )}
+                  {lang === "th" ? "อัปเดตเนื้อหาลิงก์เดิม" : "Update Current Link Content"}
+                </Button>
+                
+                <Button
+                  onClick={() => {
+                    localStorage.removeItem(`share_url_${session.id}`);
+                    setShareUrl(null);
+                  }}
+                  variant="ghost"
+                  className="w-full h-10 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-50 font-bold transition-all"
+                >
+                  <XCircle className="h-4 w-4 mr-2" />
+                  {lang === "th" ? "ยกเลิกลิงก์แชร์" : "Delete Share Link"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 bg-gray-50 border-t border-gray-100 flex justify-center">
+          <p className="text-[10px] text-gray-400 font-medium">
+            {lang === "th" ? "จัดการความเป็นส่วนตัวได้ที่หน้าตั้งค่า" : "Manage privacy settings in configuration"}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
