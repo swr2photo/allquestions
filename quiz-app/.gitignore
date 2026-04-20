@@ -44,3 +44,10 @@ next-env.d.ts
 data/sessions.json
 data/admin-data.json
 
+# npm cache
+npm-cache/
+.npm/
+
+# logs
+*.log
+
