@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { toast } from "sonner";
 import CanvasView from "./components/CanvasView";
 import { parseArtifacts } from "./utils/canvasParser";
 import { Artifact } from "./types/canvas";
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import hljs from "highlight.js/lib/core";
@@ -60,23 +59,14 @@ import {
   Database,
   Download,
   AlertTriangle,
-  Type,
   MessageCircle,
   Image,
   GraduationCap,
   ClipboardList,
-  SearchIcon,
   MoreHorizontal,
   Copy,
-  RotateCcw,
-  ThumbsUp,
-  ThumbsDown,
-  ExternalLink,
   SquarePen,
   Brain,
-  Mic,
-  MicOff,
-  ArrowUpRight,
   Folder as FolderIcon,
   FolderPlus,
   FolderInput,
@@ -759,14 +749,12 @@ function QuotaExceededPopup({
 function CreditNeededPopup({
   needed,
   have,
-  model,
   onClose,
   onOpenSettings,
   lang,
 }: {
   needed: number;
   have: number;
-  model: string;
   onClose: () => void;
   onOpenSettings: () => void;
   lang: string;
