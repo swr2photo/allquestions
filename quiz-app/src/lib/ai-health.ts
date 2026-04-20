@@ -14,7 +14,7 @@ export interface ProviderDetail {
   checkedAt: number;           // timestamp ms
 }
 
-interface HealthResult {
+export interface HealthResult {
   gemini: boolean;
   claude: boolean;
   openrouter: boolean;

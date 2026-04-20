@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     const lastMsg = truncatedMessages[truncatedMessages.length - 1]?.content || "";
     const isComplex = truncatedMessages.length > 8 || lastMsg.length > 400 || canvasMode;
     modelToUse = pickAutoModel(
-      health as Record<string, boolean>, 
+      health, 
       isComplex, 
       !!openRouterApiKey, 
       !!geminiApiKey, 
