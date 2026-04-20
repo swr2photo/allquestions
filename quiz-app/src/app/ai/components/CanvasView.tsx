@@ -21,11 +21,10 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 // Dynamically import ReactQuill to avoid SSR issues
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-gray-50 animate-pulse" />
-}) as any;
+});
 import "react-quill-new/dist/quill.snow.css";
 
 import { Artifact } from "../types/canvas";

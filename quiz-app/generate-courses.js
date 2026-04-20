@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // Build script: generates src/data/courses.ts from extracted questions
 const fs = require('fs');
 const path = require('path');

@@ -1,0 +1,215 @@
+diff --git a/quiz-app/src/app/ai/page.tsx b/quiz-app/src/app/ai/page.tsx
+index 845a1b23..a8bec7b6 100644
+--- a/quiz-app/src/app/ai/page.tsx
++++ b/quiz-app/src/app/ai/page.tsx
+@@ -57,8 +57,20 @@ import {
+   Database,
+   Download,
+   AlertTriangle,
++  AlertCircle,
++  AlertOctagon,
++  CheckCircle2,
++  XCircle,
++  Info,
++  Folder,
++  FolderPlus,
++  ArrowUpRight,
++  Share2,
++  Calendar,
++  RefreshCw,
+   Type,
+   MessageCircle,
++  Bot,
+   Image,
+   GraduationCap,
+   ClipboardList,
+@@ -68,6 +80,7 @@ import {
+   RotateCcw,
+   ThumbsUp,
+   ThumbsDown,
++  Volume2,
+   ExternalLink,
+   SquarePen,
+   Brain,
+@@ -110,18 +123,31 @@ hljs.registerLanguage("md", markdown);
+ hljs.registerLanguage("diff", diff);
+
+ function parseThinking(content: string): { thinking: string; answer: string } {
+-  const thinkMatch = content.match(/<think>([\s\S]*?)(<\/think>|$)/);
+-  if (!thinkMatch) return { thinking: "", answer: content };
++  // Try to find the end of the thinking block
++  const thinkEndIndex = content.toLowerCase().lastIndexOf("</think>");
++  const thinkStartIndex = content.toLowerCase().indexOf("<think");
+
+-  // Strip MEMORY_SAVE tags from thinking content
+-  let thinking = thinkMatch[1].trim();
+-  thinking = thinking.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++  if (thinkStartIndex === -1) {
++    return { thinking: "", answer: content };
++  }
+
+-  let afterThink = content.replace(/<think>[\s\S]*?(<\/think>|$)/, "").trim();
+-  // Also strip MEMORY_SAVE from answer
+-  afterThink = afterThink.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++  // If we have a start but no end, we are still thinking
++  if (thinkEndIndex === -1) {
++    const thinking = content.substring(thinkStartIndex).replace(/<think(?:\s+[^>]*?)?>/i, "").trim();
++    return { thinking, answer: "" };
++  }
+
+-  return { thinking, answer: afterThink };
++  // We have both start and end
++  const thinkingPart = content.substring(thinkStartIndex, thinkEndIndex + 8);
++  const thinking = thinkingPart.replace(/<think(?:\s+[^>]*?)?>/i, "").replace(/<\/think>/i, "").trim();        
++  
++  // The answer is everything EXCEPT the thinking part
++  const answer = content.replace(thinkingPart, "").trim();
++  
++  // Clean up any remaining tags
++  const cleanedAnswer = answer.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++
++  return { thinking, answer: cleanedAnswer || (answer ? answer : "") };
+ }
+
+ function ThinkingBlock({
+@@ -142,28 +168,33 @@ function ThinkingBlock({
+     }
+   }, [isStreaming, thinking]);
+
++  // Close automatically when streaming finishes if content is long
++  useEffect(() => {
++    if (!isStreaming && thinking.length > 50) {
++      const timer = setTimeout(() => setOpen(false), 800);
++      return () => clearTimeout(timer);
++    }
++  }, [isStreaming, thinking.length]);
++
+   if (!thinking && !isStreaming) return null;
+
+   return (
+-    <div className="mb-2">
++    <div className="mb-3 animate-in fade-in duration-500">
+       <button
+         onClick={() => setOpen(!open)}
+-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
++        className="flex items-center gap-2 text-[11px] font-bold text-gray-400 hover:text-emerald-600 transition-colors uppercase tracking-widest py-1"
+       >
+-        <Zap className="h-3 w-3" />
+-        {isStreaming ? (
+-          <span className="flex items-center gap-1.5">
+-            <Loader2 className="h-3 w-3 animate-spin" />
+-            {thinking ? "เธเธณเธฅเธฑเธเธ
+                                         เธดเธ”..." : status}
+-          </span>
+-        ) : (
+-          <span>เธ”เธนเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                                                เธดเธ”</span>
+-        )}
+-        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
++        <div className={`p-1 rounded-md ${isStreaming ? 'bg-emerald-50 text-emerald-600 animate-pulse' : 'bg-gray-100'}`}>
++          <Zap className={`h-3 w-3 ${isStreaming ? 'fill-current' : ''}`} />
++        </div>
++        {isStreaming ? (thinking ? "เธเธณเธฅเธฑเธเธธฃเธฐเธกเธงเธฅเธเธฅ..." : status) : (open ? "เธเนเธญเธเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                   เธดเธ”" : "เธ”เธนเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                                                             เธดเธ”"                                           ")}
++        <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />    
+       </button>
+-      {open && (thinking || isStreaming) && (
+-        <div className="mt-1.5 ml-1 pl-3 border-l-2 border-gray-200 text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap">
+-          {thinking || (isStreaming && !thinking && <span className="italic opacity-70">เธเธณเธฅเธฑเธเธธฃเธฐเธกเธงเธฅเธเธฅ...</span>                                                                                          >)}
++      
++      {open && (
++        <div className="pl-3 ml-2.5 border-l-2 border-emerald-50 text-[12px] leading-relaxed text-gray-500/80 italic font-medium whitespace-pre-wrap animate-in slide-in-from-top-1 duration-200">
++          {thinking}
++          {isStreaming && <span className="inline-block w-1 h-3 ml-1 bg-emerald-300 animate-pulse" />}
+         </div>
+       )}
+     </div>
+@@ -2145,6 +2176,14 @@ interface ChatSession {
+   messages: Message[];
+   createdAt: number;
+   updatedAt?: number;
++  folderId?: string;
++}
++
++interface Folder {
++  id: string;
++  name: string;
++  sessionIds: string[];
++  isOpen?: boolean;
+ }
+
+ function generateTitle(firstMessage: string): string {
+@@ -2191,20 +2230,58 @@ export default function AIChatPage() {
+   const router = useRouter();
+   const [sessions, setSessions] = useState<ChatSession[]>([]);
+   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+-  const [messages, setMessages] = useState<Message[]>([]);
+   const [input, setInput] = useState("");
++
++  const activeSession = useMemo(() => 
++    sessions.find(s => s.id === activeSessionId), 
++    [sessions, activeSessionId]
++  );
++  
++  const messages = useMemo(() => 
++    activeSession?.messages || [], 
++    [activeSession]
++  );
+   const [loading, setLoading] = useState(false);
+   const [attachments, setAttachments] = useState<FileData[]>([]);
+   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+   const [sidebarSearch, setSidebarSearch] = useState("");
+   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+   const [editingTitle, setEditingTitle] = useState("");
++  const [sharingSession, setSharingSession] = useState<ChatSession | null>(null);
++  const [shareModalOpen, setShareModalOpen] = useState(false);
++  const [folders, setFolders] = useState<Folder[]>([]);
++  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
++  const [editingFolderName, setEditingFolderName] = useState("");
++  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
++  const [movingSession, setMovingSession] = useState<ChatSession | null>(null);
++  const [draggedSessionId, setDraggedSessionId] = useState<string | null>(null);
++  const [hoveredFolderId, setHoveredFolderId] = useState<string | null>(null);
++
++  // Notifications State
++  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" | "info" | "warning" } | null>(null);
++  const [confirmDialog, setConfirmDialog] = useState<{
++    isOpen: boolean;
++    title: string;
++    message: string;
++    confirmText?: string;
++    cancelText?: string;
++    variant?: "destructive" | "primary";
++    onConfirm: () => void;
++  } | null>(null);
++
++  const showToast = useCallback((msg: string, type: "success" | "error" | "info" | "warning" = "info") => {    
++    setToast({ msg, type });
++  }, []);
++
++  const askConfirm = useCallback((opts: { title: string; message: string; confirmText?: string; cancelText?: string; variant?: "destructive" | "primary"; onConfirm: () => void; }) => {
++    setConfirmDialog({ ...opts, isOpen: true });
++  }, []);
+   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
+   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
+   const [showCreditPopup, setShowCreditPopup] = useState<{ needed: number; have: number; model: string } | null>(null);
+   const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_SETTINGS);
+-  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true });
++  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true });
+   const [isDragging, setIsDragging] = useState(false);
+   const [isRecording, setIsRecording] = useState(false);
+   const recognitionRef = useRef<SpeechRecognition | null>(null);
+@@ -2215,7 +2292,7 @@ export default function AIChatPage() {
+   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
+   const [artifactVersions, setArtifactVersions] = useState<Artifact[]>([]);
+   const [isArtifactComplete, setIsArtifactComplete] = useState(false);
+-  const [canvasWidth, setCanvasWidth] = useState(Math.max(550, typeof window !== "undefined" ? Math.floor(window.innerWidth * 0.45) : 600));
++  const [canvasWidth, setCanvasWidth] = useState(500);
+   const [isResizingCanvas, setIsResizingCanvas] = useState(false);
+   const [previewImage, setPreviewImage] = useState<string | null>(null);
+   const [memories, setMemories] = useState<MemoryItem[]>([]);
+@@ -2230,35 +2307,97 @@ export default function AIChatPage() {
+   const [gsiReady, setGsiReady] = useState(false);
+   const [selectedModel, setSelectedModel] = useState("auto"); // auto, gemini-1.5-pro, gemini-1.5-flash        

@@ -4,6 +4,26 @@ import { isValidSession } from "@/lib/admin-store";
 
 export const dynamic = "force-dynamic";
 
+interface Model {
+  id: string;
+  name: string;
+  provider: string;
+  pricing?: {
+    prompt: string;
+    completion: string;
+    image: string;
+    request: string;
+  };
+  context_length?: number;
+}
+
+interface Results {
+  gemini: Model[];
+  openrouter: Model[];
+  groq: Model[];
+  github: Model[];
+}
+
 export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("user-session")?.value || cookieStore.get("admin-session")?.value;
@@ -16,7 +36,7 @@ export async function GET() {
   const groqKey = process.env.GROQ_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
 
-  const results: any = { gemini: [], openrouter: [], groq: [], github: [] };
+  const results: Results = { gemini: [], openrouter: [], groq: [], github: [] };
 
   // 1. Fetch Gemini Models
   if (geminiKey) {
@@ -24,8 +44,8 @@ export async function GET() {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}`, { next: { revalidate: 3600 } });
       const data = await res.json();
       results.gemini = (data.models || [])
-        .filter((m: any) => m.supportedGenerationMethods.includes("generateContent"))
-        .map((m: any) => ({
+        .filter((m: { supportedGenerationMethods: string[] }) => m.supportedGenerationMethods.includes("generateContent"))
+        .map((m: { name: string; displayName: string }) => ({
           id: m.name?.replace("models/", ""),
           name: m.displayName,
           provider: "gemini"
@@ -41,7 +61,12 @@ export async function GET() {
         next: { revalidate: 3600 }
       });
       const data = await res.json();
-      results.openrouter = (data.data || []).map((m: any) => ({
+      results.openrouter = (data.data || []).map((m: { 
+        id: string; 
+        name: string; 
+        pricing: { prompt: string; completion: string; image: string; request: string }; 
+        context_length: number 
+      }) => ({
         id: `openrouter/${m.id}`,
         name: m.name,
         provider: "openrouter",
@@ -59,7 +84,7 @@ export async function GET() {
         next: { revalidate: 3600 }
       });
       const data = await res.json();
-      results.groq = (data.data || []).map((m: any) => ({
+      results.groq = (data.data || []).map((m: { id: string }) => ({
         id: `groq/${m.id}`,
         name: m.id,
         provider: "groq"
@@ -76,7 +101,7 @@ export async function GET() {
       });
       if (res.ok) {
         const data = await res.json();
-        results.github = (data || []).map((m: any) => ({
+        results.github = (data || []).map((m: { name: string; friendlyName: string }) => ({
           id: `github/${m.name}`,
           name: m.friendlyName || m.name,
           provider: "github"

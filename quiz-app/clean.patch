@@ -1,0 +1,1721 @@
+diff --git a/quiz-app/src/app/ai/page.tsx b/quiz-app/src/app/ai/page.tsx
+index 845a1b23..a8bec7b6 100644
+--- a/quiz-app/src/app/ai/page.tsx
++++ b/quiz-app/src/app/ai/page.tsx
+@@ -57,8 +57,20 @@ import {
+   Database,
+   Download,
+   AlertTriangle,
++  AlertCircle,
++  AlertOctagon,
++  CheckCircle2,
++  XCircle,
++  Info,
++  Folder,
++  FolderPlus,
++  ArrowUpRight,
++  Share2,
++  Calendar,
++  RefreshCw,
+   Type,
+   MessageCircle,
++  Bot,
+   Image,
+   GraduationCap,
+   ClipboardList,
+@@ -68,6 +80,7 @@ import {
+   RotateCcw,
+   ThumbsUp,
+   ThumbsDown,
++  Volume2,
+   ExternalLink,
+   SquarePen,
+   Brain,
+@@ -110,18 +123,31 @@ hljs.registerLanguage("md", markdown);
+ hljs.registerLanguage("diff", diff);
+
+ function parseThinking(content: string): { thinking: string; answer: string } {
+-  const thinkMatch = content.match(/<think>([\s\S]*?)(<\/think>|$)/);
+-  if (!thinkMatch) return { thinking: "", answer: content };
++  // Try to find the end of the thinking block
++  const thinkEndIndex = content.toLowerCase().lastIndexOf("</think>");
++  const thinkStartIndex = content.toLowerCase().indexOf("<think");
+
+-  // Strip MEMORY_SAVE tags from thinking content
+-  let thinking = thinkMatch[1].trim();
+-  thinking = thinking.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++  if (thinkStartIndex === -1) {
++    return { thinking: "", answer: content };
++  }
+
+-  let afterThink = content.replace(/<think>[\s\S]*?(<\/think>|$)/, "").trim();
+-  // Also strip MEMORY_SAVE from answer
+-  afterThink = afterThink.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++  // If we have a start but no end, we are still thinking
++  if (thinkEndIndex === -1) {
++    const thinking = content.substring(thinkStartIndex).replace(/<think(?:\s+[^>]*?)?>/i, "").trim();
++    return { thinking, answer: "" };
++  }
+
+-  return { thinking, answer: afterThink };
++  // We have both start and end
++  const thinkingPart = content.substring(thinkStartIndex, thinkEndIndex + 8);
++  const thinking = thinkingPart.replace(/<think(?:\s+[^>]*?)?>/i, "").replace(/<\/think>/i, "").trim();        
++  
++  // The answer is everything EXCEPT the thinking part
++  const answer = content.replace(thinkingPart, "").trim();
++  
++  // Clean up any remaining tags
++  const cleanedAnswer = answer.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++
++  return { thinking, answer: cleanedAnswer || (answer ? answer : "") };
+ }
+
+ function ThinkingBlock({
+@@ -142,28 +168,33 @@ function ThinkingBlock({
+     }
+   }, [isStreaming, thinking]);
+
++  // Close automatically when streaming finishes if content is long
++  useEffect(() => {
++    if (!isStreaming && thinking.length > 50) {
++      const timer = setTimeout(() => setOpen(false), 800);
++      return () => clearTimeout(timer);
++    }
++  }, [isStreaming, thinking.length]);
++
+   if (!thinking && !isStreaming) return null;
+
+   return (
+-    <div className="mb-2">
++    <div className="mb-3 animate-in fade-in duration-500">
+       <button
+         onClick={() => setOpen(!open)}
+-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
++        className="flex items-center gap-2 text-[11px] font-bold text-gray-400 hover:text-emerald-600 transition-colors uppercase tracking-widest py-1"
+       >
+-        <Zap className="h-3 w-3" />
+-        {isStreaming ? (
+-          <span className="flex items-center gap-1.5">
+-            <Loader2 className="h-3 w-3 animate-spin" />
+-            {thinking ? "เธเธณเธฅเธฑเธเธ
+                                         เธดเธ”..." : status}
+-          </span>
+-        ) : (
+-          <span>เธ”เธนเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                                                เธดเธ”</span>
+-        )}
+-        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
++        <div className={`p-1 rounded-md ${isStreaming ? 'bg-emerald-50 text-emerald-600 animate-pulse' : 'bg-gray-100'}`}>
++          <Zap className={`h-3 w-3 ${isStreaming ? 'fill-current' : ''}`} />
++        </div>
++        {isStreaming ? (thinking ? "เธเธณเธฅเธฑเธเธธฃเธฐเธกเธงเธฅเธเธฅ..." : status) : (open ? "เธเนเธญเธเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                   เธดเธ”" : "เธ”เธนเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                                                             เธดเธ”"                                           ")}
++        <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />    
+       </button>
+-      {open && (thinking || isStreaming) && (
+-        <div className="mt-1.5 ml-1 pl-3 border-l-2 border-gray-200 text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap">
+-          {thinking || (isStreaming && !thinking && <span className="italic opacity-70">เธเธณเธฅเธฑเธเธธฃเธฐเธกเธงเธฅเธเธฅ...</span>                                                                                          >)}
++      
++      {open && (
++        <div className="pl-3 ml-2.5 border-l-2 border-emerald-50 text-[12px] leading-relaxed text-gray-500/80 italic font-medium whitespace-pre-wrap animate-in slide-in-from-top-1 duration-200">
++          {thinking}
++          {isStreaming && <span className="inline-block w-1 h-3 ml-1 bg-emerald-300 animate-pulse" />}
+         </div>
+       )}
+     </div>
+@@ -2145,6 +2176,14 @@ interface ChatSession {
+   messages: Message[];
+   createdAt: number;
+   updatedAt?: number;
++  folderId?: string;
++}
++
++interface Folder {
++  id: string;
++  name: string;
++  sessionIds: string[];
++  isOpen?: boolean;
+ }
+
+ function generateTitle(firstMessage: string): string {
+@@ -2191,20 +2230,58 @@ export default function AIChatPage() {
+   const router = useRouter();
+   const [sessions, setSessions] = useState<ChatSession[]>([]);
+   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+-  const [messages, setMessages] = useState<Message[]>([]);
+   const [input, setInput] = useState("");
++
++  const activeSession = useMemo(() => 
++    sessions.find(s => s.id === activeSessionId), 
++    [sessions, activeSessionId]
++  );
++  
++  const messages = useMemo(() => 
++    activeSession?.messages || [], 
++    [activeSession]
++  );
+   const [loading, setLoading] = useState(false);
+   const [attachments, setAttachments] = useState<FileData[]>([]);
+   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+   const [sidebarSearch, setSidebarSearch] = useState("");
+   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+   const [editingTitle, setEditingTitle] = useState("");
++  const [sharingSession, setSharingSession] = useState<ChatSession | null>(null);
++  const [shareModalOpen, setShareModalOpen] = useState(false);
++  const [folders, setFolders] = useState<Folder[]>([]);
++  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
++  const [editingFolderName, setEditingFolderName] = useState("");
++  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
++  const [movingSession, setMovingSession] = useState<ChatSession | null>(null);
++  const [draggedSessionId, setDraggedSessionId] = useState<string | null>(null);
++  const [hoveredFolderId, setHoveredFolderId] = useState<string | null>(null);
++
++  // Notifications State
++  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" | "info" | "warning" } | null>(null);
++  const [confirmDialog, setConfirmDialog] = useState<{
++    isOpen: boolean;
++    title: string;
++    message: string;
++    confirmText?: string;
++    cancelText?: string;
++    variant?: "destructive" | "primary";
++    onConfirm: () => void;
++  } | null>(null);
++
++  const showToast = useCallback((msg: string, type: "success" | "error" | "info" | "warning" = "info") => {    
++    setToast({ msg, type });
++  }, []);
++
++  const askConfirm = useCallback((opts: { title: string; message: string; confirmText?: string; cancelText?: string; variant?: "destructive" | "primary"; onConfirm: () => void; }) => {
++    setConfirmDialog({ ...opts, isOpen: true });
++  }, []);
+   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
+   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
+   const [showCreditPopup, setShowCreditPopup] = useState<{ needed: number; have: number; model: string } | null>(null);
+   const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_SETTINGS);
+-  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true });
++  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true });
+   const [isDragging, setIsDragging] = useState(false);
+   const [isRecording, setIsRecording] = useState(false);
+   const recognitionRef = useRef<SpeechRecognition | null>(null);
+@@ -2215,7 +2292,7 @@ export default function AIChatPage() {
+   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
+   const [artifactVersions, setArtifactVersions] = useState<Artifact[]>([]);
+   const [isArtifactComplete, setIsArtifactComplete] = useState(false);
+-  const [canvasWidth, setCanvasWidth] = useState(Math.max(550, typeof window !== "undefined" ? Math.floor(window.innerWidth * 0.45) : 600));
++  const [canvasWidth, setCanvasWidth] = useState(500);
+   const [isResizingCanvas, setIsResizingCanvas] = useState(false);
+   const [previewImage, setPreviewImage] = useState<string | null>(null);
+   const [memories, setMemories] = useState<MemoryItem[]>([]);
+@@ -2230,35 +2307,97 @@ export default function AIChatPage() {
+   const [gsiReady, setGsiReady] = useState(false);
+   const [selectedModel, setSelectedModel] = useState("auto"); // auto, gemini-1.5-pro, gemini-1.5-flash        
+   const [generatingStatus, setGeneratingStatus] = useState("เธเธณเธฅเธฑเธเธงเธดเน€เธ
+                                                                                     เธฃเธฒเธฐเธซเน...");
++
++  // Fetch real health status from API
++  const fetchHealth = useCallback(async () => {
++    try {
++      const res = await fetch("/api/ai/health");
++      if (res.ok) {
++        const data = await res.json();
++        setApiHealth({
++          gemini: data.gemini,
++          claude: data.claude,
++          openrouter: data.openrouter,
++          thaillm: data.thaillm
++        });
++      }
++    } catch (e) {
++      console.warn("Failed to fetch API health:", e);
++    }
++  }, []);
++
++  useEffect(() => {
++    fetchHealth();
++    // Refresh health every 5 minutes
++    const timer = setInterval(fetchHealth, 5 * 60 * 1000);
++    return () => clearInterval(timer);
++  }, [fetchHealth]);
++
+   const googleBtnRef = useRef<HTMLDivElement>(null);
+
+   const scrollRef = useRef<HTMLDivElement>(null);
+   const inputRef = useRef<HTMLTextAreaElement>(null);
+   const fileInputRef = useRef<HTMLInputElement>(null);
+
+-  const MODEL_OPTIONS = [
+-    { value: "auto", label: "Auto", icon: <Sparkles className="h-3.5 w-3.5 text-amber-500" />, desc: "เธญเธฑเธ•เนเธเธกเธฑเธ•เธด                                                                                               เธด" },
+-    { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <Zap className="h-3.5 w-3.5 text-violet-500" />, desc: "Gemini Direct", provider: "gemini" },
+-    { value: "gemini-2.5-flash", label: "Flash 2.5", icon: <Loader2 className="h-3.5 w-3.5 text-sky-500" />, desc: "Gemini Direct", provider: "gemini" },
+-    { value: "claude-sonnet", label: "Claude", icon: <Brain className="h-3.5 w-3.5 text-orange-500" />, desc: "Anthropic", provider: "claude" },
+-    { value: "openrouter/google/gemini-2.5-pro-preview", label: "Gemini 2.5 Pro", icon: <Zap className="h-3.5 w-3.5 text-emerald-500" />, desc: "OpenRouter", provider: "openrouter" },
+-    { value: "openrouter/google/gemini-2.5-flash", label: "Gemini 2.5 Flash", icon: <Loader2 className="h-3.5 w-3.5 text-emerald-500" />, desc: "OpenRouter", provider: "openrouter" },
+-    { value: "openrouter/openai/gpt-4.1", label: "GPT-4.1", icon: <Brain className="h-3.5 w-3.5 text-green-500" />, desc: "OpenRouter", provider: "openrouter" },
+-    { value: "openrouter/openai/o4-mini", label: "o4-mini", icon: <Brain className="h-3.5 w-3.5 text-green-500" />, desc: "OpenRouter", provider: "openrouter" },
+-    { value: "openrouter/deepseek/deepseek-r1", label: "DeepSeek R1", icon: <Brain className="h-3.5 w-3.5 text-blue-500" />, desc: "OpenRouter", provider: "openrouter" },
+-    { value: "openrouter/meta-llama/llama-4-maverick", label: "Llama 4", icon: <Brain className="h-3.5 w-3.5 text-indigo-500" />, desc: "OpenRouter", provider: "openrouter" },
++  // Categorized Model Options
++  const MODEL_CATEGORIES = [
++    {
++      name: aiSettings.language === "th" ? "เนเธเธฐเธเธณ" : "Recommended",
++      models: [
++        { value: "auto", label: "Auto Select", icon: <Zap className="h-3.5 w-3.5 text-amber-500" />, desc: "Best available", provider: "all" },
++        { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <Zap className="h-3.5 w-3.5 text-violet-500" />, desc: "Gemini Direct", provider: "gemini" },
++      ]
++    },
++    {
++      name: aiSettings.language === "th" ? "เนเธกเน€เธ”เธฅเน
+                                                             เธ—เธข" : "Thai Models",
++      models: [
++        { value: "thaillm/typhoon-v1.5x-70b-instruct", label: "Typhoon 1.5X", icon: <Sparkles className="h-3.5 w-3.5 text-red-500" />, desc: "Thai LLM", provider: "thaillm" },
++      ]
++    },
++    {
++      name: "Claude & DeepSeek (OpenRouter)",
++      models: [
++        { value: "claude-sonnet", label: "Claude", icon: <Brain className="h-3.5 w-3.5 text-orange-500" />, desc: "Anthropic", provider: "claude" },
++        { value: "openrouter/deepseek/deepseek-r1", label: "DeepSeek R1", icon: <Brain className="h-3.5 w-3.5 text-blue-500" />, desc: "OpenRouter", provider: "openrouter" },
++        { value: "openrouter/meta-llama/llama-4-maverick", label: "Llama 4", icon: <Brain className="h-3.5 w-3.5 text-indigo-500" />, desc: "OpenRouter", provider: "openrouter" },
++      ]
++    }
+   ];
+
++  const ALL_MODELS = MODEL_CATEGORIES.flatMap(c => c.models);
++
+   // Check if a model is available based on API health
+   const isModelAvailable = useCallback((modelValue: string): boolean => {
+-    if (modelValue === "auto") return apiHealth.openrouter || apiHealth.gemini || apiHealth.claude;
+-    if (modelValue.startsWith("openrouter/")) return apiHealth.openrouter;
+-    if (modelValue.startsWith("claude-")) return apiHealth.claude;
+-    // Gemini direct models
+-    return apiHealth.gemini;
+-  }, [apiHealth]);
++    if (modelValue === "auto") return apiHealth.gemini || apiHealth.thaillm || apiHealth.openrouter || apiHealth.claude || apiHealth.groq || apiHealth.github;
++    const model = ALL_MODELS.find(m => m.value === modelValue);
++    if (!model) return false;
++    return apiHealth[model.provider] ?? false;
++  }, [apiHealth, ALL_MODELS]);
++
++  // Smart Auto-Fallback Logic
++  const getEffectiveModel = useCallback((requestedModel: string): string => {
++    if (requestedModel !== "auto") {
++      if (isModelAvailable(requestedModel)) return requestedModel;
++      
++      // If requested model is down, show a toast and find fallback
++      const modelName = ALL_MODELS.find(m => m.value === requestedModel)?.label || requestedModel;
++      showToast(
++        aiSettings.language === "th" 
++          ? `เนเธกเน€เธ”เธฅ ${modelName} เน
+                                            เธกเนเธธฃเนเธญเธกเนเธเนเธเธฒเธ เธเธณเธฅเธฑเธเธชเธฅเธฑเธเน
+                                                                                                     เธนเธเนเนเธกเน€เธ”เธฅเธ—เธตเนเธ”เธตเธ—เธตเนเธชเธธเธ”เนเธ—เธ`
++          : `Model ${modelName} is unavailable. Switching to best fallback.`,
++        "warning"
++      );
++    }
++
++    // Auto-selection priority: Gemini -> ThaiLLM -> OpenRouter
++    if (apiHealth.gemini) return "gemini-3.1-pro";
++    if (apiHealth.thaillm) return "thaillm/typhoon-v1.5x-70b-instruct";
++    if (apiHealth.openrouter) return "openrouter/deepseek/deepseek-r1";
++    
++    return requestedModel; // Last resort
++  }, [apiHealth, isModelAvailable, ALL_MODELS, aiSettings.language, showToast]);
+
+-  const currentModel = MODEL_OPTIONS.find(m => m.value === selectedModel) || MODEL_OPTIONS[0];
++  const currentModel = ALL_MODELS.find(m => m.value === selectedModel) || ALL_MODELS[0];
+
+   // Close model picker / tools menu on click outside
+   useEffect(() => {
+@@ -2305,6 +2444,82 @@ export default function AIChatPage() {
+     };
+   }, [isResizingCanvas]);
+
++  // Clipboard paste handler for images
++  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
++    const items = e.clipboardData.items;
++    const newFiles: FileData[] = [];
++
++    for (let i = 0; i < items.length; i++) {
++      const item = items[i];
++      if (!item.type.startsWith("image/")) continue;
++
++      const file = item.getAsFile();
++      if (!file) continue;
++      if (file.size > 4 * 1024 * 1024) continue;
++      if (attachments.length + newFiles.length >= 5) break;
++
++      const reader = new FileReader();
++      const filePromise = new Promise<FileData>((resolve) => {
++        reader.onloadend = () => {
++          resolve({
++            name: `pasted-image-${Date.now()}.${file.type.split("/")[1] || "png"}`,
++            data: reader.result as string,
++            type: file.type,
++          });
++        };
++      });
++      reader.readAsDataURL(file);
++      newFiles.push(await filePromise);
++    }
++
++    if (newFiles.length > 0) {
++      setAttachments((prev) => [...prev, ...newFiles]);
++      
++      // Auto-focus and adjust height
++      setTimeout(() => {
++        if (inputRef.current) {
++          inputRef.current.focus();
++          inputRef.current.style.height = "auto";
++          inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 200)}px`;
++        }
++      }, 50);
++    }
++  }, [attachments.length]);
++
++  // Global paste handler for images
++  useEffect(() => {
++    const handleGlobalPaste = (e: ClipboardEvent) => {
++      // Don't intercept if user is typing in another input/textarea
++      if (
++        document.activeElement?.tagName === "INPUT" || 
++        (document.activeElement?.tagName === "TEXTAREA" && document.activeElement !== inputRef.current)        
++      ) {
++        return;
++      }
++
++      if (e.clipboardData?.items) {
++        const items = e.clipboardData.items;
++        let hasImage = false;
++        for (let i = 0; i < items.length; i++) {
++          if (items[i].type.indexOf("image") !== -1) {
++            hasImage = true;
++            break;
++          }
++        }
++
++        if (hasImage) {
++          // Trigger the existing handlePaste (casting to any since we need to simulate the event structure)   
++          handlePaste(e as any);
++          // Focus the input
++          inputRef.current?.focus();
++        }
++      }
++    };
++
++    window.addEventListener("paste", handleGlobalPaste);
++    return () => window.removeEventListener("paste", handleGlobalPaste);
++  }, [handlePaste]);
++
+   const fetchAuthAndQuota = useCallback(async () => {
+     try {
+       const authRes = await fetch("/api/auth/user");
+@@ -2431,7 +2646,6 @@ export default function AIChatPage() {
+         setSessions(parsed);
+         if (parsed.length > 0) {
+           setActiveSessionId(parsed[0].id);
+-          setMessages(parsed[0].messages);
+         }
+       } catch (e) {
+         console.error("Failed to load chat history", e);
+@@ -2480,18 +2694,6 @@ export default function AIChatPage() {
+     }
+   }, [sessions]);
+
+-  // Sync messages with active session
+-  useEffect(() => {
+-    if (activeSessionId) {
+-      const session = sessions.find((s) => s.id === activeSessionId);
+-      if (session) {
+-        setMessages(session.messages);
+-      }
+-    } else {
+-      setMessages([]);
+-    }
+-  }, [activeSessionId, sessions]);
+-
+   const createNewSession = () => {
+     const now = Date.now();
+     const newSession: ChatSession = {
+@@ -2507,15 +2709,111 @@ export default function AIChatPage() {
+
+   const deleteSession = (id: string, e: React.MouseEvent) => {
+     e.stopPropagation();
+-    const updated = sessions.filter((s) => s.id !== id);
+-    setSessions(updated);
+-    if (activeSessionId === id) {
+-      if (updated.length > 0) {
+-        setActiveSessionId(updated[0].id);
+-      } else {
+-        setActiveSessionId(null);
++    const session = sessions.find(s => s.id === id);
++    
++    setConfirmDialog({
++      isOpen: true,
++      title: aiSettings.language === "th" ? "เธฅเธเธเธฒเธฃเธชเธเธ—เธเธฒ?" : "Delete Chat?",
++      message: aiSettings.language === "th" 
++        ? `เธ
+              เธธเธ“เนเธเนเนเธเธซเธฃเธทเธญเน
+                                            เธกเนเธงเนเธฒเธ•เนเธญเธเธเธฒเธฃเธฅเธ "${session?.title || "เนเธเธ—เธเธตเน"}"? เธเธฒเธฃเธ”เธณเน€เธเธดเธเธเธฒเธฃเธเธตเนเน
+                                                   เธกเนเธชเธฒเธกเธฒเธฃเธ–เน€เธฃเธตเธขเธเธ
+                                                                                          เธทเธเน
+                                                                                                 เธ”เน`   
++        : `Are you sure you want to delete "${session?.title || "this chat"}"? This action cannot be undone.`, 
++      confirmText: aiSettings.language === "th" ? "เธฅเธเนเธเธ—" : "Delete",
++      variant: "destructive",
++      onConfirm: () => {
++        const updated = sessions.filter((s) => s.id !== id);
++        setSessions(updated);
++        if (activeSessionId === id) {
++          if (updated.length > 0) setActiveSessionId(updated[0].id);
++          else setActiveSessionId(null);
++        }
++        showToast(
++          aiSettings.language === "th" ? "เธฅเธเธเธฒเธฃเธชเธเธ—เธเธฒเน€เธฃเธตเธขเธเธฃเนเธญเธขเนเธฅเนเธง" : "Conversation deleted",
++          "success"
++        );
++      }
++    });
++  };
++
++  // Persistent state for folders
++  useEffect(() => {
++    if (typeof window !== "undefined") {
++      const saved = localStorage.getItem("allquiz_ai_folders");
++      if (saved) {
++        try {
++          setFolders(JSON.parse(saved));
++        } catch (e) {
++          console.error("Failed to load folders:", e);
++        }
++      }
++    }
++  }, []);
++
++  useEffect(() => {
++    if (typeof window !== "undefined") {
++      localStorage.setItem("allquiz_ai_folders", JSON.stringify(folders));
++    }
++  }, [folders]);
++
++  const moveSessionToFolder = (sessionId: string, folderId: string | null) => {
++    setSessions(prev => prev.map(s => 
++      s.id === sessionId ? { ...s, folderId: folderId || undefined } : s
++    ));
++    
++    setFolders(prev => prev.map(f => {
++      // Remove from any other folder first
++      const updatedSessionIds = f.sessionIds.filter(id => id !== sessionId);
++      // Add to new folder if this is the target
++      if (f.id === folderId) {
++        if (!updatedSessionIds.includes(sessionId)) {
++          return { ...f, sessionIds: [...updatedSessionIds, sessionId] };
++        }
+       }
++      return { ...f, sessionIds: updatedSessionIds };
++    }));
++  };
++
++  const createFolder = () => {
++    const newFolder: Folder = {
++      id: Date.now().toString(),
++      name: aiSettings.language === "th" ? "เนเธธฅเน€เธ”เธญเธฃเนเนเธซเธกเน" : "New Folder",
++      sessionIds: [],
++      isOpen: true
++    };
++    setFolders(prev => [...prev, newFolder]);
++  };
++
++  const toggleFolder = (folderId: string) => {
++    setFolders(prev => prev.map(f => 
++      f.id === folderId ? { ...f, isOpen: !f.isOpen } : f
++    ));
++  };
++
++  const deleteFolder = (folderId: string, e: React.MouseEvent) => {
++    e.stopPropagation();
++    const folder = folders.find(f => f.id === folderId);
++    if (folder) {
++      setSessions(prev => prev.map(s => 
++        folder.sessionIds.includes(s.id) ? { ...s, folderId: undefined } : s
++      ));
++    }
++    setFolders(prev => prev.filter(f => f.id !== folderId));
++  };
++
++  const renameFolder = (folderId: string) => {
++    if (!editingFolderName.trim()) {
++      setEditingFolderId(null);
++      return;
+     }
++    setFolders(prev => prev.map(f => 
++      f.id === folderId ? { ...f, name: editingFolderName.trim() } : f
++    ));
++    setEditingFolderId(null);
++  };
++
++  const startEditingFolder = (folder: Folder, e: React.MouseEvent) => {
++    e.stopPropagation();
++    setEditingFolderId(folder.id);
++    setEditingFolderName(folder.name);
+   };
+
+   const renameSession = (id: string) => {
+@@ -2535,24 +2833,57 @@ export default function AIChatPage() {
+     setEditingTitle(session.title);
+   };
+
+-  const filteredSessions = sidebarSearch.trim()
+-    ? sessions.filter(s =>
+-        s.title.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
+-        s.messages.some(m => m.content.toLowerCase().includes(sidebarSearch.toLowerCase()))
+-      )
+-    : sessions;
+-
+-  const groupedSessions = groupSessionsByDate(filteredSessions);
+-
+-  const scrollToBottom = useCallback(() => {
+-    setTimeout(() => {
+-      scrollRef.current?.scrollTo({
+-        top: scrollRef.current.scrollHeight,
+-        behavior: "smooth",
+-      });
+-    }, 100);
++  const filteredSessions = useMemo(() => {
++    const list = sidebarSearch.trim()
++      ? sessions.filter(s =>
++          s.title.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
++          s.messages.some(m => m.content.toLowerCase().includes(sidebarSearch.toLowerCase()))
++        )
++      : sessions;
++    
++    // Sort: Newest/Most recently active first
++    return [...list].sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
++  }, [sessions, sidebarSearch]);
++
++  const groupedSessions = useMemo(() => {
++    // Only group sessions NOT in a folder
++    const sessionsNotInFolders = filteredSessions.filter(s => !s.folderId);
++    return groupSessionsByDate(sessionsNotInFolders);
++  }, [filteredSessions]);
++
++  const [showScrollButton, setShowScrollButton] = useState(false);
++  const [isAtBottom, setIsAtBottom] = useState(true);
++
++  const scrollToBottom = useCallback((force = false) => {
++    if (force || isAtBottom) {
++      setTimeout(() => {
++        scrollRef.current?.scrollTo({
++          top: scrollRef.current.scrollHeight,
++          behavior: "smooth",
++        });
++      }, 100);
++    } else {
++      setShowScrollButton(true);
++    }
++  }, [isAtBottom]);
++
++  // Handle scroll events to show/hide button
++  const handleScroll = useCallback(() => {
++    if (!scrollRef.current) return;
++    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
++    const atBottom = scrollHeight - scrollTop - clientHeight < 100;
++    setIsAtBottom(atBottom);
++    if (atBottom) setShowScrollButton(false);
+   }, []);
+
++  useEffect(() => {
++    const el = scrollRef.current;
++    if (el) {
++      el.addEventListener("scroll", handleScroll);
++      return () => el.removeEventListener("scroll", handleScroll);
++    }
++  }, [handleScroll]);
++
+   useEffect(() => {
+     scrollToBottom();
+   }, [messages, scrollToBottom]);
+@@ -2757,6 +3088,8 @@ export default function AIChatPage() {
+         if (res.status === 403) {
+           // Quota exceeded - show popup instead of error message
+           setShowQuotaPopup(true);
++          setGeneratingStatus("");
++          setLoading(false);
+           // Remove the empty assistant message we added
+           setSessions((prev) => prev.map(s => {
+             if (s.id === currentSessionId) {
+@@ -2774,6 +3107,29 @@ export default function AIChatPage() {
+             have: err.creditBalance ?? 0,
+             model: selectedModel,
+           });
++          setGeneratingStatus("");
++          setLoading(false);
++          setSessions((prev) => prev.map(s => {
++            if (s.id === currentSessionId) {
++              const updatedMessages = s.messages.filter((m, i) => !(i === s.messages.length - 1 && m.role === "assistant" && !m.content));
++              return { ...s, messages: updatedMessages };
++            }
++            return s;
++          }));
++          return;
++        }
++
++        if (res.status === 500 || err.allFailed) {
++          // All models failed - show modern confirm modal
++          fetchHealth();
++          setGeneratingStatus("");
++          setLoading(false);
++          setConfirmDialog({
++            title: aiSettings.language === "th" ? "เธฃเธฐเธเธเธเธฑเธ”เธเนเธญเธ" : "System Error",
++            message: err.error || (aiSettings.language === "th" ? "เน
+                                                                      เธกเนเธชเธฒเธกเธฒเธฃเธ–เน€เธเธทเนเธญเธกเธ•เนเธญ AI เน
+           เธ”เนเนเธเธเธ“เธฐเธเธตเน เธเธฃเธธเธ“เธฒเธฅเธญเธเนเธซ                                                เธซเธกเนเธ เธฒเธขเธซเธฅเธฑเธ" : "Cannot connect to AI at this moment. Please try again later."),
++            confirmText: aiSettings.language === "th" ? "เธ•เธเธฅเธ" : "OK",
++            onConfirm: () => {}
++          });
+           setSessions((prev) => prev.map(s => {
+             if (s.id === currentSessionId) {
+               const updatedMessages = s.messages.filter((m, i) => !(i === s.messages.length - 1 && m.role === "assistant" && !m.content));
+@@ -2783,6 +3139,7 @@ export default function AIChatPage() {
+           }));
+           return;
+         }
++
+         throw new Error(err.error || "AI service error");
+       }
+
+@@ -2799,6 +3156,31 @@ export default function AIChatPage() {
+       let collectedSources: SearchSource[] = [];
+       setSearchingUrls([]);
+
++      let updateTask: number | null = null;
++      const throttleUpdate = () => {
++        if (updateTask) return;
++        updateTask = requestAnimationFrame(() => {
++          updateTask = null;
++          setSessions((prev) => prev.map(s => {
++            if (s.id === currentSessionId) {
++              const updatedMessages = [...s.messages];
++              const lastMsg = updatedMessages[updatedMessages.length - 1];
++              if (lastMsg && lastMsg.role === "assistant") {
++                updatedMessages[updatedMessages.length - 1] = {
++                  ...lastMsg,
++                  content: fullText,
++                  images: collectedImages.length > 0 ? collectedImages : undefined,
++                  sources: collectedSources.length > 0 ? collectedSources : undefined,
++                };
++              }
++              return { ...s, messages: updatedMessages };
++            }
++            return s;
++          }));
++          scrollToBottom();
++        });
++      };
++
+       while (true) {
+         const { done, value } = await reader.read();
+         if (done) break;
+@@ -2807,6 +3189,7 @@ export default function AIChatPage() {
+         const lines = buffer.split("\n");
+         buffer = lines.pop() || "";
+
++        let hasNewContent = false;
+         for (const line of lines) {
+           if (line.startsWith("data: ")) {
+             const jsonStr = line.slice(6).trim();
+@@ -2814,14 +3197,26 @@ export default function AIChatPage() {
+             try {
+               const parsed = JSON.parse(jsonStr);
+
++              // Handle model switching notification
++              if (parsed.status === "switching") {
++                if (parsed.model) setSelectedModel(parsed.model);
++                showToast(parsed.message, "warning");
++                setGeneratingStatus(parsed.message);
++                continue;
++              }
++
+               if (parsed.text) {
+                 fullText += parsed.text;
++                hasNewContent = true;
+
+                 // --- ARTIFACT PARSING ---
+                 const { artifact: parsedArtifact, isComplete: artComplete } = parseArtifacts(fullText);        
+                 if (parsedArtifact) {
+                   setActiveArtifact(prev => {
+-                    // Keep existing version number if same content is streaming
++                    // Only update if content length changed (avoid infinite loop)
++                    if (prev && prev.content === parsedArtifact.content && prev.title === parsedArtifact.title) {
++                      return prev;
++                    }
+                     if (prev && prev.title === parsedArtifact.title) {
+                       return { ...parsedArtifact, id: prev.id, version: prev.version };
+                     }
+@@ -2835,6 +3230,7 @@ export default function AIChatPage() {
+               // Collect generated images
+               if (parsed.image) {
+                 collectedImages = [...collectedImages, parsed.image];
++                hasNewContent = true;
+               }
+
+               // Show search queries being executed
+@@ -2846,6 +3242,7 @@ export default function AIChatPage() {
+               // Collect search sources
+               if (parsed.sources) {
+                 collectedSources = parsed.sources;
++                hasNewContent = true;
+                 // Update status to show which sites are being searched
+                 const siteNames = parsed.sources.slice(0, 3).map((s: SearchSource) => {
+                   try { return new URL(s.url).hostname.replace("www.", ""); } catch { return s.title; }        
+@@ -2853,32 +3250,37 @@ export default function AIChatPage() {
+                 setGeneratingStatus(`เธเธณเธฅเธฑเธเธญเนเธฒเธเธเนเธญเธกเธนเธฅเธเธฒเธ ${siteNames.join(", ")}...`);
+                 setSearchingUrls(siteNames);
+               }
+-
+-              // Update session with all collected data
+-              setSessions((prev) => prev.map(s => {
+-                if (s.id === currentSessionId) {
+-                  const updatedMessages = [...s.messages];
+-                  const lastMsg = updatedMessages[updatedMessages.length - 1];
+-                  if (lastMsg && lastMsg.role === "assistant") {
+-                    updatedMessages[updatedMessages.length - 1] = {
+-                      ...lastMsg,
+-                      content: fullText,
+-                      images: collectedImages.length > 0 ? collectedImages : undefined,
+-                      sources: collectedSources.length > 0 ? collectedSources : undefined,
+-                    };
+-                  }
+-                  return { ...s, messages: updatedMessages };
+-                }
+-                return s;
+-              }));
+-              scrollToBottom();
+             } catch {
+               // skip
+             }
+           }
+         }
++
++        if (hasNewContent) {
++          throttleUpdate();
++        }
+       }
+
++      // Final forced update to ensure everything is rendered correctly
++      if (updateTask) cancelAnimationFrame(updateTask);
++      setSessions((prev) => prev.map(s => {
++        if (s.id === currentSessionId) {
++          const updatedMessages = [...s.messages];
++          const lastMsg = updatedMessages[updatedMessages.length - 1];
++          if (lastMsg && lastMsg.role === "assistant") {
++            updatedMessages[updatedMessages.length - 1] = {
++              ...lastMsg,
++              content: fullText,
++              images: collectedImages.length > 0 ? collectedImages : undefined,
++              sources: collectedSources.length > 0 ? collectedSources : undefined,
++            };
++          }
++          return { ...s, messages: updatedMessages };
++        }
++        return s;
++      }));
++      scrollToBottom();
++
+       // After streaming completes โ€” finalize artifact version
+       if (fullText) {
+         const { artifact: finalArtifact, isComplete: finalComplete } = parseArtifacts(fullText);
+@@ -3209,39 +3611,6 @@ export default function AIChatPage() {
+     setIsDragging(false);
+   }, []);
+
+-  // Clipboard paste handler for images
+-  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
+-    const items = e.clipboardData.items;
+-    const newFiles: FileData[] = [];
+-
+-    for (let i = 0; i < items.length; i++) {
+-      const item = items[i];
+-      if (!item.type.startsWith("image/")) continue;
+-
+-      const file = item.getAsFile();
+-      if (!file) continue;
+-      if (file.size > 4 * 1024 * 1024) continue;
+-      if (attachments.length + newFiles.length >= 5) break;
+-
+-      const reader = new FileReader();
+-      const filePromise = new Promise<FileData>((resolve) => {
+-        reader.onloadend = () => {
+-          resolve({
+-            name: `pasted-image-${Date.now()}.${file.type.split("/")[1] || "png"}`,
+-            data: reader.result as string,
+-            type: file.type,
+-          });
+-        };
+-      });
+-      reader.readAsDataURL(file);
+-      newFiles.push(await filePromise);
+-    }
+-
+-    if (newFiles.length > 0) {
+-      setAttachments((prev) => [...prev, ...newFiles]);
+-    }
+-  }, [attachments.length]);
+-
+   if (authLoading) {
+     return (
+       <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-3 bg-background">     
+@@ -3302,7 +3671,7 @@ export default function AIChatPage() {
+         }`}
+       >
+         <div className="p-2 flex flex-col h-full w-64 shrink-0">
+-          {/* New Chat + Close */}
++          {/* New Chat + Close + Create Folder */}
+           <div className="flex items-center gap-1.5 mb-2">
+             <Button
+               onClick={createNewSession}
+@@ -3310,7 +3679,16 @@ export default function AIChatPage() {
+               className="flex-1 justify-start gap-2 h-9 text-sm"
+             >
+               <Plus className="h-4 w-4" />
+-              เนเธเธ—เนเธซเธกเน
++              {aiSettings.language === "th" ? "เนเธเธ—เนเธซเธกเน" : "New Chat"}
++            </Button>
++            <Button
++              variant="ghost"
++              size="icon"
++              className="h-9 w-9 shrink-0 text-muted-foreground"
++              onClick={createFolder}
++              title={aiSettings.language === "th" ? "เธชเธฃเนเธฒเธเนเธธฅเน€เธ”เธญเธฃเน" : "Create Folder"}
++            >
++              <FolderPlus className="h-4 w-4" />
+             </Button>
+             <Button
+               variant="ghost"
+@@ -3329,7 +3707,7 @@ export default function AIChatPage() {
+               type="text"
+               value={sidebarSearch}
+               onChange={(e) => setSidebarSearch(e.target.value)}
+-              placeholder="เธ
+                              เนเธเธซเธฒ..."
++              placeholder={aiSettings.language === "th" ? "เธ
+                                                              เนเธเธซเธฒ..." : "Search..."}
+               className="w-full pl-8 pr-8 py-1.5 text-sm bg-transparent border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+             />
+             {sidebarSearch && (
+@@ -3343,12 +3721,150 @@ export default function AIChatPage() {
+           </div>
+
+           {/* Session List */}
+-          <div className="flex-1 overflow-y-auto space-y-0.5">
+-            {filteredSessions.length === 0 ? (
++          <div className="flex-1 overflow-y-auto space-y-0.5 pr-1 custom-scrollbar">
++            {/* Folders */}
++            {folders.length > 0 && !sidebarSearch && (
++              <div className="mb-2">
++                {folders.map(folder => (
++                  <div 
++                    key={folder.id} 
++                    className="mb-1"
++                    onDragOver={(e) => {
++                      e.preventDefault();
++                      setHoveredFolderId(folder.id);
++                    }}
++                    onDragLeave={() => setHoveredFolderId(null)}
++                    onDrop={(e) => {
++                      e.preventDefault();
++                      const sessionId = e.dataTransfer.getData("sessionId");
++                      if (sessionId) moveSessionToFolder(sessionId, folder.id);
++                      setHoveredFolderId(null);
++                    }}
++                  >
++                    <div
++                      className={`flex items-center gap-1.5 px-2 py-1.5 rounded-md cursor-pointer hover:bg-accent/50 group transition-colors ${
++                        hoveredFolderId === folder.id ? 'bg-emerald-500/10 ring-1 ring-emerald-500/30' : ''    
++                      }`}
++                      onClick={() => toggleFolder(folder.id)}
++                    >
++                      {folder.isOpen ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
++                      <Folder className={`h-3.5 w-3.5 ${folder.isOpen ? 'text-emerald-500' : 'text-muted-foreground'}`} />
++
++                      {editingFolderId === folder.id ? (
++                        <form
++                          className="flex-1 flex items-center gap-1"
++                          onSubmit={(e) => { e.preventDefault(); renameFolder(folder.id); }}
++                        >
++                          <input
++                            autoFocus
++                            value={editingFolderName}
++                            onChange={(e) => setEditingFolderName(e.target.value)}
++                            onBlur={() => renameFolder(folder.id)}
++                            onKeyDown={(e) => { if (e.key === "Escape") setEditingFolderId(null); }}
++                            className="flex-1 text-sm bg-transparent border-b border-ring focus:outline-none text-foreground py-0"
++                            onClick={(e) => e.stopPropagation()}
++                          />
++                          <button type="submit" onClick={(e) => e.stopPropagation()} className="p-0.5 text-primary">
++                            <Check className="h-3.5 w-3.5" />
++                          </button>
++                        </form>
++                      ) : (
++                        <>
++                          <span className="text-sm flex-1 truncate font-medium">{folder.name}</span>
++                          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
++                            <button 
++                              onClick={(e) => startEditingFolder(folder, e)}
++                              className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-md transition-all"
++                            >
++                              <Pencil className="h-3 w-3" />
++                            </button>
++                            <button 
++                              onClick={(e) => { e.stopPropagation(); deleteFolder(folder.id, e); }}
++                              className="p-1 hover:text-destructive rounded-md transition-all"
++                            >
++                              <Trash2 className="h-3 w-3" />
++                            </button>
++                          </div>
++                        </>
++                      )}
++                    </div>
++
++                    {folder.isOpen && (
++                      <div className="ml-4 pl-2 border-l border-gray-100 space-y-0.5 mt-0.5">
++                        {sessions.filter(s => s.folderId === folder.id).map(s => (
++                          <div
++                            key={s.id}
++                            draggable
++                            onDragStart={(e) => {
++                              setDraggedSessionId(s.id);
++                              e.dataTransfer.setData("sessionId", s.id);
++                            }}
++                            onDragEnd={() => setDraggedSessionId(null)}
++                            onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
++                            className={`group/item relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
++                              activeSessionId === s.id
++                                ? "bg-accent text-accent-foreground"
++                                : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
++                            } ${draggedSessionId === s.id ? 'opacity-40' : ''}`}
++                          >
++                            <MessageSquare className="h-3.5 w-3.5 shrink-0" />
++
++                            {editingSessionId === s.id ? (
++                              <form
++                                className="flex-1 flex items-center gap-1"
++                                onSubmit={(e) => { e.preventDefault(); renameSession(s.id); }}
++                              >
++                                <input
++                                  autoFocus
++                                  value={editingTitle}
++                                  onChange={(e) => setEditingTitle(e.target.value)}
++                                  onBlur={() => renameSession(s.id)}
++                                  onKeyDown={(e) => { if (e.key === "Escape") setEditingSessionId(null); }}    
++                                  className="flex-1 text-sm bg-transparent border-b border-ring focus:outline-none text-foreground py-0"
++                                  onClick={(e) => e.stopPropagation()}
++                                />
++                                <button type="submit" onClick={(e) => e.stopPropagation()} className="p-0.5 text-primary">
++                                  <Check className="h-3.5 w-3.5" />
++                                </button>
++                              </form>
++                            ) : (
++                              <>
++                                <span className="text-sm truncate block flex-1">{s.title}</span>
++                                <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0">
++                                  <button onClick={(e) => { e.stopPropagation(); setSharingSession(s); setShareModalOpen(true); }} className="p-1 hover:bg-accent text-muted-foreground rounded-sm">
++                                    <Globe className="h-3 w-3" />
++                                  </button>
++                                  <button onClick={(e) => startEditing(s, e)} className="p-1 hover:bg-accent text-muted-foreground rounded-sm">
++                                    <Pencil className="h-3 w-3" />
++                                  </button>
++                                  <button onClick={(e) => { e.stopPropagation(); moveSessionToFolder(s.id, null); }} className="p-1 hover:bg-accent text-muted-foreground rounded-sm">
++                                    <ArrowUpRight className="h-3 w-3" />
++                                  </button>
++                                  <button onClick={(e) => deleteSession(s.id, e)} className="p-1 hover:bg-destructive/10 text-muted-foreground hover:text-destructive rounded-sm">
++                                    <Trash2 className="h-3 w-3" />
++                                  </button>
++                                </div>
++                              </>
++                            )}
++                          </div>
++                        ))}
++                        {sessions.filter(s => s.folderId === folder.id).length === 0 && (
++                          <div className="py-2 px-2 text-[11px] text-muted-foreground italic">
++                            {aiSettings.language === "th" ? "เธงเนเธฒเธเน€เธธฅเนเธฒ (เธฅเธฒเธเธกเธฒเธงเธฒเธ)" : "Empty (drag sessions here                                                                                    e)"}
++                          </div>
++                        )}
++                      </div>
++                    )}
++                  </div>
++                ))}
++              </div>
++            )}
++
++            {filteredSessions.length === 0 && folders.length === 0 ? (
+               <div className="px-2 py-10 text-center text-muted-foreground">
+                 <MessageSquare className="h-6 w-6 mx-auto mb-2 opacity-40" />
+                 <p className="text-xs">
+-                  {sidebarSearch ? "เน
+                                       เธกเนเธธเนเธเธ—เธ—เธตเนเธ
+                                                                เนเธเธซเธฒ" : "เธขเธฑเธเน
+                                                                                         เธกเนเธกเธตเธธฃเธฐเธงเธฑเธ•เธด"}
++                  {sidebarSearch ? (aiSettings.language === "th" ? "เน
+                                                                       เธกเนเธธเนเธเธ—เธ—เธตเนเธ
+                                                                                                เนเธเธซเธฒ" : "No chats found") : (ai                                                                                          iSettings.language === "th" ? "เธขเธฑเธเน
+                                        เธกเนเธกเธตเธธฃเธฐเธงเธฑเธ•เธด" : "No history yet")}
+                 </p>
+               </div>
+             ) : (
+@@ -3360,12 +3876,18 @@ export default function AIChatPage() {
+                   {groupSessions.map((s) => (
+                     <div
+                       key={s.id}
++                      draggable
++                      onDragStart={(e) => {
++                        setDraggedSessionId(s.id);
++                        e.dataTransfer.setData("sessionId", s.id);
++                      }}
++                      onDragEnd={() => setDraggedSessionId(null)}
+                       onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+                       className={`group/item relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                         activeSessionId === s.id
+                           ? "bg-accent text-accent-foreground"
+                           : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+-                      }`}
++                      } ${draggedSessionId === s.id ? 'opacity-40' : ''}`}
+                     >
+                       <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+
+@@ -3393,6 +3915,13 @@ export default function AIChatPage() {
+                             <span className="text-sm truncate block">{s.title}</span>
+                           </div>
+                           <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0">
++                            <button
++                              onClick={(e) => { e.stopPropagation(); setSharingSession(s); setShareModalOpen(true); }}
++                              className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-colors"
++                              title={aiSettings.language === "th" ? "เนเธเธฃเน" : "Share"}
++                            >
++                              <Globe className="h-3 w-3" />
++                            </button>
+                             <button
+                               onClick={(e) => startEditing(s, e)}
+                               className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-colors"
+@@ -3496,11 +4025,23 @@ export default function AIChatPage() {
+           </Button>
+         )}
+
+-        <main className="flex-1 overflow-hidden flex flex-col">
+-          <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 py-6 scroll-smooth ${
++        <main className="flex-1 overflow-hidden flex flex-col relative bg-[#fcfcfd]">
++          {/* Floating Scroll to Bottom Button */}
++          {showScrollButton && (
++            <button
++              onClick={() => scrollToBottom(true)}
++              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[45] flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-emerald-100 shadow-2xl text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 hover:scale-105 active:scale-95 transition-all animate-in slide-in-from-bottom-8 duration-500 group"    
++            >
++              <ArrowDown className="h-4 w-4 animate-bounce" />
++              <span className="text-xs font-bold uppercase tracking-widest">เธกเธตเธเนเธญเธ
+                                                                                            เธงเธฒเธกเนเธซเธกเน</span>
++              <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse" />
++            </button>
++          )}
++
++          <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 py-6 scroll-smooth relative ${
+             aiSettings.fontSize === "small" ? "text-xs" : aiSettings.fontSize === "large" ? "text-base" : "text-sm"
+           }`}>
+-            <div className="max-w-2xl mx-auto flex flex-col gap-6 pb-8">
++            <div className="max-w-2xl mx-auto flex flex-col gap-6 pb-20">
+           {messages.length === 0 && (
+             <div className="flex flex-col items-center justify-center py-16 text-center">
+               <div className="h-12 w-12 mb-4 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+@@ -3583,26 +4124,80 @@ export default function AIChatPage() {
+                         // Strip <canvas> tags from chat display โ€” content shows in Canvas panel
+                         const { cleanedContent: answer, artifact: msgArtifact } = parseArtifacts(rawAnswer);   
+                         const isStreaming = loading && i === messages.length - 1;
+-                        const isStillThinking = isStreaming && !m.content.includes("</think>");
++                        const isStillThinking = isStreaming && !/<\/think>/i.test(m.content);
+                         const isWebSearching = isStreaming && activeTool === "webSearch";
+-                        // Hide thinking for flash/small models โ€” their thinking is too shallow to be useful   
+-                        const isProModel = selectedModel.includes("pro") || selectedModel.includes("opus") || selectedModel.includes("3.1");
+-                        const isAutoMaybeFlash = selectedModel === "auto" && thinking && thinking.split("\n").filter(l => l.trim()).length <= 2;
+-                        const showThinking = isProModel || (selectedModel === "auto" && !isAutoMaybeFlash);    
++
++                        // Show thinking if thinking exists or it's still thinking (streaming)
++                        const showThinking = !!thinking || isStillThinking;
++
+                         return (
+                           <div className="w-full overflow-hidden text-left">
+-                            {showThinking && (thinking || isStillThinking) && (
++                            {showThinking && (
+                               <ThinkingBlock
+                                 thinking={thinking}
+                                 isStreaming={isStillThinking}
+                                 status={generatingStatus}
+                               />
+                             )}
++
++                            {/* Canvas Shortcut Button */}
++                            {msgArtifact && !isStillThinking && (
++                              <button
++                                onClick={() => {
++                                  setActiveArtifact(msgArtifact);
++                                  setIsCanvasOpen(true);
++                                }}
++                                className="mb-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-emerald-100 bg-emerald-50/50 hover:bg-emerald-50 hover:border-emerald-200 shadow-sm transition-all text-xs font-bold text-emerald-700 group animate-in zoom-in-95 duration-300"
++                              >
++                                <div className="p-1 rounded bg-emerald-100 text-emerald-600 group-hover:scale-110 transition-transform">
++                                  <SquarePen className="h-3 w-3" />
++                                </div>
++                                {aiSettings.language === "th" ? "เน€เธธดเธ”เธ”เธนเนเธ Canvas" : "Open in Canvas"}
++                                <ArrowUpRight className="h-3 w-3 opacity-50" />
++                              </button>
++                            )}
++
+                             {answer && (
+-                              <div
+-                                className="text-sm leading-relaxed prose prose-sm dark:prose-invert prose-p:my-1 prose-headings:my-2 w-full max-w-none text-left"
+-                                dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.replace(/\*\(Artifact generated in Canvas\)\*/g, "")) }}
+-                              />
++                              <>
++                                <div
++                                  className="text-sm leading-relaxed prose prose-sm dark:prose-invert prose-p:my-1 prose-headings:my-2 w-full max-w-none text-left"
++                                  dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.replace(/\*\(Artifact generated in Canvas\)\*/g, "")) }}
++                                />
++
++                                {/* Modern Message Action Bar */}
++                                {!isStillThinking && !isStreaming && (
++                                  <div className="mt-4 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200">
++                                    <button
++                                      onClick={() => {
++                                        navigator.clipboard.writeText(answer);
++                                        showToast(aiSettings.language === "th" ? "เธ
+                                                                                     เธฑเธ”เธฅเธญเธเธเนเธญเธ
+                                                                                                            เธงเธฒเธกเนเธฅเนเธง" : "Copied                                                                                      to clipboard", "success");
++                                      }}
++                                      className="p-1.5 hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 rounded-lg transition-all"
++                                      title={aiSettings.language === "th" ? "เธ
+                                                                                เธฑเธ”เธฅเธญเธ" : "Copy"}
++                                    >
++                                      <Copy className="h-3.5 w-3.5" />
++                                    </button>
++                                    <button
++                                      onClick={() => {
++                                        const utter = new SpeechSynthesisUtterance(answer);
++                                        utter.lang = aiSettings.language === "th" ? "th-TH" : "en-US";
++                                        window.speechSynthesis.speak(utter);
++                                      }}
++                                      className="p-1.5 hover:bg-emerald-50 text-gray-400 hover:text-emerald-600 rounded-lg transition-all"
++                                      title={aiSettings.language === "th" ? "เธญเนเธฒเธเธญเธญเธเน€เธชเธตเธขเธ" : "Read Aloud"}     
++                                    >
++                                      <Volume2 className="h-3.5 w-3.5" />
++                                    </button>
++                                    <div className="flex-1" />
++                                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-gray-50 border border-gray-100">
++                                      <Bot className="h-2.5 w-2.5 text-gray-400" />
++                                      <span className="text-[9px] text-gray-400 font-bold uppercase tracking-tight">
++                                        {ALL_MODELS.find(m => m.value === activeSession?.model)?.label || "AI"}
++                                      </span>
++                                    </div>
++                                  </div>
++                                )}
++                              </>
+                             )}
+                             {/* Open Canvas button */}
+                             {msgArtifact && (
+@@ -3951,42 +4546,62 @@ export default function AIChatPage() {
+                     </button>
+
+                     {isModelPickerOpen && (
+-                      <div className="absolute bottom-full left-0 mb-1.5 w-44 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
+-                        <div className="px-2 py-1">
+-                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Model</span>
+-                        </div>
+-                        {MODEL_OPTIONS.map((model) => {
+-                          const available = isModelAvailable(model.value);
+-                          const cost = quota?.pricing?.[model.value] ?? (model.value === "auto" ? 0 : undefined);
+-                          const hasCredits = cost === undefined || cost === 0 || (quota?.credits ?? 0) >= cost;
+-                          const canUse = available && hasCredits;
+-                          return (
+-                            <button
+-                              key={model.value}
+-                              onClick={() => { if (canUse) { setSelectedModel(model.value); setIsModelPickerOpen(false); } }}
+-                              disabled={!canUse}
+-                              className={`w-full flex items-center gap-2 px-2 py-1.5 text-left transition-colors ${
+-                                !canUse ? "opacity-40 cursor-not-allowed" :
+-                                selectedModel === model.value ? "bg-gray-100" : "hover:bg-gray-50"
+-                              }`}
+-                            >
+-                              {model.icon}
+-                              <span className="text-xs flex-1 text-gray-900">{model.label}</span>
+-                              {!available ? (
+-                                <span className="text-[9px] text-red-400 font-medium">เน
+                                                                                         เธกเนเธธฃเนเธญเธก</span>
+-                              ) : cost !== undefined && cost > 0 ? (
+-                                <span className={`text-[9px] font-semibold tabular-nums ${hasCredits ? "text-amber-500" : "text-red-400"}`}>
+-                                  {cost}cr
+-                                </span>
+-                              ) : cost === 0 ? (
+-                                <span className="text-[9px] text-emerald-500 font-medium">FREE</span>
+-                              ) : (
+-                                <span className="text-[10px] text-muted-foreground">{model.desc}</span>        
+-                              )}
+-                              {selectedModel === model.value && canUse && <Check className="h-3 w-3 text-primary" />}
+-                            </button>
+-                          );
+-                        })}
++                      <div className="absolute bottom-full left-0 mb-1.5 w-52 sm:w-60 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50 max-h-[70vh] overflow-y-auto animate-in slide-in-from-bottom-2 duration-200">
++                        {MODEL_CATEGORIES.map((category, catIdx) => (
++                          <div key={category.name}>
++                            {catIdx > 0 && <div className="h-px bg-gray-100 my-1.5 mx-2" />}
++                            <div className="px-3 py-1.5">
++                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{category.name}</span>
++                            </div>
++                            {category.models.map((model) => {
++                              const available = isModelAvailable(model.value);
++                              const cost = quota?.pricing?.[model.value] ?? (model.value === "auto" ? 0 : undefined);
++                              const hasCredits = cost === undefined || cost === 0 || (quota?.credits ?? 0) >= cost;
++                              const canUse = available && hasCredits;
++
++                              return (
++                                <button
++                                  key={model.value}
++                                  onClick={() => { if (canUse) { setSelectedModel(model.value); setIsModelPickerOpen(false); } }}
++                                  disabled={!canUse}
++                                  className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-all ${
++                                    !canUse ? "opacity-40 grayscale" :
++                                    selectedModel === model.value ? "bg-emerald-50 text-emerald-700" : "hover:bg-gray-50"
++                                  }`}
++                                >
++                                  <div className={`shrink-0 p-1.5 rounded-lg ${selectedModel === model.value ? 'bg-emerald-100' : 'bg-gray-100'}`}>
++                                    {model.icon}
++                                  </div>
++                                  <div className="flex-1 min-w-0">
++                                    <div className="flex items-center justify-between gap-2">
++                                      <span className="text-xs font-bold truncate">{model.label}</span>        
++                                      {cost !== undefined && (
++                                        <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
++                                          cost === 0 ? "bg-emerald-100 text-emerald-600" : 
++                                          hasCredits ? "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600"
++                                        }`}>
++                                          {cost === 0 ? "FREE" : `${cost}cr`}
++                                        </span>
++                                      )}
++                                    </div>
++                                    <div className="flex items-center justify-between mt-0.5">
++                                      <span className="text-[10px] text-gray-400 truncate">{model.desc}</span> 
++                                      {!available && (
++                                        <span className="text-[9px] text-red-500 font-bold flex items-center gap-0.5">
++                                          <AlertCircle className="h-2.5 w-2.5" />
++                                          Down
++                                        </span>
++                                      )}
++                                    </div>
++                                  </div>
++                                  {selectedModel === model.value && canUse && (
++                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200" />
++                                  )}
++                                </button>
++                              );
++                            })}
++                          </div>
++                        ))}
+                       </div>
+                     )}
+                   </div>
+@@ -4032,14 +4647,14 @@ export default function AIChatPage() {
+         >
+           {/* Resize handle */}
+           <div
+-            className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 group hover:bg-primary/20 active:bg-primary/30 transition-colors"
++            className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 group hover:bg-emerald-500/20 active:bg-emerald-500/30 transition-colors"
+             onMouseDown={(e) => {
+               e.preventDefault();
+               canvasResizeRef.current = { startX: e.clientX, startWidth: canvasWidth };
+               setIsResizingCanvas(true);
+             }}
+           >
+-            <div className="absolute left-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 group-hover:bg-primary/50 transition-colors" />
++            <div className="absolute left-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 group-hover:bg-emerald-500/50 transition-colors" />
+           </div>
+           <div className="flex-1 border-l border-gray-200 overflow-hidden">
+             <CanvasView
+@@ -4134,6 +4749,368 @@ export default function AIChatPage() {
+           </div>
+         </div>
+       )}
++
++      {/* UI Modals */}
++      {toast && (
++        <Toast
++          message={toast.msg}
++          type={toast.type}
++          onClose={() => setToast(null)}
++          lang={aiSettings.language}
++        />
++      )}
++
++      {confirmDialog?.isOpen && (
++        <ModernConfirmModal
++          title={confirmDialog.title}
++          message={confirmDialog.message}
++          confirmText={confirmDialog.confirmText}
++          cancelText={confirmDialog.cancelText}
++          variant={confirmDialog.variant}
++          onConfirm={confirmDialog.onConfirm}
++          onClose={() => setConfirmDialog(null)}
++          lang={aiSettings.language}
++        />
++      )}
++
++      {isMoveModalOpen && movingSession && (
++        <MoveToFolderModal
++          session={movingSession}
++          folders={folders}
++          onMove={(fid) => moveSessionToFolder(movingSession.id, fid)}
++          onClose={() => { setIsMoveModalOpen(false); setMovingSession(null); }}
++          lang={aiSettings.language}
++        />
++      )}
++
++      {shareModalOpen && sharingSession && (
++        <ShareModal
++          session={sharingSession}
++          onClose={() => { setShareModalOpen(false); setSharingSession(null); }}
++          lang={aiSettings.language}
++        />
++      )}
+     </div>
+   );
+ }
++
++/**
++ * UI Support Components
++ */
++
++function Toast({ message, type, onClose, lang }: { 
++  message: string; 
++  type: 'success' | 'error' | 'info' | 'warning'; 
++  onClose: () => void;
++  lang: string;
++}) {
++  useEffect(() => {
++    const timer = setTimeout(onClose, 3000);
++    return () => clearTimeout(timer);
++  }, [onClose]);
++
++  const icons = {
++    success: <CheckCircle2 className="h-5 w-5 text-emerald-500" />,
++    error: <XCircle className="h-5 w-5 text-red-500" />,
++    warning: <AlertCircle className="h-5 w-5 text-amber-500" />,
++    info: <Info className="h-5 w-5 text-blue-500" />
++  };
++
++  const bgColors = {
++    success: "bg-emerald-50 border-emerald-100",
++    error: "bg-red-50 border-red-100",
++    warning: "bg-amber-50 border-amber-100",
++    info: "bg-blue-50 border-blue-100"
++  };
++
++  return (
++    <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg ${bgColors[type]} animate-in fade-in slide-in-from-bottom-4 duration-300`}>
++      {icons[type]}
++      <span className="text-sm font-medium text-gray-800">{message}</span>
++      <button onClick={onClose} className="p-1 hover:bg-black/5 rounded-full transition-colors">
++        <X className="h-4 w-4 text-gray-400" />
++      </button>
++    </div>
++  );
++}
++
++function ModernConfirmModal({ 
++  title, 
++  message, 
++  confirmText, 
++  cancelText, 
++  onConfirm, 
++  onClose,
++  variant = "primary",
++  lang 
++}: { 
++  title: string; 
++  message: string; 
++  confirmText?: string; 
++  cancelText?: string; 
++  onConfirm: () => void; 
++  onClose: () => void;
++  variant?: "primary" | "destructive";
++  lang: string;
++}) {
++  return (
++    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
++      <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
++        <div className="p-6">
++          <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
++          <p className="text-sm text-gray-500 leading-relaxed">{message}</p>
++        </div>
++        <div className="flex border-t border-gray-100">
++          <button
++            onClick={onClose}
++            className="flex-1 px-4 py-4 text-sm font-medium text-gray-500 hover:bg-gray-50 transition-colors"  
++          >
++            {cancelText || (lang === "th" ? "เธขเธเน€เธฅเธดเธ" : "Cancel")}
++          </button>
++          <button
++            onClick={() => { onConfirm(); onClose(); }}
++            className={`flex-1 px-4 py-4 text-sm font-bold border-l border-gray-100 transition-colors ${       
++              variant === "destructive" ? "text-red-600 hover:bg-red-50" : "text-emerald-600 hover:bg-emerald-50"
++            }`}
++          >
++            {confirmText || (lang === "th" ? "เธขเธทเธเธขเธฑเธ" : "Confirm")}
++          </button>
++        </div>
++      </div>
++    </div>
++  );
++}
++
++function MoveToFolderModal({
++  session,
++  folders,
++  onMove,
++  onClose,
++  lang
++}: {
++  session: ChatSession;
++  folders: Folder[];
++  onMove: (folderId: string | null) => void;
++  onClose: () => void;
++  lang: string;
++}) {
++  return (
++    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">  
++      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
++        <div className="p-6 border-b border-gray-100">
++          <h3 className="text-lg font-semibold">{lang === "th" ? "เธขเนเธฒเธขเน
+                                                                                เธธขเธฑเธเนเธธฅเน€เธ”เธญเธฃเน" : "Move to Folder"}</h3>  
++          <p className="text-sm text-muted-foreground mt-1">"{session.title}"</p>
++        </div>
++        <div className="p-2 max-h-[300px] overflow-y-auto">
++          <button
++            onClick={() => { onMove(null); onClose(); }}
++            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent rounded-xl transition-colors text-left"
++          >
++            <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-500">  
++              <MessageSquare className="h-5 w-5" />
++            </div>
++            <div>
++              <div className="font-medium">{lang === "th" ? "เน
+                                                                เธกเนเธกเธตเนเธธฅเน€เธ”เธญเธฃเน" : "No Folder"}</div>
++              <div className="text-xs text-muted-foreground">{lang === "th" ? "เนเธชเธ”เธเนเธเธฃเธฒเธขเธเธฒเธฃเธซเธฅเธฑเธ" : "Show in mai                                                                                     in list"}</div>
++            </div>
++          </button>
++
++          {folders.map(folder => (
++            <button
++              key={folder.id}
++              onClick={() => { onMove(folder.id); onClose(); }}
++              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-accent rounded-xl transition-colors text-left"
++            >
++              <div className="h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600">
++                <Folder className="h-5 w-5" />
++              </div>
++              <div>
++                <div className="font-medium">{folder.name}</div>
++                <div className="text-xs text-muted-foreground">{folder.sessionIds.length} {lang === "th" ? "เนเธเธ—                                                                                                           เธ—" : "chats"}</div>
++              </div>
++            </button>
++          ))}
++        </div>
++        <div className="p-4 bg-gray-50 flex justify-end">
++          <Button variant="ghost" onClick={onClose}>{lang === "th" ? "เธธดเธ”" : "Close"}</Button>
++        </div>
++      </div>
++    </div>
++  );
++}
++
++function ShareModal({
++  session,
++  onClose,
++  lang
++}: {
++  session: ChatSession;
++  onClose: () => void;
++  lang: string;
++}) {
++  const [copied, setCopied] = useState(false);
++  const [isLoading, setIsLoading] = useState(false);
++  const [createdUrl, setCreatedUrl] = useState<string | null>(null);
++  const [expiresIn, setExpiresIn] = useState<number>(30); // Default 30 days
++
++  // Check if this session already has a saved share link in localStorage for this session
++  useEffect(() => {
++    const savedShare = localStorage.getItem(`share_url_${session.id}`);
++    if (savedShare) {
++      setCreatedUrl(savedShare);
++    }
++  }, [session.id]);
++
++  const createShareLink = async () => {
++    setIsLoading(true);
++    try {
++      const res = await fetch("/api/ai/share", {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({
++          session: {
++            id: session.id,
++            title: session.title,
++            messages: session.messages
++          },
++          expiresInDays: expiresIn === 0 ? undefined : expiresIn
++        })
++      });
++      const data = await res.json();
++      if (data.url) {
++        const fullUrl = `${window.location.origin}${data.url}`;
++        setCreatedUrl(fullUrl);
++        // Save to remember for this session locally
++        localStorage.setItem(`share_url_${session.id}`, fullUrl);
++      }
++    } catch (error) {
++      console.error("Failed to create share link:", error);
++    } finally {
++      setIsLoading(false);
++    }
++  };
++
++  const handleCopy = () => {
++    if (!createdUrl) return;
++    navigator.clipboard.writeText(createdUrl);
++    setCopied(true);
++    setTimeout(() => setCopied(false), 2000);
++  };
++
++  return (
++    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">  
++      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
++        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
++          <div>
++            <h3 className="text-lg font-semibold">{lang === "th" ? "เนเธเธฃเนเธเธฒเธฃเธชเธเธ—เธเธฒ" : "Share Conversation"}</h3> 
++            <p className="text-sm text-muted-foreground mt-0.5">{lang === "th" ? "เธ•เธฑเนเธเธ
+                                                                                               เนเธฒเธฅเธดเธเธเนเนเธเธฃเนเธเธญเธเธ
+                  เธธเธ“" : "Co                                                                                onfigure your share link"}</p>
++          </div>
++          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
++            <X className="h-5 w-5 text-gray-400" />
++          </button>
++        </div>
++
++        <div className="p-6 space-y-6">
++          {/* Expiration Settings */}
++          <div className="space-y-3">
++            <label className="text-sm font-bold text-gray-700 flex items-center gap-2">
++              <Calendar className="h-4 w-4 text-emerald-500" />
++              {lang === "th" ? "เธฃเธฐเธขเธฐเน€เธงเธฅเธฒเธซเธกเธ”เธญเธฒเธขเธธ" : "Expiration Period"}
++            </label>
++            <div className="grid grid-cols-4 gap-2">
++              {[1, 7, 30, 0].map((days) => (
++                <button
++                  key={days}
++                  onClick={() => setExpiresIn(days)}
++                  className={`py-2 text-xs font-bold rounded-xl border transition-all ${
++                    expiresIn === days 
++                      ? "bg-emerald-600 border-emerald-600 text-white shadow-md shadow-emerald-100" 
++                      : "bg-white border-gray-200 text-gray-500 hover:border-emerald-200 hover:bg-emerald-50"  
++                  }`}
++                >
++                  {days === 0 
++                    ? (lang === "th" ? "เน
+                                           เธกเนเธกเธต" : "Never") 
++                    : days + (lang === "th" ? " เธงเธฑเธ" : "d")}
++                </button>
++              ))}
++            </div>
++          </div>
++
++          {!createdUrl ? (
++            <div className="space-y-4">
++              <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex gap-3">
++                <AlertCircle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
++                <div className="text-sm text-amber-800 leading-relaxed italic">
++                  {lang === "th" 
++                    ? "เธเธทเนเธญเนเธฅเธฐเธเนเธญเธ
+                                                   เธงเธฒเธกเธเธญเธเธ
+                                                                     เธธเธ“เธเธฐเน€เธธดเธ”เน€เธนเธเธชเธฒเธธฒเธฃเธ“เธฐเธชเธณเธซเธฃเธฑเธเธ—เธธเธเธ
+                                เธเธ—เธตเนเธกเธตเธฅเธดเธเธเน" 
++                    : "Your name and messages will be public to anyone with the link."}
++                </div>
++              </div>
++              <Button 
++                onClick={createShareLink} 
++                disabled={isLoading}
++                className="w-full py-6 text-base font-bold shadow-lg shadow-emerald-200 rounded-xl"
++              >
++                {isLoading ? (
++                  <Loader2 className="h-5 w-5 animate-spin mr-2" />
++                ) : (
++                  <Share2 className="h-5 w-5 mr-2" />
++                )}
++                {lang === "th" ? "เธชเธฃเนเธฒเธเธฅเธดเธเธเนเนเธเธฃเน" : "Create Share Link"}
++              </Button>
++            </div>
++          ) : (
++            <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
++              <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
++                <label className="text-[10px] font-extrabold text-emerald-600 uppercase tracking-widest mb-1.5 block">
++                  {lang === "th" ? "เธฅเธดเธเธเนเนเธเธฃเนเธธฑเธเธเธธเธเธฑเธ" : "Current Share Link"}
++                </label>
++                <div className="flex gap-2">
++                  <div className="flex-1 px-3 py-2.5 bg-white border border-emerald-200 rounded-xl text-sm truncate text-emerald-700 font-bold select-all shadow-sm">
++                    {createdUrl}
++                  </div>
++                  <Button onClick={handleCopy} className="shrink-0 h-10 w-10 rounded-xl p-0">
++                    {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
++                  </Button>
++                </div>
++              </div>
++
++              <div className="flex flex-col gap-2 pt-2">
++                <Button 
++                  onClick={createShareLink} 
++                  disabled={isLoading}
++                  variant="outline"
++                  className="w-full py-5 text-sm font-bold border-2 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all rounded-xl"
++                >
++                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <RefreshCw className="h-4 w-4 mr-2" />}
++                  {lang === "th" ? "เธญเธฑเธน€เธ”เธ•เน€เธเธทเนเธญเธซเธฒเธฅเธดเธเธเนเน€เธ”เธดเธก" : "Update Current Link Content"}
++                </Button>
++                <p className="text-[10px] text-center text-muted-foreground">
++                  {lang === "th" 
++                    ? "*เนเธเนเธฅเธดเธเธเนเน€เธ”เธดเธกเน€เธธทเนเธญเนเธชเธ”เธเธเนเธญเธ
+                                                                                      เธงเธฒเธกเธฅเนเธฒเธชเธธเธ”เธ—เธตเนเธ
+          เธธเธ“เน€เธธดเนเธเธ
+                             เธธเธข" 
++                    : "*Uses the same link to reflect your latest conversation changes"}
++                </p>
++              </div>
++            </div>
++          )}
++        </div>
++        
++        <div className="p-4 bg-gray-50 flex justify-between items-center border-t border-gray-100">
++          <div className="text-[11px] text-muted-foreground flex items-center gap-1.5 font-bold">
++            <Globe className="h-3.5 w-3.5 text-emerald-500" />
++            {lang === "th" ? "เธฅเธดเธเธเนเน€เธเนเธฒเธ–เธถเธเธชเธฒเธธฒเธฃเธ“เธฐ" : "Public access link"}
++          </div>
++          <Button variant="ghost" onClick={onClose} className="rounded-xl font-bold text-xs">{lang === "th" ? "เน€เธชเธฃเนเธเธชเธดเนเธ" : "Done"}</Button>
++        </div>
++      </div>
++    </div>
++  );
++}
++
++๏ฟฝ๏ฟฝเนเธเธชเธดเนเธ" : "Done"}</Button>
++        </div>
++      </div>
++    </div>
++  );
++}
++

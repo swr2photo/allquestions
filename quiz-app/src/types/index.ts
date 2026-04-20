@@ -121,3 +121,41 @@ export interface SheetRow {
   deadline: string;
   status: string;
 }
+
+// AI Chat types
+export interface FileData {
+  name: string;
+  data: string; // base64
+  type: string;
+}
+
+export interface SearchSource {
+  title: string;
+  url: string;
+}
+
+export interface Message {
+  role: "user" | "assistant";
+  content: string;
+  files?: FileData[];
+  images?: string[];      // generated images (data URLs)
+  sources?: SearchSource[]; // web search sources
+}
+
+export interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  model?: string;
+  createdAt: number;
+  updatedAt?: number;
+  folderId?: string;
+}
+
+export interface Folder {
+  id: string;
+  name: string;
+  createdAt?: number;
+  sessionIds: string[];
+  isOpen?: boolean;
+}

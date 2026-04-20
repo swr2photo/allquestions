@@ -5,6 +5,7 @@ import {
   createCustomQuiz,
 } from "@/lib/custom-quiz-store";
 import { courses } from "@/data/courses";
+import { CustomQuiz } from "@/types";
 
 function checkAuth(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Return all custom quizzes grouped by course
-  const allQuizzes: Record<string, any> = {};
+  const allQuizzes: Record<string, CustomQuiz[]> = {};
   await Promise.all(
     courses.map(async (course) => {
       const cq = await getCustomQuizzesForCourse(course.id);

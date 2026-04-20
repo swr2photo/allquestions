@@ -1,0 +1,793 @@
+diff --git a/quiz-app/src/app/ai/page.tsx b/quiz-app/src/app/ai/page.tsx
+index 845a1b23..a8bec7b6 100644
+--- a/quiz-app/src/app/ai/page.tsx
++++ b/quiz-app/src/app/ai/page.tsx
+@@ -57,8 +57,20 @@ import {
+   Database,
+   Download,
+   AlertTriangle,
++  AlertCircle,
++  AlertOctagon,
++  CheckCircle2,
++  XCircle,
++  Info,
++  Folder,
++  FolderPlus,
++  ArrowUpRight,
++  Share2,
++  Calendar,
++  RefreshCw,
+   Type,
+   MessageCircle,
++  Bot,
+   Image,
+   GraduationCap,
+   ClipboardList,
+@@ -68,6 +80,7 @@ import {
+   RotateCcw,
+   ThumbsUp,
+   ThumbsDown,
++  Volume2,
+   ExternalLink,
+   SquarePen,
+   Brain,
+@@ -110,18 +123,31 @@ hljs.registerLanguage("md", markdown);
+ hljs.registerLanguage("diff", diff);
+
+ function parseThinking(content: string): { thinking: string; answer: string } {
+-  const thinkMatch = content.match(/<think>([\s\S]*?)(<\/think>|$)/);
+-  if (!thinkMatch) return { thinking: "", answer: content };
++  // Try to find the end of the thinking block
++  const thinkEndIndex = content.toLowerCase().lastIndexOf("</think>");
++  const thinkStartIndex = content.toLowerCase().indexOf("<think");
+
+-  // Strip MEMORY_SAVE tags from thinking content
+-  let thinking = thinkMatch[1].trim();
+-  thinking = thinking.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++  if (thinkStartIndex === -1) {
++    return { thinking: "", answer: content };
++  }
+
+-  let afterThink = content.replace(/<think>[\s\S]*?(<\/think>|$)/, "").trim();
+-  // Also strip MEMORY_SAVE from answer
+-  afterThink = afterThink.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++  // If we have a start but no end, we are still thinking
++  if (thinkEndIndex === -1) {
++    const thinking = content.substring(thinkStartIndex).replace(/<think(?:\s+[^>]*?)?>/i, "").trim();
++    return { thinking, answer: "" };
++  }
+
+-  return { thinking, answer: afterThink };
++  // We have both start and end
++  const thinkingPart = content.substring(thinkStartIndex, thinkEndIndex + 8);
++  const thinking = thinkingPart.replace(/<think(?:\s+[^>]*?)?>/i, "").replace(/<\/think>/i, "").trim();        
++  
++  // The answer is everything EXCEPT the thinking part
++  const answer = content.replace(thinkingPart, "").trim();
++  
++  // Clean up any remaining tags
++  const cleanedAnswer = answer.replace(/\[MEMORY_SAVE:\s*.+?\]/g, "").trim();
++
++  return { thinking, answer: cleanedAnswer || (answer ? answer : "") };
+ }
+
+ function ThinkingBlock({
+@@ -142,28 +168,33 @@ function ThinkingBlock({
+     }
+   }, [isStreaming, thinking]);
+
++  // Close automatically when streaming finishes if content is long
++  useEffect(() => {
++    if (!isStreaming && thinking.length > 50) {
++      const timer = setTimeout(() => setOpen(false), 800);
++      return () => clearTimeout(timer);
++    }
++  }, [isStreaming, thinking.length]);
++
+   if (!thinking && !isStreaming) return null;
+
+   return (
+-    <div className="mb-2">
++    <div className="mb-3 animate-in fade-in duration-500">
+       <button
+         onClick={() => setOpen(!open)}
+-        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
++        className="flex items-center gap-2 text-[11px] font-bold text-gray-400 hover:text-emerald-600 transition-colors uppercase tracking-widest py-1"
+       >
+-        <Zap className="h-3 w-3" />
+-        {isStreaming ? (
+-          <span className="flex items-center gap-1.5">
+-            <Loader2 className="h-3 w-3 animate-spin" />
+-            {thinking ? "เธเธณเธฅเธฑเธเธ
+                                         เธดเธ”..." : status}
+-          </span>
+-        ) : (
+-          <span>เธ”เธนเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                                                เธดเธ”</span>
+-        )}
+-        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
++        <div className={`p-1 rounded-md ${isStreaming ? 'bg-emerald-50 text-emerald-600 animate-pulse' : 'bg-gray-100'}`}>
++          <Zap className={`h-3 w-3 ${isStreaming ? 'fill-current' : ''}`} />
++        </div>
++        {isStreaming ? (thinking ? "เธเธณเธฅเธฑเธเธธฃเธฐเธกเธงเธฅเธเธฅ..." : status) : (open ? "เธเนเธญเธเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                   เธดเธ”" : "เธ”เธนเธเธฃเธฐเธเธงเธเธเธฒเธฃเธ
+                                                             เธดเธ”"                                           ")}
++        <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${open ? 'rotate-180' : ''}`} />    
+       </button>
+-      {open && (thinking || isStreaming) && (
+-        <div className="mt-1.5 ml-1 pl-3 border-l-2 border-gray-200 text-[11px] text-muted-foreground leading-relaxed whitespace-pre-wrap">
+-          {thinking || (isStreaming && !thinking && <span className="italic opacity-70">เธเธณเธฅเธฑเธเธธฃเธฐเธกเธงเธฅเธเธฅ...</span>                                                                                          >)}
++      
++      {open && (
++        <div className="pl-3 ml-2.5 border-l-2 border-emerald-50 text-[12px] leading-relaxed text-gray-500/80 italic font-medium whitespace-pre-wrap animate-in slide-in-from-top-1 duration-200">
++          {thinking}
++          {isStreaming && <span className="inline-block w-1 h-3 ml-1 bg-emerald-300 animate-pulse" />}
+         </div>
+       )}
+     </div>
+@@ -2145,6 +2176,14 @@ interface ChatSession {
+   messages: Message[];
+   createdAt: number;
+   updatedAt?: number;
++  folderId?: string;
++}
++
++interface Folder {
++  id: string;
++  name: string;
++  sessionIds: string[];
++  isOpen?: boolean;
+ }
+
+ function generateTitle(firstMessage: string): string {
+@@ -2191,20 +2230,58 @@ export default function AIChatPage() {
+   const router = useRouter();
+   const [sessions, setSessions] = useState<ChatSession[]>([]);
+   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+-  const [messages, setMessages] = useState<Message[]>([]);
+   const [input, setInput] = useState("");
++
++  const activeSession = useMemo(() => 
++    sessions.find(s => s.id === activeSessionId), 
++    [sessions, activeSessionId]
++  );
++  
++  const messages = useMemo(() => 
++    activeSession?.messages || [], 
++    [activeSession]
++  );
+   const [loading, setLoading] = useState(false);
+   const [attachments, setAttachments] = useState<FileData[]>([]);
+   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+   const [sidebarSearch, setSidebarSearch] = useState("");
+   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
+   const [editingTitle, setEditingTitle] = useState("");
++  const [sharingSession, setSharingSession] = useState<ChatSession | null>(null);
++  const [shareModalOpen, setShareModalOpen] = useState(false);
++  const [folders, setFolders] = useState<Folder[]>([]);
++  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
++  const [editingFolderName, setEditingFolderName] = useState("");
++  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
++  const [movingSession, setMovingSession] = useState<ChatSession | null>(null);
++  const [draggedSessionId, setDraggedSessionId] = useState<string | null>(null);
++  const [hoveredFolderId, setHoveredFolderId] = useState<string | null>(null);
++
++  // Notifications State
++  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" | "info" | "warning" } | null>(null);
++  const [confirmDialog, setConfirmDialog] = useState<{
++    isOpen: boolean;
++    title: string;
++    message: string;
++    confirmText?: string;
++    cancelText?: string;
++    variant?: "destructive" | "primary";
++    onConfirm: () => void;
++  } | null>(null);
++
++  const showToast = useCallback((msg: string, type: "success" | "error" | "info" | "warning" = "info") => {    
++    setToast({ msg, type });
++  }, []);
++
++  const askConfirm = useCallback((opts: { title: string; message: string; confirmText?: string; cancelText?: string; variant?: "destructive" | "primary"; onConfirm: () => void; }) => {
++    setConfirmDialog({ ...opts, isOpen: true });
++  }, []);
+   const [isModelPickerOpen, setIsModelPickerOpen] = useState(false);
+   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
+   const [showCreditPopup, setShowCreditPopup] = useState<{ needed: number; have: number; model: string } | null>(null);
+   const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_SETTINGS);
+-  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true });
++  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true });
+   const [isDragging, setIsDragging] = useState(false);
+   const [isRecording, setIsRecording] = useState(false);
+   const recognitionRef = useRef<SpeechRecognition | null>(null);
+@@ -2215,7 +2292,7 @@ export default function AIChatPage() {
+   const [activeArtifact, setActiveArtifact] = useState<Artifact | null>(null);
+   const [artifactVersions, setArtifactVersions] = useState<Artifact[]>([]);
+   const [isArtifactComplete, setIsArtifactComplete] = useState(false);
+-  const [canvasWidth, setCanvasWidth] = useState(Math.max(550, typeof window !== "undefined" ? Math.floor(window.innerWidth * 0.45) : 600));
++  const [canvasWidth, setCanvasWidth] = useState(500);
+   const [isResizingCanvas, setIsResizingCanvas] = useState(false);
+   const [previewImage, setPreviewImage] = useState<string | null>(null);
+   const [memories, setMemories] = useState<MemoryItem[]>([]);
+@@ -2305,6 +2444,82 @@ export default function AIChatPage() {
+     };
+   }, [isResizingCanvas]);
+
++  // Clipboard paste handler for images
++  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
++    const items = e.clipboardData.items;
++    const newFiles: FileData[] = [];
++
++    for (let i = 0; i < items.length; i++) {
++      const item = items[i];
++      if (!item.type.startsWith("image/")) continue;
++
++      const file = item.getAsFile();
++      if (!file) continue;
++      if (file.size > 4 * 1024 * 1024) continue;
++      if (attachments.length + newFiles.length >= 5) break;
++
++      const reader = new FileReader();
++      const filePromise = new Promise<FileData>((resolve) => {
++        reader.onloadend = () => {
++          resolve({
++            name: `pasted-image-${Date.now()}.${file.type.split("/")[1] || "png"}`,
++            data: reader.result as string,
++            type: file.type,
++          });
++        };
++      });
++      reader.readAsDataURL(file);
++      newFiles.push(await filePromise);
++    }
++
++    if (newFiles.length > 0) {
++      setAttachments((prev) => [...prev, ...newFiles]);
++      
++      // Auto-focus and adjust height
++      setTimeout(() => {
++        if (inputRef.current) {
++          inputRef.current.focus();
++          inputRef.current.style.height = "auto";
++          inputRef.current.style.height = `${Math.min(inputRef.current.scrollHeight, 200)}px`;
++        }
++      }, 50);
++    }
++  }, [attachments.length]);
++
++  // Global paste handler for images
++  useEffect(() => {
++    const handleGlobalPaste = (e: ClipboardEvent) => {
++      // Don't intercept if user is typing in another input/textarea
++      if (
++        document.activeElement?.tagName === "INPUT" || 
++        (document.activeElement?.tagName === "TEXTAREA" && document.activeElement !== inputRef.current)        
++      ) {
++        return;
++      }
++
++      if (e.clipboardData?.items) {
++        const items = e.clipboardData.items;
++        let hasImage = false;
++        for (let i = 0; i < items.length; i++) {
++          if (items[i].type.indexOf("image") !== -1) {
++            hasImage = true;
++            break;
++          }
++        }
++
++        if (hasImage) {
++          // Trigger the existing handlePaste (casting to any since we need to simulate the event structure)   
++          handlePaste(e as any);
++          // Focus the input
++          inputRef.current?.focus();
++        }
++      }
++    };
++
++    window.addEventListener("paste", handleGlobalPaste);
++    return () => window.removeEventListener("paste", handleGlobalPaste);
++  }, [handlePaste]);
++
+   const fetchAuthAndQuota = useCallback(async () => {
+     try {
+       const authRes = await fetch("/api/auth/user");
+@@ -2431,7 +2646,6 @@ export default function AIChatPage() {
+         setSessions(parsed);
+         if (parsed.length > 0) {
+           setActiveSessionId(parsed[0].id);
+-          setMessages(parsed[0].messages);
+         }
+       } catch (e) {
+         console.error("Failed to load chat history", e);
+@@ -2480,18 +2694,6 @@ export default function AIChatPage() {
+     }
+   }, [sessions]);
+
+-  // Sync messages with active session
+-  useEffect(() => {
+-    if (activeSessionId) {
+-      const session = sessions.find((s) => s.id === activeSessionId);
+-      if (session) {
+-        setMessages(session.messages);
+-      }
+-    } else {
+-      setMessages([]);
+-    }
+-  }, [activeSessionId, sessions]);
+-
+   const createNewSession = () => {
+     const now = Date.now();
+     const newSession: ChatSession = {
+@@ -2535,24 +2833,57 @@ export default function AIChatPage() {
+     setEditingTitle(session.title);
+   };
+
+-  const filteredSessions = sidebarSearch.trim()
+-    ? sessions.filter(s =>
+-        s.title.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
+-        s.messages.some(m => m.content.toLowerCase().includes(sidebarSearch.toLowerCase()))
+-      )
+-    : sessions;
+-
+-  const groupedSessions = groupSessionsByDate(filteredSessions);
+-
+-  const scrollToBottom = useCallback(() => {
+-    setTimeout(() => {
+-      scrollRef.current?.scrollTo({
+-        top: scrollRef.current.scrollHeight,
+-        behavior: "smooth",
+-      });
+-    }, 100);
++  const filteredSessions = useMemo(() => {
++    const list = sidebarSearch.trim()
++      ? sessions.filter(s =>
++          s.title.toLowerCase().includes(sidebarSearch.toLowerCase()) ||
++          s.messages.some(m => m.content.toLowerCase().includes(sidebarSearch.toLowerCase()))
++        )
++      : sessions;
++    
++    // Sort: Newest/Most recently active first
++    return [...list].sort((a, b) => (b.updatedAt || b.createdAt) - (a.updatedAt || a.createdAt));
++  }, [sessions, sidebarSearch]);
++
++  const groupedSessions = useMemo(() => {
++    // Only group sessions NOT in a folder
++    const sessionsNotInFolders = filteredSessions.filter(s => !s.folderId);
++    return groupSessionsByDate(sessionsNotInFolders);
++  }, [filteredSessions]);
++
++  const [showScrollButton, setShowScrollButton] = useState(false);
++  const [isAtBottom, setIsAtBottom] = useState(true);
++
++  const scrollToBottom = useCallback((force = false) => {
++    if (force || isAtBottom) {
++      setTimeout(() => {
++        scrollRef.current?.scrollTo({
++          top: scrollRef.current.scrollHeight,
++          behavior: "smooth",
++        });
++      }, 100);
++    } else {
++      setShowScrollButton(true);
++    }
++  }, [isAtBottom]);
++
++  // Handle scroll events to show/hide button
++  const handleScroll = useCallback(() => {
++    if (!scrollRef.current) return;
++    const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
++    const atBottom = scrollHeight - scrollTop - clientHeight < 100;
++    setIsAtBottom(atBottom);
++    if (atBottom) setShowScrollButton(false);
+   }, []);
+
++  useEffect(() => {
++    const el = scrollRef.current;
++    if (el) {
++      el.addEventListener("scroll", handleScroll);
++      return () => el.removeEventListener("scroll", handleScroll);
++    }
++  }, [handleScroll]);
++
+   useEffect(() => {
+     scrollToBottom();
+   }, [messages, scrollToBottom]);
+@@ -2757,6 +3088,8 @@ export default function AIChatPage() {
+         if (res.status === 403) {
+           // Quota exceeded - show popup instead of error message
+           setShowQuotaPopup(true);
++          setGeneratingStatus("");
++          setLoading(false);
+           // Remove the empty assistant message we added
+           setSessions((prev) => prev.map(s => {
+             if (s.id === currentSessionId) {
+@@ -2783,6 +3139,7 @@ export default function AIChatPage() {
+           }));
+           return;
+         }
++
+         throw new Error(err.error || "AI service error");
+       }
+
+@@ -2799,6 +3156,31 @@ export default function AIChatPage() {
+       let collectedSources: SearchSource[] = [];
+       setSearchingUrls([]);
+
++      let updateTask: number | null = null;
++      const throttleUpdate = () => {
++        if (updateTask) return;
++        updateTask = requestAnimationFrame(() => {
++          updateTask = null;
++          setSessions((prev) => prev.map(s => {
++            if (s.id === currentSessionId) {
++              const updatedMessages = [...s.messages];
++              const lastMsg = updatedMessages[updatedMessages.length - 1];
++              if (lastMsg && lastMsg.role === "assistant") {
++                updatedMessages[updatedMessages.length - 1] = {
++                  ...lastMsg,
++                  content: fullText,
++                  images: collectedImages.length > 0 ? collectedImages : undefined,
++                  sources: collectedSources.length > 0 ? collectedSources : undefined,
++                };
++              }
++              return { ...s, messages: updatedMessages };
++            }
++            return s;
++          }));
++          scrollToBottom();
++        });
++      };
++
+       while (true) {
+         const { done, value } = await reader.read();
+         if (done) break;
+@@ -2807,6 +3189,7 @@ export default function AIChatPage() {
+         const lines = buffer.split("\n");
+         buffer = lines.pop() || "";
+
++        let hasNewContent = false;
+         for (const line of lines) {
+           if (line.startsWith("data: ")) {
+             const jsonStr = line.slice(6).trim();
+@@ -2814,14 +3197,26 @@ export default function AIChatPage() {
+             try {
+               const parsed = JSON.parse(jsonStr);
+
++              // Handle model switching notification
++              if (parsed.status === "switching") {
++                if (parsed.model) setSelectedModel(parsed.model);
++                showToast(parsed.message, "warning");
++                setGeneratingStatus(parsed.message);
++                continue;
++              }
++
+               if (parsed.text) {
+                 fullText += parsed.text;
++                hasNewContent = true;
+
+                 // --- ARTIFACT PARSING ---
+                 const { artifact: parsedArtifact, isComplete: artComplete } = parseArtifacts(fullText);        
+                 if (parsedArtifact) {
+                   setActiveArtifact(prev => {
+-                    // Keep existing version number if same content is streaming
++                    // Only update if content length changed (avoid infinite loop)
++                    if (prev && prev.content === parsedArtifact.content && prev.title === parsedArtifact.title) {
++                      return prev;
++                    }
+                     if (prev && prev.title === parsedArtifact.title) {
+                       return { ...parsedArtifact, id: prev.id, version: prev.version };
+                     }
+@@ -2835,6 +3230,7 @@ export default function AIChatPage() {
+               // Collect generated images
+               if (parsed.image) {
+                 collectedImages = [...collectedImages, parsed.image];
++                hasNewContent = true;
+               }
+
+               // Show search queries being executed
+@@ -2846,6 +3242,7 @@ export default function AIChatPage() {
+               // Collect search sources
+               if (parsed.sources) {
+                 collectedSources = parsed.sources;
++                hasNewContent = true;
+                 // Update status to show which sites are being searched
+                 const siteNames = parsed.sources.slice(0, 3).map((s: SearchSource) => {
+                   try { return new URL(s.url).hostname.replace("www.", ""); } catch { return s.title; }        
+@@ -2853,32 +3250,37 @@ export default function AIChatPage() {
+                 setGeneratingStatus(`เธเธณเธฅเธฑเธเธญเนเธฒเธเธเนเธญเธกเธนเธฅเธเธฒเธ ${siteNames.join(", ")}...`);
+                 setSearchingUrls(siteNames);
+               }
+-
+-              // Update session with all collected data
+-              setSessions((prev) => prev.map(s => {
+-                if (s.id === currentSessionId) {
+-                  const updatedMessages = [...s.messages];
+-                  const lastMsg = updatedMessages[updatedMessages.length - 1];
+-                  if (lastMsg && lastMsg.role === "assistant") {
+-                    updatedMessages[updatedMessages.length - 1] = {
+-                      ...lastMsg,
+-                      content: fullText,
+-                      images: collectedImages.length > 0 ? collectedImages : undefined,
+-                      sources: collectedSources.length > 0 ? collectedSources : undefined,
+-                    };
+-                  }
+-                  return { ...s, messages: updatedMessages };
+-                }
+-                return s;
+-              }));
+-              scrollToBottom();
+             } catch {
+               // skip
+             }
+           }
+         }
++
++        if (hasNewContent) {
++          throttleUpdate();
++        }
+       }
+
++      // Final forced update to ensure everything is rendered correctly
++      if (updateTask) cancelAnimationFrame(updateTask);
++      setSessions((prev) => prev.map(s => {
++        if (s.id === currentSessionId) {
++          const updatedMessages = [...s.messages];
++          const lastMsg = updatedMessages[updatedMessages.length - 1];
++          if (lastMsg && lastMsg.role === "assistant") {
++            updatedMessages[updatedMessages.length - 1] = {
++              ...lastMsg,
++              content: fullText,
++              images: collectedImages.length > 0 ? collectedImages : undefined,
++              sources: collectedSources.length > 0 ? collectedSources : undefined,
++            };
++          }
++          return { ...s, messages: updatedMessages };
++        }
++        return s;
++      }));
++      scrollToBottom();
++
+       // After streaming completes โ€” finalize artifact version
+       if (fullText) {
+         const { artifact: finalArtifact, isComplete: finalComplete } = parseArtifacts(fullText);
+@@ -3209,39 +3611,6 @@ export default function AIChatPage() {
+     setIsDragging(false);
+   }, []);
+
+-  // Clipboard paste handler for images
+-  const handlePaste = useCallback(async (e: React.ClipboardEvent) => {
+-    const items = e.clipboardData.items;
+-    const newFiles: FileData[] = [];
+-
+-    for (let i = 0; i < items.length; i++) {
+-      const item = items[i];
+-      if (!item.type.startsWith("image/")) continue;
+-
+-      const file = item.getAsFile();
+-      if (!file) continue;
+-      if (file.size > 4 * 1024 * 1024) continue;
+-      if (attachments.length + newFiles.length >= 5) break;
+-
+-      const reader = new FileReader();
+-      const filePromise = new Promise<FileData>((resolve) => {
+-        reader.onloadend = () => {
+-          resolve({
+-            name: `pasted-image-${Date.now()}.${file.type.split("/")[1] || "png"}`,
+-            data: reader.result as string,
+-            type: file.type,
+-          });
+-        };
+-      });
+-      reader.readAsDataURL(file);
+-      newFiles.push(await filePromise);
+-    }
+-
+-    if (newFiles.length > 0) {
+-      setAttachments((prev) => [...prev, ...newFiles]);
+-    }
+-  }, [attachments.length]);
+-
+   if (authLoading) {
+     return (
+       <div className="flex flex-col items-center justify-center h-[calc(100vh-64px)] gap-3 bg-background">     
+@@ -3302,7 +3671,7 @@ export default function AIChatPage() {
+         }`}
+       >
+         <div className="p-2 flex flex-col h-full w-64 shrink-0">
+-          {/* New Chat + Close */}
++          {/* New Chat + Close + Create Folder */}
+           <div className="flex items-center gap-1.5 mb-2">
+             <Button
+               onClick={createNewSession}
+@@ -3329,7 +3707,7 @@ export default function AIChatPage() {
+               type="text"
+               value={sidebarSearch}
+               onChange={(e) => setSidebarSearch(e.target.value)}
+-              placeholder="เธ
+                              เนเธเธซเธฒ..."
++              placeholder={aiSettings.language === "th" ? "เธ
+                                                              เนเธเธซเธฒ..." : "Search..."}
+               className="w-full pl-8 pr-8 py-1.5 text-sm bg-transparent border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-ring text-foreground placeholder:text-muted-foreground"
+             />
+             {sidebarSearch && (
+@@ -3360,12 +3876,18 @@ export default function AIChatPage() {
+                   {groupSessions.map((s) => (
+                     <div
+                       key={s.id}
++                      draggable
++                      onDragStart={(e) => {
++                        setDraggedSessionId(s.id);
++                        e.dataTransfer.setData("sessionId", s.id);
++                      }}
++                      onDragEnd={() => setDraggedSessionId(null)}
+                       onClick={() => { setActiveSessionId(s.id); setEditingSessionId(null); if (window.innerWidth < 768) setIsSidebarOpen(false); }}
+                       className={`group/item relative flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition-colors ${
+                         activeSessionId === s.id
+                           ? "bg-accent text-accent-foreground"
+                           : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+-                      }`}
++                      } ${draggedSessionId === s.id ? 'opacity-40' : ''}`}
+                     >
+                       <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+
+@@ -3393,6 +3915,13 @@ export default function AIChatPage() {
+                             <span className="text-sm truncate block">{s.title}</span>
+                           </div>
+                           <div className="flex items-center gap-0.5 opacity-0 group-hover/item:opacity-100 transition-opacity shrink-0">
++                            <button
++                              onClick={(e) => { e.stopPropagation(); setSharingSession(s); setShareModalOpen(true); }}
++                              className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-colors"
++                              title={aiSettings.language === "th" ? "เนเธเธฃเน" : "Share"}
++                            >
++                              <Globe className="h-3 w-3" />
++                            </button>
+                             <button
+                               onClick={(e) => startEditing(s, e)}
+                               className="p-1 hover:bg-accent text-muted-foreground hover:text-foreground rounded-sm transition-colors"
+@@ -3496,11 +4025,23 @@ export default function AIChatPage() {
+           </Button>
+         )}
+
+-        <main className="flex-1 overflow-hidden flex flex-col">
+-          <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 py-6 scroll-smooth ${
++        <main className="flex-1 overflow-hidden flex flex-col relative bg-[#fcfcfd]">
++          {/* Floating Scroll to Bottom Button */}
++          {showScrollButton && (
++            <button
++              onClick={() => scrollToBottom(true)}
++              className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[45] flex items-center gap-2 px-4 py-2.5 rounded-full bg-white border border-emerald-100 shadow-2xl text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 hover:scale-105 active:scale-95 transition-all animate-in slide-in-from-bottom-8 duration-500 group"    
++            >
++              <ArrowDown className="h-4 w-4 animate-bounce" />
++              <span className="text-xs font-bold uppercase tracking-widest">เธกเธตเธเนเธญเธ
+                                                                                            เธงเธฒเธกเนเธซเธกเน</span>
++              <div className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-red-500 rounded-full border-2 border-white shadow-sm animate-pulse" />
++            </button>
++          )}
++
++          <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 py-6 scroll-smooth relative ${
+             aiSettings.fontSize === "small" ? "text-xs" : aiSettings.fontSize === "large" ? "text-base" : "text-sm"
+           }`}>
+-            <div className="max-w-2xl mx-auto flex flex-col gap-6 pb-8">
++            <div className="max-w-2xl mx-auto flex flex-col gap-6 pb-20">
+           {messages.length === 0 && (
+             <div className="flex flex-col items-center justify-center py-16 text-center">
+               <div className="h-12 w-12 mb-4 rounded-lg bg-primary flex items-center justify-center text-primary-foreground">
+@@ -3951,42 +4546,62 @@ export default function AIChatPage() {
+                     </button>
+
+                     {isModelPickerOpen && (
+-                      <div className="absolute bottom-full left-0 mb-1.5 w-44 sm:w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
+-                        <div className="px-2 py-1">
+-                          <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Model</span>
+-                        </div>
+-                        {MODEL_OPTIONS.map((model) => {
+-                          const available = isModelAvailable(model.value);
+-                          const cost = quota?.pricing?.[model.value] ?? (model.value === "auto" ? 0 : undefined);
+-                          const hasCredits = cost === undefined || cost === 0 || (quota?.credits ?? 0) >= cost;
+-                          const canUse = available && hasCredits;
+-                          return (
+-                            <button
+-                              key={model.value}
+-                              onClick={() => { if (canUse) { setSelectedModel(model.value); setIsModelPickerOpen(false); } }}
+-                              disabled={!canUse}
+-                              className={`w-full flex items-center gap-2 px-2 py-1.5 text-left transition-colors ${
+-                                !canUse ? "opacity-40 cursor-not-allowed" :
+-                                selectedModel === model.value ? "bg-gray-100" : "hover:bg-gray-50"
+-                              }`}
+-                            >
+-                              {model.icon}
+-                              <span className="text-xs flex-1 text-gray-900">{model.label}</span>
+-                              {!available ? (
+-                                <span className="text-[9px] text-red-400 font-medium">เน
+                                                                                         เธกเนเธธฃเนเธญเธก</span>
+-                              ) : cost !== undefined && cost > 0 ? (
+-                                <span className={`text-[9px] font-semibold tabular-nums ${hasCredits ? "text-amber-500" : "text-red-400"}`}>
+-                                  {cost}cr
+-                                </span>
+-                              ) : cost === 0 ? (
+-                                <span className="text-[9px] text-emerald-500 font-medium">FREE</span>
+-                              ) : (
+-                                <span className="text-[10px] text-muted-foreground">{model.desc}</span>        
+-                              )}
+-                              {selectedModel === model.value && canUse && <Check className="h-3 w-3 text-primary" />}
+-                            </button>
+-                          );
+-                        })}
++                      <div className="absolute bottom-full left-0 mb-1.5 w-52 sm:w-60 bg-white border border-gray-200 rounded-xl shadow-xl py-2 z-50 max-h-[70vh] overflow-y-auto animate-in slide-in-from-bottom-2 duration-200">
++                        {MODEL_CATEGORIES.map((category, catIdx) => (
++                          <div key={category.name}>
++                            {catIdx > 0 && <div className="h-px bg-gray-100 my-1.5 mx-2" />}
++                            <div className="px-3 py-1.5">
++                              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{category.name}</span>
++                            </div>
++                            {category.models.map((model) => {
++                              const available = isModelAvailable(model.value);
++                              const cost = quota?.pricing?.[model.value] ?? (model.value === "auto" ? 0 : undefined);
++                              const hasCredits = cost === undefined || cost === 0 || (quota?.credits ?? 0) >= cost;
++                              const canUse = available && hasCredits;
++
++                              return (
++                                <button
++                                  key={model.value}
++                                  onClick={() => { if (canUse) { setSelectedModel(model.value); setIsModelPickerOpen(false); } }}
++                                  disabled={!canUse}
++                                  className={`w-full flex items-center gap-3 px-3 py-2 text-left transition-all ${
++                                    !canUse ? "opacity-40 grayscale" :
++                                    selectedModel === model.value ? "bg-emerald-50 text-emerald-700" : "hover:bg-gray-50"
++                                  }`}
++                                >
++                                  <div className={`shrink-0 p-1.5 rounded-lg ${selectedModel === model.value ? 'bg-emerald-100' : 'bg-gray-100'}`}>
++                                    {model.icon}
++                                  </div>
++                                  <div className="flex-1 min-w-0">
++                                    <div className="flex items-center justify-between gap-2">
++                                      <span className="text-xs font-bold truncate">{model.label}</span>        
++                                      {cost !== undefined && (
++                                        <span className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
++                                          cost === 0 ? "bg-emerald-100 text-emerald-600" : 
++                                          hasCredits ? "bg-amber-100 text-amber-600" : "bg-red-100 text-red-600"
++                                        }`}>
++                                          {cost === 0 ? "FREE" : `${cost}cr`}
++                                        </span>
++                                      )}
++                                    </div>
++                                    <div className="flex items-center justify-between mt-0.5">
++                                      <span className="text-[10px] text-gray-400 truncate">{model.desc}</span> 
++                                      {!available && (
++                                        <span className="text-[9px] text-red-500 font-bold flex items-center gap-0.5">
++                                          <AlertCircle className="h-2.5 w-2.5" />
++                                          Down
++                                        </span>
++                                      )}
++                                    </div>
++                                  </div>
++                                  {selectedModel === model.value && canUse && (
++                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200" />
++                                  )}
++                                </button>
++                              );
++                            })}
++                          </div>
++                        ))}
+                       </div>
+                     )}
+                   </div>
+@@ -4032,14 +4647,14 @@ export default function AIChatPage() {
+         >
+           {/* Resize handle */}
+           <div
+-            className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 group hover:bg-primary/20 active:bg-primary/30 transition-colors"
++            className="absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize z-10 group hover:bg-emerald-500/20 active:bg-emerald-500/30 transition-colors"
+             onMouseDown={(e) => {
+               e.preventDefault();
+               canvasResizeRef.current = { startX: e.clientX, startWidth: canvasWidth };
+               setIsResizingCanvas(true);
+             }}
+           >
+-            <div className="absolute left-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 group-hover:bg-primary/50 transition-colors" />
++            <div className="absolute left-0.5 top-1/2 -translate-y-1/2 w-0.5 h-8 rounded-full bg-gray-300 group-hover:bg-emerald-500/50 transition-colors" />
+           </div>
+           <div className="flex-1 border-l border-gray-200 overflow-hidden">
+             <CanvasView

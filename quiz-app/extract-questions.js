@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 // Improved script to extract questions from HTML quiz files
 const fs = require('fs');
 const path = require('path');

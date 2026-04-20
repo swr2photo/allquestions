@@ -2106,6 +2106,14 @@ const SUGGESTIONS = [
 
 export default function AIChatPage() {
   const router = useRouter();
+
+  // Core state definitions (Moved to top to avoid TDZ issues)
+  const [user, setUser] = useState<{ email: string; name: string; picture: string; isAdmin?: boolean } | null>(null);
+  const [quota, setQuota] = useState<{ usage: number; limit: number; remaining: number; credits?: number; pricing?: Record<string, number> } | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [gsiReady, setGsiReady] = useState(false);
+  const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_SETTINGS);
+
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const messages = useMemo(() => {
@@ -2300,7 +2308,6 @@ export default function AIChatPage() {
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
   const [showCreditPopup, setShowCreditPopup] = useState<{ needed: number; have: number; model: string } | null>(null);
-  const [aiSettings, setAISettings] = useState<AISettings>(DEFAULT_SETTINGS);
   const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true, groq: true, github: true });
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -2333,12 +2340,6 @@ export default function AIChatPage() {
   const canvasResizeRef = useRef<{ startX: number; startWidth: number } | null>(null);
   const modelPickerRef = useRef<HTMLDivElement>(null);
   const toolsMenuRef = useRef<HTMLDivElement>(null);
-
-  // Auth & Quota state
-  const [user, setUser] = useState<{ email: string; name: string; picture: string; isAdmin?: boolean } | null>(null);
-  const [quota, setQuota] = useState<{ usage: number; limit: number; remaining: number; credits?: number; pricing?: Record<string, number> } | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
-  const [gsiReady, setGsiReady] = useState(false);
 
   // Fetch real health status from API
   const fetchHealth = useCallback(async () => {
