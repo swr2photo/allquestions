@@ -1,7 +1,7 @@
 // Shared AI provider health check with caching
 // Used by both /api/ai/health and /api/ai/chat for auto mode
 
-export type ProviderId = "gemini" | "claude" | "openrouter" | "thaillm" | "groq" | "github";
+export type ProviderId = "gemini" | "claude" | "openrouter" | "thaillm" | "groq" | "github" | "moonshot";
 
 export interface ProviderDetail {
   id: ProviderId;
