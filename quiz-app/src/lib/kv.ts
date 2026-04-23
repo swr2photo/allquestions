@@ -76,6 +76,7 @@ const memoryKv = {
         for (const cmd of commands) await cmd();
       }
     };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return p as any;
   }
 };

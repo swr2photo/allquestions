@@ -7,7 +7,10 @@ export async function parseBase64File(base64Data: string, mimeType: string, file
     const buffer = Buffer.from(base64, "base64");
 
     if (mimeType.includes("pdf") || filename.toLowerCase().endsWith(".pdf")) {
-      const pdf = (await import("pdf-parse")).default || await import("pdf-parse");
+      // Use dynamic import with any cast to avoid type conflicts with pdf-parse ESM/CJS
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const pdfParseModule = await import("pdf-parse") as any;
+      const pdf = pdfParseModule.default || pdfParseModule;
       const data = await pdf(buffer);
       return data.text;
     } 

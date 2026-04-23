@@ -17,7 +17,6 @@ import {
   Clock
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { Button } from "@/components/ui/button";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -25,6 +24,7 @@ import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 const ReactQuill = dynamic(() => import("react-quill-new"), {
   ssr: false,
   loading: () => <div className="h-full w-full bg-gray-50 animate-pulse" />
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 }) as any;
 import "react-quill-new/dist/quill.snow.css";
 

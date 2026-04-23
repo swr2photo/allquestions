@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef, useCallback } from "react";
-import { Download, List, LayoutGrid, Plus, Trash2, Search as SearchIcon, Calendar, BookOpen, Loader2, FileText, CheckCircle2, Cloud, Brain, X, Shield, Sparkles } from "lucide-react";
+import { Download, List, LayoutGrid, Plus, Trash2, Search as SearchIcon, Calendar, BookOpen, Loader2, FileText, CheckCircle2, Cloud, Brain, X, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";

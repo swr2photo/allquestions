@@ -1,6 +1,8 @@
 import React from 'react';
 
-declare module 'react-quill-new' {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+declare module "react-quill-new" {
+
   export interface ReactQuillProps {
     theme?: string;
     value?: string;
