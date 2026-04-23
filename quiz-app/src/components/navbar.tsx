@@ -2,20 +2,31 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, Home, BookOpen, Menu, X, Shield, Search, Sparkles, Library } from "lucide-react";
+import { GraduationCap, Home, BookOpen, Menu, X, Shield, Search, Sparkles, Library, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
 
 export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [user, setUser] = useState<{ isAdmin?: boolean } | null>(null);
+
+  useEffect(() => {
+    fetch("/api/auth/user")
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated) setUser(data.user);
+      })
+      .catch(() => {});
+  }, []);
 
   const links = [
     { href: "/", label: "หน้าแรก", icon: Home },
     { href: "/courses", label: "รายวิชา", icon: BookOpen },
     { href: "/gened", label: "วิชาเลือกเสรี", icon: Library },
+    { href: "/schedule", label: "ตารางเรียน", icon: Calendar },
     { href: "/search", label: "ค้นหา", icon: Search },
     { href: "/ai", label: "AI Chat", icon: Sparkles },
     { href: "/admin", label: "ผู้ดูแลระบบ", icon: Shield },
@@ -41,17 +52,17 @@ export function Navbar() {
             const Icon = link.icon;
             const isActive = pathname === link.href;
             return (
-              <Link key={link.href} href={link.href}>
+              <Link key={link.href} href={link.href} className="shrink-0">
                 <Button
                   variant={isActive ? "default" : "ghost"}
                   size="sm"
                   className={cn(
-                    "gap-2",
+                    "gap-2 shrink-0",
                     isActive && "bg-emerald-600 hover:bg-emerald-700"
                   )}
                 >
-                  <Icon className="h-4 w-4" />
-                  {link.label}
+                  <Icon className="h-4 w-4 shrink-0" />
+                  <span className="shrink-0">{link.label}</span>
                 </Button>
               </Link>
             );
