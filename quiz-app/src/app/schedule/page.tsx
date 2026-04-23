@@ -7,6 +7,12 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { domToPng } from "modern-screenshot";
 
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 interface Course {
   id: number | string;
   subject: string;
@@ -236,8 +242,7 @@ export default function SchedulePage() {
     const loadingToast = toast.loading("กำลังเตรียมไฟล์ตารางเรียน...");
     try {
       const dataUrl = await domToPng(scheduleRef.current, {
-        scale: 2, backgroundColor: "#ffffff", quality: 1,
-        features: { copyStyles: true }
+        scale: 2, backgroundColor: "#ffffff", quality: 1
       });
       const link = document.createElement("a");
       link.download = `ตารางเรียน_${semester.replace("/", "-")}.png`;
