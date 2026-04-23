@@ -21,6 +21,7 @@ export interface HealthResult {
   thaillm: boolean;
   groq: boolean;
   github: boolean;
+  moonshot: boolean;
   openrouterCredits: number; // remaining credits on OpenRouter
   providers: ProviderDetail[];
 }
@@ -166,6 +167,32 @@ async function checkGitHub(token: string): Promise<{ ok: boolean; latency: numbe
   return { ok, latency: latencyMs, msg: ok ? "ปกติ" : `ผิดพลาด (HTTP ${res.status})` };
 }
 
+async function checkMoonshot(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "https://api.moonshot.ai/v1/chat/completions",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({ model: "moonshot-v1-auto", messages: [{ role: "user", content: "hi" }], max_tokens: 1 }),
+    },
+    8000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  
+  if (res.status === 401) {
+    return { ok: false, latency: latencyMs, msg: "API Key ไม่ถูกต้อง (Unauthorized 401)" };
+  }
+  if (res.status === 403) {
+    return { ok: false, latency: latencyMs, msg: "ไม่มีสิทธิ์เข้าถึงหรือยอดเงินหมด (403)" };
+  }
+  if (res.status === 429) {
+    return { ok: true, latency: latencyMs, msg: "ปกติ (แต่ติด Rate Limit 429 ชั่วคราว)" };
+  }
+  
+  const ok = res.status === 200;
+  return { ok, latency: latencyMs, msg: ok ? "ปกติ" : `ผิดพลาด (HTTP ${res.status})` };
+}
+
 export async function getProviderHealth(): Promise<HealthResult> {
   // Return cached if fresh
   if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
@@ -178,15 +205,17 @@ export async function getProviderHealth(): Promise<HealthResult> {
   const thaillmKey = process.env.THAILLM_API_KEY;
   const groqKey = process.env.GROQ_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
+  const moonshotKey = process.env.MOONSHOT_API_KEY;
   const now = Date.now();
 
-  const [geminiResult, claudeResult, orResult, thaillmResult, groqResult, githubResult] = await Promise.all([
+  const [geminiResult, claudeResult, orResult, thaillmResult, groqResult, githubResult, moonshotResult] = await Promise.all([
     geminiKey ? checkGemini(geminiKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     claudeKey ? checkClaude(claudeKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     openRouterKey ? checkOpenRouter(openRouterKey) : Promise.resolve({ ok: false, credits: 0, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     thaillmKey ? checkThaiLLM(thaillmKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     groqKey ? checkGroq(groqKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     githubToken ? checkGitHub(githubToken) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า GitHub Token" }),
+    moonshotKey ? checkMoonshot(moonshotKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
   ]);
 
   const providers: ProviderDetail[] = [
@@ -250,6 +279,16 @@ export async function getProviderHealth(): Promise<HealthResult> {
       message: githubResult.msg,
       checkedAt: now,
     },
+    {
+      id: "moonshot",
+      name: "Moonshot AI (Kimi)",
+      configured: !!moonshotKey,
+      online: moonshotResult.ok,
+      latencyMs: moonshotKey ? moonshotResult.latency : null,
+      credits: null,
+      message: moonshotResult.msg,
+      checkedAt: now,
+    },
   ];
 
   const result: HealthResult = {
@@ -259,6 +298,7 @@ export async function getProviderHealth(): Promise<HealthResult> {
     thaillm: thaillmResult.ok,
     groq: groqResult.ok,
     github: githubResult.ok,
+    moonshot: moonshotResult.ok,
     openrouterCredits: orResult.credits,
     providers,
   };
@@ -281,32 +321,38 @@ export function pickAutoModel(
   hasThaiLLMKey: boolean,
   hasGroqKey: boolean = false,
   hasGitHubToken: boolean = false,
+  hasMoonshotKey: boolean = false,
 ): string {
   // === STRATEGY: Prioritize FREE (0-credit) models first ===
   
-  // 1. ThaiLLM (Typhoon) - Excellent Thai support & Free
+  // 1. Gemini Flash (Direct) - Very fast, Free, and natively supports Files/Images
+  if (hasGeminiKey && health.gemini) {
+    return "gemini-2.0-flash";
+  }
+
+  // 2. ThaiLLM (Typhoon) - Excellent Thai support & Free
   if (hasThaiLLMKey && health.thaillm) {
     return "thaillm/typhoon-v1.5x-70b-instruct";
   }
 
-  // 2. Groq (Llama 3) - Extremely fast
+  // 3. Groq (Llama 3) - Extremely fast
   if (hasGroqKey && health.groq) {
     return "groq/llama-3.3-70b-versatile";
   }
 
-  // 3. GitHub Models (GPT-4o/Llama)
+  // 4. GitHub Models (GPT-4o/Llama)
   if (hasGitHubToken && health.github) {
     return "github/gpt-4o";
   }
 
-  // 4. Gemini Flash (Direct) - Very fast & Free
-  if (hasGeminiKey && health.gemini) {
-    return "gemini-2.5-flash";
+  // 5. Moonshot (Kimi)
+  if (hasMoonshotKey && health.moonshot) {
+    return "moonshot/moonshot-v1-auto";
   }
 
-  // 5. OpenRouter Free Models
+  // 6. OpenRouter Free Models
   if (hasOpenRouterKey && health.openrouter) {
-    return "openrouter/google/gemini-2.5-flash";
+    return "openrouter/google/gemini-2.0-flash";
   }
 
   // === STRATEGY: If no free models are online, then consider models with credits ===
@@ -315,7 +361,7 @@ export function pickAutoModel(
     if (isComplex && health.openrouterCredits > 0.01) {
       return "openrouter/google/gemini-2.5-pro-preview";
     }
-    return "openrouter/google/gemini-2.5-flash";
+    return "openrouter/google/gemini-2.0-flash";
   }
 
   if (hasClaudeKey && health.claude) {
@@ -326,10 +372,11 @@ export function pickAutoModel(
   if (hasThaiLLMKey) return "thaillm/typhoon-v1.5x-70b-instruct";
   if (hasGroqKey) return "groq/llama-3.3-70b-versatile";
   if (hasGitHubToken) return "github/gpt-4o";
-  if (hasGeminiKey) return "gemini-2.5-flash";
-  if (hasOpenRouterKey) return "openrouter/google/gemini-2.5-flash";
+  if (hasMoonshotKey) return "moonshot/moonshot-v1-auto";
+  if (hasGeminiKey) return "gemini-2.0-flash";
+  if (hasOpenRouterKey) return "openrouter/google/gemini-2.0-flash";
   if (hasClaudeKey) return "claude-sonnet";
 
-  return "gemini-2.5-flash"; // last resort
+  return "gemini-2.0-flash"; // last resort
 }
 

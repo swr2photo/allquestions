@@ -13,7 +13,8 @@ import {
   X,
   Loader2,
   ChevronDown,
-  RefreshCw
+  RefreshCw,
+  Clock
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
@@ -42,13 +43,10 @@ type TabType = "preview" | "code" | "document";
 
 /** Find the default-exported component name from React code */
 function findComponentName(code: string): string {
-  // Match: export default function ComponentName
   const exportDefault = code.match(/export\s+default\s+function\s+(\w+)/);
   if (exportDefault) return exportDefault[1];
-  // Match: export default ComponentName (at end or with semicolon)
   const exportDefaultVar = code.match(/export\s+default\s+(\w+)\s*[;\n]/);
   if (exportDefaultVar) return exportDefaultVar[1];
-  // Match: first function component (capitalized)
   const firstComponent = code.match(/function\s+([A-Z]\w+)\s*\(/);
   if (firstComponent) return firstComponent[1];
   return "App";
@@ -57,13 +55,9 @@ function findComponentName(code: string): string {
 /** Strip import/export statements for browser execution */
 function stripModuleSyntax(code: string): string {
   return code
-    // Remove import statements (single and multi-line)
     .replace(/^import\s+.*?(?:from\s+['"].*?['"]|['"].*?['"]);?\s*$/gm, "")
-    // Remove "export default function" → "function"
     .replace(/export\s+default\s+function\s+/g, "function ")
-    // Remove "export default" at end
     .replace(/export\s+default\s+(\w+)\s*;?/g, "")
-    // Remove "export " prefix from declarations
     .replace(/export\s+(const|let|var|function|class)\s+/g, "$1 ")
     .trim();
 }
@@ -91,12 +85,10 @@ body{font-family:'Kanit',sans-serif}
 <body>
 <div id="root"></div>
 <script type="text/babel" data-presets="react,typescript">
-// Provide stub for useState etc. in global scope
 const { useState, useEffect, useRef, useCallback, useMemo, useReducer, useContext, createContext, Fragment } = React;
 
 ${cleanCode}
 
-// Render
 try {
   const root = ReactDOM.createRoot(document.getElementById('root'));
   root.render(React.createElement(${componentName}));
@@ -120,20 +112,18 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
 
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [showVersionMenu, setShowVersionMenu] = useState(false);
+  const [showVersionPanel, setShowVersionPanel] = useState(false);
   const exportMenuRef = useRef<HTMLDivElement>(null);
-  const versionMenuRef = useRef<HTMLDivElement>(null);
   const codeEndRef = useRef<HTMLDivElement>(null);
 
   // Close menus on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
       if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) setShowExportMenu(false);
-      if (versionMenuRef.current && !versionMenuRef.current.contains(e.target as Node)) setShowVersionMenu(false);
     };
-    if (showExportMenu || showVersionMenu) document.addEventListener("mousedown", handleClick);
+    if (showExportMenu) document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
-  }, [showExportMenu, showVersionMenu]);
+  }, [showExportMenu]);
 
   const isDocType = ["document", "pdf", "word", "markdown"].includes(artifact?.type?.toLowerCase() || "");
 
@@ -224,14 +214,20 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
     if (!isPreviewReady) {
       return (
         <div className="flex flex-col items-center justify-center h-full text-muted-foreground bg-white gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <p className="text-sm">กำลังสร้างพรีวิว...</p>
-          <p className="text-xs opacity-60">พรีวิวจะแสดงผลเมื่อโค้ดเขียนเสร็จสมบูรณ์</p>
+          <div className="relative">
+            <Loader2 className="h-10 w-10 animate-spin text-emerald-500" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-4 w-4 bg-emerald-100 rounded-full animate-pulse" />
+            </div>
+          </div>
+          <div className="text-center">
+            <p className="text-sm font-bold text-gray-900">กำลังเตรียมพรีวิว...</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mt-1">Generating artifact content</p>
+          </div>
         </div>
       );
     }
 
-    // React / Next.js — self-hosted iframe with Babel + React CDN
     if (artifact.type === "react" || artifact.type === "nextjs") {
       const srcDoc = buildReactSrcDoc(artifact.content);
       return (
@@ -243,20 +239,19 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
             className="w-full flex-1 border-none bg-white"
             sandbox="allow-scripts allow-modals"
           />
-          <div className="absolute bottom-3 right-3 flex gap-1.5">
+          <div className="absolute bottom-4 right-4 flex gap-2">
             <button
               onClick={() => setPreviewKey(k => k + 1)}
-              className="p-1.5 rounded-md bg-white/90 border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-              title="รีเฟรช"
+              className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition-all active:scale-90"
+              title="รีเฟรชพรีวิว"
             >
-              <RefreshCw className="h-3.5 w-3.5 text-gray-600" />
+              <RefreshCw className="h-4 w-4" />
             </button>
           </div>
         </div>
       );
     }
 
-    // HTML — direct iframe
     const srcDoc = artifact.content.includes("<!DOCTYPE") || artifact.content.includes("<html")
       ? artifact.content
       : `<!DOCTYPE html>
@@ -279,13 +274,13 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
           className="w-full flex-1 border-none bg-white"
           sandbox="allow-scripts allow-modals"
         />
-        <div className="absolute bottom-3 right-3">
+        <div className="absolute bottom-4 right-4">
           <button
             onClick={() => setPreviewKey(k => k + 1)}
-            className="p-1.5 rounded-md bg-white/90 border border-gray-200 shadow-sm hover:bg-gray-50 transition-colors"
-            title="รีเฟรช"
+            className="h-9 w-9 flex items-center justify-center rounded-xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-xl hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-600 transition-all active:scale-90"
+            title="รีเฟรชพรีวิว"
           >
-            <RefreshCw className="h-3.5 w-3.5 text-gray-600" />
+            <RefreshCw className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -293,140 +288,126 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
   };
 
   return (
-    <div className="relative h-full flex flex-col bg-white shadow-xl w-full">
+    <div className="relative h-full flex flex-col bg-white shadow-2xl w-full border-l border-gray-100 animate-in slide-in-from-right duration-500">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-gray-50 shrink-0">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="p-1.5 bg-primary/10 rounded-md shrink-0">
-            {isDocType ? <FileText className="h-4 w-4 text-primary" /> : <Code2 className="h-4 w-4 text-primary" />}
+      <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200/60 bg-[#fafafa] shrink-0">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="p-2 bg-emerald-500/10 rounded-xl shrink-0">
+            {isDocType ? <FileText className="h-5 w-5 text-emerald-600" /> : <Code2 className="h-5 w-5 text-emerald-600" />}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-semibold text-gray-900 truncate pr-2">
+            <h3 className="text-sm font-black text-gray-900 truncate tracking-tight">
               {artifact.title}
             </h3>
-            <div className="flex items-center gap-2">
-              {/* Version selector */}
-              {versions.length > 1 ? (
-                <div className="relative" ref={versionMenuRef}>
-                  <button
-                    onClick={() => setShowVersionMenu(!showVersionMenu)}
-                    className="flex items-center gap-1 text-[10px] text-gray-500 uppercase tracking-wider hover:text-gray-900 transition-colors"
+            <div className="flex items-center gap-2.5 mt-0.5">
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-gray-100 text-[10px] font-black text-gray-500 uppercase tracking-widest">
+                <span>V{artifact.version}</span>
+                {versions.length > 1 && (
+                  <button 
+                    onClick={() => setShowVersionPanel(!showVersionPanel)}
+                    className="ml-1 text-emerald-600 hover:text-emerald-700 transition-colors"
                   >
-                    V{artifact.version} <ChevronDown className="h-3 w-3" />
+                    <RefreshCw className="h-2.5 w-2.5" />
                   </button>
-                  {showVersionMenu && (
-                    <div className="absolute top-full left-0 mt-1 w-36 bg-white border border-gray-200 shadow-lg rounded-md overflow-hidden z-50">
-                      <div className="max-h-48 overflow-y-auto py-1">
-                        {versions.map((v) => (
-                          <button
-                            key={v.id}
-                            onClick={() => { onSelectVersion?.(v); setShowVersionMenu(false); }}
-                            className={`w-full text-left px-3 py-1.5 text-xs transition-colors ${
-                              v.id === artifact.id
-                                ? "bg-primary/10 text-primary font-medium"
-                                : "text-gray-600 hover:bg-gray-50"
-                            }`}
-                          >
-                            Version {v.version} {v.id === versions[versions.length - 1].id && "(ล่าสุด)"}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider">
-                  V{artifact.version}
-                </p>
-              )}
-              <p className="text-[10px] text-gray-500 uppercase tracking-wider">• {artifact.type}</p>
+                )}
+              </div>
+              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">• {artifact.type}</span>
               {!isComplete && (
-                <span className="flex items-center gap-1 text-[10px] text-amber-600 font-medium">
-                  <span className="h-1 w-1 rounded-full bg-amber-500 animate-pulse" />
-                  Streaming...
+                <span className="flex items-center gap-1.5 text-[10px] text-amber-600 font-black uppercase tracking-widest">
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-ping" />
+                  Streaming
                 </span>
               )}
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 shrink-0">
-          <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(!isFullscreen)} className="h-8 w-8 text-gray-500 hover:text-gray-900">
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button 
+            onClick={() => setIsFullscreen(!isFullscreen)} 
+            className="h-9 w-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all active:scale-90"
+          >
             {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-          </Button>
-          <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 text-gray-500 hover:text-gray-900">
-            <X className="h-4 w-4" />
-          </Button>
+          </button>
+          <button 
+            onClick={onClose} 
+            className="h-9 w-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
       </div>
 
-      {/* Control Bar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-gray-200 bg-white shrink-0">
-        <div>
+      {/* Modern Tab Bar */}
+      <div className="flex items-center justify-between px-3 sm:px-5 py-2 border-b border-gray-100 bg-white shrink-0">
+        <div className="flex items-center gap-1 p-1 bg-gray-100/60 rounded-2xl border border-gray-200/50 shadow-sm">
           {isDocType ? (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium">
-              <FileText className="h-3.5 w-3.5" />
-              เอกสาร
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-white text-emerald-600 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-widest shadow-sm">
+              <FileText className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
+              Document
             </div>
           ) : (
-            <div className="flex items-center bg-gray-100/80 p-0.5 rounded-full border border-gray-200/60 shadow-sm">
+            <>
               <button
                 onClick={() => setActiveTab("preview")}
-                className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
                   activeTab === "preview"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-emerald-600 shadow-sm scale-105"
+                    : "text-gray-400 hover:text-gray-600"
                 }`}
               >
-                <Eye className="h-3.5 w-3.5" />
-                พรีวิว
+                <Eye className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
+                <span className="hidden sm:inline">Preview</span>
               </button>
               <button
                 onClick={() => setActiveTab("code")}
-                className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium rounded-full transition-all duration-200 ${
+                className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-xl transition-all duration-300 ${
                   activeTab === "code"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-emerald-600 shadow-sm scale-105"
+                    : "text-gray-400 hover:text-gray-600"
                 }`}
               >
-                <Code2 className="h-3.5 w-3.5" />
-                โค้ด
+                <Code2 className="h-3 sm:h-3.5 w-3 sm:w-3.5" />
+                <span className="hidden sm:inline">Code</span>
               </button>
-            </div>
+            </>
           )}
         </div>
 
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={handleCopy} className="h-7 text-xs gap-1.5 text-gray-600 hover:text-gray-900">
-            {copied ? <Check className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
-            {copied ? "คัดลอกแล้ว" : "คัดลอก"}
-          </Button>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <button 
+            onClick={handleCopy} 
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200"
+          >
+            {copied ? <Check className="h-3 sm:h-3.5 w-3 sm:w-3.5 text-emerald-500" /> : <Copy className="h-3 sm:h-3.5 w-3 sm:w-3.5" />}
+            <span className="hidden sm:inline">{copied ? "Copied" : "Copy"}</span>
+          </button>
+          
           <div className="relative" ref={exportMenuRef}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 text-xs gap-1.5 text-gray-600 hover:text-gray-900"
+            <button
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-700 shadow-md shadow-emerald-500/20 transition-all active:scale-95 disabled:opacity-50"
               onClick={() => setShowExportMenu(!showExportMenu)}
               disabled={exporting}
             >
-              {exporting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Download className="h-3.5 w-3.5" />}
-              {exporting ? "กำลัง Export..." : "ดาวน์โหลด"}
-              <ChevronDown className="h-3 w-3" />
-            </Button>
+              {exporting ? <Loader2 className="h-3 sm:h-3.5 w-3 sm:w-3.5 animate-spin" /> : <Download className="h-3 sm:h-3.5 w-3 sm:w-3.5" />}
+              <span className="hidden sm:inline">{exporting ? "Exporting..." : "Download"}</span>
+              <ChevronDown className={`h-2.5 sm:h-3 w-2.5 sm:w-3 transition-transform ${showExportMenu ? 'rotate-180' : ''}`} />
+            </button>
+
             {showExportMenu && (
-              <div className="absolute right-0 top-full mt-1 w-44 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
-                <button onClick={handleDownloadCode} className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors">
-                  <Code2 className="h-4 w-4 text-gray-500" />
-                  <span>ไฟล์โค้ด</span>
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-2xl py-2 z-50 animate-in slide-in-from-top-2 duration-200">
+                <button onClick={handleDownloadCode} className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-all">
+                  <Code2 className="h-4 w-4 opacity-70" />
+                  <span>Source Code</span>
                 </button>
-                <div className="border-t border-gray-100 my-1" />
-                <button onClick={() => handleExportDoc("pdf")} className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors">
-                  <FileText className="h-4 w-4 text-red-500" />
-                  <span>Export PDF</span>
+                <div className="border-t border-gray-50 my-1.5" />
+                <button onClick={() => handleExportDoc("pdf")} className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all">
+                  <FileText className="h-4 w-4 text-red-500/70" />
+                  <span>Export to PDF</span>
                 </button>
-                <button onClick={() => handleExportDoc("docx")} className="w-full flex items-center gap-2.5 px-3 py-2 text-left text-sm hover:bg-gray-50 transition-colors">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span>Export DOCX</span>
+                <button onClick={() => handleExportDoc("docx")} className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-600 transition-all">
+                  <FileText className="h-4 w-4 text-blue-500/70" />
+                  <span>Export to DOCX</span>
                 </button>
               </div>
             )}
@@ -435,52 +416,92 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-hidden relative bg-gray-50">
-        {activeTab === "preview" && !isDocType && (
-          <div className="h-full w-full overflow-hidden bg-white">
-            {renderPreview()}
+      <div className="flex-1 overflow-hidden relative bg-white flex flex-col">
+        {/* Version History Sidebar Overlay */}
+        {showVersionPanel && versions.length > 0 && (
+          <div className="absolute inset-y-0 left-0 w-full sm:w-72 bg-white/95 backdrop-blur-xl border-r border-emerald-500/10 z-[60] shadow-2xl animate-in slide-in-from-left duration-300">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Version History</span>
+              <button onClick={() => setShowVersionPanel(false)} className="text-gray-400 hover:text-gray-600"><X className="h-4 w-4" /></button>
+            </div>
+            <div className="overflow-y-auto h-full pb-20 px-2 pt-2 space-y-1">
+              {[...versions].reverse().map((v) => (
+                <button
+                  key={v.id}
+                  onClick={() => { onSelectVersion?.(v); setShowVersionPanel(false); }}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl text-left transition-all group ${
+                    v.id === artifact.id
+                      ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                      : "hover:bg-emerald-50 text-gray-600 hover:text-emerald-700"
+                  }`}
+                >
+                  <div className={`p-2 rounded-lg ${v.id === artifact.id ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-white transition-colors'}`}>
+                    <Clock className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-black tracking-tight truncate">Version {v.version}</p>
+                    <p className={`text-[10px] font-bold opacity-60 uppercase tracking-tighter`}>
+                      {v.id === versions[versions.length - 1].id ? "Latest Update" : "Previous State"}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {activeTab === "code" && !isDocType && (
-          <div className="h-full w-full overflow-auto bg-[#1E1E1E] font-mono text-sm relative">
-            <SyntaxHighlighter
-              language={artifact.type === "react" || artifact.type === "nextjs" ? "tsx" : artifact.type === "html" ? "html" : "javascript"}
-              style={vscDarkPlus}
-              customStyle={{ margin: 0, padding: "1rem", minHeight: "100%", background: "transparent", fontSize: "13px" }}
-              wrapLines={true}
-              showLineNumbers={true}
-            >
-              {artifact.content}
-            </SyntaxHighlighter>
-            {!isComplete && (
-              <div className="px-4 pb-4">
-                <span className="inline-block w-2 h-4 bg-blue-400 animate-pulse align-middle" />
+        <div className="flex-1 relative overflow-hidden flex flex-col">
+          {activeTab === "preview" && !isDocType && (
+            <div className="flex-1 w-full bg-white overflow-hidden">
+              {renderPreview()}
+            </div>
+          )}
+
+          {activeTab === "code" && !isDocType && (
+            <div className="flex-1 w-full overflow-auto bg-[#0d0d0f] font-mono text-sm relative custom-scrollbar">
+              <SyntaxHighlighter
+                language={artifact.type === "react" || artifact.type === "nextjs" ? "tsx" : artifact.type === "html" ? "html" : "javascript"}
+                style={vscDarkPlus}
+                customStyle={{ margin: 0, padding: "2rem", minHeight: "100%", background: "transparent", fontSize: "13px", lineHeight: "1.6" }}
+                wrapLines={true}
+                showLineNumbers={true}
+              >
+                {artifact.content}
+              </SyntaxHighlighter>
+              {!isComplete && (
+                <div className="px-8 pb-8">
+                  <div className="flex items-center gap-2">
+                    <div className="h-4 w-1.5 bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest">Compiling stream...</span>
+                  </div>
+                </div>
+              )}
+              <div ref={codeEndRef} />
+            </div>
+          )}
+
+          {activeTab === "document" && isDocType && (
+            <div className="flex-1 w-full bg-white flex flex-col overflow-hidden">
+              <div className="flex-1 overflow-y-auto modern-quill-container">
+                <ReactQuill
+                  theme="snow"
+                  value={documentContent}
+                  onChange={setDocumentContent}
+                  className="h-full"
+                  modules={{
+                    toolbar: [
+                      [{ 'header': [1, 2, 3, false] }],
+                      ['bold', 'italic', 'underline', 'strike'],
+                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                      ['link', 'image', 'code-block'],
+                      ['clean']
+                    ],
+                  }}
+                />
               </div>
-            )}
-            <div ref={codeEndRef} />
-          </div>
-        )}
-
-        {activeTab === "document" && isDocType && (
-          <div className="h-full w-full bg-white flex flex-col overflow-hidden">
-            <ReactQuill
-              theme="snow"
-              value={documentContent}
-              onChange={setDocumentContent}
-              className="flex-1 overflow-y-auto"
-              modules={{
-                toolbar: [
-                  [{ 'header': [1, 2, 3, false] }],
-                  ['bold', 'italic', 'underline', 'strike'],
-                  [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                  ['link', 'image', 'code-block'],
-                  ['clean']
-                ],
-              }}
-            />
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

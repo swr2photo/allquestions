@@ -82,6 +82,9 @@ import {
   Github,
   Code2,
   Maximize2,
+  Bot,
+  Square,
+  ArrowDown,
 } from "lucide-react";
 
 // Register highlight.js languages
@@ -155,16 +158,15 @@ const renderMarkdown = (text: string) => {
       highlighted = trimmed.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    const html = 
-      `<div class="aq-code my-3 rounded-xl overflow-hidden border border-gray-700/50 bg-[#1e1e2e] shadow-lg">` +
-      `<div class="flex items-center justify-between px-4 py-2 bg-[#181825] border-b border-gray-700/50">` +
+    const html =
+      `<div class="aq-code my-3 rounded-xl border border-gray-700 bg-gray-900 shadow-xl relative">` +
+      `<div class="flex items-center justify-between px-4 py-2.5 bg-gray-800 border-b border-gray-700 sticky top-0 z-[40] rounded-t-xl opacity-100">` +
       `<div class="flex items-center gap-2"><div class="flex gap-1.5"><span class="w-3 h-3 rounded-full bg-[#f38ba8]"></span><span class="w-3 h-3 rounded-full bg-[#f9e2af]"></span><span class="w-3 h-3 rounded-full bg-[#a6e3a1]"></span></div>` +
-      `<span class="text-[11px] text-gray-400 font-medium ml-2">${langLabel}</span></div>` +
-      `<button onclick="(function(b){var p=b.closest('.aq-code');var c=p&&p.querySelector('code');if(c){navigator.clipboard.writeText(c.textContent||'');b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><polyline points=\\'20 6 9 17 4 12\\'></polyline></svg> Copied';setTimeout(function(){b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><rect x=\\'9\\' y=\\'9\\' width=\\'13\\' height=\\'13\\' rx=\\'2\\' ry=\\'2\\'></rect><path d=\\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\\'></path></svg> Copy'},1500)}})(this)" class="flex items-center gap-1.5 text-gray-400 hover:text-gray-200 text-xs px-2.5 py-1 rounded-md hover:bg-white/10 transition-all"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy</button>` +
+      `<span class="text-[11px] text-gray-400 font-bold ml-2 uppercase tracking-widest">${langLabel}</span></div>` +
+      `<button onclick="(function(b){var p=b.closest('.aq-code');var c=p&&p.querySelector('code');if(c){navigator.clipboard.writeText(c.textContent||'');b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><polyline points=\\'20 6 9 17 4 12\\'></polyline></svg> Copied';setTimeout(function(){b.innerHTML='<svg width=\\'14\\' height=\\'14\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'currentColor\\' stroke-width=\\'2\\'><rect x=\\'9\\' y=\\'9\\' width=\\'13\\' height=\\'13\\' rx=\\'2\\' ry=\\'2\\'></rect><path d=\\'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1\\'></path></svg> Copy'},1500)}})(this)" class="flex items-center gap-1.5 text-white bg-gray-700 hover:bg-gray-600 shadow-md border border-gray-600 text-[11px] font-bold px-3 py-1.5 rounded-lg transition-all cursor-pointer pointer-events-auto active:scale-95"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> Copy Code</button>` +
       `</div>` +
-      `<pre class="p-4 text-[13px] leading-relaxed overflow-x-auto" style="word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap"><code class="hljs">${highlighted}</code></pre>` +
-      `</div>`;
-    
+      `<pre class="p-4 text-[13px] leading-relaxed overflow-x-auto rounded-b-xl" style="word-break:break-word;overflow-wrap:break-word;white-space:pre-wrap"><code class="hljs">${highlighted}</code></pre>` +
+      `</div>`;    
     return addBlock("CODE", html);
   });
 
@@ -307,27 +309,43 @@ function ThinkingBlock({
   if (!thinking && !isStreaming) return null;
   
   return (
-    <div className="mb-3 animate-in fade-in slide-in-from-top-1 duration-300">
+    <div className="mb-4 animate-in fade-in slide-in-from-top-2 duration-500">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-emerald-600 hover:opacity-80 transition-all px-2 py-1 rounded-lg bg-emerald-50/50 border border-emerald-100/50"
+        className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 hover:opacity-80 transition-all px-3 py-1.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 shadow-sm"
       >
-        <Zap className={`h-3 w-3 ${isStreaming ? "animate-pulse" : ""}`} />
+        <div className="relative">
+          <Brain className={`h-3.5 w-3.5 ${isStreaming ? "animate-pulse" : ""}`} />
+          {isStreaming && <div className="absolute -top-0.5 -right-0.5 h-1.5 w-1.5 bg-emerald-500 rounded-full animate-ping" />}
+        </div>
         {isStreaming ? (
-          <span className="flex items-center gap-1.5">
-            <Loader2 className="h-2.5 w-2.5 animate-spin" />
-            {thinking ? "กำลังประมวลผลความคิด..." : status}
+          <span className="flex items-center gap-2">
+            <span className="inline-block w-24 h-2 bg-emerald-200/50 rounded-full animate-pulse overflow-hidden relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
+            </span>
+            <span className="opacity-70">{thinking ? "กำลังประมวลผล..." : status}</span>
           </span>
         ) : (
           <span>กระบวนการคิด</span>
         )}
-        {open ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
+        <ChevronDown className={`h-3 w-3 transition-transform duration-300 ${open ? "" : "-rotate-90"}`} />
       </button>
-      {open && (thinking || isStreaming) && (
-        <div 
-          className="mt-2 ml-1 pl-4 border-l-2 border-emerald-200/50 text-xs text-muted-foreground/80 leading-relaxed italic prose prose-sm max-w-none transition-all duration-300"
-          dangerouslySetInnerHTML={{ __html: renderMarkdown(thinking || (isStreaming ? "กำลังเชื่อมต่อฐานข้อมูลความรู้..." : "")) }}
-        />
+      
+      {open && (
+        <div className="mt-3 ml-2 pl-4 border-l-2 border-emerald-500/20 space-y-3">
+          {thinking ? (
+            <div 
+              className="text-xs text-muted-foreground/80 leading-relaxed italic prose prose-sm max-w-none animate-in fade-in duration-700"
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(thinking) }}
+            />
+          ) : isStreaming ? (
+            <div className="space-y-2 animate-in fade-in duration-500">
+              <div className="h-2 bg-gray-100 rounded-full w-full animate-pulse" />
+              <div className="h-2 bg-gray-100 rounded-full w-[90%] animate-pulse [animation-delay:200ms]" />
+              <div className="h-2 bg-gray-100 rounded-full w-[95%] animate-pulse [animation-delay:400ms]" />
+            </div>
+          ) : null}
+        </div>
       )}
     </div>
   );
@@ -335,17 +353,36 @@ function ThinkingBlock({
 
 function MessageSkeleton() {
   return (
-    <div className="flex flex-row gap-4 w-full animate-in fade-in duration-500">
-      <div className="shrink-0 pt-1">
-        <div className="h-9 w-9 rounded-xl bg-gray-200 animate-pulse" />
-      </div>
-      <div className="flex flex-col gap-2 w-full max-w-[80%]">
-        <div className="h-4 w-24 bg-gray-200 rounded-lg animate-pulse" />
-        <div className="space-y-2 p-4 rounded-2xl bg-white/40 backdrop-blur-md border border-white/20 shadow-sm">
-          <div className="h-3 w-full bg-gray-200/60 rounded animate-pulse" />
-          <div className="h-3 w-[90%] bg-gray-200/60 rounded animate-pulse" />
-          <div className="h-3 w-[95%] bg-gray-200/60 rounded animate-pulse" />
-          <div className="h-3 w-[40%] bg-gray-200/60 rounded animate-pulse" />
+    <div className="flex w-full animate-in fade-in slide-in-from-bottom-3 duration-500 justify-start">
+      <div className="flex gap-4 w-full max-w-[90%] sm:max-w-[80%] flex-row">
+        <div className="shrink-0 pt-1">
+          <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-50 animate-pulse shadow-sm border border-emerald-100/50 flex items-center justify-center">
+            <Bot className="h-5 w-5 text-emerald-300" />
+          </div>
+        </div>
+        <div className="flex flex-col items-start flex-1 min-w-0 space-y-2">
+          <div className="h-3 w-20 bg-gray-100 rounded-full animate-pulse" />
+          <div className="relative w-full rounded-2xl sm:rounded-3xl bg-white border border-gray-100/80 px-6 py-5 shadow-sm overflow-hidden">
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-50/50 to-transparent -translate-x-full animate-[shimmer_2s_infinite]" />
+            
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex gap-1">
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:-0.3s]" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce [animation-delay:-0.15s]" />
+                  <div className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-bounce" />
+                </div>
+                <span className="text-[10px] font-black text-emerald-500/70 uppercase tracking-widest ml-1">AI is analyzing</span>
+              </div>
+              
+              <div className="space-y-2.5">
+                <div className="h-2.5 bg-gray-100/80 rounded-full w-full animate-pulse" />
+                <div className="h-2.5 bg-gray-100/80 rounded-full w-[95%] animate-pulse [animation-delay:150ms]" />
+                <div className="h-2.5 bg-gray-100/80 rounded-full w-[40%] animate-pulse [animation-delay:300ms]" />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -2039,6 +2076,7 @@ interface Message {
   files?: FileData[];
   images?: string[];      // generated images (data URLs)
   sources?: SearchSource[]; // web search sources
+  modelUsed?: string;     // model that generated this response
 }
 
 interface ChatSession {
@@ -2112,7 +2150,8 @@ export default function AIChatPage() {
     return sessions.find(s => s.id === activeSessionId)?.messages || [];
   }, [activeSessionId, sessions]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loadingSessions, setLoadingSessions] = useState<Set<string>>(new Set());
+  const loading = activeSessionId ? loadingSessions.has(activeSessionId) : false;
   const [attachments, setAttachments] = useState<FileData[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sidebarSearch, setSidebarSearch] = useState("");
@@ -2139,7 +2178,8 @@ export default function AIChatPage() {
     "openrouter": true,
     "thaillm": true,
     "groq": true,
-    "github": true
+    "github": true,
+    "moonshot": true
   });
 
 
@@ -2305,7 +2345,7 @@ export default function AIChatPage() {
   const [isRecording, setIsRecording] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
-  const [activeTool, setActiveTool] = useState<"none" | "webSearch" | "generateImage" | "canvas" | "summarize">("none");
+  const [activeTool, setActiveTool] = useState<"none" | "webSearch" | "generateImage" | "canvas" | "summarize" | "dualAgent">("none");
   const [searchingUrls, setSearchingUrls] = useState<string[]>([]);
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
@@ -2353,6 +2393,14 @@ export default function AIChatPage() {
     }
   }, []);
 
+  // Reset Canvas and Artifacts when changing sessions
+  useEffect(() => {
+    setIsCanvasOpen(false);
+    setActiveArtifact(null);
+    setArtifactVersions([]);
+    setIsArtifactComplete(false);
+  }, [activeSessionId]);
+
   useEffect(() => {
     fetchHealth();
     // Refresh health every 5 minutes
@@ -2367,6 +2415,14 @@ export default function AIChatPage() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const stopGenerating = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      abortControllerRef.current = null;
+    }
+  }, []);
 
   // Categorized Model Options
   const MODEL_CATEGORIES = useMemo(() => {
@@ -2393,10 +2449,27 @@ export default function AIChatPage() {
         ]
       },
       {
+          name: "GitHub Models",
+          models: [
+            { value: "github/gpt-4o", label: "GPT-4o", icon: <Brain className="h-3.5 w-3.5 text-gray-700" />, desc: "OpenAI", provider: "github" },
+            { value: "github/gpt-4o-mini", label: "GPT-4o Mini", icon: <Zap className="h-3.5 w-3.5 text-gray-500" />, desc: "OpenAI Fast", provider: "github" },
+            { value: "github/gpt-4.1", label: "GPT-4.1", icon: <Brain className="h-3.5 w-3.5 text-gray-800" />, desc: "OpenAI Advanced", provider: "github" },
+            { value: "github/o3-mini", label: "o3-mini", icon: <Brain className="h-3.5 w-3.5 text-sky-600" />, desc: "OpenAI Reasoning", provider: "github" },
+            { value: "github/o1", label: "o1", icon: <Brain className="h-3.5 w-3.5 text-sky-700" />, desc: "OpenAI Advanced Reasoning", provider: "github" },
+            { value: "github/DeepSeek-R1", label: "DeepSeek R1", icon: <Sparkles className="h-3.5 w-3.5 text-blue-500" />, desc: "Reasoning", provider: "github" },
+            { value: "github/Llama-3.3-70B-Instruct", label: "Llama 3.3 70B", icon: <Zap className="h-3.5 w-3.5 text-indigo-500" />, desc: "Meta", provider: "github" },
+            { value: "github/Meta-Llama-3.1-405B-Instruct", label: "Llama 3.1 405B", icon: <Brain className="h-3.5 w-3.5 text-indigo-700" />, desc: "Meta Massive", provider: "github" },
+            { value: "github/Phi-4", label: "Phi-4", icon: <Brain className="h-3.5 w-3.5 text-teal-600" />, desc: "Microsoft", provider: "github" },
+            { value: "github/Phi-4-reasoning", label: "Phi-4 Reasoning", icon: <Sparkles className="h-3.5 w-3.5 text-teal-500" />, desc: "Microsoft", provider: "github" },
+            { value: "github/Cohere-command-r-plus-08-2024", label: "Command R+", icon: <Brain className="h-3.5 w-3.5 text-rose-500" />, desc: "Cohere", provider: "github" },
+            { value: "github/Mistral-Small-2402", label: "Mistral Small", icon: <Zap className="h-3.5 w-3.5 text-amber-500" />, desc: "Mistral AI", provider: "github" },
+          ]
+      },
+      {
           name: "Others",
           models: [
             { value: "groq/llama-3.3-70b-versatile", label: "Llama 3.3 70B", icon: <Zap className="h-3.5 w-3.5 text-orange-500" />, desc: "Groq (Fast)", provider: "groq" },
-            { value: "github/gpt-4o", label: "GPT-4o", icon: <Brain className="h-3.5 w-3.5 text-gray-700" />, desc: "GitHub Models", provider: "github" },
+            { value: "moonshot/moonshot-v1-8k", label: "Kimi (Moonshot)", icon: <Sparkles className="h-3.5 w-3.5 text-indigo-400" />, desc: "Moonshot AI", provider: "moonshot" },
           ]
       }
     ];
@@ -2494,29 +2567,63 @@ export default function AIChatPage() {
     if (!isResizingCanvas) return;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!canvasResizeRef.current) return;
-      const delta = canvasResizeRef.current.startX - e.clientX;
-      const newWidth = Math.min(Math.max(canvasResizeRef.current.startWidth + delta, 400), window.innerWidth * 0.75);
+      if (!isResizingCanvas) return;
+      
+      // Use absolute measurement: Distance from right edge of window to mouse
+      const calculatedWidth = window.innerWidth - e.clientX;
+      
+      // Constraints:
+      // 1. Min Canvas Width = 300px
+      // 2. Min Chat Area Width = 450px (to prevent icons squishing)
+      const sidebarW = isSidebarOpen ? 272 : 0;
+      const minChatW = 450;
+      
+      const minW = 300;
+      const maxW = Math.max(minW, window.innerWidth - sidebarW - minChatW);
+      
+      const newWidth = Math.min(Math.max(calculatedWidth, minW), maxW);
       setCanvasWidth(newWidth);
     };
 
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: MouseEvent) => {
+      e.stopPropagation();
       setIsResizingCanvas(false);
       canvasResizeRef.current = null;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
     };
 
-    document.addEventListener("mousemove", handleMouseMove);
-    document.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    // Use capture to ensure we get the event before any iframe or child consumes it
+    window.addEventListener("mouseup", handleMouseUp, { capture: true });
+    
     document.body.style.cursor = "col-resize";
     document.body.style.userSelect = "none";
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp, { capture: true });
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
     };
   }, [isResizingCanvas]);
+
+  // Handle initial responsive width for Canvas
+  useEffect(() => {
+    if (isCanvasOpen && !isResizingCanvas) {
+      const isMobile = window.innerWidth < 768;
+      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1280;
+      
+      if (isMobile) {
+        setCanvasWidth(window.innerWidth);
+      } else if (isTablet) {
+        setCanvasWidth(window.innerWidth * 0.6); // 60% for tablets
+      } else {
+        // Only set default if not already set or too small
+        if (canvasWidth < 400) setCanvasWidth(window.innerWidth * 0.5); // 50% for desktop
+      }
+    }
+  }, [isCanvasOpen]);
 
   const fetchAuthAndQuota = useCallback(async () => {
     try {
@@ -3017,8 +3124,11 @@ export default function AIChatPage() {
     }));
 
     setInput("");
+    if (inputRef.current) {
+      inputRef.current.style.height = "40px";
+    }
     setAttachments([]);
-    setLoading(true);
+    setLoadingSessions(prev => { const next = new Set(prev); next.add(currentSessionId!); return next; });
 
     // Set initial thinking status based on active tool
     let initialStatus = "กำลังวิเคราะห์ข้อมูล...";
@@ -3046,6 +3156,7 @@ export default function AIChatPage() {
 
     // Abort controller with timeout to prevent stuck loading
     const controller = new AbortController();
+    abortControllerRef.current = controller;
     const timeoutId = setTimeout(() => controller.abort(), activeTool === "generateImage" ? 90000 : 60000);
 
     try {
@@ -3063,11 +3174,12 @@ export default function AIChatPage() {
           })),
           model: selectedModel,
           responseStyle: aiSettings.responseStyle,
-          customInstructions: aiSettings.customInstructions || undefined,
+          customInstructions: (aiSettings.customInstructions ? aiSettings.customInstructions + "\n" : "") + "You are an advanced reasoning AI. Before providing the final answer, you must use a 'Chain of Thought' process. Break the problem down into steps: Assessing, Confirming, Verifying, and Evaluating. Enclose your entire internal thought process strictly within <think> and </think> tags. Do not show the final answer inside the think tags. Ensure your reasoning is logical, self-correcting, and strictly follows safety compliance.",
           language: aiSettings.language,
           webSearch: activeTool === "webSearch",
           generateImage: activeTool === "generateImage",
           canvasMode: activeTool === "canvas",
+          dualAgent: activeTool === "dualAgent",
           memoryEnabled: aiSettings.memoryEnabled,
         }),
       });
@@ -3109,6 +3221,8 @@ export default function AIChatPage() {
       // If successful request, refresh quota
       fetchAuthAndQuota();
 
+      clearTimeout(timeoutId); // Clear timeout since connection was successful and stream has started
+
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No stream");
 
@@ -3133,6 +3247,31 @@ export default function AIChatPage() {
             if (jsonStr === "[DONE]") continue;
             try {
               const parsed = JSON.parse(jsonStr);
+
+              if (parsed.error && parsed.allFailed) {
+                toast.error(parsed.error);
+                continue;
+              }
+
+              if (parsed.status === "switching") {
+                setGeneratingStatus(`สลับโมเดล: ${parsed.message}`);
+                toast.warning(parsed.message);
+                continue;
+              }
+
+              if (parsed.modelUsed) {
+                setSessions((prev) => prev.map(s => {
+                  if (s.id === currentSessionId) {
+                    const updated = [...s.messages];
+                    if (updated.length > 0) {
+                      updated[updated.length - 1] = { ...updated[updated.length - 1], modelUsed: parsed.modelUsed };
+                    }
+                    return { ...s, messages: updated };
+                  }
+                  return s;
+                }));
+                // We don't continue here because the chunk might also contain text or just be metadata
+              }
 
               if (parsed.text) {
                 fullText += parsed.text;
@@ -3271,8 +3410,19 @@ export default function AIChatPage() {
       setGeneratingStatus(isAbort ? "หมดเวลา — ลองใหม่อีกครั้ง" : "เกิดข้อผิดพลาด — ลองใหม่อีกครั้ง");
       setTimeout(() => setGeneratingStatus("กำลังวิเคราะห์..."), 3000);
     } finally {
+      // Remove empty assistant bubble if stream finished without any text
+      setSessions((prev) => prev.map(s => {
+        if (s.id === currentSessionId) {
+          const updatedMessages = s.messages.filter((m, idx) =>
+            !(idx === s.messages.length - 1 && m.role === "assistant" && !m.content)
+          );
+          return { ...s, messages: updatedMessages };
+        }
+        return s;
+      }));
+      setGeneratingStatus("กำลังวิเคราะห์..."); // Reset status
       clearTimeout(timeoutId);
-      setLoading(false);
+      setLoadingSessions(prev => { const next = new Set(prev); next.delete(currentSessionId!); return next; });
       setSearchingUrls([]);
     }
   };
@@ -3322,21 +3472,39 @@ export default function AIChatPage() {
     setTimeout(() => sendMessage(userMsg.content), 100);
   };
 
-  // Edit: put user message back in input, remove from history
+  // Edit: Inline editing functionality
+  const [editingMessageIndex, setEditingMessageIndex] = useState<number | null>(null);
+  const [editMessageContent, setEditMessageContent] = useState("");
+
   const editMessage = (messageIndex: number) => {
     if (loading || !activeSessionId) return;
     const msg = messages[messageIndex];
     if (!msg || msg.role !== "user") return;
 
-    setInput(msg.content);
-    if (msg.files) setAttachments(msg.files);
+    setEditingMessageIndex(messageIndex);
+    setEditMessageContent(msg.content);
+  };
 
-    // Remove this message and everything after
+  const cancelEdit = () => {
+    setEditingMessageIndex(null);
+    setEditMessageContent("");
+  };
+
+  const submitEdit = (messageIndex: number) => {
+    if (!editMessageContent.trim() || !activeSessionId) return;
+    
+    // Remove this message and everything after from history
     const trimmed = messages.slice(0, messageIndex);
     setSessions(prev => prev.map(s =>
       s.id === activeSessionId ? { ...s, messages: trimmed } : s
     ));
-    inputRef.current?.focus();
+    
+    const newContent = editMessageContent;
+    setEditingMessageIndex(null);
+    setEditMessageContent("");
+    
+    // Resend with new content
+    setTimeout(() => sendMessage(newContent), 100);
   };
 
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -3496,7 +3664,7 @@ export default function AIChatPage() {
   }
 
   return (
-    <div className="flex h-[100dvh] md:h-[calc(100vh-64px)] bg-[#fcfcfd]  overflow-hidden transition-colors duration-500">
+    <div className="flex h-[100dvh] md:h-[calc(100vh-64px)] bg-[#fcfcfd] overflow-hidden relative transition-colors duration-500">
       {/* Mobile sidebar overlay */}
       {isSidebarOpen && (
         <div
@@ -3865,7 +4033,7 @@ export default function AIChatPage() {
 
       {/* Main Content Area */}
       <div
-        className="flex-1 flex flex-col min-w-0 relative h-full bg-[#fcfcfd] "
+        className="flex-1 flex flex-col min-w-[450px] relative h-full bg-[#fcfcfd] overflow-hidden"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -3963,15 +4131,15 @@ export default function AIChatPage() {
                   )}
                 </div>
 
-                <div className={`flex flex-col min-w-0 ${m.role === "user" ? "items-end" : "items-start"} flex-1`}>
+                <div className={`flex flex-col min-w-0 ${m.role === "user" ? "items-end" : "items-start"} flex-1 group/msg`}>
                   <div
-                    className={`relative w-fit max-w-full rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border flex items-center min-h-[44px] ${
+                    className={`relative w-fit max-w-full rounded-2xl sm:rounded-3xl shadow-sm border flex flex-col min-h-[44px] ${
                       m.role === "user"
-                        ? "bg-emerald-600 text-white border-emerald-500 px-5 py-2.5"
-                        : "bg-white  border-gray-100  px-5 py-3.5"
+                        ? "bg-emerald-600 text-white border-emerald-500"
+                        : "bg-white  border-gray-100"
                     }`}
                   >
-                    <div className="w-full">
+                    <div className={`w-full ${m.role === "user" ? "px-5 py-2.5" : "px-5 py-3.5"}`}>
                       {m.files && m.files.length > 0 && (
                         <div className="mb-4 flex flex-wrap gap-2">
                           {m.files.map((file, idx) => (
@@ -3998,9 +4166,12 @@ export default function AIChatPage() {
                             const { cleanedContent: answer, artifact: msgArtifact } = parseArtifacts(rawAnswer);
                             const isStreaming = loading && i === messages.length - 1;
                             const isStillThinking = isStreaming && !m.content.includes("</think>");
-                            const isProModel = selectedModel.includes("pro") || selectedModel.includes("opus") || selectedModel.includes("3.1");
-                            const isAutoMaybeFlash = selectedModel === "auto" && thinking && thinking.split("\n").filter(l => l.trim()).length <= 2;
-                            const showThinking = isProModel || (selectedModel === "auto" && !isAutoMaybeFlash);
+
+                            // Logic to decide when to show the thinking block
+                            // 1. If it's a Pro model, always show it.
+                            // 2. If it's Auto mode and we have thinking content (or it's still thinking), show it.
+                            const isProModel = selectedModel.includes("pro") || selectedModel.includes("opus") || selectedModel.includes("3.1") || selectedModel.includes("o1") || selectedModel.includes("o3");
+                            const showThinking = isProModel || selectedModel === "auto" || (thinking && thinking.length > 0);
 
                             return (
                               <div className="w-full relative z-10 text-left">
@@ -4010,8 +4181,7 @@ export default function AIChatPage() {
                                     isStreaming={isStillThinking}
                                     status={generatingStatus}
                                   />
-                                )}
-                                {answer && (
+                                )}                                {answer && (
                                   <div
                                     className="text-[15px] leading-relaxed prose prose-neutral  prose-p:my-2 prose-headings:font-black prose-a:text-emerald-500 prose-strong:text-emerald-600  w-full max-w-none transition-all duration-300"
                                     dangerouslySetInnerHTML={{ __html: renderMarkdown(answer.replace(/\*\(Artifact generated in Canvas\)\*/g, "")) }}
@@ -4020,13 +4190,16 @@ export default function AIChatPage() {
 
                                 {/* Open Canvas card */}
                                 {msgArtifact && (
-                                  <div className="mt-4 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex flex-col sm:flex-row items-center gap-4 animate-in slide-in-from-left-2 duration-500">
-                                    <div className="h-12 w-12 rounded-xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0">
-                                      {msgArtifact.type === 'code' ? <Code2 className="h-6 w-6" /> : <FileText className="h-6 w-6" />}
+                                  <div className="mt-4 p-4 rounded-2xl bg-emerald-50/50 border border-emerald-500/20 flex flex-col sm:flex-row items-center gap-4 animate-in slide-in-from-left-2 duration-500 group relative">
+                                    <div className="h-14 w-14 rounded-2xl bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20 shrink-0 transition-transform group-hover:scale-105">
+                                      {msgArtifact.type === 'code' ? <Code2 className="h-7 w-7" /> : <FileText className="h-7 w-7" />}
                                     </div>
-                                    <div className="flex-1 min-w-0 text-center sm:text-left">
-                                      <h4 className="font-bold text-gray-900  truncate">{msgArtifact.title}</h4>
-                                      <p className="text-xs text-emerald-600  font-bold uppercase tracking-widest">{msgArtifact.type} artifact</p>
+                                    <div className="flex-1 min-w-0 flex flex-col gap-0.5 overflow-hidden">
+                                      <h4 className="font-black text-gray-900 truncate text-sm uppercase tracking-tight">{msgArtifact.title}</h4>
+                                      <div className="flex items-center gap-2">
+                                        <span className="px-1.5 py-0.5 rounded-md bg-emerald-100 text-[10px] text-emerald-700 font-black uppercase tracking-widest">{msgArtifact.type}</span>
+                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Artifact Component</p>
+                                      </div>
                                     </div>
                                     <button
                                       onClick={() => {
@@ -4034,13 +4207,12 @@ export default function AIChatPage() {
                                         setIsArtifactComplete(true);
                                         setIsCanvasOpen(true);
                                       }}
-                                      className="h-10 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-all shadow-md shadow-emerald-500/10 active:scale-95 whitespace-nowrap"
+                                      className="w-full sm:w-auto h-10 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black uppercase tracking-widest transition-all shadow-md shadow-emerald-500/10 active:scale-95 whitespace-nowrap shrink-0"
                                     >
                                       เปิดในหน้าต่างเสริม
                                     </button>
                                   </div>
                                 )}
-
                                 {/* Generated images card */}
                                 {m.images && m.images.length > 0 && (
                                   <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -4091,7 +4263,7 @@ export default function AIChatPage() {
                               <div className="absolute -top-1 -right-1 h-3 w-3 bg-emerald-500 rounded-full animate-ping" />
                             </div>
                             <div className="flex flex-col gap-0.5">
-                              <span className="text-sm font-bold text-gray-900 ">{generatingStatus}</span>
+                              <span className="text-sm font-bold text-gray-400 animate-pulse">{generatingStatus}</span>
                               {activeTool === "webSearch" && searchingUrls.length > 0 && (
                                 <div className="flex items-center gap-1.5 overflow-hidden">
                                   {searchingUrls.map((url, idx) => (
@@ -4102,21 +4274,50 @@ export default function AIChatPage() {
                             </div>
                           </div>
                         )
+                      ) : editingMessageIndex === i ? (
+                        <div className="flex flex-col gap-2 w-full min-w-[250px] sm:min-w-[400px]">
+                          <textarea
+                            autoFocus
+                            value={editMessageContent}
+                            onChange={(e) => {
+                              setEditMessageContent(e.target.value);
+                              e.target.style.height = "auto";
+                              e.target.style.height = `${Math.min(e.target.scrollHeight, 300)}px`;
+                            }}
+                            className="w-full bg-white/10 text-white placeholder:text-white/50 border border-white/20 rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-white/30 resize-none min-h-[80px]"
+                            placeholder="แก้ไขข้อความ..."
+                          />
+                          <div className="flex justify-end gap-2 mt-1">
+                            <button
+                              onClick={cancelEdit}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white/10 hover:bg-white/20 text-white transition-all"
+                            >
+                              {aiSettings.language === "th" ? "ยกเลิก" : "Cancel"}
+                            </button>
+                            <button
+                              onClick={() => submitEdit(i)}
+                              disabled={!editMessageContent.trim()}
+                              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white text-emerald-600 hover:bg-emerald-50 disabled:opacity-50 shadow-sm transition-all"
+                            >
+                              {aiSettings.language === "th" ? "ส่งใหม่" : "Save & Submit"}
+                            </button>
+                          </div>
+                        </div>
                       ) : (
                         <p className="whitespace-pre-wrap leading-relaxed font-medium">{m.content}</p>
                       )}
                     </div>
                   </div>
 
-                  {/* Message action toolbar */}
+                  {/* Restored Message Action Toolbar */}
                   {!loading && m.content && (
-                    <div className={`flex items-center gap-1.5 mt-1.5 transition-all px-1 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                    <div className={`flex items-center gap-1.5 mt-1.5 transition-all px-1 opacity-100 ${m.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
                       <button
                         onClick={() => {
                           copyMessage(m.content, i);
                           showToast(aiSettings.language === "th" ? "คัดลอกแล้ว" : "Copied", "success");
                         }}
-                        className={`p-1.5 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100  transition-all`}
+                        className="p-1.5 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all pointer-events-auto"
                         title="คัดลอก"
                       >
                         {copiedIndex === i ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" /> : <Copy className="h-3.5 w-3.5" />}
@@ -4131,6 +4332,18 @@ export default function AIChatPage() {
                           >
                             {speakingIndex === i ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
                           </button>
+                          
+                          {/* Retry/Regenerate Button - Show only for the latest assistant message */}
+                          {i === messages.length - 1 && (
+                            <button
+                              onClick={() => retryMessage(i)}
+                              className="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 transition-all"
+                              title="สร้างคำตอบใหม่"
+                            >
+                              <RefreshCw className="h-3.5 w-3.5" />
+                              <span className="text-[10px] font-bold">สร้างใหม่</span>
+                            </button>
+                          )}
                         </>
                       )}
 
@@ -4138,12 +4351,20 @@ export default function AIChatPage() {
                       {m.role === "user" && i === messages.findLastIndex(msg => msg.role === "user") && (
                         <button
                           onClick={() => editMessage(i)}
-                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100  transition-all"
+                          className="flex items-center gap-1 px-2 py-1 rounded-lg text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all"
                           title="แก้ไขข้อความ"
                         >
                           <SquarePen className="h-3.5 w-3.5" />
                           <span className="text-[10px] font-bold">แก้ไข</span>
                         </button>
+                      )}
+
+                      {/* Display the model used for this assistant message */}
+                      {m.role === "assistant" && m.modelUsed && (
+                        <span className="flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest ml-auto shadow-sm">
+                          <Bot className="h-3 w-3" />
+                          {m.modelUsed}
+                        </span>
                       )}
                     </div>
                   )}
@@ -4195,22 +4416,6 @@ export default function AIChatPage() {
               )}
 
               <div className="flex flex-col">
-                {/* Tool info bar - Anchored to the top inner edge */}
-                {activeTool !== "none" && (
-                  <div className="px-4 pt-2 pb-1">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                      activeTool === "webSearch" ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" :
-                      activeTool === "canvas" ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" :
-                      "bg-violet-500 text-white shadow-lg shadow-violet-500/20"
-                    }`}>
-                      {activeTool === "webSearch" ? <Globe className="h-3 w-3" /> :
-                       activeTool === "canvas" ? <SquarePen className="h-3 w-3" /> : <Image className="h-3 w-3" />}
-                      {activeTool === "webSearch" ? "WEB SEARCH" : activeTool === "canvas" ? "CANVAS MODE" : "GENERATE IMAGE"}
-                      <button onClick={() => setActiveTool("none")} className="ml-1 hover:scale-125 transition-transform"><X className="h-2.5 w-2.5" /></button>
-                    </div>
-                  </div>
-                )}
-
                 <div className="flex items-center gap-2 p-2 sm:p-3">
                   {/* Model Picker Trigger */}
                   <div className="relative shrink-0 self-end mb-0.5">
@@ -4284,37 +4489,66 @@ export default function AIChatPage() {
                     )}
                   </div>
 
-                  <div className="flex-1 relative flex items-center">
-                    <textarea
-                      ref={inputRef}
-                      value={input}
-                      disabled={!!(quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
-                      onChange={(e) => {
-                        setInput(e.target.value);
-                        e.target.style.height = "auto";
-                        e.target.style.height = `${Math.min(e.target.scrollHeight, 250)}px`;
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey && aiSettings.sendWithEnter) {
-                          e.preventDefault();
-                          sendMessage();
-                        }
-                      }}
-                      onPaste={handlePaste}
-                      placeholder={quota && quota.usage >= quota.limit && isFreeModel(selectedModel) 
-                        ? (aiSettings.language === "th" ? "โควตาฟรีวันนี้เต็มแล้ว..." : "Free quota reached for today...")
-                        : (aiSettings.language === "th" ? "ถามอะไรก็ได้..." : "Ask anything...")}
-                      className="w-full bg-transparent border-none focus:ring-0 outline-none text-[15px] py-2 px-1 min-h-[40px] max-h-[250px] resize-none text-gray-800  placeholder:text-gray-400  font-medium disabled:opacity-50"
-                      rows={1}
-                    />
-                    {input && (
-                      <button 
-                        onClick={() => { setInput(""); if (inputRef.current) { inputRef.current.style.height = "40px"; inputRef.current.focus(); } }}
-                        className="absolute right-1 p-1.5 rounded-lg text-gray-400 hover:text-gray-600  hover:bg-gray-100  transition-all"
-                      >
-                        <X className="h-3.5 w-3.5" />
-                      </button>
+                  <div className="flex-1 relative flex flex-col justify-end min-w-0">
+                    {/* Tool Indicator */}
+                    {activeTool && activeTool !== 'none' && (
+                      <div className="absolute -top-10 left-0 flex items-center gap-2 animate-in slide-in-from-bottom-2 fade-in duration-300">
+                        <div className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-sm backdrop-blur-md
+                          ${activeTool === 'webSearch' ? 'bg-blue-500/20 text-blue-600 border border-blue-500/30' :
+                            activeTool === 'generateImage' ? 'bg-violet-500/20 text-violet-600 border border-violet-500/30' :
+                            activeTool === 'canvas' ? 'bg-emerald-500/20 text-emerald-600 border border-emerald-500/30' :
+                            activeTool === 'dualAgent' ? 'bg-orange-500/20 text-orange-600 border border-orange-500/30' :
+                            'bg-gray-200 text-gray-600 border border-gray-300'}`}>
+                          {activeTool === 'webSearch' ? <Globe className="w-3 h-3" /> :
+                           activeTool === 'generateImage' ? <Image className="w-3 h-3" /> :
+                           activeTool === 'canvas' ? <SquarePen className="w-3 h-3" /> :
+                           activeTool === 'dualAgent' ? <Bot className="w-3 h-3" /> : null}
+                          {activeTool === 'webSearch' ? 'Web Search: ON' :
+                           activeTool === 'generateImage' ? 'Image Gen: ON' :
+                           activeTool === 'canvas' ? 'Canvas Mode: ON' :
+                           activeTool === 'dualAgent' ? 'Dual Agent: ON' : activeTool}
+                        </div>
+                        <button 
+                          onClick={(e) => { e.preventDefault(); setActiveTool('none'); }} 
+                          className="h-6 w-6 rounded-full bg-white/80 border border-gray-200 shadow-sm hover:bg-red-50 hover:text-red-500 hover:border-red-200 text-gray-400 flex items-center justify-center transition-all"
+                          title="ปิดเครื่องมือ"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
                     )}
+                    <div className="relative flex items-center w-full">
+                      <textarea
+                        ref={inputRef}
+                        value={input}
+                        disabled={!!(quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
+                        onChange={(e) => {
+                          setInput(e.target.value);
+                          e.target.style.height = "auto";
+                          e.target.style.height = `${Math.min(e.target.scrollHeight, 250)}px`;
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" && !e.shiftKey && aiSettings.sendWithEnter) {
+                            e.preventDefault();
+                            sendMessage();
+                          }
+                        }}
+                        onPaste={handlePaste}
+                        placeholder={quota && quota.usage >= quota.limit && isFreeModel(selectedModel) 
+                          ? (aiSettings.language === "th" ? "โควตาฟรีวันนี้เต็มแล้ว..." : "Free quota reached for today...")
+                          : (aiSettings.language === "th" ? "ถามอะไรก็ได้..." : "Ask anything...")}
+                        className="w-full bg-transparent border-none focus:ring-0 outline-none text-[15px] py-2 px-1 min-h-[40px] max-h-[250px] resize-none text-gray-800  placeholder:text-gray-400  font-medium disabled:opacity-50"
+                        rows={1}
+                      />
+                      {input && (
+                        <button 
+                          onClick={() => { setInput(""); if (inputRef.current) { inputRef.current.style.height = "40px"; inputRef.current.focus(); } }}
+                          className="absolute right-1 p-1.5 rounded-lg text-gray-400 hover:text-gray-600  hover:bg-gray-100  transition-all"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-1.5 self-end mb-0.5">
@@ -4334,12 +4568,17 @@ export default function AIChatPage() {
                     </button>
 
                     <button
-                      onClick={() => sendMessage()}
-                      disabled={loading || (!input.trim() && attachments.length === 0) || (!!quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
-                      className="h-10 w-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-100  text-white font-bold transition-all shadow-lg shadow-emerald-500/20 active:scale-90 flex items-center justify-center shrink-0"
+                      onClick={() => loading ? stopGenerating() : sendMessage()}
+                      disabled={!loading && ((!input.trim() && attachments.length === 0) || (!!quota && quota.usage >= quota.limit && isFreeModel(selectedModel)))}
+                      className={`h-10 w-10 rounded-xl font-bold transition-all flex items-center justify-center shrink-0 ${
+                        loading 
+                          ? "bg-gray-800 hover:bg-gray-900 text-white shadow-lg shadow-gray-500/20 active:scale-90" 
+                          : "bg-emerald-500 hover:bg-emerald-600 disabled:bg-gray-100 disabled:text-gray-400 text-white shadow-lg shadow-emerald-500/20 active:scale-90"
+                      }`}
+                      title={loading ? "หยุดการสร้างข้อความ" : "ส่งข้อความ"}
                     >
                       {loading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
+                        <Square className="h-4 w-4 fill-current" />
                       ) : (
                         <ArrowUp className="h-5 w-5" />
                       )}
@@ -4351,7 +4590,7 @@ export default function AIChatPage() {
               {/* Floating Tools Menu - Refined with Rounded Rectangle */}
               {isToolsMenuOpen && (
                 <div className="absolute bottom-full right-0 mb-4 w-72 bg-white  border border-emerald-500/10  rounded-2xl shadow-xl p-3 z-50 animate-in slide-in-from-bottom-6 zoom-in-95 duration-300">
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <button onClick={() => { fileInputRef.current?.click(); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-emerald-500/5  transition-all group">
                       <div className="p-3 rounded-xl bg-gray-100  group-hover:bg-emerald-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-500/25 transition-all"><Paperclip className="h-5 w-5" /></div>
                       <span className="text-[9px] font-black text-gray-400 group-hover:text-emerald-500 uppercase tracking-widest transition-colors">Upload</span>
@@ -4360,14 +4599,22 @@ export default function AIChatPage() {
                       <div className={`p-3 rounded-xl transition-all ${activeTool === 'webSearch' ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/25' : 'bg-gray-100  group-hover:bg-blue-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-500/25'}`}><Globe className="h-5 w-5" /></div>
                       <span className="text-[9px] font-black text-gray-400 group-hover:text-blue-500 uppercase tracking-widest transition-colors">Search</span>
                     </button>
-                    <button onClick={() => { setActiveTool('generateImage'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-violet-500/5  transition-all group">
-                      <div className={`p-3 rounded-xl transition-all ${activeTool === 'generateImage' ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/25' : 'bg-gray-100  group-hover:bg-violet-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-violet-500/25'}`}><Image className="h-5 w-5" /></div>
-                      <span className="text-[9px] font-black text-gray-400 group-hover:text-violet-500 uppercase tracking-widest transition-colors">Image</span>
-                    </button>
+                    {(selectedModel === 'auto' || selectedModel.includes('gemini') || selectedModel.includes('openai') || selectedModel.includes('claude')) && (
+                      <button onClick={() => { setActiveTool('generateImage'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-violet-500/5  transition-all group">
+                        <div className={`p-3 rounded-xl transition-all ${activeTool === 'generateImage' ? 'bg-violet-500 text-white shadow-lg shadow-violet-500/25' : 'bg-gray-100  group-hover:bg-violet-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-violet-500/25'}`}><Image className="h-5 w-5" /></div>
+                        <span className="text-[9px] font-black text-gray-400 group-hover:text-violet-500 uppercase tracking-widest transition-colors">Image</span>
+                      </button>
+                    )}
                     <button onClick={() => { setActiveTool('canvas'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-emerald-500/5  transition-all group">
                       <div className={`p-3 rounded-xl transition-all ${activeTool === 'canvas' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/25' : 'bg-gray-100  group-hover:bg-emerald-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-500/25'}`}><SquarePen className="h-5 w-5" /></div>
                       <span className="text-[9px] font-black text-gray-400 group-hover:text-emerald-500 uppercase tracking-widest transition-colors">Canvas</span>
                     </button>
+                    {selectedModel === 'auto' && (
+                      <button onClick={() => { setActiveTool('dualAgent'); setIsToolsMenuOpen(false); }} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-orange-500/5 transition-all group">
+                        <div className={`p-3 rounded-xl transition-all ${activeTool === 'dualAgent' ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25' : 'bg-gray-100 group-hover:bg-orange-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-orange-500/25'}`}><Bot className="h-5 w-5" /></div>
+                        <span className="text-[9px] font-black text-gray-400 group-hover:text-orange-500 uppercase tracking-widest transition-colors">2 Agents</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -4383,18 +4630,38 @@ export default function AIChatPage() {
         </div>
       </div>
 
+      {/* Resizing Overlay */}
+      {isResizingCanvas && (
+        <div className="fixed inset-0 z-[9999] cursor-col-resize bg-transparent select-none pointer-events-auto" />
+      )}
+
       {/* Canvas / Artifacts Panel */}
       {isCanvasOpen && activeArtifact && (
         <div
-          className="fixed md:relative inset-y-0 right-0 z-[100] md:z-auto w-full border-l border-gray-200  bg-white  flex flex-col transition-all duration-500 animate-in slide-in-from-right-full"
+          className={`fixed md:relative inset-y-0 right-0 z-[100] md:z-auto w-full border-l border-gray-200 bg-white flex flex-col ${
+            isResizingCanvas ? 'transition-none' : 'transition-all duration-500'
+          } animate-in slide-in-from-right-full`}
           style={{ width: window.innerWidth < 768 ? "100%" : canvasWidth }}
         >
-          {/* Desktop resize handle */}
+          {/* Desktop resize handle - Enhanced UI */}
           <div
             onMouseDown={handleCanvasResizeStart}
-            className="hidden md:block absolute left-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-emerald-500/20 active:bg-emerald-500 transition-colors z-50"
-          />
-          
+            className={`hidden md:flex absolute left-[-4px] top-0 bottom-0 w-2 cursor-col-resize hover:bg-emerald-500/30 active:bg-emerald-500/50 transition-all z-[110] items-center justify-center group ${
+              isResizingCanvas ? 'bg-emerald-500/40' : ''
+            }`}
+          >
+            <div className={`w-1 h-12 rounded-full bg-gray-300 group-hover:bg-emerald-500 transition-colors ${
+              isResizingCanvas ? 'bg-emerald-600 scale-x-150' : ''
+            }`} />
+
+            {/* Visual indicator for resizing */}
+            {isResizingCanvas && (
+              <div className="absolute left-[-24px] bg-emerald-600 text-white text-[10px] font-black px-2 py-1 rounded-lg shadow-xl uppercase tracking-tighter animate-in fade-in zoom-in">
+                Resize
+              </div>
+            )}
+          </div>
+
           <CanvasView
             artifact={activeArtifact}
             versions={artifactVersions}
@@ -4405,7 +4672,6 @@ export default function AIChatPage() {
           />
         </div>
       )}
-
       {/* Settings Modal */}
       <SettingsModal
         open={isSettingsOpen}

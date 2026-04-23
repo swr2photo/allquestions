@@ -63,13 +63,14 @@ interface UserQuotaInfo {
   credits: number;
 }
 
-const PROVIDER_META: Record<ProviderRow["id"], { label: string; gradient: string; icon: string }> = {
+const PROVIDER_META: Record<string, { label: string; gradient: string; icon: string }> = {
   gemini: { label: "Google Gemini", gradient: "from-blue-500 to-sky-500", icon: "✦" },
   claude: { label: "Anthropic Claude", gradient: "from-orange-500 to-amber-500", icon: "◆" },
   openrouter: { label: "OpenRouter", gradient: "from-violet-500 to-fuchsia-500", icon: "⟟" },
   thaillm: { label: "Thai LLM", gradient: "from-red-500 to-rose-500", icon: "🇹" },
   groq: { label: "Groq Cloud", gradient: "from-orange-400 to-red-500", icon: "𝑮" },
   github: { label: "GitHub Models", gradient: "from-gray-700 to-black", icon: "𝑮" },
+  moonshot: { label: "Moonshot (Kimi)", gradient: "from-indigo-500 to-purple-500", icon: "🌙" },
 };
 
 function formatLatency(ms: number | null): string {
