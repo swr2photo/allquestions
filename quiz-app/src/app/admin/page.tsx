@@ -5,35 +5,6 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Shield, AlertTriangle, Loader2 } from "lucide-react";
 
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: { credential: string }) => void;
-            auto_select?: boolean;
-          }) => void;
-          renderButton: (
-            element: HTMLElement,
-            config: {
-              theme?: string;
-              size?: string;
-              width?: number;
-              text?: string;
-              shape?: string;
-              logo_alignment?: string;
-              locale?: string;
-            }
-          ) => void;
-          prompt: () => void;
-        };
-      };
-    };
-  }
-}
-
 export default function AdminLoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");

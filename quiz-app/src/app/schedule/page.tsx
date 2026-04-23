@@ -7,12 +7,6 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { domToPng } from "modern-screenshot";
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
 interface Course {
   id: number | string;
   subject: string;
