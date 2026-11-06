@@ -72,6 +72,7 @@ import { ExamSchedule } from "./components/ExamSchedule";
 import { ConflictsDialog, CourseDetailDialog, CustomActivityDialog } from "./components/Dialogs";
 import { RegistrationDialog } from "./components/RegistrationDialog";
 import { SavedSchedulesDialog } from "./components/SavedSchedulesDialog";
+import { GoogleSignIn } from "@/components/google-sign-in";
 import { ExportDialog } from "./components/ExportDialog";
 import { StatsPanel } from "./components/StatsPanel";
 
@@ -85,7 +86,7 @@ function termTitle(t: { year: number; term: number }) {
 type View = "week" | "agenda" | "exam";
 
 export default function TimetablePage() {
-  const { store, user, status } = useTimetableStore();
+  const { store, user, status, authChecked } = useTimetableStore();
   const { index: geIndex } = useGenedIndex();
   const { confirm, prompt } = useDialogs();
   const isDesktop = useIsDesktop();
@@ -406,6 +407,27 @@ export default function TimetablePage() {
   const hasExams = entries.some((e) => e.midterm || e.final);
 
   // ---------------------------------------------------------------- render
+  if (!authChecked) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md">
+          <CalendarRange className="h-7 w-7" />
+        </div>
+        <h1 className="text-xl font-bold text-gray-900">เข้าสู่ระบบเพื่อจัดตารางเรียน</h1>
+        <p className="text-sm text-gray-600">เข้าสู่ระบบด้วย Google เพื่อบันทึกตารางเรียนและข้อมูลการลงทะเบียนของคุณ</p>
+        <GoogleSignIn onSignedIn={() => void timetableStore.signedIn()} />
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-[1600px] px-3 pt-3 pb-28 sm:px-4 sm:pt-5 lg:pb-8">
       {/* header */}
