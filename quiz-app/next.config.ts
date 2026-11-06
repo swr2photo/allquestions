@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: {
+    "/api/**": ["./data/timetable/**/*"],
+    "/**": ["./data/timetable/**/*"],
+  },
   async rewrites() {
     return {
       beforeFiles: [
