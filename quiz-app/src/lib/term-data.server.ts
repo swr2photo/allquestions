@@ -36,11 +36,21 @@ export function loadTermIndex(origin?: string) {
   return cached("index", () => readPublicJson<TermIndex>("timetable/index.json", origin));
 }
 
+async function readTermJson(file: string, origin?: string): Promise<TermData> {
+  const termFile = path.join(process.cwd(), "data", "timetable", "terms", `${path.basename(file)}`);
+  try {
+    return JSON.parse(await fs.readFile(termFile, "utf8")) as TermData;
+  } catch (err) {
+    if (!origin) throw err;
+    return readPublicJson<TermData>(file, origin);
+  }
+}
+
 export async function loadTermData(origin?: string, termId?: string | null): Promise<TermData | null> {
   const index = await loadTermIndex(origin);
   const entry = index.terms.find((t) => t.id === termId) ?? index.terms[0];
   if (!entry) return null;
-  return cached(`term:${entry.id}`, () => readPublicJson<TermData>(entry.file, origin));
+  return cached(`term:${entry.id}`, () => readTermJson(entry.file, origin));
 }
 
 export async function loadCurriculaIndex(origin?: string): Promise<CurriculaIndex> {
