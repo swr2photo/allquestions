@@ -9,7 +9,7 @@
  *   - ไฟล์ subjects_data.js แบบเดิม  (window.PSU_SUBJECTS_DATA = [...])
  *
  * ผลลัพธ์
- *   public/timetable/terms/<year>-<term>.json   ข้อมูลภาคนั้น (รูปแบบมาตรฐาน ดู src/lib/timetable.ts)
+ *   data/timetable/terms/<year>-<term>.json     ข้อมูลภาคนั้น (ไม่อยู่ใน public เพื่อให้เข้าถึงผ่าน API ที่ต้องเข้าสู่ระบบ) (รูปแบบมาตรฐาน ดู src/lib/timetable.ts)
  *   public/timetable/index.json                 รายชื่อภาคการศึกษาที่มีในระบบ
  */
 import fs from "node:fs";
@@ -19,6 +19,7 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const OUT_DIR = path.join(ROOT, "public", "timetable");
+const DATA_DIR = path.join(ROOT, "data", "timetable");
 
 // ---------------------------------------------------------------- parsing helpers
 const DAY_PATTERNS = [
@@ -263,8 +264,8 @@ function main() {
     }
   }
 
-  fs.mkdirSync(path.join(OUT_DIR, "terms"), { recursive: true });
-  const termPath = path.join(OUT_DIR, "terms", `${id}.json`);
+  fs.mkdirSync(path.join(DATA_DIR, "terms"), { recursive: true });
+  const termPath = path.join(DATA_DIR, "terms", `${id}.json`);
   fs.writeFileSync(termPath, JSON.stringify(termFile));
 
   const indexPath = path.join(OUT_DIR, "index.json");
@@ -274,7 +275,7 @@ function main() {
     year,
     term,
     label: termFile.label,
-    file: `/timetable/terms/${id}.json`,
+    file: `/api/timetable/terms/${id}`,
     courses: courses.length,
     sections,
     campuses,

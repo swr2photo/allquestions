@@ -5,7 +5,7 @@
       "year": 2569,
       "term": 2,
       "label": "2/2569",
-      "file": "/timetable/terms/2569-2.json",
+      "file": "/api/timetable/terms/2569-2",
       "courses": 4039,
       "sections": 6276,
       "campuses": {
