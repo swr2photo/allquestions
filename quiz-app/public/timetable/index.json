@@ -1,0 +1,24 @@
+{
+  "terms": [
+    {
+      "id": "2569-2",
+      "year": 2569,
+      "term": 2,
+      "label": "2/2569",
+      "file": "/timetable/terms/2569-2.json",
+      "courses": 4039,
+      "sections": 6276,
+      "campuses": {
+        "วิทยาเขตหาดใหญ่": 2166,
+        "วิทยาเขตปัตตานี": 1232,
+        "วิทยาเขตสุราษฎร์ธานี": 440,
+        "วิทยาเขตตรัง": 201
+      },
+      "faculties": 42,
+      "fetchedAt": "2026-11-06T14:02:21.510Z",
+      "complete": true,
+      "source": "sis.psu.ac.th"
+    }
+  ],
+  "updatedAt": "2026-11-06T14:19:42.516Z"
+}
