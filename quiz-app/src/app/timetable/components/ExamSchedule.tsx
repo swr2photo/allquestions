@@ -27,7 +27,8 @@ function ExamList({ title, rows, missing }: { title: string; rows: ExamRow[]; mi
   rows.forEach((r) => byDate.set(r.exam.date, [...(byDate.get(r.exam.date) ?? []), r]));
 
   return (
-    <section className="rounded-2xl border border-gray-200 bg-white">
+    <section className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+      <div className="min-w-[440px]">
       <header className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
         <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
         <span className="text-xs text-gray-500">{rows.length} วิชา</span>
@@ -76,6 +77,7 @@ function ExamList({ title, rows, missing }: { title: string; rows: ExamRow[]; mi
           ไม่มีกำหนดสอบ/ยังไม่ประกาศ: {missing.map((m) => m.code).join(", ")}
         </p>
       )}
+      </div>
     </section>
   );
 }
