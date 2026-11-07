@@ -37,7 +37,7 @@ export function loadTermIndex(origin?: string) {
 }
 
 async function readTermJson(file: string): Promise<TermData> {
-  const termFile = path.join(process.cwd(), "data", "timetable", "terms", `${path.basename(file)}`);
+  const termFile = path.join(process.cwd(), "data", "timetable", "terms", `${path.basename(file)}.json`);
   return JSON.parse(await fs.readFile(termFile, "utf8")) as TermData;
 }
 
