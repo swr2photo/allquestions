@@ -8,6 +8,7 @@ import {
   fmtRange,
   shortCampus,
   type Course,
+  type CurriculumElectives,
   type PlannedEntry,
 } from "@/lib/timetable";
 import {
@@ -29,8 +30,15 @@ import { GeBadge, GeIcon } from "@/components/ge-badge";
 import { cn } from "@/lib/utils";
 import type { GhostBlock } from "./WeekGrid";
 import type { RecommendRequest } from "./CurriculumPicker";
+import { MajorElectives } from "./MajorElectives";
+
+type Mode = "ge" | "major" | "free";
 
 interface Props {
+  /** elective areas of the selected curriculum (หมวดวิชาเฉพาะ กลุ่มวิชาเลือก) */
+  electives?: CurriculumElectives;
+  programLabel?: string;
+  onChangeCurriculum: () => void;
   courses: Course[];
   entries: PlannedEntry[];
   geIndex: GeIndex | null;
@@ -49,6 +57,9 @@ interface Props {
 }
 
 export function RecommendPanel({
+  electives,
+  programLabel,
+  onChangeCurriculum,
   courses,
   entries,
   geIndex,
@@ -64,7 +75,7 @@ export function RecommendPanel({
   onDetail,
   onOpenRegistration,
 }: Props) {
-  const [mode, setMode] = useState<"ge" | "free">(request?.kind === "free" ? "free" : "ge");
+  const [mode, setMode] = useState<Mode>(request?.kind ?? "ge");
   const [area, setArea] = useState<string>("auto");
   const [campus, setCampus] = useState<string>(homeCampus ?? "all");
   const [includeClashing, setIncludeClashing] = useState(false);
@@ -75,7 +86,7 @@ export function RecommendPanel({
   if (request !== reqKey) {
     setReqKey(request);
     if (request) {
-      setMode(request.kind === "free" ? "free" : "ge");
+      setMode(request.kind);
       setArea("auto");
       setLimit(15);
     }
@@ -117,20 +128,22 @@ export function RecommendPanel({
 
   const recs = useMemo(
     () =>
-      recommendElectives({
-        courses,
-        index: geIndex,
-        entries,
-        takenCodes: historyBase,
-        progress,
-        only,
-        ge8Group: area === "auto" ? request?.ge8Group : undefined,
-        campus,
-        includeClashing,
-        mode,
-        ownFaculty: homeFaculty,
-        limit: 120,
-      }),
+      mode === "major"
+        ? []
+        : recommendElectives({
+            courses,
+            index: geIndex,
+            entries,
+            takenCodes: historyBase,
+            progress,
+            only,
+            ge8Group: area === "auto" ? request?.ge8Group : undefined,
+            campus,
+            includeClashing,
+            mode,
+            ownFaculty: homeFaculty,
+            limit: 120,
+          }),
     [courses, geIndex, entries, historyBase, progress, only, request, area, campus, includeClashing, mode, homeFaculty]
   );
 
@@ -152,6 +165,52 @@ export function RecommendPanel({
         </div>
       )}
 
+      <Segmented
+        aria-label="ประเภทคำแนะนำ"
+        size="sm"
+        className="flex w-full"
+        value={mode}
+        onChange={(v) => {
+          setMode(v);
+          setLimit(15);
+        }}
+        options={[
+          { value: "ge", label: "วิชา GE" },
+          { value: "major", label: "วิชาเลือกหลักสูตร" },
+          { value: "free", label: "เลือกเสรี" },
+        ]}
+      />
+
+      {mode === "major" ? (
+        electives?.areas.length ? (
+          <MajorElectives
+            electives={electives}
+            programLabel={programLabel ?? ""}
+            courses={courses}
+            entries={entries}
+            takenCodes={historyBase}
+            homeCampus={homeCampus}
+            onAdd={onAdd}
+            onPreview={onPreview}
+            onDetail={onDetail}
+            onChangeCurriculum={onChangeCurriculum}
+          />
+        ) : (
+          <div className="rounded-2xl border border-dashed border-gray-200 px-4 py-8 text-center">
+            <Sparkles className="mx-auto h-6 w-6 text-gray-300" />
+            <p className="mt-2 text-sm font-medium text-gray-700">ยังไม่มีรายการวิชาเลือกของหลักสูตรนี้</p>
+            <p className="mt-1 text-xs text-gray-500">{programLabel ? `${programLabel} — ` : ""}เลือกหลักสูตรของคุณในแท็บ “ตามหลักสูตร”</p>
+            <button
+              type="button"
+              onClick={onChangeCurriculum}
+              className="mt-3 rounded-xl bg-violet-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-violet-700"
+            >
+              เลือกหลักสูตร
+            </button>
+          </div>
+        )
+      ) : (
+        <>
       {/* GE progress */}
       <section className="rounded-2xl border border-gray-200 bg-white p-3">
         <div className="flex items-center justify-between gap-2">
@@ -232,20 +291,6 @@ export function RecommendPanel({
 
       {/* filters */}
       <div className="space-y-2">
-        <Segmented
-          aria-label="ประเภทคำแนะนำ"
-          size="sm"
-          className="flex w-full"
-          value={mode}
-          onChange={(v) => {
-            setMode(v);
-            setLimit(15);
-          }}
-          options={[
-            { value: "ge", label: "วิชา GE" },
-            { value: "free", label: "เลือกเสรี (รวมนอกคณะ)" },
-          ]}
-        />
         <div className="grid grid-cols-2 gap-2">
           <Select
             label="หมวด"
@@ -383,6 +428,8 @@ export function RecommendPanel({
         </Link>{" "}
         — เงื่อนไขหน่วยกิตแต่ละหมวดขึ้นกับเล่มหลักสูตรของคุณ โปรดตรวจสอบก่อนลงทะเบียน
       </p>
+        </>
+      )}
     </div>
   );
 }

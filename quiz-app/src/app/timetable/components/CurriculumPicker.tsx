@@ -333,6 +333,29 @@ export function CurriculumPicker({
             </p>
           </div>
         </div>
+        {edition?.electives && edition.electives.areas.length > 0 && (
+          <button
+            type="button"
+            onClick={() =>
+              onRecommend({
+                kind: "major",
+                hint: [],
+                name: "วิชาเลือกหมวดวิชาเฉพาะ",
+                credits: edition.electives?.credits ?? 0,
+              })
+            }
+            className="mt-2 flex w-full items-center gap-2 rounded-xl bg-white px-2.5 py-2 text-left text-[11px] ring-1 ring-violet-100 transition hover:bg-violet-50 hover:ring-violet-200"
+          >
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-violet-600" />
+            <span className="min-w-0 flex-1">
+              <span className="font-semibold text-gray-900">วิชาเลือกหลักสูตร {edition.electives.areas.length} ด้าน/กลุ่ม</span>
+              <span className="block truncate text-gray-500">
+                {edition.electives.areas.map((a) => a.name).join(" · ")}
+              </span>
+            </span>
+            <span className="shrink-0 font-semibold text-violet-700">แนะนำ ›</span>
+          </button>
+        )}
         {targets && (plausibleGeTarget(targets) > 0 || targets.freeCredits > 0) && (
           <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
             {plausibleGeTarget(targets) > 0 && (
@@ -392,7 +415,7 @@ export function CurriculumPicker({
                           {info.kind === "ge" ? "หมวดศึกษาทั่วไป" : info.kind === "free" ? "หมวดเลือกเสรี" : "วิชาเลือกของหลักสูตร"}
                         </p>
                       </div>
-                      {info.kind !== "major" && (
+                      {(info.kind !== "major" || (edition?.electives?.areas.length ?? 0) > 0) && (
                         <button
                           type="button"
                           onClick={() => onRecommend({ ...info, name: c.name, credits: c.credits })}

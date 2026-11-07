@@ -103,11 +103,36 @@ export interface CurriculumYear {
   terms: CurriculumTerm[];
 }
 
+export interface CurriculumElectiveCourse {
+  code: string;
+  name: string;
+  credits: number;
+  /** กลุ่มวิชาย่อยในด้าน เช่น "การพัฒนาแอปพลิเคชัน" */
+  group?: string;
+}
+
+/** หนึ่งด้าน/กลุ่มของวิชาเลือกในหมวดวิชาเฉพาะ เช่น "ด้านที่ 1 · การพัฒนาซอฟต์แวร์" */
+export interface CurriculumElectiveArea {
+  label?: string;
+  name: string;
+  minCredits?: number;
+  courses: CurriculumElectiveCourse[];
+}
+
+export interface CurriculumElectives {
+  credits?: number;
+  /** เงื่อนไขจากเล่มหลักสูตร เช่น "ต้องเลือกด้านใดด้านหนึ่งไม่น้อยกว่า 12 หน่วยกิต" */
+  note?: string;
+  areas: CurriculumElectiveArea[];
+}
+
 export interface CurriculumEdition {
   /** ปีของหลักสูตร (พ.ศ.) เช่น 2569 / 2564 */
   curriculumYear: number;
   source: string;
   years: CurriculumYear[];
+  /** รายวิชาเลือกของหมวดวิชาเฉพาะ แยกตามด้าน (จากโครงสร้างหลักสูตรในเล่ม) */
+  electives?: CurriculumElectives;
 }
 
 export interface CurriculumProgram {

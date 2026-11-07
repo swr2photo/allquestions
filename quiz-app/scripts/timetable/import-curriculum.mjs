@@ -123,14 +123,15 @@ const FACULTIES = [
 ];
 
 const CODE = String.raw`(?:\d{3}|xxx)-(?:\d{3}[A-Za-z0-9]*|x{3}|\d{2}[A-Za-z0-9]*)`;
-const ITEM_RE = new RegExp(`(${CODE})\\s+(.+?)\\s{2,}(\\d{1,2})\\s*[(\\d]`, "g");
+// credits are recognised by their "N((…)" shape, so a grade or hours column ("50", "70") is never taken as credits
+const ITEM_RE = new RegExp(`(${CODE})\\s+(.+?)\\s+(\\d{1,2})\\s*\\((?:\\(|\\d|x)`, "g");
 const YEAR_RE = /^(?:ชั้น)?ป[\s\uE000-\uF8FF]*ี?[\s\uE000-\uF8FF]*ที่\s*(\d)(?:\s*\(?\s*([^\d\s()][^()]*?)\s*\)?)?$/;
 const TERM_HIT_RE = /ภาค\s*การศึกษาที่\s*(\d)|ภาคฤดูร้อน/g;
 const PLAN_HINT_RE = /\(\s*((?:แผน|การศึกษา)[^()\d]*)\)/;
 const PLAN_ONLY_RE = /^(แผน\S+)$/;
 const PLAN_HEADER_RE = /^แผนการศึกษา\s*(?:สำหรับหลักสูตร\s*(.*)|ตลอดหลักสูตร)?\s*$/;
+const PLAN_END_RE = /^หมวดที่\s*4\s/;
 const COURSE_DESC_RE = /^\d+(?:\.\d+)*\s+\S*อธิบายรายวิชา\s*$/;
-const PLAN_END_RE = /หมวดที่\s*4/;
 
 /** "/** "แผนโครงงาน" / "สำหรับหลักสูตรปกติ" / "(แผนสหกิจศึกษา)" → "โครงงาน" / "ปกติ" / "สหกิจศึกษา" */
 function planLabel(raw) {
@@ -165,7 +166,17 @@ export function fixThaiPdfText(s) {
   });
 }
 
+// --cache <dir>: re-use the pdftotext output of an earlier run (<faculty>-<program>-<edition>.txt)
+// instead of downloading the PDFs again — handy when the faculty site is slow or blocks scripts.
+const CACHE_ARG = process.argv.indexOf("--cache");
+const CACHE_DIR = CACHE_ARG > 0 ? process.argv[CACHE_ARG + 1] : null;
+
 function fetchPdfText(base, pdfPath, workDir, name) {
+  if (CACHE_DIR) {
+    const cached = path.join(CACHE_DIR, `${name}.txt`);
+    if (!fs.existsSync(cached)) return Promise.reject(new Error(`ไม่พบไฟล์แคช ${cached}`));
+    return Promise.resolve(fs.readFileSync(cached, "utf8").split(/\r?\n/).map(fixThaiPdfText));
+  }
   const pdfFile = path.join(workDir, `${name}.pdf`);
   const txtFile = path.join(workDir, `${name}.txt`);
   const url = /^https?:/.test(pdfPath) ? pdfPath : `${base}/${pdfPath}`;
@@ -182,7 +193,7 @@ function fetchPdfText(base, pdfPath, workDir, name) {
 function planRange(lines) {
   const start = lines.findIndex((l) => YEAR_RE.test(l.trim()) && YEAR_RE.exec(l.trim())[1] === "1");
   if (start < 0) return null;
-  let end = lines.findIndex((l, i) => i > start && COURSE_DESC_RE.test(l.trim()));
+  let end = lines.findIndex((l, i) => i > start && (COURSE_DESC_RE.test(l.trim()) || PLAN_END_RE.test(l.trim())));
   if (end < 0) end = lines.length;
   return [start, end];
 }
@@ -295,6 +306,192 @@ if (!block || (term == null && !twoColumn)) continue;
   return { years };
 }
 
+// ------------------------------------------------------------------ elective groups (หมวดวิชาเฉพาะ กลุ่มวิชาเลือก)
+//
+// The course-structure section lists every elective, grouped by area — "ด้านที่ 1 : การพัฒนาซอฟต์แวร์",
+// "กลุ่มวิชาเลือกด้านพฤกษศาสตร์", "๒. กลุ่มวิชาธรณีฟิสิกส์", "รายวิชาที่เปิดสอนโดยหลักสูตรเคมี" …
+// The study plan only says "344-xxx วิชาเฉพาะ - กลุ่มวิชาเลือก", so the app needs these lists to
+// recommend real courses per area.
+
+const REAL_CODE = String.raw`\d{3}-\d{3}[A-Za-z0-9]*`;
+// credits are recognised by their "3((3)-0-6)" / "1(0-2-1)" shape, so long names with a single space still match
+const COURSE_LINE_RE = new RegExp(`^\\s*(${REAL_CODE})\\s+(.+?)\\s+(\\d{1,2})\\s*\\((?:\\(|\\d|x)`);
+/**
+ * Section headings: "2.2) วิชาเลือก", "3) กลุ่มวิชาเลือก", "3) หมวดวิชาเฉพาะ – กลุ่มวิชาเลือก",
+ * "2.4 กลุ่มวิชาชีพเลือก", "3) กลุ่มวิชาเฉพาะด้าน" (choose-a-track), and the bare "- เลือก".
+ */
+const ELECTIVE_HEAD_RE = /^(\d+(?:\.\d+)*)(?:\)|\.(?!\d)|\s)\s*(?:หมวดวิชาเฉพาะ\s*[–-]\s*)?(?:กลุ่ม)?(?:ราย)?วิชา(?:ชีพ)?(?:เลือก|เฉพาะด้าน)/;
+const DASH_HEAD_RE = /^-\s*เลือก(?:\s|$)/;
+const NUMBERED_RE = /^(\d+(?:\.\d+)*)(?:\)|\.(?!\d))\s*[ก-๙]/;
+const SECTION_END_RE = /หมวดวิชาเลือกเสรี|^[คง]\.\s*หมวด|^หมวดที่\s*\d|^\d+\.\d+\.\d+\s|^ชั้นปีที่\s*1\b/;
+const AREA_RE =
+  /^(?:[•▪]\s*)?(?:ด้านที่\s*\d+|ด้าน(?!ล่าง)\S|[๐-๙\d]+\.\s*กลุ่ม|กลุ่มวิชาเลือก(?:ด้าน|ทาง|ที่เปิดสอน)|กลุ่มวิชา(?!ที่)\S|กลุ่มชุดวิชา|ชุดวิชา\S*เลือก|หมวดวิชา\s+\S|(?:ราย)?วิชา(?:เลือก)?ที่เปิดสอนโดย|รายวิชาเลือก(?:ทาง|อ|บูรณาการ|ที่เปิดสอน)|\d+\.\d+\)\s*(?:ราย)?วิชา)/;
+const SUBGROUP_RE = /^กลุ่มวิชาที่\s*\d+\.\d+/;
+const NOT_HEADING_RE = /เลือกเรียน|นักศึกษา|ต่อไปนี้$|ได้แก่|^และ|^หรือ/;
+const CREDITS_RE = /(\d+)\s*หน่?วยกิต/;
+const GENERIC_SECTION_RE = /^(?:กลุ่ม)?(?:ราย)?วิชา(?:ชีพ)?เลือก$|^เลือก$/;
+
+function cleanHeading(t) {
+  const s = t
+    .replace(/อืน่/g, "อื่น") // pdftotext mark-order glitch the generic fix leaves alone
+    .replace(/^[•▪-]\s*/, "")
+    .replace(/^\d+(?:\.\d+)*(?:\)|\.(?!\d)|\s)\s*/, "")
+    .replace(/^หมวดวิชาเฉพาะ\s*[–-]\s*/, "")
+    .replace(/\(\s*รหัสกลุ่มวิชา[^)]*\)/, "")
+    .replace(/\s*ประกอบด้วย.*$/, "")
+    .replace(/\s*\(\s*(?:Module|[A-Za-z])[^)]*\)?\s*$/, "")
+    .replace(/\s*(?:ไม่น้อยกว่า\s*)?\d+\s*หน่?วยกิต.*$/, "")
+    .replace(/\s{2,}.*$/, "")
+    .trim();
+  const m = s.match(/^(ด้านที่\s*\d+|กลุ่มวิชาที่\s*[\d.]+|[๐-๙]+\.)\s*:?\s*(.*)$/);
+  if (m && m[2]) return { label: m[1].replace(/\.$/, "").replace(/\s+/g, " "), name: m[2].trim() };
+  return { label: undefined, name: s };
+}
+
+/** a long sentence line that does not end a clause — the next line continues it, so it is not a heading */
+function isParagraph(t) {
+  return t.length > 45 && !/(?:หน่?วยกิต|ต่อไปนี้|ดังนี้|:)\s*$/.test(t);
+}
+
+function findSections(lines, trimmed, stop) {
+  const sections = [];
+  for (let h = 0; h < stop; h++) {
+    const t = trimmed[h];
+    const head = t.match(ELECTIVE_HEAD_RE);
+    const dash = !head && DASH_HEAD_RE.test(t);
+    if ((!head && !dash) || /เสรี|ศึกษาทั่วไป/.test(t)) continue;
+    const depth = head ? head[1].split(".").length : 99;
+    // "3) …" ends at the next "4) …", not at an inner "1. …" instruction list (and vice versa)
+    const paren = head ? t.slice(head[1].length).startsWith(")") : true;
+    let end = h + 1;
+    for (; end < Math.min(stop, h + 700); end++) {
+      const x = trimmed[end];
+      if (SECTION_END_RE.test(x)) break;
+      const num = x.match(NUMBERED_RE);
+      if (num && num[1].split(".").length <= depth && x.slice(num[1].length).startsWith(")") === paren) break;
+    }
+    const courseLines = lines.slice(h + 1, end).filter((l) => COURSE_LINE_RE.test(l)).length;
+    if (courseLines < 3) continue;
+    const name = cleanHeading(t).name;
+    sections.push({
+      h,
+      end,
+      // "วิชาเฉพาะด้าน" is compulsory in some books — keep it only when it really splits into areas
+      track: /เฉพาะด้าน/.test(t) && !/เลือก/.test(t),
+      credits: Number(t.match(CREDITS_RE)?.[1]) || undefined,
+      defaultName: !name || GENERIC_SECTION_RE.test(name) ? "รายวิชาเลือกของหลักสูตร" : name,
+    });
+  }
+  return sections;
+}
+
+/** Collect every elective course list in the course-structure part of a curriculum (before the study plan). */
+export function parseElectives(lines) {
+  const range = planRange(lines);
+  const stop = range ? range[0] : lines.length;
+  const trimmed = lines.map((l) => l.trim());
+  const sections = findSections(lines, trimmed, stop);
+  if (!sections.length) return null;
+
+  const areas = [];
+  const byKey = new Map();
+  let note = "";
+  let credits;
+  for (const sec of sections) {
+    const local = [];
+    let area = null;
+    let group;
+    let prevText = "";
+    const pendingNote = [];
+    const areaFor = (label, name) => {
+      let a = local.find((x) => x.label === label && x.name === name);
+      if (!a) {
+        a = { ...(label ? { label } : {}), name, courses: [] };
+        local.push(a);
+      }
+      return a;
+    };
+    for (let i = sec.h + 1; i < sec.end; i++) {
+      const raw = lines[i];
+      const t = trimmed[i];
+      if (!t || /^\d+$/.test(t)) {
+        prevText = "";
+        continue;
+      }
+      const course = raw.match(COURSE_LINE_RE);
+      if (course) {
+        area ??= areaFor(undefined, sec.defaultName);
+        const code = course[1];
+        prevText = "";
+        if (area.courses.some((c) => c.code === code)) continue;
+        area.courses.push({
+          code,
+          name: course[2].replace(/\s+/g, " ").trim(),
+          credits: Number(course[3]),
+          ...(group ? { group } : {}),
+        });
+        continue;
+      }
+      if (/^[A-Za-z(*]/.test(t)) {
+        prevText = "";
+        continue; // English name lines / footnotes
+      }
+      if (SUBGROUP_RE.test(t) && area) {
+        group = cleanHeading(t).name;
+        prevText = "";
+        continue;
+      }
+      const bullet = /^[•▪]/.test(t);
+      if (
+        AREA_RE.test(t) &&
+        !NOT_HEADING_RE.test(t.replace(/\(.*$/, "")) &&
+        t.length < 130 &&
+        (bullet || !prevText || !isParagraph(prevText))
+      ) {
+        const { label, name } = cleanHeading(t);
+        if (name.length >= 3) {
+          area = areaFor(label, name);
+          group = undefined;
+          const min = t.match(/ไม่น้อยกว่า\s*(\d+)\s*หน่?วยกิต/);
+          if (min) area.minCredits = Number(min[1]);
+          prevText = "";
+          continue;
+        }
+      }
+      // instruction text: the section intro becomes the note; "เลือก … N หน่วยกิต" right under an area is its minimum
+      if (area && !area.courses.length) {
+        const min = t.match(/(?:ไม่น้อยกว่า|จำนวน|จานวน)\s*(\d+)\s*หน่?วยกิต/);
+        if (min && !area.minCredits) area.minCredits = Number(min[1]);
+      } else if (!area) {
+        pendingNote.push(t);
+      }
+      prevText = t;
+    }
+
+    const filled = local.filter((a) => a.courses.length);
+    if (sec.track && !filled.some((a) => a.name !== sec.defaultName)) continue;
+    credits ??= sec.credits;
+    if (!note && pendingNote.length) note = pendingNote.join(" ").replace(/\s+/g, " ").slice(0, 400);
+    for (const a of filled) {
+      const key = `${a.label ?? ""}|${a.name}`;
+      const prev = byKey.get(key);
+      if (!prev) {
+        byKey.set(key, a);
+        areas.push(a);
+      } else {
+        for (const c of a.courses) if (!prev.courses.some((x) => x.code === c.code)) prev.courses.push(c);
+      }
+    }
+  }
+
+  if (!areas.length) return null;
+  return {
+    ...(credits ? { credits } : {}),
+    ...(note ? { note } : {}),
+    areas,
+  };
+}
+
 async function main() {
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), "psu-curriculum-"));
   for (const faculty of FACULTIES) {
@@ -304,10 +501,15 @@ async function main() {
       for (const [editionIndex, ed] of p.editions.entries()) {
         const lines = await fetchPdfText(faculty.base, ed.pdf, workDir, `${faculty.id}-${index}-${editionIndex}`);
         const plan = parsePlan(lines);
+        const electives = parseElectives(lines);
         const courseCount = plan.years.reduce((n, y) => n + y.terms.reduce((m, t) => m + t.courses.length, 0), 0);
-        console.log(`✔ ${p.name} ${ed.curriculumYear}: ${plan.years.length} กลุ่มแผน, ${courseCount} รายการ${plan.warning ? ` (${plan.warning})` : ""}`);
+        const electiveCount = electives?.areas.reduce((n, a) => n + a.courses.length, 0) ?? 0;
+        console.log(
+          `✔ ${p.name} ${ed.curriculumYear}: ${plan.years.length} กลุ่มแผน, ${courseCount} รายการ` +
+            `, วิชาเลือก ${electives?.areas.length ?? 0} กลุ่ม ${electiveCount} วิชา${plan.warning ? ` (${plan.warning})` : ""}`
+        );
         const source = /^https?:/.test(ed.pdf) ? ed.pdf : `${faculty.base}/${ed.pdf}`;
-        editions.push({ curriculumYear: ed.curriculumYear, source, years: plan.years });
+        editions.push({ curriculumYear: ed.curriculumYear, source, years: plan.years, ...(electives ? { electives } : {}) });
       }
       programs.push({ id: p.id, name: p.name, division: p.division, editions });
     }

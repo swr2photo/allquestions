@@ -213,6 +213,13 @@ export function CourseSearch({
       ) : panel === "recommend" ? (
         <div className="ui-scroll min-h-0 flex-1 overflow-y-auto">
           <RecommendPanel
+            electives={resolved.edition?.electives}
+            programLabel={
+              resolved.program
+                ? `${resolved.program.name}${resolved.edition ? ` · หลักสูตร ${resolved.edition.curriculumYear}` : ""}`
+                : undefined
+            }
+            onChangeCurriculum={() => setPanel("curriculum")}
             courses={courses}
             entries={entries}
             geIndex={geIndex}
