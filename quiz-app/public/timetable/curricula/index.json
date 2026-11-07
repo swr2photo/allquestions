@@ -7,16 +7,7 @@
       "file": "/timetable/curricula/sci.json",
       "programs": 12,
       "source": "https://www.sci.psu.ac.th",
-      "updatedAt": "2026-11-07T06:21:23.928Z"
-    },
-    {
-      "id": "agro",
-      "faculty": "คณะอุตสาหกรรมเกษตร",
-      "campus": "วิทยาเขตหาดใหญ่",
-      "file": "/timetable/curricula/agro.json",
-      "programs": 2,
-      "source": "https://agro.psu.ac.th/agro6/curriculum",
-      "updatedAt": "2026-11-07T06:21:23.944Z"
+      "updatedAt": "2026-11-07T00:37:54.395Z"
     }
   ]
 }
