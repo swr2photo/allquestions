@@ -3,9 +3,19 @@ import { exec } from "child_process";
 import os from "os";
 import fs from "fs";
 import { join } from "path";
+import { cookies } from "next/headers";
+import { isValidSession } from "@/lib/admin-store";
+
+async function requireAdmin() {
+  const token = (await cookies()).get("admin-session")?.value;
+  return isValidSession(token);
+}
 
 // POST: Run notebooklm-mcp-server auth (opens browser)
 export async function POST() {
+  if (!(await requireAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const cacheDir = join(os.tmpdir(), `npm-cache-nlm-${Date.now()}`);
     console.log("[NotebookLM Auth] Starting auth process...");
@@ -27,6 +37,9 @@ export async function POST() {
 
 // GET: Check auth status
 export async function GET() {
+  if (!(await requireAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const authPath = join(os.homedir(), ".notebooklm-mcp", "auth.json");
     if (!fs.existsSync(authPath)) {

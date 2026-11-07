@@ -2,44 +2,53 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { GraduationCap, Home, BookOpen, Menu, X, Shield, Search, Sparkles, Library, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import {
+  BookOpen,
+  Building2,
+  CalendarRange,
+  GraduationCap,
+  Home,
+  Library,
+  Menu,
+  Search,
+  Shield,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { AnimatedShinyText } from "@/components/ui/animated-shiny-text";
+
+const links = [
+  { href: "/", label: "หน้าแรก", icon: Home },
+  { href: "/courses", label: "รายวิชา", icon: BookOpen },
+  { href: "/timetable", label: "จัดตารางเรียน", icon: CalendarRange },
+  { href: "/gened", label: "วิชาเลือกเสรี", icon: Library },
+  { href: "/faculties", label: "คณะ/หลักสูตร", icon: Building2 },
+  { href: "/search", label: "ค้นหา", icon: Search },
+  { href: "/ai", label: "AI Chat", icon: Sparkles },
+  { href: "/admin", label: "ผู้ดูแลระบบ", icon: Shield },
+];
 
 export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [user, setUser] = useState<{ isAdmin?: boolean } | null>(null);
+  const [lastPath, setLastPath] = useState(pathname);
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
+    setMobileOpen(false);
+  }
 
-  useEffect(() => {
-    fetch("/api/auth/user")
-      .then(res => res.json())
-      .then(data => {
-        if (data.authenticated) setUser(data.user);
-      })
-      .catch(() => {});
-  }, []);
-
-  const links = [
-    { href: "/", label: "หน้าแรก", icon: Home },
-    { href: "/courses", label: "รายวิชา", icon: BookOpen },
-    { href: "/gened", label: "วิชาเลือกเสรี", icon: Library },
-    { href: "/schedule", label: "ตารางเรียน", icon: Calendar },
-    { href: "/search", label: "ค้นหา", icon: Search },
-    { href: "/ai", label: "AI Chat", icon: Sparkles },
-    { href: "/admin", label: "ผู้ดูแลระบบ", icon: Shield },
-  ];
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-white/80 backdrop-blur-lg">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-green-600 text-white shadow-md group-hover:shadow-lg transition-shadow">
+    <header className="sticky top-0 z-40 w-full border-b border-gray-200/70 bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur-lg print:hidden">
+      <div className="container mx-auto flex h-16 items-center justify-between gap-3 px-4">
+        <Link href="/" className="group flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-green-600 text-white shadow-md transition-shadow group-hover:shadow-lg">
             <GraduationCap className="h-5 w-5" />
           </div>
-          <span className="text-lg font-bold bg-linear-to-r from-emerald-600 to-green-600 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-emerald-600 to-green-600 bg-clip-text text-lg font-bold text-transparent">
             <AnimatedShinyText className="text-lg font-bold" shimmerWidth={80}>
               Allquiz
             </AnimatedShinyText>
@@ -47,62 +56,66 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden items-center gap-0.5 lg:flex" aria-label="เมนูหลัก">
           {links.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+            const active = isActive(link.href);
             return (
-              <Link key={link.href} href={link.href} className="shrink-0">
-                <Button
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  className={cn(
-                    "gap-2 shrink-0",
-                    isActive && "bg-emerald-600 hover:bg-emerald-700"
-                  )}
-                >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="shrink-0">{link.label}</span>
-                </Button>
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "flex h-9 items-center gap-1.5 rounded-xl px-3 text-[13px] font-medium whitespace-nowrap transition-colors",
+                  active ? "bg-emerald-600 text-white shadow-sm" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {link.label}
               </Link>
             );
           })}
         </nav>
 
         {/* Mobile toggle */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="md:hidden"
+        <button
+          type="button"
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-700 hover:bg-gray-100 lg:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-expanded={mobileOpen}
+          aria-label={mobileOpen ? "ปิดเมนู" : "เปิดเมนู"}
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
+        </button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t bg-white animate-slide-up">
-          <nav className="container mx-auto p-4 flex flex-col gap-2">
+        <div className="animate-slide-up border-t border-gray-100 bg-white lg:hidden">
+          <nav className="container mx-auto grid grid-cols-2 gap-2 p-3 sm:grid-cols-4" aria-label="เมนูหลัก">
             {links.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+              const active = isActive(link.href);
               return (
                 <Link
                   key={link.href}
                   href={link.href}
+                  aria-current={active ? "page" : undefined}
                   onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    "flex min-h-14 items-center gap-3 rounded-2xl px-3 text-sm font-medium transition",
+                    active ? "bg-emerald-600 text-white shadow-sm" : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                  )}
                 >
-                  <Button
-                    variant={isActive ? "default" : "ghost"}
+                  <span
                     className={cn(
-                      "w-full justify-start gap-3",
-                      isActive && "bg-emerald-600 hover:bg-emerald-700"
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-xl",
+                      active ? "bg-white/20" : "bg-white text-emerald-700 shadow-sm"
                     )}
                   >
                     <Icon className="h-4 w-4" />
-                    {link.label}
-                  </Button>
+                  </span>
+                  {link.label}
                 </Link>
               );
             })}

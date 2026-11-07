@@ -2,6 +2,23 @@ import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  outputFileTracingRoot: process.cwd(),
+  outputFileTracingIncludes: {
+    "/api/**": ["./data/timetable/**/*"],
+    "/**": ["./data/timetable/**/*"],
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        {
+          source: "/timetable/terms/:file*",
+          destination: "/api/timetable/terms/blocked",
+        },
+      ],
+      afterFiles: [],
+      fallback: [],
+    };
+  },
   async headers() {
     return [
       {
