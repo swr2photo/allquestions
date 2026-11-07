@@ -5,6 +5,7 @@ export interface ProjectFile {
   content: string;
   language?: string;
   isComplete?: boolean;
+  action?: "write" | "delete";
 }
 
 export interface Artifact {
