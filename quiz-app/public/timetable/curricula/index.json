@@ -140,9 +140,9 @@
       "faculty": "คณะศิลปศาสตร์และวิทยาการจัดการ",
       "campus": "วิทยาเขตสุราษฎร์ธานี",
       "file": "/timetable/curricula/lams.json",
-      "programs": 6,
+      "programs": 4,
       "source": "https://lams.surat.psu.ac.th/",
-      "updatedAt": "2026-11-07T07:58:51.239Z"
+      "updatedAt": "2026-11-07T06:48:51.443Z"
     },
     {
       "id": "surat-scit",

@@ -46,6 +46,7 @@ import { execFileSync, spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { FACULTIES } from "./curriculum-sources.mjs";
 import { parsePlan, planTotals, statedTotal } from "./curriculum-parser.mjs";
+import { splitTracks } from "./curriculum-tracks.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const OUT_DIR = path.join(ROOT, "public", "timetable", "curricula");
@@ -328,6 +329,7 @@ async function importFaculty(fac) {
     for (const ed of p.editions) {
       const lines = await editionLines(ed);
       const plan = finishPlan(parsePlan(lines), ed);
+      if (ed.tracks) plan.years = splitTracks(plan.years, ed.tracks);
       for (const y of plan.years) {
         for (const t of y.terms) {
           for (const c of t.courses) {

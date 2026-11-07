@@ -528,8 +528,9 @@ export const FACULTIES = [
 
   // Surat Thani — Art and Management Sciences (LAMS): each program's plan is a PDF linked from
   // https://lams.surat.psu.ac.th/. Accounting's years 3–4 print one table per co-op / internship track; it is
-  // split with `tracks` (curriculum-tracks.mjs). English and Chinese business communication print their co-op /
-  // internship years as separate tables: lineFixes name each one so the parser splits them by track.
+  // split with `tracks` (curriculum-tracks.mjs). Not imported: ภาษาอังกฤษเพื่อการสื่อสารทางธุรกิจ 2567 (129 of 124:
+  // the year-2 elective menu is listed as required rows), ภาษาจีนเพื่อการสื่อสารทางธุรกิจ 2568 (year 2 row credits
+  // do not match their stated sums).
   {
     id: "lams",
     faculty: "คณะศิลปศาสตร์และวิทยาการจัดการ",
@@ -546,12 +547,6 @@ export const FACULTIES = [
           "สหกิจศึกษา": { "3/2": "3/2", "4/2": "4/2" },
           "ฝึกงาน": { "3/3": "3/2", "4/3": "4/2" },
         } }] },
-      { id: "english-business-communication", name: "ภาษาอังกฤษเพื่อการสื่อสารทางธุรกิจ", division: "คณะศิลปศาสตร์และวิทยาการจัดการ", editions: [{ curriculumYear: 2567, pdf: "https://lams.surat.psu.ac.th/UserFiles/file/%E0%B9%80%E0%B8%A5%E0%B9%88%E0%B8%A1%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3/67/%E0%B8%84%E0%B8%B9%E0%B9%88%E0%B8%A1%E0%B8%B7%E0%B8%AD%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3%20EBC%2067_compressed.pdf",
-        // years 3–4 print one table per track (ฝึกงาน / สหกิจศึกษา); the track headings are split onto their own lines
-        lineFixes: [[/^(แผนฝึ กงาน|แผนสหกิจศึกษา)\s{2,}(?=ชั้นปี)/, "$1\n"]] }] },
-      { id: "chinese-business-communication", name: "ภาษาจีนเพื่อการสื่อสารทางธุรกิจ", division: "คณะศิลปศาสตร์และวิทยาการจัดการ", editions: [{ curriculumYear: 2568, pdf: "https://lams.surat.psu.ac.th/UserFiles/file/%E0%B9%80%E0%B8%A5%E0%B9%88%E0%B8%A1%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3/2568/%E0%B9%80%E0%B8%A5%E0%B9%88%E0%B8%A1%20%20CBC%20%2068.pdf",
-        // the China year (ปี ที่ 3) is printed under each track; one heading form lets both tracks take it
-        lineFixes: [[/(?:ชั้นปี|ปี) ที่ 3 \(ณ สาธารณรัฐประชาชนจีน\s*\)/, "ชั้นปี ที่ 3"]] }] },
     ],
   },
 
