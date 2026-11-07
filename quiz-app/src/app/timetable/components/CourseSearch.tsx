@@ -1,34 +1,18 @@
 "use client";
 
 import { useDeferredValue, useMemo, useState } from "react";
+import { BookMarked, Building2, CalendarCheck, ChevronDown, Info, MapPin, Search, Sparkles, X } from "lucide-react";
 import {
-  AlertTriangle,
-  BookMarked,
-  Building2,
-  Check,
-  ChevronDown,
-  Info,
-  MapPin,
-  Plus,
-  Search,
-  Sparkles,
-  Users,
-  X,
-} from "lucide-react";
-import {
+  DAY_COLORS,
   DAY_SHORT,
   courseHaystack,
-  fmtExam,
-  fmtRange,
   matchScore,
   normalizeQuery,
   sectionClashes,
-  sectionExamClashes,
   shortCampus,
   type Course,
   type PlannedEntry,
   type ScheduleGroup,
-  type Section,
 } from "@/lib/timetable";
 import { GE_AREAS, GE_META, classifyCourse, curriculumTargets, geArea, type GeInfo } from "@/lib/ge";
 import type { RegistrationHistory } from "@/lib/registration";
@@ -41,6 +25,7 @@ import { cn } from "@/lib/utils";
 import type { GhostBlock } from "./WeekGrid";
 import { CurriculumPicker, resolveSelection, useCurriculumData, type RecommendRequest } from "./CurriculumPicker";
 import { RecommendPanel } from "./RecommendPanel";
+import { SectionCard } from "./SectionCard";
 
 interface Props {
   courses: Course[];
@@ -435,11 +420,13 @@ function CourseResult({
   onDetail: (course: Course) => void;
 }) {
   const added = plannedSec !== undefined;
+  const meetDays = [...new Set(course.sections.flatMap((s) => s.slots.map((sl) => sl.day)))].sort((a, b) => a - b);
+  const freeSecs = entries.length ? course.sections.filter((s) => !sectionClashes(s, entries, course.id).length).length : null;
   return (
     <li
       className={cn(
-        "rounded-2xl border bg-white transition",
-        added ? "border-emerald-300 ring-1 ring-emerald-200" : "border-gray-200 hover:border-gray-300"
+        "overflow-hidden rounded-2xl border bg-white transition",
+        added ? "border-emerald-300 ring-1 ring-emerald-200" : open ? "border-gray-300 shadow-sm" : "border-gray-200 hover:border-gray-300 hover:shadow-sm"
       )}
     >
       <button type="button" onClick={onToggle} className="flex w-full items-start gap-2 p-3 text-left" aria-expanded={open}>
@@ -449,27 +436,54 @@ function CourseResult({
             <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-600">{course.creditNum} หน่วยกิต</span>
             {ge?.levels.slice(0, 1).map((g) => <GeBadge key={g} ge={g} size="xs" />)}
             {added && (
-              <span className="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-                เลือก Sec {plannedSec}
+              <span className="flex items-center gap-0.5 rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700">
+                <CalendarCheck className="h-3 w-3" /> Sec {plannedSec}
               </span>
             )}
           </div>
           <p className="mt-0.5 line-clamp-2 text-sm text-gray-800">{course.nameTh}</p>
           <p className="truncate text-[11px] text-gray-500 uppercase">{course.nameEn}</p>
-          <p className="mt-1 truncate text-[11px] text-gray-400">
-            {shortCampus(course.campus)} · {course.faculty} · {course.sections.length} section
-          </p>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-gray-400">
+            {meetDays.length > 0 && (
+              <span className="flex gap-0.5" aria-label="วันที่มีเรียน">
+                {meetDays.map((d) => (
+                  <span
+                    key={d}
+                    className="rounded px-1 text-[9.5px] leading-4 font-bold text-white"
+                    style={{ background: DAY_COLORS[d] }}
+                  >
+                    {DAY_SHORT[d]}
+                  </span>
+                ))}
+              </span>
+            )}
+            <span className="min-w-0 truncate">
+              {shortCampus(course.campus)} · {course.sections.length} Sec
+              {freeSecs !== null && !added && (
+                <span className={freeSecs ? "text-emerald-600" : "text-red-500"}> · {freeSecs ? `ว่าง ${freeSecs} Sec` : "ชนทุก Sec"}</span>
+              )}
+            </span>
+          </div>
+          <p className="mt-0.5 truncate text-[11px] text-gray-400">{course.faculty}</p>
         </div>
         <ChevronDown className={`mt-1 h-4 w-4 shrink-0 text-gray-400 transition ${open ? "rotate-180" : ""}`} />
       </button>
 
       {open && (
-        <div className="space-y-2 border-t border-gray-100 p-2">
+        <div className="space-y-2 border-t border-gray-100 bg-gray-50/70 p-2">
           {course.sections.length === 0 && (
             <p className="px-1 py-2 text-xs text-gray-500">ยังไม่มี section ที่เปิดสอนในภาคนี้</p>
           )}
+          {course.sections.length > 1 && entries.length > 0 && (
+            <p className="flex items-center gap-1.5 px-1 text-[11px] text-gray-500">
+              <span className="font-semibold text-emerald-700">
+                {course.sections.filter((s) => !sectionClashes(s, entries, course.id).length).length}
+              </span>
+              / {course.sections.length} Section ไม่ชนกับตาราง · ชี้เพื่อดูตัวอย่างบนตาราง
+            </p>
+          )}
           {course.sections.map((s) => (
-            <SectionRow
+            <SectionCard
               key={s.sec}
               course={course}
               section={s}
@@ -483,118 +497,12 @@ function CourseResult({
           <button
             type="button"
             onClick={() => onDetail(course)}
-            className="flex w-full items-center justify-center gap-1 rounded-lg py-1.5 text-xs text-gray-500 hover:bg-gray-50 hover:text-gray-800"
+            className="flex w-full items-center justify-center gap-1 rounded-lg py-1.5 text-xs font-medium text-gray-500 hover:bg-white hover:text-gray-800"
           >
             <Info className="h-3.5 w-3.5" /> รายละเอียดวิชา / คำอธิบายรายวิชา
           </button>
         </div>
       )}
     </li>
-  );
-}
-
-function SectionRow({
-  course,
-  section,
-  selected,
-  entries,
-  onAdd,
-  onRemove,
-  onPreview,
-}: {
-  course: Course;
-  section: Section;
-  selected: boolean;
-  entries: PlannedEntry[];
-  onAdd: (course: Course, sec: string) => void;
-  onRemove: (courseId: string) => void;
-  onPreview: (ghost: GhostBlock | null) => void;
-}) {
-  const clashes = sectionClashes(section, entries, course.id);
-  const examClashes = sectionExamClashes(section, entries, course.id);
-  const hasSlots = section.slots.length > 0;
-
-  return (
-    <div
-      className={cn(
-        "rounded-xl border p-2 text-xs",
-        selected ? "border-emerald-400 bg-emerald-50/60" : clashes.length ? "border-red-200 bg-red-50/40" : "border-gray-100 bg-gray-50/60"
-      )}
-      onMouseEnter={() =>
-        hasSlots && onPreview({ code: course.code, sec: section.sec, slots: section.slots, clash: clashes.length > 0 })
-      }
-      onMouseLeave={() => onPreview(null)}
-    >
-      <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1 space-y-1">
-          <div className="flex flex-wrap items-center gap-1.5">
-            <span className="font-semibold text-gray-900">Sec {section.sec}</span>
-            {section.seats !== null && (
-              <span className="flex items-center gap-0.5 text-gray-500">
-                <Users className="h-3 w-3" />
-                {section.seats}
-              </span>
-            )}
-            {section.badges.map((b) => (
-              <span key={b} className="rounded bg-amber-100 px-1 py-0.5 text-[10px] text-amber-800">
-                {b}
-              </span>
-            ))}
-          </div>
-          <div className="text-gray-700">
-            {hasSlots ? (
-              section.slots.map((sl, i) => (
-                <div key={i} className="tabular-nums">
-                  <span className="inline-block w-7 font-medium">{DAY_SHORT[sl.day]}</span>
-                  {fmtRange(sl.start, sl.end)}
-                  {sl.room && (
-                    <span className="ml-1 text-gray-500">
-                      <MapPin className="inline h-3 w-3" /> {sl.room}
-                    </span>
-                  )}
-                </div>
-              ))
-            ) : (
-              <span className="text-gray-500">{section.dayTime || "ยังไม่มีตารางเรียน"}</span>
-            )}
-          </div>
-          {section.instructors.length > 0 && <p className="text-gray-600">ผู้สอน: {section.instructors.join(", ")}</p>}
-          {section.group && <p className="text-gray-500">ผู้เรียน: {section.group}</p>}
-          <p className="text-gray-500">
-            กลางภาค: {section.midtermAt ? fmtExam(section.midtermAt) : section.midterm}
-            <br />
-            ปลายภาค: {section.finalAt ? fmtExam(section.finalAt) : section.final}
-          </p>
-          {clashes.length > 0 && (
-            <p className="flex items-center gap-1 font-medium text-red-600">
-              <AlertTriangle className="h-3 w-3" /> เวลาเรียนชนกับ {clashes.map((c) => c.code).join(", ")}
-            </p>
-          )}
-          {examClashes.length > 0 && (
-            <p className="flex items-center gap-1 font-medium text-orange-600">
-              <AlertTriangle className="h-3 w-3" /> วันสอบชนกับ {examClashes.map((c) => c.code).join(", ")}
-            </p>
-          )}
-        </div>
-        {selected ? (
-          <button
-            type="button"
-            onClick={() => onRemove(course.id)}
-            className="flex shrink-0 items-center gap-1 rounded-lg bg-emerald-600 px-2.5 py-2 font-medium text-white hover:bg-red-600"
-            title="นำออกจากตาราง"
-          >
-            <Check className="h-3.5 w-3.5" /> เลือกแล้ว
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={() => onAdd(course, section.sec)}
-            className="flex shrink-0 items-center gap-1 rounded-lg border border-emerald-600 px-2.5 py-2 font-medium text-emerald-700 hover:bg-emerald-600 hover:text-white"
-          >
-            <Plus className="h-3.5 w-3.5" /> เลือก
-          </button>
-        )}
-      </div>
-    </div>
   );
 }

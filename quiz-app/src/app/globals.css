@@ -242,6 +242,38 @@ html.ui-scroll-locked body {
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 
+/* === Timetable grid blocks === */
+@keyframes tt-pop {
+  from { opacity: 0; transform: translateY(6px) scale(0.92); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes tt-clash {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.45); }
+  50% { box-shadow: 0 0 0 5px rgba(220, 38, 38, 0); }
+}
+@keyframes tt-live {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.8); opacity: 0; }
+}
+@keyframes tt-flash {
+  0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.55); }
+  100% { box-shadow: 0 0 0 14px rgba(16, 185, 129, 0); }
+}
+.tt-pop { animation: tt-pop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.tt-clash { animation: tt-clash 1.6s ease-in-out infinite; }
+.tt-live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: inherit;
+  animation: tt-live 1.6s ease-out infinite;
+}
+.tt-flash { animation: tt-flash 0.9s ease-out 2; }
+@media (prefers-reduced-motion: reduce) {
+  .tt-pop, .tt-clash, .tt-live::after, .tt-flash { animation: none !important; }
+}
+
 /* === Syntax Highlighting (Catppuccin Mocha) === */
 .hljs {
   color: #cdd6f4;

@@ -21,9 +21,11 @@ import {
   Pin,
   RefreshCw,
   Save,
+  Share2,
   Trash2,
   Upload,
 } from "lucide-react";
+import { isScheduleShared, useMyShares } from "@/hooks/use-timetable-share";
 import { Dialog, dialogButton } from "@/components/ui/dialog";
 import { useDialogs } from "@/components/ui/confirm";
 import { Menu } from "@/components/ui/menu";
@@ -44,6 +46,8 @@ interface Props {
   activeScheduleId: string | null;
   onOpenSchedule: (s: SavedSchedule) => void;
   onSaved: (s: SavedSchedule) => void;
+  /** open the live-share dialog for this saved schedule */
+  onShare?: (s: SavedSchedule) => void;
 }
 
 const ALL = "__all";
@@ -63,9 +67,11 @@ export function SavedSchedulesDialog({
   activeScheduleId,
   onOpenSchedule,
   onSaved,
+  onShare,
 }: Props) {
   const { store, user, authChecked, status, lastSyncedAt, error } = useTimetableStore();
   const { confirm, prompt } = useDialogs();
+  const shares = useMyShares(open && !!user);
   const [folder, setFolder] = useState<string>(ALL);
   const [moving, setMoving] = useState<SavedSchedule | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -112,7 +118,9 @@ export function SavedSchedulesDialog({
     if (!active) return;
     const saved = timetableStore.saveSchedule({ ...active, items, credits, courseCount, termId, termLabel });
     onSaved(saved);
-    toast.success(`อัปเดต “${saved.name}” แล้ว`);
+    toast.success(`อัปเดต “${saved.name}” แล้ว`, {
+      description: isScheduleShared(shares, saved.id) ? "ลิงก์ที่แชร์อยู่จะแสดงเวอร์ชันนี้ให้ผู้ที่เปิดดูโดยอัตโนมัติ" : undefined,
+    });
   };
 
   const newFolder = async () => {
@@ -301,6 +309,14 @@ export function SavedSchedulesDialog({
                         <p className="flex items-center gap-1 truncate text-sm font-semibold text-gray-900">
                           {s.pinned && <Pin className="h-3.5 w-3.5 shrink-0 fill-amber-400 text-amber-500" aria-label="ปักหมุด" />}
                           <span className="truncate">{s.name}</span>
+                          {isScheduleShared(shares, s.id) && (
+                            <span
+                              className="flex shrink-0 items-center gap-0.5 rounded-full bg-sky-100 px-1.5 py-0.5 text-[9.5px] font-bold text-sky-700"
+                              title="แชร์ลิงก์สดอยู่ — ผู้เปิดลิงก์เห็นเวอร์ชันล่าสุดที่บันทึก"
+                            >
+                              <Share2 className="h-2.5 w-2.5" /> แชร์อยู่
+                            </span>
+                          )}
                         </p>
                         <p className="mt-0.5 text-[11px] text-gray-500">
                           ภาค {s.termLabel ?? s.termId} · {s.courseCount ?? s.items.length} วิชา · {s.credits ?? "-"} นก.
@@ -319,6 +335,9 @@ export function SavedSchedulesDialog({
                           </button>
                         )}
                         items={[
+                          ...(onShare && user
+                            ? [{ key: "share", label: isScheduleShared(shares, s.id) ? "ลิงก์แชร์ (สด)" : "แชร์ลิงก์สด", icon: <Share2 />, onSelect: () => onShare(s) }]
+                            : []),
                           { key: "rename", label: "เปลี่ยนชื่อ", icon: <Pencil />, onSelect: () => renameSchedule(s) },
                           { key: "move", label: "ย้ายไปโฟลเดอร์", icon: <FolderInput />, onSelect: () => setMoving(s) },
                           {

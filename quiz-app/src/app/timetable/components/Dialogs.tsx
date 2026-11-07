@@ -1,18 +1,36 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { ExternalLink, Plus, Trash2, AlertTriangle, CheckCircle2, CalendarPlus, ShieldCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  Award,
+  BookOpen,
+  Building2,
+  CalendarCheck,
+  CalendarPlus,
+  CheckCircle2,
+  ExternalLink,
+  FileText,
+  Info,
+  Layers,
+  MapPin,
+  Plus,
+  ShieldCheck,
+  Trash2,
+} from "lucide-react";
 import { Dialog, dialogButton } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DAY_NAMES,
-  fmtExam,
-  fmtRange,
+  sectionClashes,
   shortCampus,
   type Conflict,
   type Course,
+  type PlannedEntry,
   type Slot,
 } from "@/lib/timetable";
+import { SectionCard } from "./SectionCard";
 
 /** Thin wrapper kept for older call sites — renders the shared custom Dialog. */
 export function Modal({
@@ -41,98 +59,135 @@ export function Modal({
   );
 }
 
-export function CourseDetailDialog({ course: incoming, onClose }: { course: Course | null; onClose: () => void }) {
+export function CourseDetailDialog({
+  course: incoming,
+  onClose,
+  entries = [],
+  onAdd,
+  onRemove,
+}: {
+  course: Course | null;
+  onClose: () => void;
+  /** current plan — enables clash checks and the "เลือก" buttons */
+  entries?: PlannedEntry[];
+  onAdd?: (course: Course, sec: string) => void;
+  onRemove?: (courseId: string) => void;
+}) {
   // keep showing the last course while the sheet animates out
   const [course, setCourse] = useState(incoming);
-  if (incoming && incoming !== course) setCourse(incoming);
+  const [showAllDesc, setShowAllDesc] = useState(false);
+  const [freeOnly, setFreeOnly] = useState(false);
+  if (incoming && incoming !== course) {
+    setCourse(incoming);
+    setShowAllDesc(false);
+    setFreeOnly(false);
+  }
+  const plannedSec = course ? entries.find((e) => e.course?.id === course.id)?.sec : undefined;
+  const sections = course
+    ? course.sections.filter((s) => !freeOnly || s.sec === plannedSec || !sectionClashes(s, entries, course.id).length)
+    : [];
+  const freeCount = course ? course.sections.filter((s) => !sectionClashes(s, entries, course.id).length).length : 0;
+  const longDesc = (course?.desc.length ?? 0) > 260;
+
   return (
     <Modal
       open={!!incoming}
       onClose={onClose}
       wide
+      icon={<BookOpen className="h-5 w-5" />}
       title={
         course && (
           <>
-            <span className="font-mono">{course.code}</span> {course.nameTh}
-            <p className="text-xs font-normal text-gray-500 uppercase">{course.nameEn}</p>
+            <span className="mr-1.5 inline-block rounded-lg bg-emerald-50 px-2 py-0.5 font-mono text-emerald-700 ring-1 ring-emerald-100">{course.code}</span>
+            {course.nameTh}
+            <p className="mt-0.5 text-xs font-normal tracking-wide text-gray-500 uppercase">{course.nameEn}</p>
           </>
         )
       }
     >
       {course && (
         <div className="space-y-4 text-sm">
-          <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:grid-cols-4">
-            <div>
-              <dt className="text-gray-500">หน่วยกิต</dt>
-              <dd className="font-medium">{course.credits}</dd>
-            </div>
-            <div>
-              <dt className="text-gray-500">วิทยาเขต</dt>
-              <dd className="font-medium">{shortCampus(course.campus)}</dd>
-            </div>
-            <div className="col-span-2">
-              <dt className="text-gray-500">คณะ / ภาควิชา</dt>
-              <dd className="font-medium">
-                {course.faculty}
-                {course.dept && ` · ${course.dept}`}
-              </dd>
+          <dl className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
+            <InfoTile icon={<Award className="h-4 w-4" />} label="หน่วยกิต" value={course.credits || String(course.creditNum)} tone="emerald" />
+            <InfoTile icon={<MapPin className="h-4 w-4" />} label="วิทยาเขต" value={shortCampus(course.campus)} tone="sky" />
+            <InfoTile icon={<Layers className="h-4 w-4" />} label="Section" value={`${course.sections.length} กลุ่ม`} tone="violet" />
+            <InfoTile
+              icon={<CalendarCheck className="h-4 w-4" />}
+              label="ไม่ชนกับตาราง"
+              value={entries.length ? `${freeCount} / ${course.sections.length} Sec` : "—"}
+              tone={entries.length && !freeCount ? "red" : "amber"}
+            />
+            <div className="col-span-2 flex items-start gap-2 rounded-xl bg-gray-50 px-3 py-2 sm:col-span-4">
+              <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" />
+              <div className="min-w-0">
+                <dt className="text-[10px] font-semibold text-gray-500">คณะ / ภาควิชา</dt>
+                <dd className="font-medium text-gray-800">
+                  {course.faculty}
+                  {course.dept && <span className="text-gray-500"> · {course.dept}</span>}
+                </dd>
+              </div>
             </div>
           </dl>
+
           {course.conditions?.map((c) => (
-            <div key={c.title} className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">
-              <span className="font-semibold">{c.title}:</span> {c.body}
+            <div key={c.title} className="flex gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+              <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+              <p>
+                <span className="font-semibold">{c.title}:</span> {c.body}
+              </p>
             </div>
           ))}
+
           {course.desc && (
-            <div>
-              <h4 className="mb-1 text-xs font-semibold text-gray-700">คำอธิบายรายวิชา</h4>
-              <p className="leading-relaxed text-gray-700">{course.desc}</p>
+            <div className="rounded-xl border border-gray-100 px-3 py-2.5">
+              <h4 className="mb-1 flex items-center gap-1 text-xs font-semibold text-gray-700">
+                <FileText className="h-3.5 w-3.5 text-gray-400" /> คำอธิบายรายวิชา
+              </h4>
+              <p className={`text-[13px] leading-relaxed text-gray-700 ${longDesc && !showAllDesc ? "line-clamp-4" : ""}`}>{course.desc}</p>
+              {longDesc && (
+                <button type="button" onClick={() => setShowAllDesc((v) => !v)} className="mt-1 text-xs font-semibold text-emerald-700 hover:underline">
+                  {showAllDesc ? "ย่อ" : "อ่านทั้งหมด"}
+                </button>
+              )}
             </div>
           )}
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[520px] text-left text-xs">
-              <thead className="border-b border-gray-200 text-gray-500">
-                <tr>
-                  <th className="py-1.5 pr-2">Sec</th>
-                  <th className="py-1.5 pr-2">วัน / เวลา / ห้อง</th>
-                  <th className="py-1.5 pr-2">ผู้สอน</th>
-                  <th className="py-1.5">สอบ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 align-top">
-                {course.sections.map((s) => (
-                  <tr key={s.sec}>
-                    <td className="py-2 pr-2 font-semibold">
-                      {s.sec}
-                      {s.seats !== null && <p className="font-normal text-gray-500">{s.seats} ที่</p>}
-                    </td>
-                    <td className="py-2 pr-2 tabular-nums">
-                      {s.slots.length
-                        ? s.slots.map((sl, i) => (
-                            <div key={i}>
-                              {DAY_NAMES[sl.day]} {fmtRange(sl.start, sl.end)}
-                              {sl.room && <span className="text-gray-500"> · {sl.room}</span>}
-                            </div>
-                          ))
-                        : s.dayTime}
-                      {s.group && <p className="mt-0.5 text-gray-500">ผู้เรียน: {s.group}</p>}
-                    </td>
-                    <td className="py-2 pr-2">{s.instructors.join(", ") || "-"}</td>
-                    <td className="py-2 text-gray-600">
-                      <div>กลาง: {s.midtermAt ? fmtExam(s.midtermAt) : s.midterm}</div>
-                      <div>ปลาย: {s.finalAt ? fmtExam(s.finalAt) : s.final}</div>
-                    </td>
-                  </tr>
+
+          <div>
+            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+              <h4 className="flex items-center gap-1.5 text-sm font-bold text-gray-900">
+                Section ที่เปิดสอน <span className="rounded-full bg-gray-100 px-2 text-xs font-semibold text-gray-600">{course.sections.length}</span>
+              </h4>
+              {entries.length > 0 && course.sections.length > 1 && (
+                <Checkbox checked={freeOnly} onChange={setFreeOnly} label="เฉพาะ Sec ที่ไม่ชนกับตาราง" />
+              )}
+            </div>
+            {course.sections.length === 0 ? (
+              <p className="rounded-xl bg-gray-50 px-3 py-4 text-center text-xs text-gray-500">ยังไม่มี section ที่เปิดสอนในภาคนี้</p>
+            ) : sections.length === 0 ? (
+              <p className="rounded-xl bg-red-50 px-3 py-4 text-center text-xs text-red-700">ทุก Section ชนกับตารางปัจจุบัน</p>
+            ) : (
+              <div className="space-y-2">
+                {sections.map((s) => (
+                  <SectionCard
+                    key={s.sec}
+                    course={course}
+                    section={s}
+                    entries={entries}
+                    selected={plannedSec === s.sec}
+                    onAdd={onAdd}
+                    onRemove={onRemove}
+                  />
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
+
           {course.url && (
             <a
               href={course.url}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs font-medium text-emerald-700 hover:underline"
+              className="inline-flex items-center gap-1 rounded-lg px-1 text-xs font-semibold text-emerald-700 hover:underline"
             >
               เปิดใน SIS <ExternalLink className="h-3.5 w-3.5" />
             </a>
@@ -140,6 +195,26 @@ export function CourseDetailDialog({ course: incoming, onClose }: { course: Cour
         </div>
       )}
     </Modal>
+  );
+}
+
+const TILE_TONE = {
+  emerald: "bg-emerald-50 text-emerald-600",
+  sky: "bg-sky-50 text-sky-600",
+  violet: "bg-violet-50 text-violet-600",
+  amber: "bg-amber-50 text-amber-600",
+  red: "bg-red-50 text-red-600",
+} as const;
+
+function InfoTile({ icon, label, value, tone }: { icon: ReactNode; label: string; value: string; tone: keyof typeof TILE_TONE }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-gray-100 bg-white px-2.5 py-2">
+      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${TILE_TONE[tone]}`}>{icon}</span>
+      <div className="min-w-0">
+        <dt className="text-[10px] font-semibold text-gray-500">{label}</dt>
+        <dd className="truncate text-[13px] font-bold text-gray-900">{value}</dd>
+      </div>
+    </div>
   );
 }
 

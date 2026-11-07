@@ -1,11 +1,14 @@
 // ระบบจัดตารางเรียน — data model + pure helpers (no React here)
 //
-// ข้อมูลแต่ละภาคการศึกษาอยู่ที่ public/timetable/terms/<year>-<term>.json
+// ข้อมูลแต่ละภาคการศึกษาอยู่ที่ data/timetable/terms/<year>-<term>.json (ไม่อยู่ใน public)
+// เสิร์ฟผ่าน /api/timetable/terms/<year>-<term> เฉพาะผู้ที่เข้าสู่ระบบ
 // สร้างโดย scripts/timetable/import-term.mjs จากข้อมูล SIS (sis.psu.ac.th)
 
 export const DAY_NAMES = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"] as const;
 export const DAY_SHORT = ["จ.", "อ.", "พ.", "พฤ.", "ศ.", "ส.", "อา."] as const;
 export const DAY_EN = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
+/** สีประจำวันแบบไทย จันทร์เหลือง อังคารชมพู พุธเขียว พฤหัสส้ม ศุกร์ฟ้า เสาร์ม่วง อาทิตย์แดง */
+export const DAY_COLORS = ["#eab308", "#ec4899", "#22c55e", "#f97316", "#0ea5e9", "#a855f7", "#ef4444"] as const;
 
 export interface Slot {
   /** 0 = จันทร์ … 6 = อาทิตย์ */
@@ -186,6 +189,17 @@ export function fmtTime(min: number): string {
 
 export function fmtRange(start: number, end: number): string {
   return `${fmtTime(start)}–${fmtTime(end)}`;
+}
+
+/** class length rounded to half hours — SIS periods end at :50, so 09:00–11:50 reads "3 ชม." */
+export function fmtDuration(start: number, end: number): string {
+  const h = Math.max(0.5, Math.round(((end - start) / 60) * 2) / 2);
+  return `${h} ชม.`;
+}
+
+/** Monday-first weekday index (0 = จันทร์) for a JS Date */
+export function weekdayIndex(d: Date): number {
+  return (d.getDay() + 6) % 7;
 }
 
 const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];

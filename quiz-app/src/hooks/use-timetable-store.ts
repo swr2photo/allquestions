@@ -385,4 +385,11 @@ export const timetableStore = {
   syncNow() {
     return pull();
   },
+
+  /** push pending changes now (e.g. right before creating a share link) */
+  async flush() {
+    if (!state.user) return;
+    clearTimeout(pushTimer);
+    await push();
+  },
 };

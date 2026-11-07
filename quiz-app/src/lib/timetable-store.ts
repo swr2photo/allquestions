@@ -8,6 +8,8 @@ import type { PlanItem } from "./timetable";
 import type { RegistrationHistory } from "./registration";
 
 export const STORE_VERSION = 1;
+/** KV key of a user's store: STORE_KEY_PREFIX + lower-cased email */
+export const STORE_KEY_PREFIX = "timetable_store:v1:";
 export const MAX_STORE_BYTES = 512 * 1024;
 const TOMBSTONE_TTL_MS = 120 * 24 * 60 * 60 * 1000;
 

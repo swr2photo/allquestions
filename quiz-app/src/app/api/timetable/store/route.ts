@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionInfo, isValidSession } from "@/lib/admin-store";
 import { kv } from "@/lib/kv";
-import { MAX_STORE_BYTES, emptyStore, mergeStores, sanitizeStore, type TimetableStore } from "@/lib/timetable-store";
+import { MAX_STORE_BYTES, STORE_KEY_PREFIX, emptyStore, mergeStores, sanitizeStore, type TimetableStore } from "@/lib/timetable-store";
 
 export const dynamic = "force-dynamic";
 
-const KEY_PREFIX = "timetable_store:v1:";
+const KEY_PREFIX = STORE_KEY_PREFIX;
 
 function sessionEmail(req: NextRequest): string | null {
   for (const name of ["user-session", "admin-session"]) {

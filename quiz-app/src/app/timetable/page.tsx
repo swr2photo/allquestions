@@ -22,19 +22,24 @@ import {
   Loader2,
   Printer,
   Save,
+  MapPin,
   Search,
+  Share2,
   ShieldCheck,
   Trash2,
+  User,
   X,
 } from "lucide-react";
 import {
+  DAY_COLORS,
+  DAY_SHORT,
   PALETTE,
   TERM_NAMES,
   decodePlan,
-  encodePlan,
   examsToIcs,
+  fmtExamDate,
+  fmtRange,
   findConflicts,
-  fmtExam,
   nextColor,
   randomSchedule,
   resolvePlan,
@@ -75,6 +80,10 @@ import { SavedSchedulesDialog } from "./components/SavedSchedulesDialog";
 import { GoogleSignIn } from "@/components/google-sign-in";
 import { ExportDialog } from "./components/ExportDialog";
 import { StatsPanel } from "./components/StatsPanel";
+import { ShareDialog } from "./components/ShareDialog";
+import { SharedBanner } from "./components/SharedBanner";
+import { useSharedTimetable } from "@/hooks/use-timetable-share";
+import type { ShareSource, SharedTimetable } from "@/lib/timetable-share";
 
 const REG_AT_KEY = "psu-registration:v1:at";
 const EMPTY_ITEMS: PlanItem[] = [];
@@ -88,7 +97,7 @@ type View = "week" | "agenda" | "exam";
 export default function TimetablePage() {
   const { store, user, status, authChecked } = useTimetableStore();
   const { index: geIndex } = useGenedIndex();
-  const { confirm, prompt } = useDialogs();
+  const { confirm } = useDialogs();
   const isDesktop = useIsDesktop();
 
   const [index, setIndex] = useState<TermIndex | null>(null);
@@ -105,6 +114,10 @@ export default function TimetablePage() {
   const [registrationOpen, setRegistrationOpen] = useState(false);
   const [savedOpen, setSavedOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareSource, setShareSource] = useState<ShareSource | null>(null);
+  /** viewing someone's live share link (?share=<id>) — read-only */
+  const [shareId, setShareId] = useState<string | null>(null);
   const [activeScheduleId, setActiveScheduleId] = useState<string | null>(null);
   const [initialQuery, setInitialQuery] = useState("");
   const [localReg, setLocalReg] = useState<{ h: RegistrationHistory; at: number }>({
@@ -122,7 +135,8 @@ export default function TimetablePage() {
   }, []);
 
   const cache = useRef(new Map<string, TermData>());
-  const sharedRef = useRef<{ termId: string; items: { courseId: string; sec: string }[] } | null>(null);
+  /** old-style snapshot link (?p=…) — imported once into the working plan */
+  const snapshotRef = useRef<{ termId: string; items: { courseId: string; sec: string }[] } | null>(null);
   const pendingAdd = useRef<string | null>(null);
 
   const effectiveView: View = view ?? (isDesktop ? "week" : "agenda");
@@ -152,9 +166,9 @@ export default function TimetablePage() {
           td = (await res.json()) as TermData;
           cache.current.set(entry.id, td);
         }
-        const shared = sharedRef.current;
+        const shared = snapshotRef.current;
         if (shared && shared.termId === entry.id) {
-          sharedRef.current = null;
+          snapshotRef.current = null;
           const ids = new Set(td.courses.map((c) => c.id));
           const incoming: PlanItem[] = shared.items
             .filter((s) => ids.has(s.courseId))
@@ -206,8 +220,13 @@ export default function TimetablePage() {
         }
         const params = new URLSearchParams(window.location.search);
         const entry = idx.terms.find((t) => t.id === params.get("term")) ?? idx.terms[0];
+        const sid = params.get("share");
+        if (sid) {
+          setShareId(sid);
+          setMobilePane("plan");
+        }
         const p = params.get("p");
-        if (p) sharedRef.current = { termId: entry.id, items: decodePlan(p) };
+        if (p && !sid) snapshotRef.current = { termId: entry.id, items: decodePlan(p) };
         const q = params.get("q");
         if (q) {
           setInitialQuery(q);
@@ -227,8 +246,33 @@ export default function TimetablePage() {
     };
   }, [loadTerm]);
 
+  // ---------------------------------------------------------------- live share (viewer)
+  const termIdRef = useRef(termId);
+  useEffect(() => {
+    termIdRef.current = termId;
+  }, [termId]);
+  const sharedLive = useSharedTimetable(shareId, (s: SharedTimetable, first: boolean) => {
+    // the link may point at another term than the one opened first
+    if (s.termId !== termIdRef.current) {
+      const entry = index?.terms.find((t) => t.id === s.termId);
+      if (entry) loadTerm(entry);
+      else toast.warning(`ไม่มีข้อมูลภาค ${s.termLabel} ในระบบแล้ว`);
+    }
+    if (!first) toast.info(`${s.ownerName || "ต้นฉบับ"} อัปเดตตารางแล้ว`, { description: `“${s.name}”`, duration: 4000 });
+  });
+  const shared = shareId ? sharedLive.share : null;
+  const viewingShared = !!shareId;
+
+  const exitShare = useCallback(() => {
+    setShareId(null);
+    const url = new URL(window.location.href);
+    url.searchParams.delete("share");
+    window.history.replaceState(null, "", url);
+  }, []);
+
   // ---------------------------------------------------------------- derived
-  const items = (data && store.working[data.id]?.items) || EMPTY_ITEMS;
+  const workingItems = (data && store.working[data.id]?.items) || EMPTY_ITEMS;
+  const items = viewingShared ? (shared && data && shared.termId === data.id ? shared.items : EMPTY_ITEMS) : workingItems;
   const byId = useMemo(() => new Map((data?.courses ?? []).map((c) => [c.id, c])), [data]);
   const entries = useMemo(() => resolvePlan(items, byId), [items, byId]);
   const conflicts = useMemo(() => findConflicts(entries), [entries]);
@@ -248,12 +292,68 @@ export default function TimetablePage() {
   const isGe = useCallback((e: PlannedEntry) => geOf(e) !== null, [geOf]);
 
   // ---------------------------------------------------------------- actions
-  const setItems = useCallback(
+  const writeItems = useCallback(
     (fn: (items: PlanItem[]) => PlanItem[]) => {
       if (data) timetableStore.setWorking(data.id, fn);
     },
     [data]
   );
+
+  /** copy the shared timetable into my working plan and leave the read-only view */
+  const forkShared = useCallback(
+    async (reason: "button" | "edit"): Promise<boolean> => {
+      if (!shared) return false;
+      const existing = timetableStore.get().store.working[shared.termId]?.items ?? [];
+      const overwrite = existing.length > 0;
+      if (reason === "edit" || overwrite) {
+        const ok = await confirm({
+          title: reason === "edit" ? "คัดลอกมาเป็นตารางของคุณเพื่อแก้ไข?" : "คัดลอกตารางนี้มาเป็นของคุณ?",
+          description: [
+            reason === "edit" ? "ตารางที่แชร์มาแก้ไม่ได้ ต้องคัดลอกเป็นของคุณก่อน — หลังคัดลอกจะไม่อัปเดตตามต้นฉบับแล้ว" : "",
+            overwrite ? `ตารางที่คุณจัดไว้ของภาค ${shared.termLabel} (${existing.length} รายการ) จะถูกแทนที่ — บันทึกเก็บไว้ก่อนได้ที่ “ตารางที่บันทึก”` : "",
+          ]
+            .filter(Boolean)
+            .join(" · "),
+          confirmText: "คัดลอกมาแก้ไข",
+          tone: overwrite ? "warning" : "default",
+          icon: <Link2 className="h-5 w-5" />,
+        });
+        if (!ok) return false;
+      }
+      timetableStore.setWorking(shared.termId, () => shared.items.map((i) => ({ ...i })));
+      setActiveScheduleId(null);
+      exitShare();
+      toast.success("คัดลอกมาเป็นตารางของคุณแล้ว — แก้ไขได้เลย");
+      return true;
+    },
+    [shared, confirm, exitShare]
+  );
+
+  /** every edit goes through here — while viewing a share link it asks to copy first */
+  const setItems = useCallback(
+    (fn: (items: PlanItem[]) => PlanItem[]) => {
+      if (viewingShared) {
+        void forkShared("edit").then((ok) => ok && writeItems(fn));
+        return;
+      }
+      writeItems(fn);
+    },
+    [viewingShared, forkShared, writeItems]
+  );
+
+  const saveSharedAsMine = () => {
+    if (!shared) return;
+    const s = timetableStore.saveSchedule({
+      name: `${shared.name}${shared.ownerName && !shared.isOwner ? ` (จาก ${shared.ownerName})` : ""}`.slice(0, 80),
+      folderId: null,
+      termId: shared.termId,
+      termLabel: shared.termLabel,
+      items: shared.items,
+      credits: totalCredits,
+      courseCount,
+    });
+    toast.success(`บันทึก “${s.name}” ไว้ใน “ตารางที่บันทึก” แล้ว`);
+  };
 
   const updateRegistration = (next: RegistrationHistory) => {
     const at = Date.now();
@@ -286,9 +386,9 @@ export default function TimetablePage() {
       toast.success("ปิดการสำรอง — ลบข้อมูลบนเซิร์ฟเวอร์แล้ว ข้อมูลในเครื่องยังอยู่");
     }
   };
-  const addCourse = useCallback(
+  const addCourseNow = useCallback(
     (course: Course, sec: string) => {
-      setItems((list) => {
+      writeItems((list) => {
         const existing = list.find((i) => i.kind === "course" && i.courseId === course.id);
         if (existing) return list.map((i) => (i === existing ? { ...existing, sec } : i));
         // same code from a different campus/curriculum already planned → replace it
@@ -310,7 +410,14 @@ export default function TimetablePage() {
         toast.warning(`${course.code} เคยลงทะเบียนแล้วใน ${priorTerms.join(", ")} (ถ้าเป็นวิชาตามรีเกรดให้ติ๊กในประวัติการลงทะเบียน)`, { duration: 6000 });
       }
     },
-    [setItems, byId, entries, currentTerm, registration]
+    [writeItems, byId, entries, currentTerm, registration]
+  );
+  const addCourse = useCallback(
+    (course: Course, sec: string) => {
+      if (viewingShared) void forkShared("edit").then((ok) => ok && addCourseNow(course, sec));
+      else addCourseNow(course, sec);
+    },
+    [viewingShared, forkShared, addCourseNow]
   );
 
   // ?add=<courseId> from the GenEd page
@@ -370,16 +477,9 @@ export default function TimetablePage() {
     }
   };
 
-  const share = async () => {
-    const url = new URL(window.location.href);
-    url.searchParams.set("term", termId);
-    url.searchParams.set("p", encodePlan(items));
-    try {
-      await navigator.clipboard.writeText(url.toString());
-      toast.success("คัดลอกลิงก์ตารางเรียนแล้ว");
-    } catch {
-      await prompt({ title: "ลิงก์ตารางเรียน", description: "คัดลอกลิงก์นี้ไปแชร์", defaultValue: url.toString(), copyOnly: true, icon: <Link2 className="h-5 w-5" /> });
-    }
+  const openShare = (source: ShareSource | null = null) => {
+    setShareSource(source);
+    setShareOpen(true);
   };
 
   const downloadIcs = () => {
@@ -393,6 +493,7 @@ export default function TimetablePage() {
   };
 
   const openSchedule = (s: SavedSchedule) => {
+    if (viewingShared) exitShare();
     timetableStore.setWorking(s.termId, () => s.items);
     setActiveScheduleId(s.id);
     if (s.termId !== termId) {
@@ -458,6 +559,7 @@ export default function TimetablePage() {
                 const t = index?.terms.find((x) => x.id === id);
                 if (t) {
                   setActiveScheduleId(null);
+                  if (viewingShared) exitShare();
                   loadTerm(t);
                 }
               }}
@@ -474,7 +576,7 @@ export default function TimetablePage() {
             type="button"
             onClick={() => setCheckOpen(true)}
             className={cn(
-              "hidden h-10 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold sm:flex",
+              "hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border px-3 text-xs font-semibold whitespace-nowrap sm:flex",
               conflicts.length ? "border-red-300 bg-red-50 text-red-700" : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
             )}
           >
@@ -489,6 +591,16 @@ export default function TimetablePage() {
             <FolderOpen className="h-4 w-4 shrink-0" /> <span className="truncate sm:hidden">บันทึก</span>
             <span className="hidden truncate sm:inline">ตารางที่บันทึก</span>
           </button>
+          {!viewingShared && (
+            <button
+              type="button"
+              onClick={() => openShare()}
+              className="hidden h-10 shrink-0 items-center gap-1.5 rounded-xl border border-sky-200 bg-sky-50 px-3 text-xs font-semibold whitespace-nowrap text-sky-700 hover:bg-sky-100 sm:flex"
+              title="แชร์ลิงก์สด — เพื่อนเห็นเวอร์ชันล่าสุดทุกครั้งที่คุณบันทึก"
+            >
+              <Share2 className="h-4 w-4" /> <span className="hidden sm:inline">แชร์</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setExportOpen(true)}
@@ -519,10 +631,10 @@ export default function TimetablePage() {
               { key: "reg", label: "ประวัติการลงทะเบียน (PDF)", icon: <FileText />, onSelect: () => setRegistrationOpen(true) },
               { key: "custom", label: "เพิ่มวิชา / กิจกรรมเอง", icon: <CalendarPlus />, onSelect: () => setCustomOpen(true) },
               { key: "save", label: "บันทึกเป็นตารางใหม่", icon: <Save />, onSelect: () => setSavedOpen(true), disabled: !items.length },
-              { key: "share", label: "คัดลอกลิงก์แชร์", icon: <Link2 />, onSelect: share, disabled: !items.some((i) => i.kind === "course"), separator: true },
+              { key: "share", label: "แชร์ตาราง (ลิงก์สด)", icon: <Share2 />, onSelect: () => openShare(), disabled: viewingShared, separator: true },
               { key: "ics", label: "ตารางสอบ .ics ลงปฏิทิน", icon: <Download />, onSelect: downloadIcs, disabled: !hasExams },
               { key: "print", label: "พิมพ์หน้านี้", icon: <Printer />, onSelect: () => window.print() },
-              { key: "clear", label: "ล้างตาราง", icon: <Trash2 />, danger: true, separator: true, onSelect: clearAll, disabled: !items.length },
+              { key: "clear", label: "ล้างตาราง", icon: <Trash2 />, danger: true, separator: true, onSelect: clearAll, disabled: !items.length || viewingShared },
             ]}
           />
         </div>
@@ -603,7 +715,17 @@ export default function TimetablePage() {
             </div>
           </div>
 
-          {activeScheduleId && store.schedules.find((s) => s.id === activeScheduleId) && (
+          {viewingShared && (
+            <SharedBanner
+              state={sharedLive}
+              onFork={() => void forkShared("button")}
+              onSave={saveSharedAsMine}
+              onRefresh={sharedLive.refresh}
+              onExit={exitShare}
+            />
+          )}
+
+          {!viewingShared && activeScheduleId && store.schedules.find((s) => s.id === activeScheduleId) && (
             <p className="flex items-center gap-1.5 text-xs text-gray-500 print:hidden">
               <FolderOpen className="h-3.5 w-3.5" /> กำลังแก้ “{store.schedules.find((s) => s.id === activeScheduleId)!.name}” — กด
               <button type="button" onClick={() => setSavedOpen(true)} className="font-semibold text-emerald-700 hover:underline">
@@ -628,9 +750,16 @@ export default function TimetablePage() {
                   conflictKeys={conflictKeys}
                   onSelect={(e) => e.course && setDetail(e.course)}
                   onRemove={removeEntry}
+                  readOnly={viewingShared}
                 />
               ) : (
-                <AgendaView entries={entries} conflictKeys={conflictKeys} onSelect={(e) => e.course && setDetail(e.course)} onRemove={removeEntry} />
+                <AgendaView
+                  entries={entries}
+                  conflictKeys={conflictKeys}
+                  onSelect={(e) => e.course && setDetail(e.course)}
+                  onRemove={removeEntry}
+                  readOnly={viewingShared}
+                />
               )}
               {unscheduled.length > 0 && (
                 <div className="flex flex-wrap items-center gap-2 rounded-xl border border-dashed border-gray-300 bg-white px-3 py-2 text-xs text-gray-600">
@@ -643,7 +772,14 @@ export default function TimetablePage() {
                 </div>
               )}
               <StatsPanel entries={entries} geOf={geOf} />
-              <SelectedTable entries={entries} conflictKeys={conflictKeys} onRemove={removeEntry} onChangeSection={changeSection} onDetail={setDetail} />
+              <SelectedTable
+                entries={entries}
+                conflictKeys={conflictKeys}
+                onRemove={removeEntry}
+                onChangeSection={changeSection}
+                onDetail={setDetail}
+                readOnly={viewingShared}
+              />
             </>
           )}
 
@@ -699,7 +835,7 @@ export default function TimetablePage() {
         </div>
       </nav>
 
-      <CourseDetailDialog course={detail} onClose={() => setDetail(null)} />
+      <CourseDetailDialog course={detail} onClose={() => setDetail(null)} entries={entries} onAdd={addCourse} onRemove={removeCourse} />
       <RegistrationDialog
         open={registrationOpen}
         onClose={() => setRegistrationOpen(false)}
@@ -736,9 +872,24 @@ export default function TimetablePage() {
         items={items}
         credits={totalCredits}
         courseCount={courseCount}
-        activeScheduleId={activeScheduleId}
+        activeScheduleId={viewingShared ? null : activeScheduleId}
         onOpenSchedule={openSchedule}
-        onSaved={(s) => setActiveScheduleId(s.id)}
+        onSaved={(s) => {
+          if (!viewingShared) setActiveScheduleId(s.id);
+        }}
+        onShare={(s) => {
+          setSavedOpen(false);
+          openShare({ kind: "schedule", scheduleId: s.id });
+        }}
+      />
+      <ShareDialog
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        termId={termId}
+        termLabel={currentTerm?.label ?? termId}
+        items={workingItems}
+        activeScheduleId={activeScheduleId}
+        initialSource={shareSource}
       />
       <ExportDialog
         open={exportOpen}
@@ -777,18 +928,51 @@ function SyncPill({ status, signedIn, onClick, className }: { status: string; si
   );
 }
 
+function ExamChip({ label, at, text }: { label: string; at: PlannedEntry["midterm"]; text: string }) {
+  return (
+    <span className="inline-flex min-w-0 items-center gap-1 rounded-md bg-gray-50 px-1.5 py-0.5 text-[11px] text-gray-600 ring-1 ring-gray-100">
+      <span className="font-semibold text-gray-500">{label}</span>
+      <span className="truncate">{at ? `${fmtExamDate(at.date)} ${fmtRange(at.start, at.end)}` : text && text !== "-" ? text : "—"}</span>
+    </span>
+  );
+}
+
+function SlotChips({ e }: { e: PlannedEntry }) {
+  if (!e.slots.length) return <span className="text-[11px] text-gray-400">ยังไม่มีเวลาเรียน</span>;
+  return (
+    <span className="flex flex-col gap-0.5">
+      {e.slots.map((s, i) => (
+        <span key={i} className="flex min-w-0 items-center gap-1 text-[11px] text-gray-700 tabular-nums">
+          <span className="w-6 shrink-0 rounded py-px text-center text-[9.5px] font-bold text-white" style={{ background: DAY_COLORS[s.day] }}>
+            {DAY_SHORT[s.day]}
+          </span>
+          {fmtRange(s.start, s.end)}
+          {s.room && s.room !== "-" && (
+            <span className="flex min-w-0 items-center gap-0.5 text-gray-400">
+              <MapPin className="h-3 w-3 shrink-0" />
+              <span className="truncate">{s.room}</span>
+            </span>
+          )}
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function SelectedTable({
   entries,
   conflictKeys,
   onRemove,
   onChangeSection,
   onDetail,
+  readOnly,
 }: {
   entries: PlannedEntry[];
   conflictKeys: Set<string>;
   onRemove: (e: PlannedEntry) => void;
   onChangeSection: (e: PlannedEntry, sec: string) => void;
   onDetail: (c: Course) => void;
+  readOnly?: boolean;
 }) {
   if (!entries.length) {
     return (
@@ -798,120 +982,143 @@ function SelectedTable({
       </div>
     );
   }
+  const sectionPicker = (e: PlannedEntry, width: string, compactLabel: boolean) =>
+    !readOnly && e.course && e.course.sections.length > 1 ? (
+      <div className={cn(width, "print:hidden")}>
+        <Select
+          label={`Section ของ ${e.code}`}
+          size="sm"
+          value={e.sec}
+          onChange={(sec) => onChangeSection(e, sec)}
+          options={e.course.sections.map((s) => ({ value: s.sec, label: compactLabel ? s.sec : `Sec ${s.sec}`, description: s.dayTime }))}
+          minPopoverWidth={240}
+        />
+      </div>
+    ) : (
+      <span className="rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] font-semibold whitespace-nowrap text-gray-700">
+        {e.sec === "-" ? "กิจกรรม" : `Sec ${e.sec}`}
+      </span>
+    );
+
   return (
-    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-gray-100 px-4 py-2.5">
+        <p className="text-sm font-bold text-gray-900">รายวิชาที่เลือก</p>
+        <p className="text-[11px] text-gray-500">
+          {entries.length} รายการ · {entries.reduce((n, e) => n + (e.credits || 0), 0)} หน่วยกิต
+        </p>
+      </div>
       {/* phones: cards */}
       <ul className="divide-y divide-gray-100 md:hidden">
         {entries.map((e) => {
           const c = PALETTE[e.color % PALETTE.length];
+          const clash = conflictKeys.has(e.key);
           return (
-            <li key={e.key} className={cn("flex items-start gap-3 px-3 py-3", conflictKeys.has(e.key) && "bg-red-50/60")}>
-              <span className="mt-1.5 h-3 w-3 shrink-0 rounded-full" style={{ background: c.border }} />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm">
-                  <span className="font-mono font-semibold text-gray-900">{e.code}</span>{" "}
+            <li key={e.key} className={cn("relative flex items-start gap-3 py-3 pr-3 pl-4", clash && "bg-red-50/60")}>
+              <span className="absolute inset-y-2 left-1.5 w-1 rounded-full" style={{ background: clash ? "#dc2626" : c.border }} />
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="flex items-center gap-1.5 text-sm">
+                  {clash && <AlertTriangle className="h-3.5 w-3.5 text-red-600" aria-label="ชนกัน" />}
+                  <span className="font-mono font-bold text-gray-900">{e.code}</span>
                   <span className="text-xs text-gray-500">{e.credits || "-"} นก.</span>
                 </p>
-                <button type="button" onClick={() => e.course && onDetail(e.course)} className="text-left text-[13px] text-gray-700">
+                <button type="button" onClick={() => e.course && onDetail(e.course)} className="text-left text-[13px] leading-snug text-gray-700">
                   {e.name}
                 </button>
-                <div className="mt-1.5 flex items-center gap-2">
-                  {e.course && e.course.sections.length > 1 ? (
-                    <div className="w-28">
-                      <Select
-                        label={`Section ของ ${e.code}`}
-                        size="sm"
-                        value={e.sec}
-                        onChange={(sec) => onChangeSection(e, sec)}
-                        options={e.course.sections.map((s) => ({ value: s.sec, label: `Sec ${s.sec}`, description: s.dayTime }))}
-                      />
-                    </div>
-                  ) : (
-                    <span className="text-xs text-gray-500">Sec {e.sec}</span>
-                  )}
-                  {e.final && <span className="truncate text-[11px] text-gray-500">ปลายภาค {fmtExam(e.final)}</span>}
+                <SlotChips e={e} />
+                <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                  {sectionPicker(e, "w-28", false)}
+                  {e.final && <ExamChip label="ปลายภาค" at={e.final} text={e.finalText} />}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => onRemove(e)}
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-600"
-                aria-label={`ลบ ${e.code}`}
-              >
-                <X className="h-4 w-4" />
-              </button>
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={() => onRemove(e)}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-gray-400 hover:bg-red-50 hover:text-red-600"
+                  aria-label={`ลบ ${e.code}`}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </li>
           );
         })}
       </ul>
       {/* tablets / desktop: table */}
       <div className="hidden overflow-x-auto md:block">
-        <table className="w-full min-w-[720px] text-left text-xs">
-          <thead className="border-b border-gray-200 bg-gray-50 text-gray-500">
+        <table className="w-full min-w-[820px] text-left text-xs">
+          <thead className="border-b border-gray-200 bg-gray-50/80 text-[11px] text-gray-500">
             <tr>
-              <th className="px-3 py-2">รหัสวิชา</th>
-              <th className="px-3 py-2">ชื่อวิชา</th>
-              <th className="px-3 py-2">Sec</th>
-              <th className="px-3 py-2 text-center">นก.</th>
-              <th className="px-3 py-2">ผู้สอน</th>
-              <th className="px-3 py-2">สอบกลางภาค / ปลายภาค</th>
-              <th className="px-3 py-2 print:hidden" aria-label="จัดการ" />
+              <th className="px-3 py-2 font-semibold">รหัสวิชา</th>
+              <th className="px-3 py-2 font-semibold">ชื่อวิชา</th>
+              <th className="px-3 py-2 font-semibold">Sec</th>
+              <th className="px-3 py-2 text-center font-semibold">นก.</th>
+              <th className="px-3 py-2 font-semibold">วัน / เวลา / ห้อง</th>
+              <th className="px-3 py-2 font-semibold">ผู้สอน</th>
+              <th className="px-3 py-2 font-semibold">สอบ</th>
+              {!readOnly && <th className="px-3 py-2 print:hidden" aria-label="จัดการ" />}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 align-top">
             {entries.map((e) => {
               const c = PALETTE[e.color % PALETTE.length];
+              const clash = conflictKeys.has(e.key);
               return (
-                <tr key={e.key} className={conflictKeys.has(e.key) ? "bg-red-50/60" : ""}>
-                  <td className="px-3 py-2">
-                    <span className="flex items-center gap-2 font-mono font-semibold text-gray-900">
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: c.border }} />
+                <tr key={e.key} className={cn("transition-colors hover:bg-gray-50/70", clash && "bg-red-50/60 hover:bg-red-50")}>
+                  <td className="px-3 py-2.5">
+                    <span className="flex items-center gap-2 font-mono font-bold text-gray-900">
+                      <span className="h-6 w-1.5 shrink-0 rounded-full" style={{ background: clash ? "#dc2626" : c.border }} />
                       {e.code}
+                      {clash && <AlertTriangle className="h-3.5 w-3.5 text-red-600" aria-label="ชนกัน" />}
                     </span>
                   </td>
-                  <td className="px-3 py-2">
+                  <td className="max-w-[220px] px-3 py-2.5">
                     {e.course ? (
-                      <button type="button" onClick={() => onDetail(e.course!)} className="text-left text-gray-800 hover:text-emerald-700 hover:underline">
+                      <button type="button" onClick={() => onDetail(e.course!)} className="text-left font-medium text-gray-800 hover:text-emerald-700 hover:underline">
                         {e.name}
                       </button>
                     ) : (
-                      <span className="text-gray-800">{e.name}</span>
+                      <span className="font-medium text-gray-800">{e.name}</span>
                     )}
                     {e.course && <p className="text-[10px] text-gray-400">{shortCampus(e.course.campus)}</p>}
                   </td>
-                  <td className="px-3 py-2">
-                    {e.course && e.course.sections.length > 1 ? (
-                      <div className="w-24 print:hidden">
-                        <Select
-                          label={`Section ของ ${e.code}`}
-                          size="sm"
-                          value={e.sec}
-                          onChange={(sec) => onChangeSection(e, sec)}
-                          options={e.course.sections.map((s) => ({ value: s.sec, label: s.sec, description: s.dayTime }))}
-                          minPopoverWidth={240}
-                        />
-                      </div>
-                    ) : (
-                      e.sec
-                    )}
+                  <td className="px-3 py-2.5">
+                    {sectionPicker(e, "w-24", true)}
                     <span className="hidden print:inline">{e.sec}</span>
                   </td>
-                  <td className="px-3 py-2 text-center tabular-nums">{e.credits || "-"}</td>
-                  <td className="px-3 py-2 text-gray-600">{e.instructors.join(", ") || "-"}</td>
-                  <td className="px-3 py-2 text-gray-600">
-                    <div>{e.midterm ? fmtExam(e.midterm) : e.midtermText}</div>
-                    <div>{e.final ? fmtExam(e.final) : e.finalText}</div>
+                  <td className="px-3 py-2.5 text-center font-semibold tabular-nums">{e.credits || "-"}</td>
+                  <td className="px-3 py-2.5">
+                    <SlotChips e={e} />
                   </td>
-                  <td className="px-3 py-2 text-right print:hidden">
-                    <button
-                      type="button"
-                      onClick={() => onRemove(e)}
-                      className="rounded-md p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
-                      aria-label={`ลบ ${e.code}`}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
+                  <td className="max-w-[180px] px-3 py-2.5 text-gray-600">
+                    {e.instructors.length ? (
+                      <span className="flex items-start gap-1">
+                        <User className="mt-0.5 h-3 w-3 shrink-0 text-gray-400" />
+                        <span className="line-clamp-2">{e.instructors.join(", ")}</span>
+                      </span>
+                    ) : (
+                      "-"
+                    )}
                   </td>
+                  <td className="px-3 py-2.5">
+                    <div className="flex flex-col items-start gap-1">
+                      <ExamChip label="กลาง" at={e.midterm} text={e.midtermText} />
+                      <ExamChip label="ปลาย" at={e.final} text={e.finalText} />
+                    </div>
+                  </td>
+                  {!readOnly && (
+                    <td className="px-3 py-2.5 text-right print:hidden">
+                      <button
+                        type="button"
+                        onClick={() => onRemove(e)}
+                        className="rounded-md p-1 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        aria-label={`ลบ ${e.code}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
