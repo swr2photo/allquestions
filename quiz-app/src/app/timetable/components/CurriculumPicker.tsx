@@ -136,8 +136,10 @@ export function resolveSelection(data: CurriculumFile | undefined, selection: Cu
   const yearsInPlan = edition?.years.filter((y) => !y.plan || y.plan === plan) ?? [];
   const yearChoices = [...new Set(yearsInPlan.map((y) => y.year))].sort((a, b) => a - b);
   const yearNo = yearChoices.includes(selection?.year ?? 0) ? selection!.year : (yearChoices[0] ?? 1);
-  const year = yearsInPlan.find((y) => y.year === yearNo);
-  return { divisions, division, programs, program, editions, edition, plans, plan, yearChoices, yearNo, year };
+  const yearBlocks = yearsInPlan.filter((y) => y.year === yearNo);
+  const year = yearBlocks[0];
+  const termsOfYear = [...new Map(yearBlocks.flatMap((y) => y.terms).map((t) => [t.term, t])).values()].sort((a, b) => a.term - b.term);
+  return { divisions, division, programs, program, editions, edition, plans, plan, yearChoices, yearNo, year, termsOfYear };
 }
 
 export function CurriculumPicker({
@@ -154,13 +156,14 @@ export function CurriculumPicker({
 }: Props) {
   const [openCode, setOpenCode] = useState<string | null>(null);
   const { index, data, error, facultyEntry } = useCurriculumData(selection);
-  const { divisions, division, programs, program, editions, edition, plans, plan, yearChoices, yearNo, year } = useMemo(
+  const { divisions, division, programs, program, editions, edition, plans, plan, yearChoices, yearNo, year, termsOfYear } = useMemo(
     () => resolveSelection(data, selection),
     [data, selection]
   );
   const wantedTerm = selection?.termOf === termId && selection.term ? selection.term : defaultTerm;
-  const term = year?.terms.find((t) => t.term === wantedTerm) ?? year?.terms[0];
+  const term = termsOfYear.find((t) => t.term === wantedTerm) ?? termsOfYear[0];
   const catalog = term ? isCatalogTerm(term) : false;
+  const planHint = plans.length > 1 && !plans.includes(selection?.plan ?? "") && !!term && (edition?.years ?? []).some((block) => block.year === yearNo && !!block.plan && block.terms.some((blockTerm) => blockTerm.term === term.term));
 
   const current: CurriculumSelection = {
     curriculumId: facultyEntry?.id ?? "sci",
@@ -299,14 +302,14 @@ export function CurriculumPicker({
           onChange={(v) => change({ year: Number(v), term: undefined })}
           options={yearChoices.map((y) => ({ value: String(y), label: `ปี ${y}` }))}
         />
-        {(year?.terms.length ?? 0) > 1 && (
+        {termsOfYear.length > 1 && (
           <Segmented
             aria-label="ภาคการศึกษา"
             size="sm"
             className="flex w-full"
             value={String(term?.term ?? 1)}
             onChange={(v) => change({ term: Number(v), termOf: termId })}
-            options={(year?.terms ?? []).map((t) => ({
+            options={termsOfYear.map((t) => ({
               value: String(t.term),
               label: (
                 <span className="flex items-center gap-1">
@@ -393,6 +396,12 @@ export function CurriculumPicker({
           {catalog && (
             <p className="mb-2 rounded-lg bg-sky-50 px-2 py-1.5 text-[11px] text-sky-800">
               รายการวิชาเลือกท้ายเล่มหลักสูตร (ไม่ใช่แผนรายภาค) — เลือกเฉพาะวิชาที่ต้องการลงเพิ่ม
+            </p>
+          )}
+          {!catalog && planHint && (
+            <p className="mb-2 flex items-start gap-1.5 rounded-lg bg-sky-50 px-2 py-1.5 text-[11px] text-sky-800">
+              <Layers className="mt-px h-3 w-3 shrink-0" />
+              ปี {yearNo} ภาค {term?.term} ต้องเลือกแผน — เลือกแผนการศึกษาด้านบนให้ตรงกับแผนที่คุณเรียน
             </p>
           )}
           {!catalog && term.term !== defaultTerm && (
