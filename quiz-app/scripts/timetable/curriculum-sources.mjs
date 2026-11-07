@@ -338,4 +338,128 @@ export const FACULTIES = [
       },
     ],
   },
+
+  // Nursing (Hat Yai): "แผนการศึกษาหลักสูตรพยาบาลศาสตรบัณฑิต หลักสูตรปรับปรุง พ.ศ. 2567" linked from
+  // https://www.nur.psu.ac.th/nur/student_info.aspx. Years 3–4 are split into four student groups
+  // (ตอน 01–04, one credits column each) — each becomes a plan; all four add up to the stated 127.
+  // Not imported: หลักสูตร 2563 — its years 3–4 were re-planned from 1/2565 (Docs_03042566.pdf holds the
+  // new plan only as a side-by-side old/new comparison table), so neither the มคอ.2 plan nor the
+  // English-class plan (plan_2563_eng_edit.pdf, updated 9/6/2564) is current for years 3–4.
+  {
+    id: "nur",
+    faculty: "คณะพยาบาลศาสตร์",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะพยาบาลศาสตร์ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://www.nur.psu.ac.th/nur/student_info.aspx",
+    programs: [
+      {
+        id: "nursing", name: "พยาบาลศาสตร์", division: "คณะพยาบาลศาสตร์",
+        editions: [{
+          curriculumYear: 2567,
+          pdf: "https://www.nur.psu.ac.th/nur/file_courses/Docs_08042568.pdf",
+          statedTotal: 127, // "หลักสูตรพยาบาลศาสตรบัณฑิต (หลักสูตรปรับปรุง พ.ศ. 2567) จำนวน 127 หน่วยกิต"
+        }],
+      },
+    ],
+  },
+
+  // Law (Hat Yai): the มคอ.2 of each curriculum is embedded as a Drive PDF on
+  // https://law.psu.ac.th/index.php/course/bachelor-degree.html (the site rejects scripted requests,
+  // the Drive files don't). Both list the co-op plan (and 2564 the ASEAN-exchange plan) only for the
+  // terms that differ — "ในปีที่ 1 ถึง ปีที่ 3 ใช้แผนการศึกษาเดียวกับแผนการศึกษาปกติ" — so the rest is
+  // filled from แผนปกติ; co-op / exchange students "ไม่จำเป็นต้องลงทะเบียนในภาคฤดูร้อน" (year 3 summer).
+  // The third file on that page (โครงสร้างหลักสูตร 2569) has no plan.
+  {
+    id: "law",
+    faculty: "คณะนิติศาสตร์",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะนิติศาสตร์ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://law.psu.ac.th/index.php/course/bachelor-degree.html",
+    programs: [
+      {
+        id: "law", name: "นิติศาสตร์", division: "คณะนิติศาสตร์",
+        editions: [
+          {
+            curriculumYear: 2569,
+            drive: "1X7B9ieAAuMH2ckiCK8rJejymcRNAcyVm",
+            page: "https://law.psu.ac.th/index.php/course/bachelor-degree.html",
+            fill: { from: "ปกติ" },
+          },
+          {
+            curriculumYear: 2564,
+            drive: "1roEyPvTPe_zrae5KQKzm9YUWBr9VUQVL",
+            page: "https://law.psu.ac.th/index.php/course/bachelor-degree.html",
+            lineFixes: [
+              // a row whose "(สาระ 5)" wraps around its credits
+              [/\(สาระ 2\(\(2\)-0-4\)\s*$/, "(สาระ 5) 2((2)-0-4)"],
+              // exchange plan, year 4 term 2: the one row has no code
+              [/^(\s*)(ลงทะเบียนเรียนรายวิชาที่เกี่ยวกับกฎหมายภายในของประเทศ)/, "$1xxx-xxx $2"],
+            ],
+            renamePlans: { "แผน 2": "สหกิจศึกษา", "นักศึกษาที่เลือกเรียนรายวิชากฎหมาย": "ศึกษา ณ ต่างประเทศ" },
+            fill: { from: "ปกติ", except: ["3/3"] },
+          },
+        ],
+      },
+    ],
+  },
+
+  // Medicine (Hat Yai): curriculum documents linked from https://school.medicine.psu.ac.th/undergraduate-program/.
+  // Only years split into ภาคการศึกษา are imported — later clinical years are one block per year
+  // (กายภาพบำบัด 2568 year 4 "ตลอดปีการศึกษา" 20 หน่วยกิต; รังสีเทคนิค 2567 years 3–4, 34 + 21), which
+  // the app's terms can't hold (กายภาพบำบัด 2563 year 4: 29). Not imported:
+  //   - แพทยศาสตรบัณฑิต 2564 (all four แผนการศึกษา): every year is one block (ปีที่ 1 39, ปีที่ 2 41 …);
+  //   - ปฏิบัติการฉุกเฉินการแพทย์ 2565: only year 1 has terms ("ชั้นปีที่ 2-4 จัดการศึกษาเป็นปีการศึกษา");
+  //   - รังสีเทคนิค 2562 (doc2022110406.pdf): its text layer drops rows — every term reads 2–8 credits
+  //     short of its own "รวม".
+  {
+    id: "med",
+    faculty: "คณะแพทยศาสตร์",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะแพทยศาสตร์ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://school.medicine.psu.ac.th/undergraduate-program/",
+    programs: [
+      {
+        id: "physical-therapy", name: "กายภาพบำบัด", division: "สาขาวิชากายภาพบำบัด",
+        editions: [
+          { curriculumYear: 2568, drive: "1eEz1lUc1bkdXd6_rEhy3LaajTCrh7PTp", page: "https://school.medicine.psu.ac.th/undergraduate-program/" },
+          { curriculumYear: 2563, pdf: "https://school.medicine.psu.ac.th/wp-content/uploads/2022/11/doc2022110901.pdf" },
+        ],
+      },
+      {
+        id: "radiological-technology", name: "รังสีเทคนิค", division: "สาขาวิชารังสีวิทยา",
+        editions: [{ curriculumYear: 2567, drive: "1p-Mzs3KTTl4uucDHStUj0DWQuD4EF4fe", page: "https://school.medicine.psu.ac.th/undergraduate-program/" }],
+      },
+    ],
+  },
+
+  // International College (Hat Yai): CMDT's study-plan page https://cmdt-uic.psu.ac.th/study-plan/
+  // links the 2568 มคอ.2. Term totals there are bare "18 หน่วยกิต" lines and year 4 term 2 lists two
+  // groups side by side ("เลือกลงทะเบียนตามกลุ่มที่ 1 หรือ กลุ่มที่ 2"), so lineFixes restore one row per
+  // line. Not imported: CMDT 2563 (https://cmdt-uic.psu.ac.th/study-plan-2/ — its "แผนการศึกษาตามแผน
+  // การเรียนการสอนแบบโมดูล" lists modules per term, "เลือก M01.1 …", without course codes or credits).
+  {
+    id: "psuic",
+    faculty: "วิทยาลัยนานาชาติ",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "วิทยาลัยนานาชาติ มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตหาดใหญ่",
+    source: "https://uic.psu.ac.th/creative-media-and-digital-technologies/",
+    programs: [
+      {
+        id: "cmdt", name: "สื่อสร้างสรรค์และเทคโนโลยีดิจิทัล (นานาชาติ)", division: "วิทยาลัยนานาชาติ วิทยาเขตหาดใหญ่",
+        editions: [{
+          curriculumYear: 2568,
+          pdf: "https://cmdt-uic.psu.ac.th/wp-content/uploads/2026/05/หลักสูตรวท.บ. สื่อสร้างสรรค์และเทคโนโลยีดิจิทัล_นานาชาติ 2568 เพิ่มวิทยาเขตแล้ว.pdf",
+          lineFixes: [
+            [/^(\s+)(\d{1,2}) หน่วยกิต\s*$/, "$1รวม $2 หน่วยกิต"],
+            [/^(?:หมวดวิชา|กลุ่มวิชา)[ก-๙]+\s*$/, ""], // group headings (would be read as wrapped names)
+            [/^รายวิชาเลือก(\s+2\(\(x\)-y-z\))/, "xxx-xxx รายวิชาเลือก (หมวดวิชาศึกษาทั่วไป)$1"],
+            [/^\s*142-456 การออกแบบการจัดแสดงและการจัด\s+142-451 นานาชาติศึกษา 1 (3\(\(2\)-2-5\))\s*$/,
+              " 142-456 การออกแบบการจัดแสดงและการจัดนิทรรศการ (กลุ่มที่ 1)    6(0-18-0)\n 142-451 นานาชาติศึกษา 1 (กลุ่มที่ 2)    $1"],
+            [/^\s*นิทรรศการ 6\(0-18-0\)\s+142-452 นานาชาติศึกษา 2 (3\(\(2\)-2-5\))\s*$/,
+              " 142-452 นานาชาติศึกษา 2 (กลุ่มที่ 2)    $1\n    รวม 6 หน่วยกิต"],
+          ],
+        }],
+      },
+    ],
+  },
 ];

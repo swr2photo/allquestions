@@ -209,6 +209,8 @@ async function editionLines(ed) {
   else if (ed.drive) lines = pdfLines(await download(`https://drive.google.com/uc?export=download&id=${ed.drive}`, `drive-${ed.drive}.pdf`));
   else if (ed.sheet) lines = await sheetLines(ed.sheet);
   lines = lines.map(fixThaiPdfText);
+  // layout fixes for one document ([RegExp, replacement]; a replacement may split a line with "\n")
+  for (const [re, to] of ed.lineFixes ?? []) lines = lines.flatMap((l) => l.replace(re, to).split("\n"));
   if (ed.section) {
     const s = lines.findIndex((l) => ed.section.start.test(l));
     if (s < 0) throw new Error(`ไม่พบจุดเริ่ม section ${ed.section.start}`);
@@ -219,16 +221,113 @@ async function editionLines(ed) {
   return lines;
 }
 
+/**
+ * Edition options applied to the parsed plan (see curriculum-sources.mjs):
+ *   renamePlans: { "<parsed name>": "<name>" }
+ *   fill: { from: "ปกติ", except?: ["3/3"] } — the other plans only list the terms where they differ
+ *         ("แผนสหกิจศึกษาในปีที่ 1 ถึง 3 ใช้แผนเดียวกับแผนปกติ"): copy every year / term they lack from
+ *         `from` (minus "year/term" in `except`), then merge years that end up the same in every plan.
+ */
+export function finishPlan(plan, ed) {
+  let years = plan.years.map((y) => ({ ...y, ...(y.plan && ed.renamePlans?.[y.plan] ? { plan: ed.renamePlans[y.plan] } : {}) }));
+  if (ed.fill) {
+    const { from, except = [] } = ed.fill;
+    const base = years.filter((y) => y.plan === from);
+    if (!base.length) throw new Error(`fill: ไม่พบแผน ${from}`);
+    const others = [...new Set(years.map((y) => y.plan).filter((p) => p && p !== from))];
+    const copy = (t) => ({ ...t, courses: t.courses.map((c) => ({ ...c })) });
+    for (const p of others) {
+      for (const b of base) {
+        const terms = b.terms.filter((t) => !except.includes(`${b.year}/${t.term}`));
+        const own = years.find((y) => y.year === b.year && y.plan === p);
+        if (!own) years.push({ year: b.year, plan: p, terms: terms.map(copy) });
+        else {
+          for (const t of terms) if (!own.terms.some((x) => x.term === t.term)) own.terms.push(copy(t));
+          own.terms.sort((a, c) => a.term - c.term);
+        }
+      }
+    }
+    const plans = [from, ...others];
+    const merged = [];
+    for (const n of [...new Set(years.map((y) => y.year))]) {
+      const ys = years.filter((y) => y.year === n);
+      const same = ys.length === plans.length && ys.every((y) => y.plan && JSON.stringify(y.terms) === JSON.stringify(ys[0].terms));
+      merged.push(...(same ? [{ year: n, terms: ys[0].terms }] : ys));
+    }
+    years = merged.sort((a, b) => a.year - b.year || (a.plan ?? "").localeCompare(b.plan ?? "", "th"));
+  }
+  return { ...plan, years };
+}
+
+/**
+ * SIS course names (data/timetable/terms/*.json) replace a plan row's name when both are the same
+ * name apart from PDF glyph glitches — "สาหรับ" (ำ lost) / "พ้นื ฐาน" (marks out of place) / stray
+ * spaces. A plan name that only adds a note after the SIS name ("…* (Audit)", "… (สาระ 1)") keeps the
+ * note; a different name for the same code (curricula rename courses) is left alone.
+ */
+let SIS_NAMES = null;
+function sisNames() {
+  if (SIS_NAMES) return SIS_NAMES;
+  SIS_NAMES = new Map();
+  const dir = path.join(ROOT, "data", "timetable", "terms");
+  const files = fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith(".json")).sort() : [];
+  for (const f of files) {
+    for (const c of JSON.parse(fs.readFileSync(path.join(dir, f), "utf8")).courses ?? []) {
+      if (c.code && c.nameTh?.trim()) SIS_NAMES.set(c.code, c.nameTh.trim().replace(/\s+/g, " "));
+    }
+  }
+  return SIS_NAMES;
+}
+const nameKey = (s) => s.replace(/ำ/g, "า").replace(/[ัิ-ฺ็-๎\s*]/g, "").toLowerCase();
+const markCount = (s) => (s.match(/[ัิ-ฺ็-๎ำ]/g) ?? []).length;
+// spaces inside Thai words, a mark right after a space, ํ+า instead of ำ
+const glitches = (s) => (s.match(/[ก-๎] (?=[ก-๎])|\s[ัิ-ฺ็-๎]|ํา/g) ?? []).length;
+/** Is the SIS spelling `sis` a repaired version of the PDF spelling `pdf` (same letters)? */
+function sisIsCleaner(sis, pdf) {
+  const ms = markCount(sis);
+  const mp = markCount(pdf);
+  if (ms !== mp) return ms > mp; // PDFs lose marks (สาหรับ, น้า); a mark SIS lacks (คณภาพ) is SIS's typo
+  return glitches(sis) < glitches(pdf); // misplaced marks / split words; ties keep the plan's spelling
+}
+export function sisName(code, name) {
+  const sis = sisNames().get(code);
+  if (!sis || sis === name) return name;
+  const k = nameKey(sis);
+  const n = nameKey(name);
+  if (!k || !n.startsWith(k)) return name;
+  let i = 0;
+  for (let seen = 0; i < name.length && seen < k.length; i++) seen += nameKey(name[i]).length;
+  while (i < name.length && /[ัิ-ฺ็-๎]/.test(name[i])) i++; // marks trailing the last letter
+  const head = name.slice(0, i);
+  const rest = name.slice(i);
+  if (rest && !/^\s*[*(]/.test(rest)) return name; // the plan's name goes on: not the same course name
+  if (!sisIsCleaner(sis, head.trim())) return name;
+  // SIS names split words too ("…การวิเคราะห์ เชิงธุรกิจ"): keep the plan's unsplit words
+  const better = /[ก-๎] (?=[ก-๎])/.test(head.trim()) ? sis : sis.replace(/([ก-๎]) (?=[ก-๎])/g, "$1");
+  return rest ? `${better}${rest.trimStart().startsWith("*") ? rest.trimStart() : ` ${rest.trimStart()}`}` : better;
+}
+
 // ---------------------------------------------------------------------------------------------
 
 async function importFaculty(fac) {
   const programs = [];
   const report = [];
+  let renamed = 0; // rows whose name came from SIS (see sisName)
   for (const p of fac.programs) {
     const editions = [];
     for (const ed of p.editions) {
       const lines = await editionLines(ed);
-      const plan = parsePlan(lines);
+      const plan = finishPlan(parsePlan(lines), ed);
+      for (const y of plan.years) {
+        for (const t of y.terms) {
+          for (const c of t.courses) {
+            if (c.placeholder) continue;
+            const better = sisName(c.code, c.name);
+            if (better !== c.name) renamed++;
+            c.name = better;
+          }
+        }
+      }
       const courses = plan.years.reduce((n, y) => n + y.terms.reduce((m, t) => m + t.courses.length, 0), 0);
       const totals = planTotals(plan.years);
       const stated = ed.statedTotal ?? statedTotal(lines);
@@ -247,10 +346,22 @@ async function importFaculty(fac) {
 
   const outFile = path.join(OUT_DIR, `${fac.id}.json`);
   fs.mkdirSync(OUT_DIR, { recursive: true });
-  fs.writeFileSync(outFile, JSON.stringify({ faculty: fac.title, programs }, null, 2));
-  console.log(`→ ${path.relative(ROOT, outFile)} (${programs.length} หลักสูตร)`);
+  writeOutput(outFile, JSON.stringify({ faculty: fac.title, programs }, null, 2));
+  console.log(`→ ${path.relative(ROOT, outFile)} (${programs.length} หลักสูตร${renamed ? `, ชื่อวิชาจาก SIS ${renamed} แถว` : ""})`);
   writeCurriculaIndex(fac, programs.length);
   return report;
+}
+
+/** Windows sometimes refuses a write for a moment (a watcher still has the file open): retry. */
+function writeOutput(file, text) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return fs.writeFileSync(file, text);
+    } catch (e) {
+      if (attempt >= 12 || !["UNKNOWN", "EBUSY", "EPERM"].includes(e.code)) throw e;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 250 * attempt);
+    }
+  }
 }
 
 /** public/timetable/curricula/index.json — faculties that have study plans (read by the app). */
@@ -275,7 +386,7 @@ function writeCurriculaIndex(fac, programCount) {
   index.faculties = programCount ? [...rest, entry] : rest;
   const order = FACULTIES.map((f) => f.id);
   index.faculties.sort((a, b) => (order.indexOf(a.id) + 1 || 999) - (order.indexOf(b.id) + 1 || 999));
-  fs.writeFileSync(indexFile, JSON.stringify(index, null, 2));
+  writeOutput(indexFile, JSON.stringify(index, null, 2));
 }
 
 async function main() {

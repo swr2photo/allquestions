@@ -46,7 +46,8 @@ export function skeleton(s) {
   return { text, map };
 }
 
-const CODE_SRC = String.raw`(?:[\dxX]{3}-[\dxX]{3}[A-Za-z0-9]*|GE\s?\d[AB]?|[.…]{2,}-[.…]+)`;
+// (an en dash sometimes stands in for the hyphen: "890–xxx")
+const CODE_SRC = String.raw`(?:[\dxX]{3}[-–][\dxX]{3}[A-Za-z0-9]*|GE\s?\d[AB]?|[.…]{2,}-[.…]+)`;
 // credits: "3((2)-3-4)", "1(0-3-0)", "3(x-y-z)", or "3 หน่วยกิต"
 // (a range "2-3 หน่วยกิต" counts as its upper bound)
 const CREDITS_SRC = String.raw`(\d{1,2}(?:\s*-\s*\d{1,2})?)\s*(?=\(|$|\s{2,}|หน่วย)`;
@@ -172,7 +173,7 @@ function normCode(code) {
   const ge = code.match(/^GE\s?(\d[AB]?)$/);
   if (ge) return `xxx-xxxG${ge[1]}`;
   if (/^[.…]/.test(code)) return "xxx-xxx";
-  return code.replace(/^([\dxX]{3}-[\dxX]{3})/, (s) => s.toLowerCase());
+  return code.replace(/^([\dxX]{3})–/, "$1-").replace(/^([\dxX]{3}-[\dxX]{3})/, (s) => s.toLowerCase());
 }
 function cleanName(code, name) {
   let n = name.replace(/\s+/g, " ").replace(/\s*\*+$/, "").trim();
@@ -242,6 +243,8 @@ export function parsePlan(lines) {
   const sectionLines = lines.filter((l, i) => i >= start - 4 && planLine(l.trim()) && YEAR_SK.test(nextLine(i))).length;
   const useSections = sectionLines >= 2;
   if (useSections) for (let i = Math.max(0, start - 4); i < start; i++) sectionPlan = planLine(lines[i].trim()) ?? sectionPlan;
+  let sections = null; // "ตอน 01  ตอน 02 …" column labels of the open term (each column is a plan)
+  let sectionRows = null; // rows added from the last section-column line (for wrapped names)
   let pending = null; // code line still waiting for its credits
   let last = null; // last row added (for wrapped names)
   let group = null; // "สาระที่ 6 ภาษาและการสื่อสาร  2 หน่วยกิต" heading and how many rows followed it
@@ -316,6 +319,7 @@ export function parsePlan(lines) {
       block = blockFor(year, plan);
       term = null;
       twoColumn = null;
+      sections = null;
       closed = false;
       pendingPlan = null;
       resetRows();
@@ -366,6 +370,7 @@ export function parsePlan(lines) {
       block = blockFor(year, plan);
       const wasClosed = closed;
       closed = false;
+      sections = null;
       resetRows();
       if (twoCol) {
         const at = (h) => map[sk.indexOf(h[0], h.index)] ?? h.index;
@@ -385,8 +390,65 @@ export function parsePlan(lines) {
       continue;
     }
 
+    // section columns (Nursing): "รหัสวิชา  ชื่อรายวิชา  ตอน 01  ตอน 02  ตอน 03  ตอน 04" — each column
+    // is a group of students with its own credits per row ("-" = not taken this term) and its own
+    // "รวม 21  22  18  22"; every column becomes a plan ("ตอน 01" …) for this term.
+    if (term != null && !closed) {
+      const secs = [...trimmed.matchAll(/ตอน\s*(\d{1,2})/g)];
+      if (secs.length >= 2 && !lineItems(line).length) {
+        flushGroup();
+        sections = secs.map((m) => `ตอน ${m[1].padStart(2, "0")}`);
+        sectionRows = null;
+        resetRows();
+        continue;
+      }
+    }
+    if (sections) {
+      const planOf = (k) => withMajor(yearPlan, sections[k]);
+      if (TOTAL_LINE_SK.test(skt)) {
+        const nums = [...trimmed.replace(/^\S*รวม\S*/, "").replace(/\([^)]*\)?/g, " ").matchAll(/(?<![\d-])\d{1,3}(?![\d-])/g)];
+        if (nums.length === sections.length) nums.forEach((n, k) => blockFor(year, planOf(k)).declared.set(term, Number(n[0])));
+        else warnings.push(`ปี ${year} ภาค ${term}: อ่านยอดรวมแยกตอนไม่ได้ (“${trimmed}”)`);
+        closed = true;
+        sections = null;
+        sectionRows = null;
+        continue;
+      }
+      const row = line.match(new RegExp(`^\\s*-?(${CODE_SRC})\\**\\s+(\\S.*)$`));
+      if (row) {
+        let rest = row[2];
+        const cells = [];
+        let m;
+        while (cells.length < sections.length && (m = rest.match(/\s+(\d{1,2}\s?\([\d()xyzXYZ-]*|-+)\s*$/))) {
+          cells.unshift(m[1]);
+          rest = rest.slice(0, m.index);
+        }
+        if (cells.length !== sections.length) {
+          warnings.push(`ปี ${year} ภาค ${term}: แถว “${trimmed}” มี ${cells.length} ช่อง ไม่ตรงกับ ${sections.length} ตอน`);
+          sectionRows = null;
+          continue;
+        }
+        const keep = block;
+        sectionRows = [];
+        cells.forEach((cell, k) => {
+          if (/^-+$/.test(cell)) return;
+          block = blockFor(year, planOf(k));
+          const added = add(term, row[1], rest, Number(cell.match(/^\d+/)[0]), 0);
+          if (added) sectionRows.push(added.row);
+        });
+        block = keep;
+        continue;
+      }
+      // "(รายวิชาเลือกเสรี)" / the rest of a wrapped name under the row
+      if (sectionRows?.length && THAI_RE.test(trimmed) && !/^(\*|หมายเหตุ)/.test(trimmed)) {
+        for (const r of sectionRows) r.name = `${r.name} ${trimmed.replace(/\s+/g, " ")}`;
+      }
+      sectionRows = null;
+      continue;
+    }
+
     // totals
-    if (TOTAL_LINE_SK.test(skt) || (/รวม/.test(skt) && !lineItems(line).length && [...sk.matchAll(TOTAL_SK)].length)) {
+    if (TOTAL_LINE_SK.test(skt) ||(/รวม/.test(skt) && !lineItems(line).length && [...sk.matchAll(TOTAL_SK)].length)) {
       flushGroup();
       const totals = [...sk.matchAll(TOTAL_SK)].map((m) => ({ n: Number(m[2] ?? m[1]), at: map[m.index] ?? m.index }));
       if (block && term != null && !closed && totals.length) {
@@ -576,7 +638,8 @@ export function statedTotal(lines) {
   const end = findStart(lines);
   for (let i = 0; i < (end < 0 ? lines.length : end); i++) {
     const sk = skeleton(`${lines[i]} ${lines[i + 1] ?? ""}`).text;
-    const m = sk.match(/หนวยกตรวมตลอดหลกสตร(?:\s*[^\d\s]{0,12}\s*)(\d{3})(?!\d)/);
+    // "จำนวนหน่วยกิตรวมตลอดหลักสูตร 128" / "จำนวนหน่วยกิต   รวมตลอดหลักสูตรไม่น้อยกว่า 125"
+    const m = sk.match(/หนวยกต\s*รวมตลอดหลกสตร(?:\s*[^\d\s]{0,12}\s*)(\d{3})(?!\d)/);
     if (m && Number(m[1]) >= 90 && Number(m[1]) <= 200) return Number(m[1]);
   }
   return null;
