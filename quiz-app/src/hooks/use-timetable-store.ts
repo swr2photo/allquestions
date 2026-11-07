@@ -136,6 +136,11 @@ function outbound(s: TimetableStore): TimetableStore {
   return { ...s, registration: s.registration && s.registration.records.length === 0 ? s.registration : undefined };
 }
 
+/** fingerprint of what the server holds, so local and remote compare like-for-like */
+function fingerprintOf(s: TimetableStore): string {
+  return storeFingerprint(outbound(s));
+}
+
 function schedulePush(delay = 1200) {
   if (!state.user) return;
   clearTimeout(pushTimer);
@@ -149,7 +154,7 @@ async function push(keepalive = false) {
     return;
   }
   const snapshot = state.store;
-  if (storeFingerprint(snapshot) === lastPushed) {
+  if (fingerprintOf(snapshot) === lastPushed) {
     if (state.status !== "synced") patch({ status: "synced" });
     return;
   }
@@ -169,10 +174,10 @@ async function push(keepalive = false) {
     }
     if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
     const server = sanitizeStore(json.store);
-    lastPushed = storeFingerprint(server);
+    lastPushed = fingerprintOf(server);
     const merged = mergeStores(state.store, server);
     applyStore(merged, false);
-    const dirty = storeFingerprint(merged) !== lastPushed;
+    const dirty = fingerprintOf(merged) !== lastPushed;
     patch({ status: dirty ? "syncing" : "synced", lastSyncedAt: Date.now(), error: undefined });
     if (dirty) schedulePush(400);
   } catch (e) {
@@ -198,10 +203,10 @@ async function pull() {
     const json = await res.json();
     if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
     const remote = json.store ? sanitizeStore(json.store) : null;
-    lastPushed = remote ? storeFingerprint(remote) : "";
+    lastPushed = remote ? fingerprintOf(remote) : "";
     const merged = remote ? mergeStores(state.store, remote) : state.store;
     applyStore(merged, false);
-    if (storeFingerprint(merged) !== lastPushed) await push();
+    if (fingerprintOf(merged) !== lastPushed) await push();
     else patch({ status: "synced", lastSyncedAt: Date.now(), error: undefined });
   } catch (e) {
     patch({ status: "error", error: e instanceof Error ? e.message : "เชื่อมต่อฐานข้อมูลไม่สำเร็จ" });
