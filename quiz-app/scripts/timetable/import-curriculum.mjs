@@ -9,7 +9,8 @@
  *            --refresh         ignore the cache and download again
  *            --report <file>   also write per-program totals / warnings as JSON
  *
- * Faculties now imported (all วิทยาเขตหาดใหญ่): sci, eng, agro, fms, natres, libarts — sources and the
+ * Faculties now imported: Hat Yai (sci, eng, agro, fms, natres, libarts, nur, law, med, psuic), Pattani (pn-*),
+ * Trang (trang-*) and Surat Thani (surat-scit) — sources and the
  * programs that were skipped (and why) are listed in curriculum-sources.mjs. To add a faculty, add an
  * entry there and run this script for its id; the app reads index.json and needs no change.
  *
@@ -108,9 +109,18 @@ function cacheName(key) {
 async function download(url, key) {
   const file = path.join(CACHE_DIR, cacheName(key));
   if (!REFRESH && fs.existsSync(file) && fs.statSync(file).size > 0) return file;
-  const res = await fetch(new URL(url).href, { headers: UA, redirect: "follow" });
-  if (!res.ok) throw new Error(`ดาวน์โหลดไม่สำเร็จ ${res.status}: ${url}`);
-  const buf = Buffer.from(await res.arrayBuffer());
+  let buf;
+  for (let attempt = 1; !buf; attempt++) {
+    try {
+      const res = await fetch(new URL(url).href, { headers: UA, redirect: "follow" });
+      if (!res.ok) throw Object.assign(new Error(`ดาวน์โหลดไม่สำเร็จ ${res.status}: ${url}`), { final: res.status < 500 });
+      buf = Buffer.from(await res.arrayBuffer());
+    } catch (e) {
+      // some faculty servers drop large downloads now and then ("other side closed")
+      if (e.final || attempt >= 4) throw e;
+      await new Promise((r) => setTimeout(r, 1500 * attempt));
+    }
+  }
   fs.mkdirSync(CACHE_DIR, { recursive: true });
   fs.writeFileSync(file, buf);
   return file;

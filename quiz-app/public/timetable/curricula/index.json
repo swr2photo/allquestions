@@ -89,6 +89,60 @@
       "programs": 1,
       "source": "https://uic.psu.ac.th/creative-media-and-digital-technologies/",
       "updatedAt": "2026-11-07T05:59:14.742Z"
+    },
+    {
+      "id": "pn-scitech",
+      "faculty": "คณะวิทยาศาสตร์และเทคโนโลยี",
+      "campus": "วิทยาเขตปัตตานี",
+      "file": "/timetable/curricula/pn-scitech.json",
+      "programs": 2,
+      "source": "https://curriculum.pn.psu.ac.th/curriculumn_2022/?page=course-study_guide",
+      "updatedAt": "2026-11-07T06:21:11.308Z"
+    },
+    {
+      "id": "pn-huso",
+      "faculty": "คณะมนุษยศาสตร์และสังคมศาสตร์",
+      "campus": "วิทยาเขตปัตตานี",
+      "file": "/timetable/curricula/pn-huso.json",
+      "programs": 3,
+      "source": "https://curriculum.pn.psu.ac.th/curriculumn_2022/?page=course-study_guide",
+      "updatedAt": "2026-11-07T06:21:14.743Z"
+    },
+    {
+      "id": "pn-cis",
+      "faculty": "คณะวิทยาการอิสลาม",
+      "campus": "วิทยาเขตปัตตานี",
+      "file": "/timetable/curricula/pn-cis.json",
+      "programs": 2,
+      "source": "https://curriculum.pn.psu.ac.th/curriculumn_2022/?page=course-study_guide",
+      "updatedAt": "2026-11-07T06:21:16.929Z"
+    },
+    {
+      "id": "trang-fcm",
+      "faculty": "คณะพาณิชยศาสตร์และการจัดการ",
+      "campus": "วิทยาเขตตรัง",
+      "file": "/timetable/curricula/trang-fcm.json",
+      "programs": 7,
+      "source": "https://cm.trang.psu.ac.th/course/bachelor-degree",
+      "updatedAt": "2026-11-07T06:21:32.223Z"
+    },
+    {
+      "id": "trang-arch",
+      "faculty": "คณะสถาปัตยกรรมศาสตร์",
+      "campus": "วิทยาเขตตรัง",
+      "file": "/timetable/curricula/trang-arch.json",
+      "programs": 1,
+      "source": "https://arch.trang.psu.ac.th/หลักสูตร/ปริญญาตรี/",
+      "updatedAt": "2026-11-07T06:21:33.432Z"
+    },
+    {
+      "id": "surat-scit",
+      "faculty": "คณะวิทยาศาสตร์และเทคโนโลยีอุตสาหกรรม",
+      "campus": "วิทยาเขตสุราษฎร์ธานี",
+      "file": "/timetable/curricula/surat-scit.json",
+      "programs": 5,
+      "source": "https://scit.surat.psu.ac.th/p_majorall?id=1",
+      "updatedAt": "2026-11-07T06:22:00.977Z"
     }
   ]
 }

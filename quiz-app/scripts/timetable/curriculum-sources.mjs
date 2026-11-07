@@ -462,4 +462,129 @@ export const FACULTIES = [
       },
     ],
   },
+
+  // ---------------------------------------------------------------------------------------------
+  // Pattani: the campus curriculum office (งานหลักสูตรและส่งเสริมการเรียนรู้) publishes every
+  // program's คู่มือการศึกษา per entry year at https://curriculum.pn.psu.ac.th/curriculumn_2022/?page=course-study_guide
+  // (documents/study_guide/bachelor/<entry year>/<faculty>/…). Only guides whose plan reads back to
+  // the guide's own "หน่วยกิตรวมตลอดหลักสูตร" and that name their curriculum year are imported (the
+  // 2569 guide, or the 2568 one for the previous curriculum). Pattani programs not listed here have no usable guide or total yet.
+  ...pattaniFaculties(),
+
+  // Trang — Commerce and Management: each program page under https://cm.trang.psu.ac.th/course/bachelor-degree
+  // links its current มคอ.2 ("สำหรับนักศึกษารหัส 69 เป็นต้นไป") and the previous one ("…รวมไฟล์.pdf").
+  // Curriculum years are the ones those pages state. Not imported:
+  //   - ภาษาอังกฤษธุรกิจ 2569 (BE-69-trang.pdf: plan reads 121 of the stated 124) and 2564 (103 of 129);
+  //   - บัญชีบัณฑิต 2568 (3-ACC-68.pdf: no year/term plan table is found);
+  //   - การจัดการสารสนเทศและเทคโนโลยีดิจิทัล 2564 (2.1-IDTM-2564: 125 of 126).
+  {
+    id: "trang-fcm",
+    faculty: "คณะพาณิชยศาสตร์และการจัดการ",
+    campus: "วิทยาเขตตรัง",
+    title: "คณะพาณิชยศาสตร์และการจัดการ มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตตรัง",
+    source: "https://cm.trang.psu.ac.th/course/bachelor-degree",
+    programs: [
+      ["accounting", "บัญชีบัณฑิต", "accounting", [[2564, "2025/10/1-ACC-2564-รวมไฟล์.pdf"]]],
+      ["business-information-technology", "บริหารธุรกิจ สาขาวิชาเทคโนโลยีสารสนเทศทางธุรกิจ", "business-information-technology",
+        [[2568, "2024/10/1.-หลักสูตร-BIT-2568.pdf"]]],
+      ["digital-business", "บริหารธุรกิจ สาขาวิชาธุรกิจดิจิทัล", "business-information-technology",
+        [[2564, "2025/11/2.2-DBiz-2564-รวมไฟล์-1.pdf"]]],
+      // 2564: "การเงิน ประกันภัยและการจัดการความเสี่ยง", the same program before its 2569 revision
+      ["insurance-risk", "บริหารธุรกิจ สาขาวิชาการบริหารธุรกิจประกันภัยและการจัดการความเสี่ยง", "ibarm",
+        [[2569, "2025/07/IBARM-69-trang.pdf"], [2564, "2025/11/5-FIRM-2564-รวมไฟล์.pdf"]]],
+      ["marketing", "บริหารธุรกิจ สาขาวิชาการตลาด", "marketing",
+        [[2569, "2025/07/MKT-69-trang.docx.pdf"], [2564, "2025/11/4-MKT-2564-รวมไฟล์-เว็บ.pdf"]]],
+      ["public-management", "รัฐประศาสนศาสตร์ สาขาวิชาการจัดการรัฐกิจ", "public-management",
+        [[2568, "2025/06/4.-PA-68.pdf"], [2563, "2025/11/8-PA-2563-รวมไฟล์.pdf"]]],
+      // 2564: "การจัดการการท่องเที่ยว", the same program before its 2569 revision
+      ["tourism-hotel", "บริหารธุรกิจ สาขาวิชาการจัดการการท่องเที่ยวและการโรงแรม", "thm",
+        [[2569, "2025/11/หลักสูตร-TRM-2569.pdf"], [2564, "2025/11/3-TRM-2564-รวมไฟล์-เว็บ.pdf"]]],
+    ].map(([id, name, page, eds]) => ({
+      id, name, division: "คณะพาณิชยศาสตร์และการจัดการ",
+      editions: eds.map(([curriculumYear, file]) => ({
+        curriculumYear,
+        pdf: `https://cm.trang.psu.ac.th/wp-content/uploads/${file}`,
+        page: `https://cm.trang.psu.ac.th/course/bachelor-degree/${page}`,
+      })),
+    })),
+  },
+
+  // Trang — Architecture: "หลักสูตรสถาปัตยกรรมศาสตรบัณฑิต หลักสูตรปรับปรุง พ.ศ. 2565" (5 years, 169 หน่วยกิต)
+  // linked from the faculty's ปริญญาตรี page. Not imported: plan_arch_61.pdf (2561 — reads 121 of 171).
+  {
+    id: "trang-arch",
+    faculty: "คณะสถาปัตยกรรมศาสตร์",
+    campus: "วิทยาเขตตรัง",
+    title: "คณะสถาปัตยกรรมศาสตร์ มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตตรัง",
+    source: "https://arch.trang.psu.ac.th/หลักสูตร/ปริญญาตรี/",
+    programs: [
+      {
+        // the SIS department of most of the program's 997- codes (the rest: "คณะสถาปัตยกรรมศาสตร์")
+        id: "architecture", name: "สถาปัตยกรรม", division: "โครงการจัดตั้งคณะสถาปัตยกรรมศาสตร์",
+        editions: [{ curriculumYear: 2565, pdf: "https://arch.trang.psu.ac.th/wp-content/uploads/2023/10/1.-หลักสูตร-ARCH-2565-ใส่เว็บ_คณะ.docx.pdf" }],
+      },
+    ],
+  },
+
+  // Surat Thani — Science and Industrial Technology: each major's page https://scit.surat.psu.ac.th/p_major?id=N
+  // links its part of the faculty's คู่มือการศึกษาประจำปีการศึกษา 2569, whose program list gives the
+  // curricula (2569 revisions, การจัดการงานวิศวกรรม 2565, การจัดการนวัตกรรมการค้าสมัยใหม่ 2568).
+  // Not imported: เคมีเพื่ออุตสาหกรรม (id=4: plan reads 126 of the stated 132); เทคโนโลยีการจัดการ
+  // สิ่งแวดล้อม (id=8) and อาชีวอนามัยและความปลอดภัย (id=9): their co-op plans read 131 / 142 against
+  // 134 / 139 — the year-3 summer practical of the other plan is printed as shared.
+  // คณะศิลปศาสตร์และวิทยาการจัดการ and คณะนวัตกรรมการเกษตร ประมง และอาหาร: not attempted yet.
+  {
+    id: "surat-scit",
+    faculty: "คณะวิทยาศาสตร์และเทคโนโลยีอุตสาหกรรม",
+    campus: "วิทยาเขตสุราษฎร์ธานี",
+    title: "คณะวิทยาศาสตร์และเทคโนโลยีอุตสาหกรรม มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตสุราษฎร์ธานี",
+    source: "https://scit.surat.psu.ac.th/p_majorall?id=1",
+    programs: [
+      ["information-technology", "เทคโนโลยีสารสนเทศ", 1, 2569, "MAJOR_FILE_MN_6a320b892a652.pdf"],
+      ["rubber-industry-management", "การจัดการอุตสาหกรรมยาง", 7, 2569, "MAJOR_FILE_MN_6a320bcfcedc2.pdf"],
+      ["wood-product-technology", "เทคโนโลยีและการพัฒนาผลิตภัณฑ์ไม้", 15, 2569, "MAJOR_FILE_MN_6a320b338dea5.pdf"],
+      ["engineering-management", "วิศวกรรมศาสตร์ สาขาวิชาการจัดการงานวิศวกรรม", 10, 2565, "MAJOR_FILE_MN_6a320c1fe7d50.pdf"],
+      ["modern-trade-innovation", "เทคโนโลยีบัณฑิต สาขาวิชาการจัดการนวัตกรรมการค้าสมัยใหม่", 13, 2568, "MAJOR_FILE_MN_6a320b53b9ece.pdf"],
+    ].map(([id, name, n, curriculumYear, file]) => ({
+      id, name, division: "คณะวิทยาศาสตร์และเทคโนโลยีอุตสาหกรรม",
+      editions: [{ curriculumYear, pdf: `https://scit.surat.psu.ac.th/source/images/upload/${file}`, page: `https://scit.surat.psu.ac.th/p_major?id=${n}` }],
+    })),
+  },
 ];
+
+function pattaniFaculties() {
+  const guide = (path) => `https://curriculum.pn.psu.ac.th/curriculumn_2022/documents/study_guide/bachelor/${path}`;
+  const page = "https://curriculum.pn.psu.ac.th/curriculumn_2022/?page=course-study_guide";
+  const faculty = (id, name, programs) => ({
+    id,
+    faculty: name,
+    campus: "วิทยาเขตปัตตานี",
+    title: `${name} มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตปัตตานี`,
+    source: page,
+    programs: programs.map(([pid, pname, division, eds, extra = {}]) => ({
+      id: pid, name: pname, division,
+      editions: eds.map(([curriculumYear, path]) => ({ curriculumYear, pdf: guide(path), page, ...extra })),
+    })),
+  });
+  return [
+    faculty("pn-scitech", "คณะวิทยาศาสตร์และเทคโนโลยี", [
+      ["food-science-nutrition", "วิทยาศาสตร์การอาหารและโภชนาการ", "ภาควิชาวิทยาศาสตร์การอาหารและโภชนาการ",
+        [[2567, "2569/Science/69_FoodSci&Nutrtion.pdf"]]],
+      ["physics", "ฟิสิกส์", "ภาควิชาวิทยาศาสตร์", [[2565, "2569/Science/69_Physics.pdf"]], {
+        // a stray "แผนสหกิจศึกษา" line right under "ปี ที่ 4 แผนฝึกประสบการณ์"
+        lineFixes: [[/^แผนสหกิจศึกษา\s*$/, ""]],
+        renamePlans: { "ฝึ กประสบการณ์": "ฝึกประสบการณ์" },
+      }],
+    ]),
+    faculty("pn-huso", "คณะมนุษยศาสตร์และสังคมศาสตร์", [
+      ["geography", "ภูมิศาสตร์", "ภาควิชาภูมิศาสตร์", [[2569, "2569/Human&Social/69_Geography.pdf"]]],
+      ["information-science", "สารสนเทศศาสตร์", "ภาควิชาบรรณารักษศาสตร์และสารนิเทศศาสตร์", [[2569, "2569/Human&Social/69_Info.pdf"]]],
+      ["entrepreneurial-economics", "เศรษฐศาสตร์การประกอบการ", "คณะมนุษยศาสตร์และสังคมศาสตร์", [[2569, "2569/Human&Social/69_EntrepreneurialEco.pdf"]]],
+    ]),
+    faculty("pn-cis", "คณะวิทยาการอิสลาม", [
+      ["islamic-business-innovation", "บริหารธุรกิจ สาขาวิชานวัตกรรมธุรกิจอิสลาม", "วิทยาลัยอิสลามศึกษา",
+        [[2569, "2569/Islamic/69_IslamicBusinessInno.pdf"]]],
+      ["teaching-islamic-studies", "การสอนอิสลามศึกษา", "คณะวิทยาการอิสลาม", [[2567, "2569/Islamic/69_TeachingIslamicStudies.pdf"]]],
+    ]),
+  ];
+}
