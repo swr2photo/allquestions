@@ -1,7 +1,7 @@
 // Shared AI provider health check with caching
 // Used by both /api/ai/health and /api/ai/chat for auto mode
 
-export type ProviderId = "gemini" | "claude" | "openrouter" | "thaillm" | "groq" | "github" | "moonshot";
+export type ProviderId = "gemini" | "claude" | "openrouter" | "thaillm" | "groq" | "github" | "moonshot" | "nvidia";
 
 export interface ProviderDetail {
   id: ProviderId;
@@ -22,6 +22,7 @@ export interface HealthResult {
   groq: boolean;
   github: boolean;
   moonshot: boolean;
+  nvidia: boolean;
   openrouterCredits: number; // remaining credits on OpenRouter
   providers: ProviderDetail[];
 }
@@ -193,6 +194,26 @@ async function checkMoonshot(apiKey: string): Promise<{ ok: boolean; latency: nu
   return { ok, latency: latencyMs, msg: ok ? "ปกติ" : `ผิดพลาด (HTTP ${res.status})` };
 }
 
+async function checkNvidia(apiKey: string): Promise<{ ok: boolean; latency: number; msg: string }> {
+  const { res, latencyMs, error } = await timedFetch(
+    "https://integrate.api.nvidia.com/v1/chat/completions",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+      body: JSON.stringify({ 
+        model: "moonshotai/kimi-k2.5", 
+        messages: [{ role: "user", content: "hi" }], 
+        max_tokens: 1,
+        chat_template_kwargs: { thinking: false }
+      }),
+    },
+    60000
+  );
+  if (!res) return { ok: false, latency: latencyMs, msg: error || "เชื่อมต่อไม่สำเร็จ" };
+  const ok = res.status === 200;
+  return { ok, latency: latencyMs, msg: ok ? "ปกติ" : `ผิดพลาด (HTTP ${res.status})` };
+}
+
 export async function getProviderHealth(): Promise<HealthResult> {
   // Return cached if fresh
   if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_TTL) {
@@ -206,9 +227,10 @@ export async function getProviderHealth(): Promise<HealthResult> {
   const groqKey = process.env.GROQ_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
   const moonshotKey = process.env.MOONSHOT_API_KEY;
+  const nvidiaKey = process.env.NVIDIA_API_KEY;
   const now = Date.now();
 
-  const [geminiResult, claudeResult, orResult, thaillmResult, groqResult, githubResult, moonshotResult] = await Promise.all([
+  const [geminiResult, claudeResult, orResult, thaillmResult, groqResult, githubResult, moonshotResult, nvidiaResult] = await Promise.all([
     geminiKey ? checkGemini(geminiKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     claudeKey ? checkClaude(claudeKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     openRouterKey ? checkOpenRouter(openRouterKey) : Promise.resolve({ ok: false, credits: 0, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
@@ -216,6 +238,7 @@ export async function getProviderHealth(): Promise<HealthResult> {
     groqKey ? checkGroq(groqKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
     githubToken ? checkGitHub(githubToken) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า GitHub Token" }),
     moonshotKey ? checkMoonshot(moonshotKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
+    nvidiaKey ? checkNvidia(nvidiaKey) : Promise.resolve({ ok: false, latency: 0, msg: "ยังไม่ได้ตั้งค่า API Key" }),
   ]);
 
   const providers: ProviderDetail[] = [
@@ -289,6 +312,16 @@ export async function getProviderHealth(): Promise<HealthResult> {
       message: moonshotResult.msg,
       checkedAt: now,
     },
+    {
+      id: "nvidia",
+      name: "Nvidia API",
+      configured: !!nvidiaKey,
+      online: nvidiaResult.ok,
+      latencyMs: nvidiaKey ? nvidiaResult.latency : null,
+      credits: null,
+      message: nvidiaResult.msg,
+      checkedAt: now,
+    },
   ];
 
   const result: HealthResult = {
@@ -299,6 +332,7 @@ export async function getProviderHealth(): Promise<HealthResult> {
     groq: groqResult.ok,
     github: githubResult.ok,
     moonshot: moonshotResult.ok,
+    nvidia: nvidiaResult.ok,
     openrouterCredits: orResult.credits,
     providers,
   };
@@ -322,10 +356,16 @@ export function pickAutoModel(
   hasGroqKey: boolean = false,
   hasGitHubToken: boolean = false,
   hasMoonshotKey: boolean = false,
+  hasNvidiaKey: boolean = false,
 ): string {
   // === STRATEGY: Prioritize FREE (0-credit) models first ===
   
-  // 1. Gemini Flash (Direct) - Very fast, Free, and natively supports Files/Images
+  // 1. Nvidia (Kimi K2.5) - Powerful Reasoning & Free
+  if (hasNvidiaKey && health.nvidia) {
+    return "nvidia/moonshotai/kimi-k2.5";
+  }
+
+  // 2. Gemini Flash (Direct) - Very fast, Free, and natively supports Files/Images
   if (hasGeminiKey && health.gemini) {
     return "gemini-2.0-flash";
   }

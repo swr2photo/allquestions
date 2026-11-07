@@ -66,6 +66,7 @@ export async function POST(request: NextRequest) {
   const groqApiKey = process.env.GROQ_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
   const moonshotApiKey = process.env.MOONSHOT_API_KEY;
+  const nvidiaApiKey = process.env.NVIDIA_API_KEY;
 
   const health = await getProviderHealth();
   let modelToUse = requestedModel || "auto";
@@ -82,7 +83,8 @@ export async function POST(request: NextRequest) {
       !!thaillmApiKey,
       !!groqApiKey,
       !!githubToken,
-      !!moonshotApiKey
+      !!moonshotApiKey,
+      !!nvidiaApiKey
     );
   }
 
@@ -114,10 +116,36 @@ export async function POST(request: NextRequest) {
     quizContext = courses.flatMap(c => c.quizzes.map(q => `## ${c.title} > ${q.title}\n${q.questions.map((qu, idx) => `Q${idx+1}: ${qu.text}`).join("\n")}`)).join("\n\n").slice(0, 18000);
   }
 
+  // Extract current project state from history for Canvas mode
+  let projectContext = "";
+  if (canvasMode) {
+    const lastAssistantMsg = messages.filter((m: any) => m.role === "assistant").pop();
+    if (lastAssistantMsg) {
+      // Find the last canvas block and list its files
+      const fileRegex = /<file\s+path=["']([^"']+)["'][^>]*?>/gi;
+      let match;
+      const filesFound = [];
+      while ((match = fileRegex.exec(lastAssistantMsg.content)) !== null) {
+        filesFound.push(match[1]);
+      }
+      if (filesFound.length > 0) {
+        projectContext = `\nCURRENT PROJECT FILES:\n${filesFound.map(f => `- ${f}`).join("\n")}\nYou can read, edit, or delete these files by path. To delete, use <file path="name" action="delete"></file>.`;
+      }
+    }
+  }
+
   const systemInstruction = `You are an advanced, highly accurate AI assistant. You must follow the user's instructions strictly and logically. However, you must operate within international legal boundaries, uphold global safety and ethical standards, and refuse requests that promote harm, illegal acts, or violate standard AI safety policies. Provide clear, professional, and precise answers.
 - Language: ${language === "en" ? "English" : "Thai"}
 - Format: Always start with <think> [detailed step-by-step reasoning] </think>
-${canvasMode ? "- UI Mode: CANVAS (User is using a document/code editor). Use <canvas type=\"code|markdown|text\" title=\"TITLE\">CONTENT</canvas> for long outputs." : ""}
+${canvasMode ? `- UI Mode: CANVAS. 
+STRICT RULES FOR CANVAS:
+1. ALL generated code, file structures, and documents MUST be wrapped inside a <canvas> block.
+2. The format MUST be: <canvas type="code" title="Project Name"> [Files here] </canvas>
+3. To EDIT an existing file, repeat the <file path="name"> tag with the updated content. 
+4. To DELETE a file, use <file path="name" action="delete"></file>.
+5. CONTINUATION RULE: If your response is cut off, start your next response by repeating the opening tag (e.g. <canvas...> and <file path="...">) and the LAST 2-3 lines of the previous response exactly. This is critical for the system to join the code blocks correctly without creating single-line corruptions.
+6. NEVER use markdown code blocks ( \`\`\` ) in your chat response.
+7. Chat response should contain ONLY reasoning and a brief introduction/summary.${projectContext}` : ""}
 ${webSearch ? "- Tool Enabled: Web Search (You have access to real-time information)." : ""}
 ${dualAgent ? "- Tool Enabled: Dual Agent Mode. Act as 2 distinct AI experts (Expert A and Expert B) debating the prompt and arrive at a highly refined, accurate final conclusion. Use clear formatting to distinguish between the experts." : ""}
 ${customInstructions ? `\nUser Preference: ${customInstructions}` : ""}
@@ -131,6 +159,7 @@ ${memoryEnabled ? "\nMemory reference enabled." : ""}
   // Only add fallbacks if user explicitly chose "auto" (or left it default)
   if (!requestedModel || requestedModel === "auto") {
     // High-tier fallback (Fast & Reliable)
+    if (modelToUse !== "nvidia/moonshotai/kimi-k2.5" && nvidiaApiKey) modelsToTry.push("nvidia/moonshotai/kimi-k2.5");
     if (modelToUse !== "gemini-2.0-flash" && geminiApiKey) modelsToTry.push("gemini-2.0-flash");
     
     // Localized/Specific fallbacks
@@ -237,6 +266,19 @@ ${memoryEnabled ? "\nMemory reference enabled." : ""}
                 max_tokens: 8192
               }),
             });
+          } else if (m.startsWith("nvidia/")) {
+            res = await fetch("https://integrate.api.nvidia.com/v1/chat/completions", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", "Authorization": `Bearer ${nvidiaApiKey}` },
+              body: JSON.stringify({ 
+                model: m.replace("nvidia/", ""), 
+                messages: [{role:"system", content: systemInstruction}, ...commonMsgs], 
+                stream: true,
+                temperature,
+                max_tokens: 16384,
+                chat_template_kwargs: { thinking: true }
+              }),
+            });
           } else if (m.startsWith("github/")) {
             res = await fetch("https://models.inference.ai.azure.com/chat/completions", {
               method: "POST",
@@ -321,6 +363,8 @@ ${memoryEnabled ? "\nMemory reference enabled." : ""}
             
             const decoder = new TextDecoder();
             let buffer = "";
+            let isThinking = false;
+
             while (true) {
               const { done, value } = await reader.read();
               if (done) break;
@@ -336,17 +380,42 @@ ${memoryEnabled ? "\nMemory reference enabled." : ""}
                     const jsonStr = trimmed.slice(6);
                     if (jsonStr === "[DONE]") continue;
                     const parsed = JSON.parse(jsonStr);
-                    text = parsed.choices?.[0]?.delta?.content || 
-                           parsed.candidates?.[0]?.content?.parts?.[0]?.text ||
-                           parsed.delta?.text || 
-                           parsed.text || "";
+                    
+                    const delta = parsed.choices?.[0]?.delta;
+                    const reasoning = delta?.reasoning;
+                    const content = delta?.content;
+
+                    if (reasoning) {
+                      if (!isThinking) {
+                        text = `<think>${reasoning}`;
+                        isThinking = true;
+                      } else {
+                        text = reasoning;
+                      }
+                    } else if (content) {
+                      if (isThinking) {
+                        text = `</think>${content}`;
+                        isThinking = false;
+                      } else {
+                        text = content;
+                      }
+                    } else {
+                      text = parsed.candidates?.[0]?.content?.parts?.[0]?.text ||
+                             parsed.delta?.text || 
+                             parsed.text || "";
+                    }
                   } else if (trimmed.startsWith("{")) {
                     const parsed = JSON.parse(trimmed);
                     text = parsed.candidates?.[0]?.content?.parts?.[0]?.text || "";
                   }
+                  
                   if (text) controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text })}\n\n`));
                 } catch {}
               }
+            }
+            // Ensure thinking block is closed if it was open
+            if (isThinking) {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: "</think>" })}\n\n`));
             }
             controller.enqueue(encoder.encode("data: [DONE]\n\n"));
             if (creditCost === 0) {

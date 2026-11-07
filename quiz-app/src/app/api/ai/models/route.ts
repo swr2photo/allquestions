@@ -22,6 +22,7 @@ interface Results {
   openrouter: Model[];
   groq: Model[];
   github: Model[];
+  nvidia: Model[];
 }
 
 export async function GET() {
@@ -35,8 +36,9 @@ export async function GET() {
   const openRouterKey = process.env.OPENROUTER_API_KEY;
   const groqKey = process.env.GROQ_API_KEY;
   const githubToken = process.env.GITHUB_TOKEN;
+  const nvidiaKey = process.env.NVIDIA_API_KEY;
 
-  const results: Results = { gemini: [], openrouter: [], groq: [], github: [] };
+  const results: Results = { gemini: [], openrouter: [], groq: [], github: [], nvidia: [] };
 
   // 1. Fetch Gemini Models
   if (geminiKey) {
@@ -116,6 +118,13 @@ export async function GET() {
         ];
       }
     } catch (e) { console.error("GitHub models fetch failed", e); }
+  }
+
+  // 5. Add Nvidia Models
+  if (nvidiaKey) {
+    results.nvidia = [
+      { id: "nvidia/moonshotai/kimi-k2.5", name: "Kimi K2.5 (Nvidia)", provider: "nvidia" }
+    ];
   }
 
   return NextResponse.json(results);

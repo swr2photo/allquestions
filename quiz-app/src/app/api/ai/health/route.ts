@@ -7,7 +7,7 @@ export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("user-session")?.value || cookieStore.get("admin-session")?.value;
   if (!token || !isValidSession(token)) {
-    return NextResponse.json({ gemini: false, claude: false, openrouter: false, thaillm: false, groq: false, github: false });
+    return NextResponse.json({ gemini: false, claude: false, openrouter: false, thaillm: false, groq: false, github: false, moonshot: false, nvidia: false });
   }
 
   const health = await getProviderHealth();
@@ -19,5 +19,7 @@ export async function GET() {
     thaillm: health.thaillm,
     groq: health.groq,
     github: health.github,
+    moonshot: health.moonshot,
+    nvidia: health.nvidia,
   });
 }

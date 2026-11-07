@@ -330,6 +330,30 @@ html.ui-scroll-locked body {
   border-radius: 3px;
 }
 
+/* Global Transparent Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(150, 150, 150, 0.2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(150, 150, 150, 0.3) !important;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(150, 150, 150, 0.5) !important;
+}
+
 /* KaTeX overrides for chat */
 .katex-display {
   margin: 0.75em 0 !important;

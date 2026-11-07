@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import JSZip from "jszip";
 import {
   Eye,
   Code2,
@@ -13,8 +14,12 @@ import {
   X,
   Loader2,
   ChevronDown,
+  ChevronRight,
   RefreshCw,
-  Clock
+  Clock,
+  Folder,
+  File,
+  Archive
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -63,8 +68,17 @@ function stripModuleSyntax(code: string): string {
 }
 
 /** Build a self-contained HTML document that renders a React component */
-function buildReactSrcDoc(code: string): string {
+function buildReactSrcDoc(artifact: Artifact): string {
+  let code = artifact.content;
   const componentName = findComponentName(code);
+  
+  // Extract all CSS from project files to inject
+  const projectStyles = artifact.files
+    ?.filter(f => f.path.endsWith(".css"))
+    .map(f => `/* ${f.path} */\n${f.content}`)
+    .join("\n\n") || "";
+
+  // Strip module syntax for the main component
   const cleanCode = stripModuleSyntax(code);
 
   return `<!DOCTYPE html>
@@ -76,16 +90,46 @@ function buildReactSrcDoc(code: string): string {
 <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"><\/script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"><\/script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
+<script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"><\/script>
+<script src="https://unpkg.com/lucide@0.263.1/dist/umd/lucide.min.js"><\/script>
+<script src="https://unpkg.com/recharts/umd/Recharts.js"><\/script>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 html,body,#root{height:100%;margin:0;padding:0}
 body{font-family:'Kanit',sans-serif}
+${projectStyles}
 </style>
+<script>
+// Mock libraries for CDN usage
+window.framerMotion = window.Motion;
+window.lucide = window.lucide;
+// clsx and tailwind-merge simplified
+window.clsx = (...args) => args.filter(Boolean).join(' ');
+window.twMerge = (...args) => args.filter(Boolean).join(' ');
+
+// Prevent 404s by neutralizing link tags that point to local CSS
+(function() {
+  const neutralize = () => {
+    document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && (href.startsWith('/') || !href.startsWith('http'))) {
+        link.dataset.oldHref = href;
+        link.removeAttribute('href');
+        link.remove();
+      }
+    });
+  };
+  neutralize();
+  new MutationObserver(neutralize).observe(document.documentElement, { childList: true, subtree: true });
+})();
+<\/script>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel" data-presets="react,typescript">
 const { useState, useEffect, useRef, useCallback, useMemo, useReducer, useContext, createContext, Fragment } = React;
+const { motion, AnimatePresence } = window.Motion || {};
+const { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = window.Recharts || {};
 
 ${cleanCode}
 
@@ -101,6 +145,95 @@ try {
 </html>`;
 }
 
+interface ProjectExplorerProps {
+  files: { path: string; content: string }[];
+  selectedPath: string | null;
+  onSelectFile: (path: string) => void;
+}
+
+function ProjectExplorer({ files, selectedPath, onSelectFile }: ProjectExplorerProps) {
+  const [collapsedPaths, setCollapsedPaths] = useState<Record<string, boolean>>({});
+
+  const toggleFolder = (path: string) => {
+    setCollapsedPaths(prev => ({ ...prev, [path]: !prev[path] }));
+  };
+
+  // Simple folder structure parser
+  const tree: any = {};
+  files.forEach(f => {
+    const parts = f.path.split('/');
+    let current = tree;
+    let currentPath = "";
+    parts.forEach((part, i) => {
+      currentPath = currentPath ? `${currentPath}/${part}` : part;
+      if (i === parts.length - 1) {
+        current[part] = { type: 'file', path: f.path };
+      } else {
+        if (!current[part]) current[part] = { type: 'folder', children: {}, path: currentPath };
+        current = current[part].children;
+      }
+    });
+  });
+
+  const renderTree = (node: any, name: string, depth: number = 0) => {
+    if (node.type === 'file') {
+      const isActive = selectedPath === node.path;
+      return (
+        <button
+          key={node.path}
+          onClick={() => onSelectFile(node.path)}
+          className={`w-full flex items-center gap-2 px-4 py-1 text-[13px] transition-all group border-l-2 ${
+            isActive 
+              ? 'bg-[#37373d] text-white border-emerald-500' 
+              : 'text-[#cccccc] hover:bg-[#2a2d2e] border-transparent'
+          }`}
+          style={{ paddingLeft: `${(depth * 16) + 24}px` }}
+        >
+          <File className={`h-4 w-4 shrink-0 ${isActive ? 'text-emerald-400' : 'text-[#858585] group-hover:text-[#cccccc]'}`} />
+          <span className="truncate">{name}</span>
+        </button>
+      );
+    }
+
+    const isCollapsed = collapsedPaths[node.path];
+
+    return (
+      <div key={node.path}>
+        <button 
+          onClick={() => toggleFolder(node.path)}
+          className="w-full flex items-center gap-1.5 px-2 py-1 text-[12px] text-[#cccccc] font-medium hover:bg-[#2a2d2e] transition-colors group"
+          style={{ paddingLeft: `${(depth * 16) + 8}px` }}
+        >
+          {isCollapsed ? <ChevronRight className="h-4 w-4 shrink-0 text-[#858585]" /> : <ChevronDown className="h-4 w-4 shrink-0 text-[#858585]" />}
+          <Folder className="h-4 w-4 shrink-0 text-[#cccccc] group-hover:text-white transition-colors" />
+          <span className="truncate">{name}</span>
+        </button>
+        {!isCollapsed && (
+          <div className="">
+            {Object.entries(node.children).map(([childName, childNode]) => 
+              renderTree(childNode, childName, depth + 1)
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="h-full bg-[#1e1e1e] border-r border-[#2b2b2b] flex flex-col overflow-hidden select-none shrink-0">
+      <div className="px-4 py-3 border-b border-[#2b2b2b] bg-[#252526] shrink-0 flex items-center justify-between">
+        <h4 className="text-[10px] font-bold text-[#969696] uppercase tracking-wider flex items-center gap-2">
+          <Folder className="h-3 w-3" />
+          Explorer
+        </h4>
+      </div>
+      <div className="flex-1 overflow-y-auto custom-scrollbar py-1 min-w-[180px]">
+        {Object.entries(tree).map(([name, node]) => renderTree(node, name))}
+      </div>
+    </div>
+  );
+}
+
 export default function CanvasView({ artifact, versions = [], onSelectVersion, isOpen, isComplete, onClose }: CanvasViewProps) {
   const [activeTab, setActiveTab] = useState<TabType>("preview");
   const [copied, setCopied] = useState(false);
@@ -109,6 +242,9 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
   const [isPreviewReady, setIsPreviewReady] = useState(false);
   const [prevArtifactId, setPrevArtifactId] = useState(artifact?.id);
   const [previewKey, setPreviewKey] = useState(0);
+  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+  const [openFiles, setOpenFiles] = useState<string[]>([]);
+  const [showExplorer, setShowExplorer] = useState(true);
 
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -131,11 +267,37 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
     if (artifact?.id !== prevArtifactId) {
       setPrevArtifactId(artifact?.id);
       setActiveTab(isDocType ? "document" : "preview");
+      // Reset state for new artifact
+      setOpenFiles([]);
+      setSelectedFilePath(null);
     }
     if (isDocType && documentContent !== artifact?.content) {
       setDocumentContent(artifact?.content || "");
     }
-  }, [artifact, isDocType, prevArtifactId, documentContent]);
+    
+    // Auto-select logic for projects during streaming
+    if (artifact?.files && artifact.files.length > 0) {
+      const files = artifact.files;
+      const lastFile = files[files.length - 1];
+      
+      // 1. Initial selection: If no file is selected, take the first one
+      if (!selectedFilePath) {
+        setSelectedFilePath(files[0].path);
+        setOpenFiles([files[0].path]);
+      } 
+      // 2. Auto-follow: If we are currently streaming (!isComplete)
+      // and AI just started a new file. We switch to it if it's the LAST one in the list
+      // to ensure we always follow the "frontier" of the generation.
+      else if (!isComplete && lastFile.path !== selectedFilePath) {
+          // Check if this path was already opened. If it's a brand new path, follow it.
+          if (!openFiles.includes(lastFile.path)) {
+              setSelectedFilePath(lastFile.path);
+              setOpenFiles(prev => [...prev, lastFile.path]);
+              if (activeTab === "preview") setActiveTab("code");
+          }
+      }
+    }
+  }, [artifact?.id, artifact?.files?.length, isDocType, prevArtifactId, documentContent, selectedFilePath, isComplete, openFiles, activeTab]);
 
   useEffect(() => {
     if (isPreviewReady !== isComplete) {
@@ -150,6 +312,22 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
   }, [artifact?.content, activeTab]);
 
   if (!isOpen || !artifact) return null;
+
+  const handleFileSelect = (path: string) => {
+    setSelectedFilePath(path);
+    if (!openFiles.includes(path)) {
+      setOpenFiles(prev => [...prev, path]);
+    }
+  };
+
+  const closeFileTab = (path: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextOpenFiles = openFiles.filter(p => p !== path);
+    setOpenFiles(nextOpenFiles);
+    if (selectedFilePath === path) {
+      setSelectedFilePath(nextOpenFiles[nextOpenFiles.length - 1] || null);
+    }
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(artifact.content);
@@ -172,6 +350,37 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     setShowExportMenu(false);
+  };
+
+  const handleDownloadZip = async () => {
+    if (!artifact.files || artifact.files.length === 0) return;
+    
+    setExporting(true);
+    setShowExportMenu(false);
+    
+    try {
+      const zip = new JSZip();
+      artifact.files.forEach(file => {
+        // Remove leading slash if any to prevent issues in some zip viewers
+        const cleanPath = file.path.startsWith('/') ? file.path.slice(1) : file.path;
+        zip.file(cleanPath, file.content);
+      });
+      
+      const content = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(content);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${artifact.title || "project"}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("ZIP Error:", err);
+      alert("ไม่สามารถสร้างไฟล์ ZIP ได้");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const handleExportDoc = async (format: "docx" | "pdf") => {
@@ -229,7 +438,7 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
     }
 
     if (artifact.type === "react" || artifact.type === "nextjs") {
-      const srcDoc = buildReactSrcDoc(artifact.content);
+      const srcDoc = buildReactSrcDoc(artifact);
       return (
         <div className="h-full w-full bg-white flex flex-col relative">
           <iframe
@@ -252,15 +461,49 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
       );
     }
 
+    const projectStyles = artifact.files
+      ?.filter(f => f.path.endsWith(".css"))
+      .map(f => `/* ${f.path} */\n${f.content}`)
+      .join("\n\n") || "";
+
+    const cleanScript = `
+<script>
+// Prevent 404s by neutralizing link tags and other local assets before browser fetches them
+(function() {
+  const neutralize = () => {
+    document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+      const href = link.getAttribute('href');
+      if (href && (href.startsWith('/') || !href.startsWith('http') || href === 'style.css' || href === 'index.css')) {
+        link.dataset.oldHref = href;
+        link.removeAttribute('href');
+        link.remove();
+      }
+    });
+    document.querySelectorAll('img, script').forEach(el => {
+      const attr = el.tagName === 'IMG' ? 'src' : 'src';
+      const val = el.getAttribute(attr);
+      if (val && (val.startsWith('/') || !val.startsWith('http'))) {
+        if (el.tagName === 'IMG') el.style.display = 'none';
+        el.removeAttribute(attr);
+      }
+    });
+  };
+  neutralize();
+  const observer = new MutationObserver(neutralize);
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+})();
+<\/script>`;
+
     const srcDoc = artifact.content.includes("<!DOCTYPE") || artifact.content.includes("<html")
-      ? artifact.content
+      ? artifact.content.replace("</head>", `<style>${projectStyles}</style>${cleanScript}</head>`)
       : `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8"/>
 <script src="https://cdn.tailwindcss.com"><\/script>
 <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
-<style>body{font-family:'Kanit',sans-serif;padding:20px;margin:0}</style>
+<style>body{font-family:'Kanit',sans-serif;padding:20px;margin:0}${projectStyles}</style>
+${cleanScript}
 </head>
 <body>${artifact.content}</body>
 </html>`;
@@ -286,6 +529,15 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
       </div>
     );
   };
+
+  // Content Area
+  const displayContent = selectedFilePath 
+    ? artifact.files?.find(f => f.path === selectedFilePath)?.content || artifact.content
+    : artifact.content;
+    
+  const displayLanguage = selectedFilePath
+    ? artifact.files?.find(f => f.path === selectedFilePath)?.language || (artifact.type === "react" || artifact.type === "nextjs" ? "tsx" : artifact.type === "html" ? "html" : "javascript")
+    : (artifact.type === "react" || artifact.type === "nextjs" ? "tsx" : artifact.type === "html" ? "html" : "javascript");
 
   return (
     <div className="relative h-full flex flex-col bg-white shadow-2xl w-full border-l border-gray-100 animate-in slide-in-from-right duration-500">
@@ -323,6 +575,15 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
+          <button 
+            onClick={() => setShowExplorer(!showExplorer)} 
+            className={`h-9 px-3 flex items-center justify-center gap-2 rounded-xl transition-all active:scale-95 ${showExplorer ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'text-gray-400 hover:text-gray-900 hover:bg-gray-100'}`}
+            title={showExplorer ? "ซ่อน Explorer" : "แสดง Explorer"}
+          >
+            <Folder className="h-4 w-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest hidden sm:inline">Explorer</span>
+          </button>
+          <div className="w-px h-4 bg-gray-200 mx-1" />
           <button 
             onClick={() => setIsFullscreen(!isFullscreen)} 
             className="h-9 w-9 flex items-center justify-center rounded-xl text-gray-400 hover:text-gray-900 hover:bg-gray-100 transition-all active:scale-90"
@@ -400,6 +661,12 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
                   <Code2 className="h-4 w-4 opacity-70" />
                   <span>Source Code</span>
                 </button>
+                {artifact.files && artifact.files.length > 0 && (
+                  <button onClick={handleDownloadZip} className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-gray-600 hover:bg-gray-50 hover:text-emerald-600 transition-all">
+                    <Archive className="h-4 w-4 opacity-70 text-amber-600" />
+                    <span>Download Project (ZIP)</span>
+                  </button>
+                )}
                 <div className="border-t border-gray-50 my-1.5" />
                 <button onClick={() => handleExportDoc("pdf")} className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all">
                   <FileText className="h-4 w-4 text-red-500/70" />
@@ -450,57 +717,96 @@ export default function CanvasView({ artifact, versions = [], onSelectVersion, i
           </div>
         )}
 
-        <div className="flex-1 relative overflow-hidden flex flex-col">
-          {activeTab === "preview" && !isDocType && (
-            <div className="flex-1 w-full bg-white overflow-hidden">
-              {renderPreview()}
+        <div className="flex-1 relative overflow-hidden flex">
+          {/* Project Explorer Sidebar */}
+          {activeTab === "code" && artifact.files && showExplorer && (
+            <div className="w-48 sm:w-60 shrink-0 border-r border-[#2b2b2b] h-full hidden sm:block">
+              <ProjectExplorer 
+                files={artifact.files} 
+                selectedPath={selectedFilePath} 
+                onSelectFile={handleFileSelect} 
+              />
             </div>
           )}
 
-          {activeTab === "code" && !isDocType && (
-            <div className="flex-1 w-full overflow-auto bg-[#0d0d0f] font-mono text-sm relative custom-scrollbar">
-              <SyntaxHighlighter
-                language={artifact.type === "react" || artifact.type === "nextjs" ? "tsx" : artifact.type === "html" ? "html" : "javascript"}
-                style={vscDarkPlus}
-                customStyle={{ margin: 0, padding: "2rem", minHeight: "100%", background: "transparent", fontSize: "13px", lineHeight: "1.6" }}
-                wrapLines={true}
-                showLineNumbers={true}
-              >
-                {artifact.content}
-              </SyntaxHighlighter>
-              {!isComplete && (
-                <div className="px-8 pb-8">
-                  <div className="flex items-center gap-2">
-                    <div className="h-4 w-1.5 bg-emerald-500 animate-pulse" />
-                    <span className="text-[10px] font-black text-emerald-500/50 uppercase tracking-widest">Compiling stream...</span>
-                  </div>
-                </div>
-              )}
-              <div ref={codeEndRef} />
-            </div>
-          )}
-
-          {activeTab === "document" && isDocType && (
-            <div className="flex-1 w-full bg-white flex flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto modern-quill-container">
-                <ReactQuill
-                  theme="snow"
-                  value={documentContent}
-                  onChange={setDocumentContent}
-                  className="h-full"
-                  modules={{
-                    toolbar: [
-                      [{ 'header': [1, 2, 3, false] }],
-                      ['bold', 'italic', 'underline', 'strike'],
-                      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                      ['link', 'image', 'code-block'],
-                      ['clean']
-                    ],
-                  }}
-                />
+          <div className="flex-1 relative overflow-hidden flex flex-col bg-[#1e1e1e]">
+            {activeTab === "preview" && !isDocType && (
+              <div className="flex-1 w-full bg-white overflow-hidden">
+                {renderPreview()}
               </div>
-            </div>
-          )}
+            )}
+
+            {activeTab === "code" && !isDocType && (
+              <div className="flex-1 flex flex-col min-w-0">
+                {/* VS Code Style File Tabs */}
+                {artifact.files && artifact.files.length > 1 && (
+                  <div className="flex bg-[#252526] overflow-x-auto hide-scrollbar shrink-0 border-b border-[#1e1e1e]">
+                    {openFiles.map(path => (
+                      <button
+                        key={path}
+                        onClick={() => setSelectedFilePath(path)}
+                        className={`flex items-center gap-2 px-3 py-2 text-[12px] border-r border-[#1e1e1e] transition-colors shrink-0 group ${
+                          selectedFilePath === path 
+                            ? 'bg-[#1e1e1e] text-white' 
+                            : 'bg-[#2d2d2d] text-[#969696] hover:bg-[#323233] hover:text-[#cccccc]'
+                        }`}
+                      >
+                        <File className={`h-3.5 w-3.5 ${selectedFilePath === path ? 'text-emerald-400' : 'text-[#858585]'}`} />
+                        <span className="truncate max-w-[120px]">{path.split('/').pop()}</span>
+                        <X 
+                          className="h-3 w-3 hover:bg-[#454545] rounded-sm opacity-0 group-hover:opacity-100 transition-opacity" 
+                          onClick={(e) => closeFileTab(path, e)}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex-1 w-full overflow-auto bg-[#1e1e1e] font-mono text-sm relative custom-scrollbar">
+                  <SyntaxHighlighter
+                    language={displayLanguage}
+                    style={vscDarkPlus}
+                    customStyle={{ margin: 0, padding: "2rem", minHeight: "100%", background: "transparent", fontSize: "13px", lineHeight: "1.6", whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+                    wrapLongLines={true}
+                    showLineNumbers={true}
+                  >
+                    {displayContent}
+                  </SyntaxHighlighter>
+                  {!isComplete && (
+                    <div className="px-8 pb-8">
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-1.5 bg-emerald-500 animate-bounce" style={{ animationDuration: '0.5s' }} />
+                        <span className="text-[10px] font-black text-emerald-500/80 uppercase tracking-widest animate-pulse" style={{ animationDuration: '0.8s' }}>Compiling stream...</span>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={codeEndRef} />
+                </div>
+              </div>
+            )}
+
+            {activeTab === "document" && isDocType && (
+              <div className="flex-1 w-full bg-white flex flex-col overflow-hidden">
+                <div className="flex-1 overflow-y-auto modern-quill-container">
+                  <ReactQuill
+                    theme="snow"
+                    value={documentContent}
+                    onChange={setDocumentContent}
+                    className="h-full"
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'image', 'code-block'],
+                        ['clean']
+                      ],
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

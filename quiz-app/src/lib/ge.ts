@@ -214,12 +214,11 @@ export function classifyPlaceholder(name: string): PlaceholderInfo {
 }
 
 /**
- * Safety net for an appendix course list ("รายวิชาเลือก …") imported as a term — no real term carries
- * > 30 credits. The importer (scripts/timetable/curriculum-parser.mjs) already drops those; a real
- * term may list many rows when it offers alternatives ("เลือก 1 วิชาจาก …"), so rows alone don't count.
+ * The PDF importer turns a plan's appendix ("รายวิชาเลือก …" lists) into an extra
+ * "term" with dozens of courses — no real term carries > 30 credits.
  */
 export function isCatalogTerm(t: { credits: number; courses: unknown[] }): boolean {
-  return t.credits > 30;
+  return t.credits > 30 || t.courses.length > 16;
 }
 
 /** Some imported plans miss GE rows; only trust a total in the usual 18–45 credit band. */

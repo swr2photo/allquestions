@@ -15,6 +15,8 @@ export function resolveProvider(model: string): ProviderId {
   if (model.startsWith("thaillm/")) return "thaillm";
   if (model.startsWith("groq/")) return "groq";
   if (model.startsWith("github/")) return "github";
+  if (model.startsWith("moonshot/")) return "moonshot";
+  if (model.startsWith("nvidia/")) return "nvidia";
   return "gemini";
 }
 

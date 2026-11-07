@@ -86,6 +86,7 @@ import {
   Square,
   ArrowDown,
 } from "lucide-react";
+import { ModelIcons } from "@/components/model-icons";
 
 // Register highlight.js languages
 hljs.registerLanguage("javascript", javascript);
@@ -2135,6 +2136,59 @@ const SUGGESTIONS = [
   "📷 ถ่ายรูปข้อสอบแล้วส่งมาให้ AI ตรวจ",
 ];
 
+/** Intelligently join two overlapping strings of code */
+function joinCode(oldCode: string, newCode: string): string {
+  if (!oldCode) return newCode;
+  if (!newCode) return oldCode;
+  if (newCode.startsWith(oldCode)) return newCode;
+  
+  // Normalize line endings
+  const normalizedOld = oldCode.replace(/\r\n/g, "\n");
+  const normalizedNew = newCode.replace(/\r\n/g, "\n");
+
+  // Find longest overlap between suffix of oldCode and prefix of newCode
+  let overlapIndex = 0;
+  const maxOverlap = Math.min(normalizedOld.length, normalizedNew.length, 1000); // Check last 1000 chars
+  
+  for (let i = maxOverlap; i > 0; i--) {
+    const suffix = normalizedOld.substring(normalizedOld.length - i);
+    const prefix = normalizedNew.substring(0, i);
+    
+    // Exact match
+    if (suffix === prefix) {
+      overlapIndex = i;
+      break;
+    }
+    
+    // Fuzzy match: ignore trailing/leading spaces on the overlap part
+    if (suffix.trim() === prefix.trim() && suffix.trim().length > 10) {
+      overlapIndex = i;
+      break;
+    }
+  }
+  
+  if (overlapIndex > 0) {
+    return oldCode + newCode.substring(overlapIndex);
+  }
+  
+  // If no overlap, check if newCode starts with something similar to the end of oldCode
+  // (e.g. AI repeated a line but changed indentation)
+  const lastLine = normalizedOld.split("\n").pop()?.trim() || "";
+  if (lastLine.length > 5) {
+      const firstLineIdx = normalizedNew.indexOf("\n");
+      const firstLine = firstLineIdx !== -1 ? normalizedNew.substring(0, firstLineIdx).trim() : normalizedNew.trim();
+      if (firstLine === lastLine) {
+          return oldCode + "\n" + (firstLineIdx !== -1 ? newCode.substring(firstLineIdx + 1) : "");
+      }
+  }
+
+  // Last resort: simple append with a newline if needed
+  const needsNewline = oldCode.length > 0 && newCode.length > 0 && 
+                      !oldCode.endsWith("\n") && !newCode.startsWith("\n");
+  
+  return oldCode + (needsNewline ? "\n" : "") + newCode;
+}
+
 export default function AIChatPage() {
   // Core state definitions (Moved to top to avoid TDZ issues)
   const [user, setUser] = useState<{ email: string; name: string; picture: string; isAdmin?: boolean } | null>(null);
@@ -2340,9 +2394,66 @@ export default function AIChatPage() {
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("general");
   const [showQuotaPopup, setShowQuotaPopup] = useState(false);
   const [showCreditPopup, setShowCreditPopup] = useState<{ needed: number; have: number; model: string } | null>(null);
-  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true, groq: true, github: true });
+  const [apiHealth, setApiHealth] = useState<Record<string, boolean>>({ gemini: true, claude: true, openrouter: true, thaillm: true, groq: true, github: true, moonshot: true, nvidia: true });
   const [isDragging, setIsDragging] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Prevent accidental refresh/close during generation
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (loading) {
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [loading]);
+
+  // Recovery logic for interrupted sessions (e.g. after refresh)
+  useEffect(() => {
+    if (!isLoaded || loading || sessions.length === 0) return;
+
+    const interruptedSessionId = sessionStorage.getItem("ai_working_session");
+    if (!interruptedSessionId) return;
+
+    sessionStorage.removeItem("ai_working_session");
+
+    const timer = setTimeout(() => {
+      const currentSession = sessions.find(s => s.id === interruptedSessionId);
+      if (!currentSession || currentSession.messages.length === 0) return;
+
+      const lastMsg = currentSession.messages[currentSession.messages.length - 1];
+      setActiveSessionId(interruptedSessionId);
+
+      if (lastMsg.role === "user") {
+        sendMessage(lastMsg.content);
+      } else if (lastMsg.role === "assistant") {
+        const { isComplete, artifact } = parseArtifacts(lastMsg.content);
+        const content = lastMsg.content;
+        const hasCanvasStart = /<canvas/i.test(content);
+        const hasCanvasEnd = /<\/canvas>/i.test(content);
+        const hasFileStart = /<file/i.test(content);
+        const lastFileEndIndex = content.lastIndexOf("</file>");
+        const lastFileStartIndex = content.lastIndexOf("<file");
+
+        const isFileUnclosed = hasFileStart && (lastFileStartIndex > lastFileEndIndex);
+        const isCanvasUnclosed = hasCanvasStart && !hasCanvasEnd;
+
+        if (isCanvasUnclosed || isFileUnclosed || (artifact && !isComplete)) {
+          const prompt = aiSettings.language === "th"
+            ? "โค้ดก่อนหน้านี้ถูกตัดจบกลางคัน (Max Tokens) กรุณาพิมพ์แท็กเปิดไฟล์เดิมซ้ำอีกครั้ง (เช่น <file path=\"...\">) แล้วเขียนโค้ดต่อจากบรรทัดสุดท้ายที่พิมพ์ค้างไว้ทันที เพื่อให้ระบบสามารถต่อโค้ดเข้าด้วยกันได้ถูกต้อง ไม่ต้องสรุป ไม่ต้องเกริ่นนำ และไม่ต้องเริ่มเขียนใหม่ทั้งหมด"
+            : "The previous response was cut off. Please repeat the opening file tag (e.g., <file path=\"...\">) and continue writing the code exactly from where it stopped. This allows the system to join the code correctly. Do not explain or restart from the beginning.";
+          sendMessage(prompt);
+        }
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
+
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [isToolsMenuOpen, setIsToolsMenuOpen] = useState(false);
   const [activeTool, setActiveTool] = useState<"none" | "webSearch" | "generateImage" | "canvas" | "summarize" | "dualAgent">("none");
@@ -2385,7 +2496,9 @@ export default function AIChatPage() {
           openrouter: data.openrouter,
           thaillm: data.thaillm,
           groq: data.groq,
-          github: data.github
+          github: data.github,
+          moonshot: data.moonshot,
+          nvidia: data.nvidia
         });
       }
     } catch (e) {
@@ -2430,46 +2543,47 @@ export default function AIChatPage() {
       {
         name: aiSettings.language === "th" ? "แนะนำ" : "Recommended",
         models: [
-          { value: "auto", label: "Auto Select", icon: <Sparkles className="h-3.5 w-3.5 text-amber-500" />, desc: "ดีที่สุดตามสถานะ", provider: "all" },
-          { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <Zap className="h-3.5 w-3.5 text-violet-500" />, desc: "Gemini Direct", provider: "gemini" },
+          { value: "auto", label: "Auto Select", icon: <Sparkles className="h-3.5 w-3.5 shrink-0 text-amber-500" />, desc: "ดีที่สุดตามสถานะ", provider: "all" },
+          { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <ModelIcons.gemini className="h-3.5 w-3.5 shrink-0 text-blue-500" />, desc: "Gemini Direct", provider: "gemini" },
         ]
       },
       {
         name: aiSettings.language === "th" ? "โมเดลไทย" : "Thai Models",
         models: [
-          { value: "thaillm/typhoon-v1.5x-70b-instruct", label: "Typhoon 1.5X", icon: <Sparkles className="h-3.5 w-3.5 text-red-500" />, desc: "Thai LLM", provider: "thaillm" },
+          { value: "thaillm/typhoon-v1.5x-70b-instruct", label: "Typhoon 1.5X", icon: <ModelIcons.typhoon className="h-3.5 w-3.5 shrink-0 text-red-500" />, desc: "Thai LLM", provider: "thaillm" },
         ]
       },
       {
         name: "Claude & DeepSeek (OpenRouter)",
         models: [
-          { value: "claude-sonnet", label: "Claude", icon: <Brain className="h-3.5 w-3.5 text-orange-500" />, desc: "Anthropic", provider: "claude" },
-          { value: "openrouter/deepseek/deepseek-r1", label: "DeepSeek R1", icon: <Brain className="h-3.5 w-3.5 text-blue-500" />, desc: "OpenRouter", provider: "openrouter" },
-          { value: "openrouter/meta-llama/llama-4-maverick", label: "Llama 4", icon: <Brain className="h-3.5 w-3.5 text-indigo-500" />, desc: "OpenRouter", provider: "openrouter" },
+          { value: "claude-sonnet", label: "Claude", icon: <ModelIcons.anthropic className="h-3.5 w-3.5 shrink-0 text-orange-500" />, desc: "Anthropic", provider: "claude" },
+          { value: "openrouter/deepseek/deepseek-r1", label: "DeepSeek R1", icon: <ModelIcons.deepseek className="h-3.5 w-3.5 shrink-0 text-blue-500" />, desc: "OpenRouter", provider: "openrouter" },
+          { value: "openrouter/meta-llama/llama-4-maverick", label: "Llama 4", icon: <ModelIcons.meta className="h-3.5 w-3.5 shrink-0 text-indigo-500" />, desc: "OpenRouter", provider: "openrouter" },
         ]
       },
       {
           name: "GitHub Models",
           models: [
-            { value: "github/gpt-4o", label: "GPT-4o", icon: <Brain className="h-3.5 w-3.5 text-gray-700" />, desc: "OpenAI", provider: "github" },
-            { value: "github/gpt-4o-mini", label: "GPT-4o Mini", icon: <Zap className="h-3.5 w-3.5 text-gray-500" />, desc: "OpenAI Fast", provider: "github" },
-            { value: "github/gpt-4.1", label: "GPT-4.1", icon: <Brain className="h-3.5 w-3.5 text-gray-800" />, desc: "OpenAI Advanced", provider: "github" },
-            { value: "github/o3-mini", label: "o3-mini", icon: <Brain className="h-3.5 w-3.5 text-sky-600" />, desc: "OpenAI Reasoning", provider: "github" },
-            { value: "github/o1", label: "o1", icon: <Brain className="h-3.5 w-3.5 text-sky-700" />, desc: "OpenAI Advanced Reasoning", provider: "github" },
-            { value: "github/DeepSeek-R1", label: "DeepSeek R1", icon: <Sparkles className="h-3.5 w-3.5 text-blue-500" />, desc: "Reasoning", provider: "github" },
-            { value: "github/Llama-3.3-70B-Instruct", label: "Llama 3.3 70B", icon: <Zap className="h-3.5 w-3.5 text-indigo-500" />, desc: "Meta", provider: "github" },
-            { value: "github/Meta-Llama-3.1-405B-Instruct", label: "Llama 3.1 405B", icon: <Brain className="h-3.5 w-3.5 text-indigo-700" />, desc: "Meta Massive", provider: "github" },
-            { value: "github/Phi-4", label: "Phi-4", icon: <Brain className="h-3.5 w-3.5 text-teal-600" />, desc: "Microsoft", provider: "github" },
-            { value: "github/Phi-4-reasoning", label: "Phi-4 Reasoning", icon: <Sparkles className="h-3.5 w-3.5 text-teal-500" />, desc: "Microsoft", provider: "github" },
-            { value: "github/Cohere-command-r-plus-08-2024", label: "Command R+", icon: <Brain className="h-3.5 w-3.5 text-rose-500" />, desc: "Cohere", provider: "github" },
-            { value: "github/Mistral-Small-2402", label: "Mistral Small", icon: <Zap className="h-3.5 w-3.5 text-amber-500" />, desc: "Mistral AI", provider: "github" },
+            { value: "github/gpt-4o", label: "GPT-4o", icon: <ModelIcons.openai className="h-3.5 w-3.5 shrink-0 text-gray-700" />, desc: "OpenAI", provider: "github" },
+            { value: "github/gpt-4o-mini", label: "GPT-4o Mini", icon: <ModelIcons.openai className="h-3.5 w-3.5 shrink-0 text-gray-500" />, desc: "OpenAI Fast", provider: "github" },
+            { value: "github/gpt-4.1", label: "GPT-4.1", icon: <ModelIcons.openai className="h-3.5 w-3.5 shrink-0 text-gray-800" />, desc: "OpenAI Advanced", provider: "github" },
+            { value: "github/o3-mini", label: "o3-mini", icon: <ModelIcons.openai className="h-3.5 w-3.5 shrink-0 text-sky-600" />, desc: "OpenAI Reasoning", provider: "github" },
+            { value: "github/o1", label: "o1", icon: <ModelIcons.openai className="h-3.5 w-3.5 shrink-0 text-sky-700" />, desc: "OpenAI Advanced Reasoning", provider: "github" },
+            { value: "github/DeepSeek-R1", label: "DeepSeek R1", icon: <ModelIcons.deepseek className="h-3.5 w-3.5 shrink-0 text-blue-500" />, desc: "Reasoning", provider: "github" },
+            { value: "github/Llama-3.3-70B-Instruct", label: "Llama 3.3 70B", icon: <ModelIcons.meta className="h-3.5 w-3.5 shrink-0 text-indigo-500" />, desc: "Meta", provider: "github" },
+            { value: "github/Meta-Llama-3.1-405B-Instruct", label: "Llama 3.1 405B", icon: <ModelIcons.meta className="h-3.5 w-3.5 shrink-0 text-indigo-700" />, desc: "Meta Massive", provider: "github" },
+            { value: "github/Phi-4", label: "Phi-4", icon: <ModelIcons.microsoft className="h-3.5 w-3.5 shrink-0 text-teal-600" />, desc: "Microsoft", provider: "github" },
+            { value: "github/Phi-4-reasoning", label: "Phi-4 Reasoning", icon: <ModelIcons.microsoft className="h-3.5 w-3.5 shrink-0 text-teal-500" />, desc: "Microsoft", provider: "github" },
+            { value: "github/Cohere-command-r-plus-08-2024", label: "Command R+", icon: <ModelIcons.cohere className="h-3.5 w-3.5 shrink-0 text-rose-500" />, desc: "Cohere", provider: "github" },
+            { value: "github/Mistral-Small-2402", label: "Mistral Small", icon: <ModelIcons.mistral className="h-3.5 w-3.5 shrink-0 text-amber-500" />, desc: "Mistral AI", provider: "github" },
           ]
       },
       {
           name: "Others",
           models: [
-            { value: "groq/llama-3.3-70b-versatile", label: "Llama 3.3 70B", icon: <Zap className="h-3.5 w-3.5 text-orange-500" />, desc: "Groq (Fast)", provider: "groq" },
-            { value: "moonshot/moonshot-v1-8k", label: "Kimi (Moonshot)", icon: <Sparkles className="h-3.5 w-3.5 text-indigo-400" />, desc: "Moonshot AI", provider: "moonshot" },
+            { value: "groq/llama-3.3-70b-versatile", label: "Llama 3.3 70B", icon: <ModelIcons.groq className="h-3.5 w-3.5 shrink-0 text-orange-500" />, desc: "Groq (Fast)", provider: "groq" },
+            { value: "moonshot/moonshot-v1-8k", label: "Kimi (Moonshot)", icon: <ModelIcons.moonshot className="h-3.5 w-3.5 shrink-0 text-indigo-400" />, desc: "Moonshot AI", provider: "moonshot" },
+            { value: "nvidia/moonshotai/kimi-k2.5", label: "Kimi K2.5 (Nvidia)", icon: <ModelIcons.nvidia className="h-3.5 w-3.5 shrink-0 text-green-500" />, desc: "Nvidia API", provider: "nvidia" },
           ]
       }
     ];
@@ -2741,8 +2855,6 @@ export default function AIChatPage() {
     // Load memories
     loadMemories();
   }, [loadMemories]);
-
-  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load folders from localStorage
   useEffect(() => {
@@ -3078,7 +3190,10 @@ export default function AIChatPage() {
     setIsRecording(true);
   }, [isRecording, aiSettings.language, showToast]);
 
-  const sendMessage = async (text?: string) => {
+  const lastArtifactUpdateRef = useRef<number>(0);
+  const THROTTLE_MS = 50; // Update UI every 50ms during streaming
+
+  const sendMessage = async (text?: string | any) => {
     const msg = text || input.trim();
     const hasAttachments = attachments.length > 0;
 
@@ -3310,10 +3425,49 @@ export default function AIChatPage() {
           const { artifact: parsedArtifact, isComplete: artComplete } = parseArtifacts(fullText);
           if (parsedArtifact) {
             setActiveArtifact(prev => {
-              if (prev && prev.content === parsedArtifact.content && prev.id === parsedArtifact.id) return prev;
-              if (prev && prev.title === parsedArtifact.title) {
-                return { ...parsedArtifact, id: prev.id, version: prev.version };
+              // Deep check if anything actually changed to prevent re-render loop
+              if (prev && 
+                  prev.content === parsedArtifact.content && 
+                  prev.files?.length === parsedArtifact.files?.length &&
+                  prev.id === parsedArtifact.id) {
+                return prev;
               }
+
+              // Merge files logic
+              if (prev && prev.files && parsedArtifact.files) {
+                let mergedFiles = [...prev.files];
+                let changed = false;
+                
+                parsedArtifact.files.forEach(newFile => {
+                  if ((newFile as any).action === "delete") {
+                    const existingIdx = mergedFiles.findIndex(f => f.path === newFile.path);
+                    if (existingIdx !== -1) {
+                      mergedFiles.splice(existingIdx, 1);
+                      changed = true;
+                    }
+                  } else {
+                    const existingIdx = mergedFiles.findIndex(f => f.path === newFile.path);
+                    if (existingIdx !== -1) {
+                      const joinedContent = joinCode(mergedFiles[existingIdx].content, newFile.content);
+                      if (mergedFiles[existingIdx].content !== joinedContent) {
+                        mergedFiles[existingIdx] = { 
+                          ...mergedFiles[existingIdx], 
+                          content: joinedContent,
+                          isComplete: newFile.isComplete || mergedFiles[existingIdx].isComplete 
+                        };
+                        changed = true;
+                      }
+                    } else {
+                      mergedFiles.push(newFile);
+                      changed = true;
+                    }
+                  }
+                });
+                
+                if (!changed && prev.content === parsedArtifact.content) return prev;
+                return { ...parsedArtifact, id: prev.id, version: prev.version, files: mergedFiles };
+              }
+              if (prev && prev.title === parsedArtifact.title) return { ...parsedArtifact, id: prev.id, version: prev.version };
               return parsedArtifact;
             });
             setIsArtifactComplete(artComplete);
