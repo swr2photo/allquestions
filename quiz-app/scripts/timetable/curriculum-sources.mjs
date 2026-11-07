@@ -111,4 +111,231 @@ export const FACULTIES = [
       },
     ],
   },
+
+  // Engineering publishes each program's แผนการศึกษา as a public Google Sheet, linked from
+  // https://www.eng.psu.ac.th/course/<n>-bch-<program> ("หลักสูตรปรับปรุง ปี พ.ศ. 2569 (สำหรับนักศึกษารหัส
+  // 69-73)" / "… 2564 (… รหัส 65-68)"). Divisions are the SIS department names of each program's codes.
+  {
+    id: "eng",
+    faculty: "คณะวิศวกรรมศาสตร์",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://www.eng.psu.ac.th/apply-undergraduated",
+    programs: [
+      {
+        id: "electrical", name: "วิศวกรรมไฟฟ้า", division: "สาขาวิชาวิศวกรรมไฟฟ้าและชีวการแพทย์",
+        editions: [
+          { curriculumYear: 2569, sheet: "1ncQpwuYJcp8rzxK5Nh5xWPykurMMoPR92ItHAFElfbc", page: "https://www.eng.psu.ac.th/course/84-bch-ee" },
+          { curriculumYear: 2564, sheet: "1JdOB-LJprjvDD4escpqQElboIFGjDT_jlF8kb2gFzjQ", page: "https://www.eng.psu.ac.th/course/84-bch-ee" },
+        ],
+      },
+      {
+        id: "biomedical", name: "วิศวกรรมชีวการแพทย์", division: "สาขาวิชาวิศวกรรมไฟฟ้าและชีวการแพทย์",
+        editions: [
+          { curriculumYear: 2569, sheet: "16k6kX6w8BZjMTEdnQG1tEm6nee4zeIbVMWcX1u7LoEA", page: "https://www.eng.psu.ac.th/course/85-bch-be" },
+          { curriculumYear: 2564, sheet: "1e5YaQsDJdvUkpA98RQlQzU2xvgT646VcDnAKs47s0cQ", page: "https://www.eng.psu.ac.th/course/85-bch-be" },
+        ],
+      },
+      {
+        id: "mechanical", name: "วิศวกรรมเครื่องกล", division: "สาขาวิชาวิศวกรรมเครื่องกลและเมคาทรอนิกส์",
+        editions: [
+          { curriculumYear: 2569, sheet: "1lib_7vCAXE4gRWNG328bgwHnESh41BBd-TPGD1Zon2E", page: "https://www.eng.psu.ac.th/course/86-bch-me" },
+          { curriculumYear: 2564, sheet: "1ZKw1N10qC-GWQjjE5VZCIX7VYk0KNEy31hhGuaRrd2Y", page: "https://www.eng.psu.ac.th/course/86-bch-me" },
+        ],
+      },
+      {
+        id: "mechatronics", name: "วิศวกรรมเมคาทรอนิกส์", division: "สาขาวิชาวิศวกรรมเครื่องกลและเมคาทรอนิกส์",
+        editions: [
+          { curriculumYear: 2569, sheet: "1wHwBcXhKkcMc1m9ZO3ZorNlQeTnB9SVOGOxHVjPnUHc", page: "https://www.eng.psu.ac.th/course/87-bch-mce" },
+          { curriculumYear: 2564, sheet: "1Q15hXRWaGip5DNXg3RTAth6SxH_XGW8pel0y1QXlzww", page: "https://www.eng.psu.ac.th/course/87-bch-mce" },
+        ],
+      },
+      {
+        id: "civil", name: "วิศวกรรมโยธา", division: "สาขาวิชาวิศวกรรมโยธาและสิ่งแวดล้อม",
+        editions: [
+          { curriculumYear: 2569, sheet: "1rQ4lI4TrV3ntAq6JUdEQBBHG5iUOBUbRXGQBcToEMT4", page: "https://www.eng.psu.ac.th/course/88-bch-ce" },
+          { curriculumYear: 2564, sheet: "1d-Jhj-3eQ2pqxCAhJCopqPLfDXjqsmxie7cP_tTkwIk", page: "https://www.eng.psu.ac.th/course/88-bch-ce" },
+        ],
+      },
+      {
+        id: "environmental", name: "วิศวกรรมสิ่งแวดล้อม", division: "สาขาวิชาวิศวกรรมโยธาและสิ่งแวดล้อม",
+        editions: [
+          { curriculumYear: 2569, sheet: "1H-_AUo-HujX1COOL17T6Fr01vPQRsWc6xDZ9kghD5no", page: "https://www.eng.psu.ac.th/course/89-bch-eve" },
+          { curriculumYear: 2564, sheet: "1xZbn1UZmKquRz9GMvA2weevG6I9pvItp_upGxzQ_HgI", page: "https://www.eng.psu.ac.th/course/89-bch-eve" },
+        ],
+      },
+      {
+        id: "industrial", name: "วิศวกรรมอุตสาหการ", division: "สาขาวิชาวิศวกรรมอุตสาหการและการผลิต",
+        editions: [
+          { curriculumYear: 2569, sheet: "1mBJ-70SzrifNcaGJsCV9XMOk2Y-MBglAVvJRecTJpXo", page: "https://www.eng.psu.ac.th/course/90-bch-ie" },
+          { curriculumYear: 2564, sheet: "1l3v8mECrG-FlrIByqkZb8aKOWaa1V7snOA4XQer3I70", page: "https://www.eng.psu.ac.th/course/90-bch-ie" },
+        ],
+      },
+      {
+        id: "manufacturing", name: "วิศวกรรมการผลิต", division: "สาขาวิชาวิศวกรรมอุตสาหการและการผลิต",
+        editions: [
+          { curriculumYear: 2569, sheet: "1He9Uz_fWvRgtwD6ppQqZr7fgjtfglg0zNyrY8l01qJ8", page: "https://www.eng.psu.ac.th/course/91-bch-mfe" },
+          { curriculumYear: 2564, sheet: "1Ytjsdrq4-3QyNNpf2e7Rb0BmAkOhyS20gc3b_-Hr8oo", page: "https://www.eng.psu.ac.th/course/91-bch-mfe" },
+        ],
+      },
+      {
+        id: "chemical", name: "วิศวกรรมเคมี", division: "สาขาวิชาวิศวกรรมเคมี",
+        editions: [
+          { curriculumYear: 2569, sheet: "1BvAjtqo-Rd_9w6NxjCWEpsIvMdmVpw6bOybzWrLFhIM", page: "https://www.eng.psu.ac.th/course/92-bch-che" },
+          { curriculumYear: 2564, sheet: "1WNJHiVMmHEBUbTUBMatqGCqp-NsNsar-bSS61T4yuYk", page: "https://www.eng.psu.ac.th/course/92-bch-che" },
+        ],
+      },
+      {
+        id: "computer", name: "วิศวกรรมคอมพิวเตอร์", division: "สาขาวิชาวิศวกรรมคอมพิวเตอร์",
+        editions: [
+          { curriculumYear: 2569, sheet: "1APwCzatO6o83scmi89LmksbcDqis9VpjwtfRG67nDmE", page: "https://www.eng.psu.ac.th/course/93-bch-coe" },
+          { curriculumYear: 2564, sheet: "1TtmO0WhKBu2ffPcTsbbGKjt1R7BxVKFBOvvPp2ttyiM", page: "https://www.eng.psu.ac.th/course/93-bch-coe" },
+        ],
+      },
+      {
+        id: "artificial-intelligence", name: "วิศวกรรมปัญญาประดิษฐ์", division: "สาขาวิชาวิศวกรรมคอมพิวเตอร์",
+        editions: [
+          { curriculumYear: 2569, sheet: "1LVF6PXXH-qvmqJX3gTtX-TVUzurAbjMV7cV9M8SyCH8", page: "https://www.eng.psu.ac.th/course/121-bch-ai" },
+          { curriculumYear: 2564, sheet: "18Uz9nnwwipjf4Tdqq796NWf2DUhd325mBc4aRGcbsw0", page: "https://www.eng.psu.ac.th/course/121-bch-ai" },
+        ],
+      },
+      {
+        id: "mining-materials", name: "วิศวกรรมเหมืองแร่และวัสดุ", division: "สาขาวิชาวิศวกรรมเหมืองแร่และวัสดุ",
+        editions: [
+          { curriculumYear: 2569, sheet: "130lM6HtEmZo1Ohi0hYpqY01St-2Fi4fRaEoVm53UmQE", page: "https://www.eng.psu.ac.th/course/94-bch-mne" },
+          { curriculumYear: 2564, sheet: "1SBgZ1si9plYXvee4MAGETjcj0gXmm5_ga1--LxrOH8k", page: "https://www.eng.psu.ac.th/course/94-bch-mne" },
+        ],
+      },
+      {
+        id: "innovation-management", name: "วิศวกรรมและการจัดการนวัตกรรม (นานาชาติ)", division: "สาขาวิชาวิศวกรรมสหวิทยาการ",
+        editions: [
+          { curriculumYear: 2569, sheet: "1oeiMNlitRKVuJJczISuYFRck-caUzEUBVH9eQUVdfCc", page: "https://www.eng.psu.ac.th/course/122-bch-innoem" },
+          { curriculumYear: 2564, sheet: "1LD12SaQUmNQg91AQaP4D3fN1fOcXOxpRQ_X_mku6WzY", page: "https://www.eng.psu.ac.th/course/122-bch-innoem" },
+        ],
+      },
+      {
+        id: "rubber", name: "วิศวกรรมยาง (นานาชาติ)", division: "สาขาวิชาวิศวกรรมสหวิทยาการ",
+        editions: [
+          { curriculumYear: 2568, sheet: "1aguCLtQky5a5J4FXGHHm-R4m5QoNFkMCDkeqPTVrJBY", page: "https://www.eng.psu.ac.th/course/1127-bch-irc" },
+        ],
+      },
+      {
+        id: "semiconductor", name: "วิศวกรรมเซมิคอนดักเตอร์", division: "สาขาวิชาวิศวกรรมสหวิทยาการ",
+        editions: [
+          { curriculumYear: 2568, sheet: "1I_VDQ4Rqwue59oIfTlS2vizsCiX3amXRNUG4_j3qzqU", page: "https://www.eng.psu.ac.th/course/1203-sc-irc" },
+        ],
+      },
+    ],
+  },
+
+  // Bachelor plans linked from https://agro.psu.ac.th/agro6/curriculum. The page also lists
+  // เทคโนโลยีการจัดการอุตสาหกรรมอาหาร 2565 and การกำหนดอาหารและโภชนาการเพื่อสุขภาพ 2566, but their
+  // plan links are bare file names that don't resolve — not imported.
+  {
+    id: "agro",
+    faculty: "คณะอุตสาหกรรมเกษตร",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะอุตสาหกรรมเกษตร มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://agro.psu.ac.th/agro6/curriculum",
+    programs: [
+      {
+        id: "food-science", name: "วิทยาศาสตร์และเทคโนโลยีอาหาร", division: "อุตสาหกรรมเกษตร",
+        editions: [{ curriculumYear: 2565, pdf: "https://agro.psu.ac.th/agro6/wp-content/uploads/2026/07/plan-bachelor-foodsci-2565.pdf" }],
+      },
+      {
+        id: "packaging", name: "เทคโนโลยีบรรจุภัณฑ์และวัสดุ", division: "อุตสาหกรรมเกษตร",
+        editions: [{ curriculumYear: 2567, pdf: "https://agro.psu.ac.th/agro6/wp-content/uploads/2026/08/plan-bachelor-packaging-2567.pdf" }],
+      },
+    ],
+  },
+
+  // Management Sciences: "เอกสารหลักสูตรฉบับเต็ม" (มคอ.2) linked from https://www.fms.psu.ac.th/?page=curriculum-detail&id=N.
+  // The BBA 2567 document (same file for ids 3, 4, 6) holds every major's plan under "3.N วิชาเอก…";
+  // each major is cut out with `section`. The international BBA (id 7) lists courses per year
+  // ("Semester 1 and 2"), not per term, and รัฐประศาสนศาสตร์ (id 9) has no document — not imported.
+  {
+    id: "fms",
+    faculty: "คณะวิทยาการจัดการ",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะวิทยาการจัดการ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://www.fms.psu.ac.th/?page=courses-type&id=1",
+    programs: [
+      ...[
+        ["finance", "บริหารธุรกิจ วิชาเอกการเงินและการลงทุน", 1],
+        ["marketing", "บริหารธุรกิจ วิชาเอกการตลาดและการสื่อสาร", 2],
+        ["hrm", "บริหารธุรกิจ วิชาเอกการจัดการทรัพยากรมนุษย์", 3],
+        ["logistics", "บริหารธุรกิจ วิชาเอกการจัดการโลจิสติกส์และโซ่อุปทาน", 4],
+        ["bis", "บริหารธุรกิจ วิชาเอกระบบสารสนเทศทางธุรกิจ", 5],
+        ["mice", "บริหารธุรกิจ วิชาเอกการจัดการไมซ์", 6],
+      ].map(([id, name, n]) => ({
+        id: `bba-${id}`, name, division: "สาขาวิชาบริหารธุรกิจ",
+        editions: [{
+          curriculumYear: 2567,
+          pdf: "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          section: { start: new RegExp(`^\\s*3\\.${n} วิชาเอก`), end: n < 6 ? new RegExp(`^\\s*3\\.${n + 1} วิชาเอก`) : undefined },
+          statedTotal: null,
+        }],
+      })),
+      {
+        id: "accounting", name: "บัญชีบัณฑิต", division: "สาขาวิชาการบัญชี",
+        editions: [{ curriculumYear: 2568, pdf: "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250008_document.pdf" }],
+      },
+    ],
+  },
+
+  // Natural Resources: program pages (Google Sites) linked from https://natres.psu.ac.th/main/?page_id=977.
+  // วาริชศาสตร์ 2564 "โครงสร้างและแผนหลักสูตร" is on natres.psu.ac.th. Not imported:
+  //   - เกษตรศาสตร์ 2564 (4 majors, Drive PDFs on sites.google.com/psu.ac.th/nr-aim/…/bs-c-agri):
+  //     two terms side by side with codes and credits wrapped onto separate lines ("514-" / "202") —
+  //     rows and term totals can't be told apart reliably;
+  //   - นวัตกรรมการเกษตรและการจัดการ (plan PDF states no curriculum year);
+  //   - สัตวศาสตร์ (program site needs a PSU sign-in).
+  {
+    id: "natres",
+    faculty: "คณะทรัพยากรธรรมชาติ",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะทรัพยากรธรรมชาติ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://natres.psu.ac.th/main/?page_id=977",
+    programs: [
+      {
+        id: "aquatic-science", name: "วาริชศาสตร์", division: "สาขาวิชาวาริชศาสตร์และนวัตกรรมการจัดการ",
+        editions: [{
+          curriculumYear: 2564,
+          pdf: "https://natres.psu.ac.th/department/aqutic/document/b/โครงสร้างและแผนหลักสูตร-2_2.pdf",
+        }],
+      },
+    ],
+  },
+
+  // Liberal Arts (Hat Yai): each B.A. program's "แผนการศึกษา" page on the faculty's Google Site
+  // (https://sites.google.com/view/fla-es/bachelor-of-arts/…) embeds the plan as a Drive PDF.
+  {
+    id: "libarts",
+    faculty: "คณะศิลปศาสตร์",
+    campus: "วิทยาเขตหาดใหญ่",
+    title: "คณะศิลปศาสตร์ มหาวิทยาลัยสงขลานครินทร์",
+    source: "https://sites.google.com/view/fla-es/bachelor-of-arts",
+    programs: [
+      {
+        id: "applied-thai", name: "ภาษาไทยประยุกต์", division: "สาขาวิชาสังคม วัฒนธรรมและการพัฒนามนุษย์",
+        editions: [{ curriculumYear: 2564, drive: "1eZ_Oas7BXq6kjXYN1WYgwYp7OMD8HNcA", page: "https://sites.google.com/view/fla-es/bachelor-of-arts/applied-thai" }],
+      },
+      {
+        id: "english", name: "ภาษาอังกฤษ", division: "สาขาวิชาภาษาต่างประเทศ",
+        editions: [{ curriculumYear: 2563, drive: "1pSWY7ZN-bNOTHGgyQBYcb2jJ1SJWX3eR", page: "https://sites.google.com/view/fla-es/bachelor-of-arts/english" }],
+      },
+      {
+        id: "chinese", name: "ภาษาจีน", division: "สาขาวิชาภาษาต่างประเทศ",
+        editions: [{ curriculumYear: 2564, drive: "1Znugq1tlAHI2LAAwH-Y398pd0fYvTnOw", page: "https://sites.google.com/view/fla-es/bachelor-of-arts/chinese" }],
+      },
+      {
+        id: "community-studies", name: "ชุมชนศึกษาเพื่อการพัฒนาที่ยั่งยืน", division: "สาขาวิชาสังคม วัฒนธรรมและการพัฒนามนุษย์",
+        editions: [{ curriculumYear: 2564, drive: "1rNwLI6BewaKYxnku_CI-kDN2pXBQl-Z1", page: "https://sites.google.com/view/fla-es/bachelor-of-arts/community-studies" }],
+      },
+      {
+        id: "aviation", name: "การจัดการอุตสาหกรรมการบินและการบริการ", division: "สาขาวิชาภาษาต่างประเทศ",
+        editions: [{ curriculumYear: 2563, drive: "17tRutSeYKXhpgg45ATfa4ShVpPr2MyM_", page: "https://sites.google.com/view/fla-es/bachelor-of-arts/aviation" }],
+      },
+    ],
+  },
 ];

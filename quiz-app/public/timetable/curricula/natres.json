@@ -1,0 +1,312 @@
+{
+  "faculty": "คณะทรัพยากรธรรมชาติ มหาวิทยาลัยสงขลานครินทร์",
+  "programs": [
+    {
+      "id": "aquatic-science",
+      "name": "วาริชศาสตร์",
+      "division": "สาขาวิชาวาริชศาสตร์และนวัตกรรมการจัดการ",
+      "editions": [
+        {
+          "curriculumYear": 2564,
+          "source": "https://natres.psu.ac.th/department/aqutic/document/b/โครงสร้างและแผนหลักสูตร-2_2.pdf",
+          "years": [
+            {
+              "year": 1,
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 20,
+                  "courses": [
+                    {
+                      "code": "001-102",
+                      "name": "ปรัชญาของเศรษฐกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "324-109",
+                      "name": "เคมีพื้นฐานสาหรับ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "330-104",
+                      "name": "หลักชีววิทยาทางการเกษตร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "890-101G1",
+                      "name": "สรรสาระภาษาอังกฤษ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "890-102G1",
+                      "name": "ภาษาอังกฤษในชีวิต",
+                      "credits": 2
+                    },
+                    {
+                      "code": "895-001",
+                      "name": "พลเมืองที่ดี",
+                      "credits": 2
+                    },
+                    {
+                      "code": "895-876G8",
+                      "name": "ว่ายน้า",
+                      "credits": 2
+                    },
+                    {
+                      "code": "950-102",
+                      "name": "ชีวิตที่ดี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "530-101",
+                      "name": "น้าคือชีวิต",
+                      "credits": 1
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "ศึกษาทั่วไป-เลือก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 20,
+                  "courses": [
+                    {
+                      "code": "460-001",
+                      "name": "ไอเดียสู่ความเป็น",
+                      "credits": 1
+                    },
+                    {
+                      "code": "332-107",
+                      "name": "ฟิสิกส์การเกษตร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "322-103",
+                      "name": "คณิตศาสตร์ทั่วไป 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "388-100",
+                      "name": "สุขภาวะเพื่อเพื่อนมนุษย์",
+                      "credits": 1
+                    },
+                    {
+                      "code": "890-103G1",
+                      "name": "ภาษาอังกฤษพร้อมใช้",
+                      "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "การอยู่อย่างรู้เท่าทัน",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "การรู้ดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "การคิดเชิงตรรกและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "544-200",
+                      "name": "ประโยชน์เพื่อนมนุษย์",
+                      "credits": 1
+                    },
+                    {
+                      "code": "530-102",
+                      "name": "นักสืบสายน้า",
+                      "credits": 1
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 21,
+                  "courses": [
+                    {
+                      "code": "324-245",
+                      "name": "เคมีวิเคราะห์พื้นฐานสาหรับการเกษตร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "326-207",
+                      "name": "จุลชีววิทยาพื้นฐานสาหรับการเกษตร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "530-201",
+                      "name": "ชุดวิชาชีววิทยาสัตว์น้า",
+                      "credits": 5
+                    },
+                    {
+                      "code": "530-210",
+                      "name": "ชุดวิชาเคมีฟิสิกส์ของสิ่งแวดล้อมทาง",
+                      "credits": 5
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือก-รายวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือก-ชุดวิชา/รายวิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 21,
+                  "courses": [
+                    {
+                      "code": "328-205",
+                      "name": "ชีวเคมีพื้นฐานสาหรับวาริชศาสตร์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "347-201",
+                      "name": "สถิติพื้นฐาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "330-261",
+                      "name": "พันธุศาสตร์สาหรับวาริชศาสตร์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "530-211",
+                      "name": "ชุดวิชานิเวศวิทยาทางน้า",
+                      "credits": 5
+                    },
+                    {
+                      "code": "530-221",
+                      "name": "ชุดวิชาหลักการเพาะเลี้ยงสัตว์น้าและ",
+                      "credits": 5
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือก-รายวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "530-320",
+                      "name": "ชุดวิชาการเพาะเลี้ยงสัตว์น้า",
+                      "credits": 5
+                    },
+                    {
+                      "code": "530-330",
+                      "name": "ชุดวิชาทรัพยากรประมงและการ",
+                      "credits": 5
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "ชุดวิชาชีพเลือกวาริชศาสตร์",
+                      "credits": 6,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือก-ชุดวิชา/รายวิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "530-321",
+                      "name": "ชุดวิชาเทคโนโลยีการเพาะเลี้ยงสัตว์น้า",
+                      "credits": 5
+                    },
+                    {
+                      "code": "530-331",
+                      "name": "ชุดวิชานวัตกรรมการจัดการทรัพยากร",
+                      "credits": 5
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "ชุดวิชาชีพเลือกวาริชศาสตร์",
+                      "credits": 6,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 7,
+                  "courses": [
+                    {
+                      "code": "530-440",
+                      "name": "เตรียมสหกิจศึกษา",
+                      "credits": 1
+                    },
+                    {
+                      "code": "530-441",
+                      "name": "สมรรถนะอาชีพและสัมมนา",
+                      "credits": 6
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "530-442",
+                      "name": "สหกิจศึกษาทางวาริชศาสตร์",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

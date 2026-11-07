@@ -2051,7 +2051,7 @@
               "terms": [
                 {
                   "term": 1,
-                  "credits": 16,
+                  "credits": 19,
                   "courses": [
                     {
                       "code": "324-233",
@@ -2092,6 +2092,12 @@
                       "code": "345-104",
                       "name": "รู้เท่าทันเทคโนโลยีดิจิตัล",
                       "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "----------- วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
                     }
                   ]
                 },
@@ -2156,6 +2162,7 @@
             },
             {
               "year": 3,
+              "plan": "ปกติ",
               "terms": [
                 {
                   "term": 1,
@@ -2190,14 +2197,8 @@
                     },
                     {
                       "code": "xxx-xxx",
-                      "name": "กลุ่มวิชาศึกษาทั่วไป",
-                      "credits": 4,
-                      "placeholder": true
-                    },
-                    {
-                      "code": "xxx-xxx",
-                      "name": "วิชาเลือก หมวดวิชาเฉพาะ",
-                      "credits": 3,
+                      "name": "…… กลุ่มภาษาและการสื่อสาร",
+                      "credits": 2,
                       "placeholder": true
                     }
                   ]
@@ -2237,6 +2238,72 @@
                       "name": "วิชาเลือกเสรี",
                       "credits": 3,
                       "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 21,
+                  "courses": [
+                    {
+                      "code": "326-313",
+                      "name": "ชุดวิชา พันธุศาสตร์ของจุลินทรีย์และการประยุกต์ใช้",
+                      "credits": 6
+                    },
+                    {
+                      "code": "326-312",
+                      "name": "สรีรวิทยาของจุลินทรีย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "326-361",
+                      "name": "ราวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "กลุ่มวิชาศึกษาทั่วไป",
+                      "credits": 4,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือก หมวดวิชาเฉพาะ",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "…… กลุ่มภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "326-351",
+                      "name": "วิทยาภูมิคุ้มกัน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "326-322",
+                      "name": "นวภูมิปัญญาไทยทางจุลชีววิทยา",
+                      "credits": 1
+                    },
+                    {
+                      "code": "326-323",
+                      "name": "การประกันคุณภาพห้องปฏิบัติการจุลชีววิทยา",
+                      "credits": 2
                     },
                     {
                       "code": "329-392",
@@ -2261,6 +2328,67 @@
             },
             {
               "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "001-103",
+                      "name": "ไอเดียสู่ความเป็นผู้ประกอบการ",
+                      "credits": 1
+                    },
+                    {
+                      "code": "326-481",
+                      "name": "ไวรัสวิทยา",
+                      "credits": 2
+                    },
+                    {
+                      "code": "326-493",
+                      "name": "สัมมนาทางจุลชีววิทยา",
+                      "credits": 1
+                    },
+                    {
+                      "code": "326-494",
+                      "name": "การฝึกงานทางจุลชีววิทยา",
+                      "credits": 1
+                    },
+                    {
+                      "code": "326-498",
+                      "name": "ประมวลความรอบรู้ทางจุลชีววิทยา",
+                      "credits": 1
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือก หมวดวิชาเฉพาะ",
+                      "credits": 6,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 9,
+                  "courses": [
+                    {
+                      "code": "326-491",
+                      "name": "โครงงานทางจุลชีววิทยา 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือก หมวดวิชาเฉพาะ",
+                      "credits": 6,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
               "terms": [
                 {
                   "term": 1,
@@ -2294,12 +2422,6 @@
                     {
                       "code": "xxx-xxx",
                       "name": "วิชาเลือก หมวดวิชาเฉพาะ",
-                      "credits": 6,
-                      "placeholder": true
-                    },
-                    {
-                      "code": "xxx-xxx",
-                      "name": "วิชาเลือก หมวดวิชาเฉพาะ",
                       "credits": 9,
                       "placeholder": true
                     }
@@ -2309,17 +2431,6 @@
                   "term": 2,
                   "credits": 6,
                   "courses": [
-                    {
-                      "code": "326-491",
-                      "name": "โครงงานทางจุลชีววิทยา 1",
-                      "credits": 3
-                    },
-                    {
-                      "code": "xxx-xxx",
-                      "name": "วิชาเลือก หมวดวิชาเฉพาะ",
-                      "credits": 6,
-                      "placeholder": true
-                    },
                     {
                       "code": "326-497",
                       "name": "สหกิจศึกษาทางจุลชีววิทยา",
@@ -3950,10 +4061,11 @@
             },
             {
               "year": 4,
+              "plan": "ปกติ",
               "terms": [
                 {
                   "term": 1,
-                  "credits": 6,
+                  "credits": 7,
                   "courses": [
                     {
                       "code": "340-481",
@@ -3970,7 +4082,31 @@
                       "name": "วิชาเลือกในกลุ่มวิชาเลือกหมวดวิชาเฉพาะ",
                       "credits": 3,
                       "placeholder": true
-                    },
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกในกลุ่มวิชาเลือกหมวดวิชาเฉพาะ",
+                      "credits": 6,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 6,
+                  "courses": [
                     {
                       "code": "341-471",
                       "name": "สหกิจศึกษา",
@@ -3982,12 +4118,6 @@
                   "term": 2,
                   "credits": 7,
                   "courses": [
-                    {
-                      "code": "xxx-xxx",
-                      "name": "วิชาเลือกในกลุ่มวิชาเลือกหมวดวิชาเฉพาะ",
-                      "credits": 6,
-                      "placeholder": true
-                    },
                     {
                       "code": "340-481",
                       "name": "การสัมมนาทางวิทยาศาสตร์",
@@ -6457,6 +6587,7 @@
             },
             {
               "year": 4,
+              "plan": "ปกติ",
               "terms": [
                 {
                   "term": 1,
@@ -6472,11 +6603,6 @@
                       "name": "รายวิชาเลือกวิทยาศาสตร์พอลิเมอร์",
                       "credits": 2,
                       "placeholder": true
-                    },
-                    {
-                      "code": "343-471",
-                      "name": "สหกิจศึกษา 1",
-                      "credits": 6
                     }
                   ]
                 },
@@ -6489,7 +6615,30 @@
                       "name": "รายวิชาเลือกวิทยาศาสตร์พอลิเมอร์",
                       "credits": 6,
                       "placeholder": true
-                    },
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "343-471",
+                      "name": "สหกิจศึกษา 1",
+                      "credits": 6
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
                     {
                       "code": "343-471",
                       "name": "สหกิจศึกษา 1",

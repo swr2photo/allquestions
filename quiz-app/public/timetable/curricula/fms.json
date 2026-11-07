@@ -1,0 +1,4643 @@
+{
+  "faculty": "คณะวิทยาการจัดการ มหาวิทยาลัยสงขลานครินทร์",
+  "programs": [
+    {
+      "id": "bba-finance",
+      "name": "บริหารธุรกิจ วิชาเอกการเงินและการลงทุน",
+      "division": "สาขาวิชาบริหารธุรกิจ",
+      "editions": [
+        {
+          "curriculumYear": 2567,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 20,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "473-200",
+                      "name": "ชุดวิชาการบริหารและการวิเคราะห์การเงิน",
+                      "credits": 5
+                    },
+                    {
+                      "code": "473-201",
+                      "name": "หลักการวางแผนการเงินส่วนบุคคลและภาษี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-201",
+                      "name": "การบัญชีบริหารเพื่อการจัดการธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-202",
+                      "name": "สถาบันการเงินและตลาดการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 20,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "473-200",
+                      "name": "ชุดวิชาการบริหารและการวิเคราะห์การเงิน",
+                      "credits": 5
+                    },
+                    {
+                      "code": "473-201",
+                      "name": "หลักการวางแผนการเงินส่วนบุคคลและภาษี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-201",
+                      "name": "การบัญชีบริหารเพื่อการจัดการธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-202",
+                      "name": "สถาบันการเงินและตลาดการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-300",
+                      "name": "ชุดวิชาการลงทุนในตราสารทุนและกองทุนรวม",
+                      "credits": 5
+                    },
+                    {
+                      "code": "473-301",
+                      "name": "จรรยาบรรณและมาตรฐานในการประกอบวิชาชีพทางด้านการเงิน",
+                      "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-302",
+                      "name": "ชุดวิชาบริหารความเสี่ยงทางการเงินและตราสารอนุพันธ์",
+                      "credits": 5
+                    },
+                    {
+                      "code": "473-303",
+                      "name": "การวิจัยทางการเงิน 1",
+                      "credits": 2
+                    },
+                    {
+                      "code": "473-305",
+                      "name": "แบบจำลองทางการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-300",
+                      "name": "ชุดวิชาการลงทุนในตราสารทุนและกองทุนรวม",
+                      "credits": 5
+                    },
+                    {
+                      "code": "473-301",
+                      "name": "จรรยาบรรณและมาตรฐานในการประกอบวิชาชีพทางด้านการเงิน",
+                      "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-302",
+                      "name": "ชุดวิชาบริหารความเสี่ยงทางการเงินและตราสารอนุพันธ์",
+                      "credits": 5
+                    },
+                    {
+                      "code": "473-303",
+                      "name": "การวิจัยทางการเงิน 1",
+                      "credits": 2
+                    },
+                    {
+                      "code": "473-305",
+                      "name": "แบบจำลองทางการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 13,
+                  "courses": [
+                    {
+                      "code": "473-400",
+                      "name": "การเงินระหว่างประเทศ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-401",
+                      "name": "การวิจัยทางการเงิน 2",
+                      "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-400",
+                      "name": "การเงินระหว่างประเทศ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-401",
+                      "name": "การวิจัยทางการเงิน 2",
+                      "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-403",
+                      "name": "สหกิจศึกษา",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bba-marketing",
+      "name": "บริหารธุรกิจ วิชาเอกการตลาดและการสื่อสาร",
+      "division": "สาขาวิชาบริหารธุรกิจ",
+      "editions": [
+        {
+          "curriculumYear": 2567,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-101",
+                      "name": "พฤติกรรมผู้บริโภคเพื่อการจัดการการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-101",
+                      "name": "พฤติกรรมผู้บริโภคเพื่อการจัดการการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-201",
+                      "name": "การจัดการแบรนด์และผลิตภัณฑ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-202",
+                      "name": "การจัดการการตลาดเชิงนวัตกรรม",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "474-203",
+                      "name": "การตลาดเพื่อสังคม",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-204",
+                      "name": "กลยุทธ์และการวิเคราะห์ราคา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-201",
+                      "name": "การจัดการแบรนด์และผลิตภัณฑ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-202",
+                      "name": "การจัดการการตลาดเชิงนวัตกรรม",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "474-203",
+                      "name": "การตลาดเพื่อสังคม",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-204",
+                      "name": "กลยุทธ์และการวิเคราะห์ราคา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-301",
+                      "name": "การตลาดแบบเชื่อมโยงลูกค้าผ่านหลากหลายช่องทาง",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-302",
+                      "name": "การวัดและการประเมินผลทางการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 22,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-303",
+                      "name": "การวิจัยการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-305",
+                      "name": "การสื่อสารทางการตลาดเชิงบูรณาการ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-306",
+                      "name": "การตลาดดิจิทัล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-301",
+                      "name": "การตลาดแบบเชื่อมโยงลูกค้าผ่านหลากหลายช่องทาง",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-302",
+                      "name": "การวัดและการประเมินผลทางการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 22,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-303",
+                      "name": "การวิจัยการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-305",
+                      "name": "การสื่อสารทางการตลาดเชิงบูรณาการ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-306",
+                      "name": "การตลาดดิจิทัล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 11,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-401",
+                      "name": "กลยุทธ์การตลาด",
+                      "credits": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 11,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "474-401",
+                      "name": "กลยุทธ์การตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-403",
+                      "name": "สหกิจศึกษา",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bba-hrm",
+      "name": "บริหารธุรกิจ วิชาเอกการจัดการทรัพยากรมนุษย์",
+      "division": "สาขาวิชาบริหารธุรกิจ",
+      "editions": [
+        {
+          "curriculumYear": 2567,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-201",
+                      "name": "การวางแผนทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-203",
+                      "name": "ภาวะผู้นำสำหรับศตวรรษที่ 21",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "475-202",
+                      "name": "จิตวิทยาทางธุรกิจและพฤติกรรมองค์กร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-204",
+                      "name": "การพัฒนาทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-205",
+                      "name": "การจัดการผลตอบแทน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-201",
+                      "name": "การวางแผนทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-203",
+                      "name": "ภาวะผู้นำสำหรับศตวรรษที่ 21",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "475-202",
+                      "name": "จิตวิทยาทางธุรกิจและพฤติกรรมองค์กร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-204",
+                      "name": "การพัฒนาทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-205",
+                      "name": "การจัดการผลตอบแทน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-301",
+                      "name": "การจัดการประสิทธิภาพและผลการปฏิบัติงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-302",
+                      "name": "การเจรจาต่อรอง และการจัดการความขัดแย้งและยากลำบาก",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-303",
+                      "name": "การวิจัยทางด้านการจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-304",
+                      "name": "กฎหมายเกี่ยวกับการจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-301",
+                      "name": "การจัดการประสิทธิภาพและผลการปฏิบัติงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-302",
+                      "name": "การเจรจาต่อรอง และการจัดการความขัดแย้งและยากลำบาก",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-303",
+                      "name": "การวิจัยทางด้านการจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-304",
+                      "name": "กฎหมายเกี่ยวกับการจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "475-402",
+                      "name": "สัมมนาการจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 9,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "475-402",
+                      "name": "สัมมนาการจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาโท หรือ วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-403",
+                      "name": "สหกิจศึกษา",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bba-logistics",
+      "name": "บริหารธุรกิจ วิชาเอกการจัดการโลจิสติกส์และโซ่อุปทาน",
+      "division": "สาขาวิชาบริหารธุรกิจ",
+      "editions": [
+        {
+          "curriculumYear": 2567,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "476-201",
+                      "name": "ความรู้เบื้องต้นเกี่ยวกับการจัดการโลจิสติกส์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-202",
+                      "name": "การจัดการธุรกิจระหว่างประเทศสำหรับโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-203",
+                      "name": "การจัดการขนส่ง",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-204",
+                      "name": "การจัดซื้อและการจัดหา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "476-201",
+                      "name": "ความรู้เบื้องต้นเกี่ยวกับการจัดการโลจิสติกส์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-202",
+                      "name": "การจัดการธุรกิจระหว่างประเทศสำหรับโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-203",
+                      "name": "การจัดการขนส่ง",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-204",
+                      "name": "การจัดซื้อและการจัดหา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-301",
+                      "name": "การจัดการคลังสินค้าและการกระจายสินค้า",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-302",
+                      "name": "การวิเคราะห์และการจัดการสินค้าคงคลัง",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-303",
+                      "name": "ตัวแบบการหาค่าเหมาะสมที่สุดในการจัดการโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-304",
+                      "name": "การจัดการการส่งออกและนำเข้า",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-305",
+                      "name": "วิธีวิจัยโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-301",
+                      "name": "การจัดการคลังสินค้าและการกระจายสินค้า",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-302",
+                      "name": "การวิเคราะห์และการจัดการสินค้าคงคลัง",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-303",
+                      "name": "ตัวแบบการหาค่าเหมาะสมที่สุดในการจัดการโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-304",
+                      "name": "การจัดการการส่งออกและนำเข้า",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-305",
+                      "name": "วิธีวิจัยโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "476-401",
+                      "name": "การจัดการและการออกแบบโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-402",
+                      "name": "สัมมนาการจัดการโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-403",
+                      "name": "โครงงานสำหรับการจัดการโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-401",
+                      "name": "การจัดการและการออกแบบโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "476-402",
+                      "name": "สัมมนาการจัดการโลจิสติกส์และโซ่อุปทาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-403",
+                      "name": "สหกิจศึกษา",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bba-bis",
+      "name": "บริหารธุรกิจ วิชาเอกระบบสารสนเทศทางธุรกิจ",
+      "division": "สาขาวิชาบริหารธุรกิจ",
+      "editions": [
+        {
+          "curriculumYear": 2567,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-101",
+                      "name": "หลักการพื้นฐานระบบสารสนเทศ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-102",
+                      "name": "ตรรกะของการใช้โปรแกรมและโครงสร้างข้อมูล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-101",
+                      "name": "หลักการพื้นฐานระบบสารสนเทศ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-102",
+                      "name": "ตรรกะของการใช้โปรแกรมและโครงสร้างข้อมูล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "477-201",
+                      "name": "การเขียนโปรแกรมเบื้องต้นทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-202",
+                      "name": "เครือข่ายคอมพิวเตอร์และความมั่นคงทางไซเบอร์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-203",
+                      "name": "การจัดการฐานข้อมูล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-204",
+                      "name": "เทคโนโลยีแพลตฟอร์มสำหรับคลาวด์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "477-201",
+                      "name": "การเขียนโปรแกรมเบื้องต้นทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-202",
+                      "name": "เครือข่ายคอมพิวเตอร์และความมั่นคงทางไซเบอร์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-203",
+                      "name": "การจัดการฐานข้อมูล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-204",
+                      "name": "เทคโนโลยีแพลตฟอร์มสำหรับคลาวด์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-301",
+                      "name": "การพัฒนาเว็บขั้นสมบูรณ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-302",
+                      "name": "การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-303",
+                      "name": "ระบบสารสนเทศเพื่อการจัดการ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-301",
+                      "name": "การพัฒนาเว็บขั้นสมบูรณ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-302",
+                      "name": "การวิเคราะห์และออกแบบระบบสารสนเทศทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 22,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-303",
+                      "name": "ระบบสารสนเทศเพื่อการจัดการ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 11,
+                  "courses": [
+                    {
+                      "code": "477-401",
+                      "name": "สัมมนาระบบสารสนเทศทางธุรกิจ",
+                      "credits": 1
+                    },
+                    {
+                      "code": "477-402",
+                      "name": "โครงงานระบบสารสนเทศทางธุรกิจ 1",
+                      "credits": 2
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "477-403",
+                      "name": "โครงงานระบบสารสนเทศทางธุรกิจ 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 14,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-403",
+                      "name": "สหกิจศึกษา",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bba-mice",
+      "name": "บริหารธุรกิจ วิชาเอกการจัดการไมซ์",
+      "division": "สาขาวิชาบริหารธุรกิจ",
+      "editions": [
+        {
+          "curriculumYear": 2567,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250003_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "460-101",
+                      "name": "หลักการตลาด",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-102",
+                      "name": "หลักการจัดการและจิตวิทยา",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-101",
+                      "name": "การบัญชีการเงินเบื้องต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-104",
+                      "name": "การจัดการการผลิตและการดำเนินงาน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-105",
+                      "name": "การจัดการทรัพยากรมนุษย์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงตรรกะและตัวเลข",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-200",
+                      "name": "ความรู้เบื้องต้นในอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-201",
+                      "name": "การสื่อสารและการเจรจาอย่างมืออาชีพในอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "478-202",
+                      "name": "การจัดการประชุมองค์กร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-203",
+                      "name": "การจัดการการเดินทางเพื่อเป็นรางวัล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-205",
+                      "name": "ศิลปะการนำเสนอสำหรับอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-202",
+                      "name": "ธุรกิจอัจฉริยะและการวิเคราะห์ข้อมูลเชิงธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-200",
+                      "name": "ความรู้เบื้องต้นในอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-201",
+                      "name": "การสื่อสารและการเจรจาอย่างมืออาชีพในอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "478-202",
+                      "name": "การจัดการประชุมองค์กร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-203",
+                      "name": "การจัดการการเดินทางเพื่อเป็นรางวัล",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การคิดเชิงระบบ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-301",
+                      "name": "การจัดการประชุมวิชาชีพ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-302",
+                      "name": "การจัดการอีเวนต์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-303",
+                      "name": "การจัดการงานแสดงสินค้า",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-304",
+                      "name": "ชุดวิชาการผลิตอีเวนต์ด้านไมซ์และความคิดสร้างสรรค์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-302",
+                      "name": "สถิติสำหรับการวิจัยทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-301",
+                      "name": "การจัดการประชุมวิชาชีพ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-302",
+                      "name": "การจัดการอีเวนต์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 19,
+                  "courses": [
+                    {
+                      "code": "460-303",
+                      "name": "ชุดวิชาความเป็นผู้ประกอบการ นวัตกรรม และการเปลี่ยนผ่านสู่ดิจิทัล",
+                      "credits": 4
+                    },
+                    {
+                      "code": "464-301",
+                      "name": "การภาษีอากร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-303",
+                      "name": "การจัดการงานแสดงสินค้า",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-304",
+                      "name": "ชุดวิชาการผลิตอีเวนต์ด้านไมซ์และความคิดสร้างสรรค์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "478-401",
+                      "name": "การจัดการสถานที่จัดงานและสิ่งอำนวยความสะดวก",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-402",
+                      "name": "การวิจัยในอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-401",
+                      "name": "การจัดการสถานที่จัดงานและสิ่งอำนวยความสะดวก",
+                      "credits": 3
+                    },
+                    {
+                      "code": "478-402",
+                      "name": "การวิจัยในอุตสาหกรรมไมซ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือ วิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาเลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "460-403",
+                      "name": "สหกิจศึกษา",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "accounting",
+      "name": "บัญชีบัณฑิต",
+      "division": "สาขาวิชาการบัญชี",
+      "editions": [
+        {
+          "curriculumYear": 2568,
+          "source": "https://www.fms.psu.ac.th/files/curriculum/documents/CURR20250008_document.pdf",
+          "years": [
+            {
+              "year": 1,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การพัฒนาความคิด",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-111",
+                      "name": "หลักการบัญชีขั้นต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-112",
+                      "name": "การบัญชีขั้นกลาง 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-191",
+                      "name": "การจัดการธุรกิจและธุรกิจระหว่างประเทศ",
+                      "credits": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 1,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การพัฒนาความคิด",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 5 สุขภาวะแบบองค์รวม",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 6 จิตสาธารณะและการพัฒนาที่ยั่งยืน",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 7 การปรับตัวให้เข้ากับพลวัตของโลก",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-111",
+                      "name": "หลักการบัญชีขั้นต้น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "876-106",
+                      "name": "เศรษฐศาสตร์สำหรับบริหารธุรกิจ",
+                      "credits": 3
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 18,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 1 ภาษาและการสื่อสาร",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 4 การใช้เทคโนโลยีดิจิทัล",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "460-103",
+                      "name": "หลักการเงิน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "460-201",
+                      "name": "ความคิดแบบเติบโตเพื่อทักษะการสื่อสารทางธุรกิจ",
+                      "credits": 2
+                    },
+                    {
+                      "code": "460-301",
+                      "name": "กฎหมายและจริยธรรมทางธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-112",
+                      "name": "การบัญชีขั้นกลาง 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-191",
+                      "name": "การจัดการธุรกิจและธุรกิจระหว่างประเทศ",
+                      "credits": 3
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การพัฒนาความคิด",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-211",
+                      "name": "การบัญชีขั้นกลาง 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-221",
+                      "name": "การบัญชีต้นทุน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-241",
+                      "name": "เทคโนโลยีสารสนเทศเพื่อการบัญชีและธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-203",
+                      "name": "การบริหารการเงิน",
+                      "credits": 3
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-222",
+                      "name": "การบัญชีบริหาร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-242",
+                      "name": "ระบบสารสนเทศทางการบัญชี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-243",
+                      "name": "การวิเคราะห์และออกแบบฐานข้อมูลเพื่อการบัญชีและธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-251",
+                      "name": "การภาษีอากร 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 2,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 16,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 2 การพัฒนาความคิด",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-211",
+                      "name": "การบัญชีขั้นกลาง 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-221",
+                      "name": "การบัญชีต้นทุน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-241",
+                      "name": "เทคโนโลยีสารสนเทศเพื่อการบัญชีและธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "473-203",
+                      "name": "การบริหารการเงิน",
+                      "credits": 3
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-222",
+                      "name": "การบัญชีบริหาร",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-242",
+                      "name": "ระบบสารสนเทศทางการบัญชี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-243",
+                      "name": "การวิเคราะห์และออกแบบฐานข้อมูลเพื่อการบัญชีและธุรกิจ",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-251",
+                      "name": "การภาษีอากร 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-310",
+                      "name": "การบัญชีขั้นสูง 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-331",
+                      "name": "การสอบบัญชีและการให้ความเชื่อมั่น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-341",
+                      "name": "ชุดวิชาโปรแกรมสำเร็จรูปทางการบัญชี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-351",
+                      "name": "การภาษีอากร 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-311",
+                      "name": "การบัญชีขั้นสูง 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-332",
+                      "name": "การตรวจสอบระบบสารสนเทศและการตรวจสอบภายใน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-342",
+                      "name": "ชุดวิชาโปรแกรมอีอาร์พี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 3,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 8 รายวิชาเลือกในหมวดวิชาศึกษาทั่วไป",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-310",
+                      "name": "การบัญชีขั้นสูง 1",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-331",
+                      "name": "การสอบบัญชีและการให้ความเชื่อมั่น",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-341",
+                      "name": "ชุดวิชาโปรแกรมสำเร็จรูปทางการบัญชี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-351",
+                      "name": "การภาษีอากร 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 17,
+                  "courses": [
+                    {
+                      "code": "xxx-xxx",
+                      "name": "GE 3 การคิดแบบผู้ประกอบการ",
+                      "credits": 2,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "464-311",
+                      "name": "การบัญชีขั้นสูง 2",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-332",
+                      "name": "การตรวจสอบระบบสารสนเทศและการตรวจสอบภายใน",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-342",
+                      "name": "ชุดวิชาโปรแกรมอีอาร์พี",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "ปกติ",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 15,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-411",
+                      "name": "รายงานการเงินและการวิเคราะห์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 12,
+                  "courses": [
+                    {
+                      "code": "464-421",
+                      "name": "การวางแผนกำไรและการควบคุม",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-461",
+                      "name": "การบูรณาการความรู้ทางการบัญชี",
+                      "credits": 6
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "year": 4,
+              "plan": "สหกิจศึกษา",
+              "terms": [
+                {
+                  "term": 1,
+                  "credits": 21,
+                  "courses": [
+                    {
+                      "code": "460-401",
+                      "name": "การจัดการเชิงกลยุทธ์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-411",
+                      "name": "รายงานการเงินและการวิเคราะห์",
+                      "credits": 3
+                    },
+                    {
+                      "code": "464-421",
+                      "name": "การวางแผนกำไรและการควบคุม",
+                      "credits": 3
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "วิชาชีพเลือก หรือวิชาโท",
+                      "credits": 3,
+                      "placeholder": true
+                    },
+                    {
+                      "code": "xxx-xxx",
+                      "name": "เลือกเสรี",
+                      "credits": 3,
+                      "placeholder": true
+                    }
+                  ]
+                },
+                {
+                  "term": 2,
+                  "credits": 6,
+                  "courses": [
+                    {
+                      "code": "464-481",
+                      "name": "สหกิจศึกษาทางการบัญชี",
+                      "credits": 6
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -7,7 +7,52 @@
       "file": "/timetable/curricula/sci.json",
       "programs": 12,
       "source": "https://www.sci.psu.ac.th",
-      "updatedAt": "2026-11-07T00:37:54.395Z"
+      "updatedAt": "2026-11-07T05:18:47.024Z"
+    },
+    {
+      "id": "eng",
+      "faculty": "คณะวิศวกรรมศาสตร์",
+      "campus": "วิทยาเขตหาดใหญ่",
+      "file": "/timetable/curricula/eng.json",
+      "programs": 15,
+      "source": "https://www.eng.psu.ac.th/apply-undergraduated",
+      "updatedAt": "2026-11-07T05:18:47.148Z"
+    },
+    {
+      "id": "agro",
+      "faculty": "คณะอุตสาหกรรมเกษตร",
+      "campus": "วิทยาเขตหาดใหญ่",
+      "file": "/timetable/curricula/agro.json",
+      "programs": 2,
+      "source": "https://agro.psu.ac.th/agro6/curriculum",
+      "updatedAt": "2026-11-07T05:18:47.189Z"
+    },
+    {
+      "id": "fms",
+      "faculty": "คณะวิทยาการจัดการ",
+      "campus": "วิทยาเขตหาดใหญ่",
+      "file": "/timetable/curricula/fms.json",
+      "programs": 7,
+      "source": "https://www.fms.psu.ac.th/?page=courses-type&id=1",
+      "updatedAt": "2026-11-07T05:18:47.340Z"
+    },
+    {
+      "id": "natres",
+      "faculty": "คณะทรัพยากรธรรมชาติ",
+      "campus": "วิทยาเขตหาดใหญ่",
+      "file": "/timetable/curricula/natres.json",
+      "programs": 1,
+      "source": "https://natres.psu.ac.th/main/?page_id=977",
+      "updatedAt": "2026-11-07T05:18:47.348Z"
+    },
+    {
+      "id": "libarts",
+      "faculty": "คณะศิลปศาสตร์",
+      "campus": "วิทยาเขตหาดใหญ่",
+      "file": "/timetable/curricula/libarts.json",
+      "programs": 5,
+      "source": "https://sites.google.com/view/fla-es/bachelor-of-arts",
+      "updatedAt": "2026-11-07T05:18:47.377Z"
     }
   ]
 }

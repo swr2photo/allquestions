@@ -2,16 +2,22 @@
 /*
  * นำเข้าแผนการศึกษา (study plans: courses per year / term) ของแต่ละคณะ ลงระบบจัดตารางเรียน
  *
- *   node scripts/timetable/import-curriculum.mjs                 # every faculty in curriculum-sources.mjs
- *   node scripts/timetable/import-curriculum.mjs eng agro        # only these faculty ids
- *   node scripts/timetable/import-curriculum.mjs --dump eng/ee   # print the normalised text of one program
- *   options: --cache <dir>  keep downloads here (default: <tmp>/psu-curriculum-cache)
- *            --refresh      ignore the cache and download again
+ *   node scripts/timetable/import-curriculum.mjs                       # every faculty in curriculum-sources.mjs
+ *   node scripts/timetable/import-curriculum.mjs eng agro              # only these faculty ids
+ *   node scripts/timetable/import-curriculum.mjs --dump eng/civil/2564 # print one edition's normalised text
+ *   options: --cache <dir>     keep downloads here (default: <tmp>/psu-curriculum-cache)
+ *            --refresh         ignore the cache and download again
+ *            --report <file>   also write per-program totals / warnings as JSON
  *
- * Sources (see curriculum-sources.mjs): public PDFs, public Google Drive PDFs and public Google
- * Sheets that the faculties link from their own websites. PDFs go through `pdftotext -enc UTF-8
- * -layout` (poppler/xpdf must be on PATH; without -enc UTF-8 some builds silently drop all Thai).
- * Sheets are exported as CSV and turned into the same line format, so one parser handles both.
+ * Faculties now imported (all วิทยาเขตหาดใหญ่): sci, eng, agro, fms, natres, libarts — sources and the
+ * programs that were skipped (and why) are listed in curriculum-sources.mjs. To add a faculty, add an
+ * entry there and run this script for its id; the app reads index.json and needs no change.
+ *
+ * Sources: public PDFs, public Google Drive PDFs and public Google Sheets that the faculties link
+ * from their own websites (no OCR, no sign-in pages, nothing behind bot checks). PDFs go through
+ * Poppler's `pdftotext -enc UTF-8 -layout` (the script finds Poppler on PATH or MiKTeX's copy, or
+ * set PDFTOTEXT; xpdf 4.x — e.g. Git for Windows' — garbles Thai). Sheets are exported as CSV (every
+ * tab) and turned into the same line layout, so one parser handles both.
  *
  * Output
  *   public/timetable/curricula/<faculty id>.json   { faculty, programs: [{ id, name, division,
@@ -19,15 +25,18 @@
  *   public/timetable/curricula/index.json          one entry per faculty (upserted by id) — this is
  *                                                    all the app needs to show a new faculty
  *
- * Parser notes
- *   - A plan section starts at the first "ชั้นปีที่ 1" / "ปีที่ 1" heading and ends at the course
- *     descriptions (คำอธิบายรายวิชา) or at an appendix such as "รายวิชาเลือก…" catalogues. Course
- *     lists outside a "ภาคการศึกษาที่ n" / "ภาคฤดูร้อน" block are ignored, so elective catalogues
- *     no longer show up as an extra "year 4 / term 3".
- *   - A term's `credits` is the plan's own "รวม n หน่วยกิต" when it states one (so alternatives
- *     listed as "เลือก 1 วิชาจาก…" don't inflate it), else the sum of its rows.
- *   - Terms that still look like a catalogue (> 30 credits or > 16 rows) are dropped with a warning.
- *   - The run ends with a per-program credit total; real bachelor plans land at ~120–150.
+ * Parsing (curriculum-parser.mjs; see its header for every layout it handles)
+ *   - A plan starts at the first "ชั้นปีที่ 1" / "ปีที่ 1" heading followed by a term heading and ends at
+ *     หมวดที่ 4, the course descriptions (คำอธิบายรายวิชา) or ภาคผนวก. Rows outside an open
+ *     "ภาคการศึกษาที่ n" / "ภาคฤดูร้อน" block (e.g. after the term's "รวม" line) are ignored, so
+ *     elective catalogues no longer appear as an extra "year 4 / term 3"; a term that still adds up
+ *     to > 30 credits is dropped with a warning.
+ *   - A term's `credits` is the plan's own "รวม n หน่วยกิต" when it is lower than the rows' sum
+ *     (alternatives such as "เลือก 1 วิชาจาก…" are listed with their own credits), else the sum.
+ *   - Plan variants (ปกติ / สหกิจศึกษา / โครงงาน, majors, แขนง, "4+0" tables …) become `plan` names;
+ *     years shared by every variant have no `plan`, which the app applies to all of them.
+ *   - Each run prints per-program totals next to the document's own "หน่วยกิตรวมตลอดหลักสูตร";
+ *     real bachelor plans land at ~110–150.
  */
 import fs from "node:fs";
 import os from "node:os";
@@ -168,7 +177,20 @@ async function sheetLines(id) {
   for (const gid of gids.length ? gids : [null]) {
     const url = `https://docs.google.com/spreadsheets/d/${id}/export?format=csv${gid ? `&gid=${gid}` : ""}`;
     const csv = fs.readFileSync(await download(url, `sheet-${id}-${gid ?? 0}.csv`), "utf8");
-    for (const cells of parseCsv(csv)) lines.push(sheetRowLine(cells));
+    // Some tabs keep stale rows from another program far below the plan, after a long run of empty
+    // rows — stop at the first gap of 20+ empty rows once the plan has started.
+    let blank = 0;
+    let seen = 0;
+    for (const cells of parseCsv(csv)) {
+      const line = sheetRowLine(cells);
+      if (!line) {
+        if (++blank >= 20 && seen > 10) break;
+        continue;
+      }
+      blank = 0;
+      seen++;
+      lines.push(line);
+    }
     lines.push("");
   }
   return lines;
