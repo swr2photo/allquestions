@@ -526,6 +526,23 @@ export const FACULTIES = [
     ],
   },
 
+  // Surat Thani — Art and Management Sciences (LAMS): each program's plan is a PDF linked from
+  // https://lams.surat.psu.ac.th/. Only plans whose totals match the stated total are imported:
+  // not yet บัญชีบัณฑิต 2566 (reads 159 of 134), ภาษาอังกฤษเพื่อการสื่อสารทางธุรกิจ 2567 (129 of 124)
+  // and ภาษาจีนเพื่อการสื่อสารทางธุรกิจ 2568 (89 of 127).
+  {
+    id: "lams",
+    faculty: "คณะศิลปศาสตร์และวิทยาการจัดการ",
+    campus: "วิทยาเขตสุราษฎร์ธานี",
+    title: "คณะศิลปศาสตร์และวิทยาการจัดการ มหาวิทยาลัยสงขลานครินทร์ วิทยาเขตสุราษฎร์ธานี",
+    source: "https://lams.surat.psu.ac.th/",
+    programs: [
+      { id: "business-management", name: "บริหารธุรกิจ สาขาวิชาการจัดการธุรกิจ", division: "คณะศิลปศาสตร์และวิทยาการจัดการ", editions: [{ curriculumYear: 2564, pdf: "https://lams.surat.psu.ac.th/UserFiles/file/lams64-2.pdf" }] },
+      { id: "tourism-business-management", name: "บริหารธุรกิจ สาขาวิชาการจัดการธุรกิจการท่องเที่ยว", division: "คณะศิลปศาสตร์และวิทยาการจัดการ", editions: [{ curriculumYear: 2567, pdf: "https://lams.surat.psu.ac.th/UserFiles/file/%E0%B9%80%E0%B8%A5%E0%B9%88%E0%B8%A1%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3/67/%E0%B8%84%E0%B8%B9%E0%B9%88%E0%B8%A1%E0%B8%B7%E0%B8%AD%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3%20TBM%2067_compressed.pdf" }] },
+      { id: "public-administration", name: "รัฐประศาสนศาสตร์ สาขาวิชาการจัดการรัฐกิจ", division: "คณะศิลปศาสตร์และวิทยาการจัดการ", editions: [{ curriculumYear: 2567, pdf: "https://lams.surat.psu.ac.th/UserFiles/file/%E0%B9%80%E0%B8%A5%E0%B9%88%E0%B8%A1%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3/67/%E0%B8%84%E0%B8%B9%E0%B9%88%E0%B8%A1%E0%B8%B7%E0%B8%AD%E0%B8%AB%E0%B8%A5%E0%B8%B1%E0%B8%81%E0%B8%AA%E0%B8%B9%E0%B8%95%E0%B8%A3%20PA%2067_compressed.pdf" }] },
+    ],
+  },
+
   // Surat Thani — Science and Industrial Technology: each major's page https://scit.surat.psu.ac.th/p_major?id=N
   // links its part of the faculty's คู่มือการศึกษาประจำปีการศึกษา 2569, whose program list gives the
   // curricula (2569 revisions, การจัดการงานวิศวกรรม 2565, การจัดการนวัตกรรมการค้าสมัยใหม่ 2568).

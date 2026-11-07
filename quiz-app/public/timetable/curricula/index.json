@@ -136,6 +136,15 @@
       "updatedAt": "2026-11-07T06:21:33.432Z"
     },
     {
+      "id": "lams",
+      "faculty": "คณะศิลปศาสตร์และวิทยาการจัดการ",
+      "campus": "วิทยาเขตสุราษฎร์ธานี",
+      "file": "/timetable/curricula/lams.json",
+      "programs": 3,
+      "source": "https://lams.surat.psu.ac.th/",
+      "updatedAt": "2026-11-07T06:33:15.393Z"
+    },
+    {
       "id": "surat-scit",
       "faculty": "คณะวิทยาศาสตร์และเทคโนโลยีอุตสาหกรรม",
       "campus": "วิทยาเขตสุราษฎร์ธานี",
