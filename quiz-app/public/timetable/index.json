@@ -18,7 +18,27 @@
       "fetchedAt": "2026-11-06T14:02:21.510Z",
       "complete": true,
       "source": "sis.psu.ac.th"
+    },
+    {
+      "id": "2569-1",
+      "year": 2569,
+      "term": 1,
+      "label": "1/2569",
+      "file": "/api/timetable/terms/2569-1",
+      "courses": 5450,
+      "sections": 8149,
+      "campuses": {
+        "วิทยาเขตหาดใหญ่": 2840,
+        "วิทยาเขตปัตตานี": 1360,
+        "วิทยาเขตภูเก็ต": 510,
+        "วิทยาเขตสุราษฎร์ธานี": 510,
+        "วิทยาเขตตรัง": 230
+      },
+      "faculties": 49,
+      "fetchedAt": "2026-11-06T23:35:34.054Z",
+      "complete": true,
+      "source": "sis.psu.ac.th"
     }
   ],
-  "updatedAt": "2026-11-06T14:19:42.516Z"
+  "updatedAt": "2026-11-07T00:10:43.559Z"
 }

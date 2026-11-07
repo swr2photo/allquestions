@@ -413,6 +413,9 @@
   state.phase = state.stopped ? "stopped" : "done";
   const secCount = state.subjects.reduce((n, s) => n + s.sections.length, 0);
   log(`เสร็จ: ${state.subjects.length} วิชา, ${secCount} sections, error ${state.errors.length}`);
+  // A finished run must not be "resumed" next time (that would resubmit stale data),
+  // so drop the saved progress once the result is in memory and about to be handed off.
+  if (state.phase === "done" && persist) await state.clear();
   if (state.phase === "done" && CFG.submitTo) submitJson(CFG.submitTo);
   else if (CFG.download) downloadJson();
 })();
