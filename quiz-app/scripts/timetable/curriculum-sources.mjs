@@ -543,6 +543,10 @@ export const FACULTIES = [
     ],
   },
 
+  // Surat Thani — Natural Innovation for Agriculture, Fisheries and Food (IAF): not imported. Its plans are
+  // PDFs on edumanual.psu.ac.th (https://edumanual.psu.ac.th/sni/sni_iaf/, file_pdf/2567_SNI_iaf_2777.pdf),
+  // which returned 502 Bad Gateway in every attempt. iaf.surat.psu.ac.th links no plan files directly.
+
   // Surat Thani — Science and Industrial Technology: each major's page https://scit.surat.psu.ac.th/p_major?id=N
   // links its part of the faculty's คู่มือการศึกษาประจำปีการศึกษา 2569, whose program list gives the
   // curricula (2569 revisions, การจัดการงานวิศวกรรม 2565, การจัดการนวัตกรรมการค้าสมัยใหม่ 2568).
