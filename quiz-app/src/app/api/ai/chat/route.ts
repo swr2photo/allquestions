@@ -115,7 +115,7 @@ ${memoryEnabled ? "\n(Memory reference enabled)" : ""}
   const modelsToTry = [modelToUse];
   if (thaillmApiKey && !modelsToTry.includes("thaillm/typhoon-v1.5x-70b-instruct")) modelsToTry.push("thaillm/typhoon-v1.5x-70b-instruct");
   if (groqApiKey && !modelsToTry.includes("groq/llama-3.3-70b-versatile")) modelsToTry.push("groq/llama-3.3-70b-versatile");
-  if (geminiApiKey && !modelsToTry.includes("gemini-2.0-flash")) modelsToTry.push("gemini-2.0-flash");
+  if (geminiApiKey && !modelsToTry.includes("gemini-3.8-flash")) modelsToTry.push("gemini-3.8-flash");
   if (openRouterApiKey && !modelsToTry.includes("openrouter/google/gemini-2.0-flash")) modelsToTry.push("openrouter/google/gemini-2.0-flash");
 
   const stream = new ReadableStream({
@@ -170,10 +170,15 @@ ${memoryEnabled ? "\n(Memory reference enabled)" : ""}
               body: JSON.stringify({ model: m, max_tokens: 4096, system: systemInstruction, messages: commonMsgs, stream: true }),
             });
           } else {
+            const isHydrogen = m === "gemini-4-hydrogen";
+            const generationConfig = isHydrogen ? { thinkingConfig: { thinkingLevel: "high" } } : undefined;
             res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:streamGenerateContent?alt=sse&key=${geminiApiKey}`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ contents: truncatedMessages.map((msg: { role: string; content: string }) => ({ role: msg.role === "user" ? "user" : "model", parts: [{ text: msg.content }] })) }),
+              body: JSON.stringify({
+                contents: truncatedMessages.map((msg: { role: string; content: string }) => ({ role: msg.role === "user" ? "user" : "model", parts: [{ text: msg.content }] })),
+                ...(generationConfig ? { generationConfig } : {}),
+              }),
             });
           }
 

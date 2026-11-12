@@ -24,6 +24,7 @@ export const MODEL_CREDITS: Record<string, number> = {
 
   // Pro models (2 credits)
   "gemini-3.1-pro": 2,
+  "gemini-4-hydrogen": 1,
   "openrouter/deepseek/deepseek-r1": 2,
   "openrouter/openai/gpt-4.1": 2,
 

@@ -1060,6 +1060,7 @@ function SettingsModal({
   const MODEL_DESCS: Record<string, string> = {
     auto: t("autoDesc", lang),
     "gemini-3.1-pro": t("proDesc", lang),
+    "gemini-4-hydrogen": t("proDesc", lang),
     "gemini-2.5-flash": t("flashDesc", lang),
     "claude-sonnet": t("claudeDesc", lang),
   };
@@ -1129,7 +1130,7 @@ function SettingsModal({
                   <label className="text-sm font-medium text-gray-900 mb-1 block">{t("defaultModel", lang)}</label>
                   <p className="text-xs text-gray-500 mb-3">{t("defaultModelDesc", lang)}</p>
                   <div className="space-y-2">
-                    {(["auto", "gemini-3.1-pro", "gemini-2.5-flash", "claude-sonnet"] as const).map((value) => (
+                    {(["auto", "gemini-3.1-pro", "gemini-4-hydrogen", "gemini-2.5-flash", "claude-sonnet"] as const).map((value) => (
                       <label
                         key={value}
                         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
@@ -1139,7 +1140,7 @@ function SettingsModal({
                         <input type="radio" name="model" value={value} checked={draft.defaultModel === value}
                           onChange={() => setDraft({ ...draft, defaultModel: value })} className="accent-primary" />
                         <div>
-                          <span className="text-sm font-medium text-gray-900">{value === "auto" ? "Auto" : value === "gemini-3.1-pro" ? "Pro 3.1" : value === "claude-sonnet" ? "Claude" : "Flash 2.5"}</span>
+                          <span className="text-sm font-medium text-gray-900">{value === "auto" ? "Auto" : value === "gemini-3.1-pro" ? "Pro 3.1" : value === "gemini-4-hydrogen" ? "Hydrogen 4" : value === "claude-sonnet" ? "Claude" : "Flash 2.5"}</span>
                           <p className="text-xs text-gray-500">{MODEL_DESCS[value]}</p>
                         </div>
                       </label>
@@ -2370,6 +2371,7 @@ export default function AIChatPage() {
         name: aiSettings.language === "th" ? "แนะนำ" : "Recommended",
         models: [
           { value: "auto", label: "Auto Select", icon: <Sparkles className="h-3.5 w-3.5 text-amber-500" />, desc: "ดีที่สุดตามสถานะ", provider: "all" },
+          { value: "gemini-4-hydrogen", label: "Hydrogen 4", icon: <Sparkles className="h-3.5 w-3.5 text-cyan-500" />, desc: "เร็วและฉลาด • Gemini Direct", provider: "gemini" },
           { value: "gemini-3.1-pro", label: "Pro 3.1", icon: <Zap className="h-3.5 w-3.5 text-violet-500" />, desc: "Gemini Direct", provider: "gemini" },
         ]
       },
@@ -3894,10 +3896,10 @@ export default function AIChatPage() {
           <div ref={scrollRef} className={`flex-1 overflow-y-auto px-4 pt-16 pb-40 scroll-smooth custom-scrollbar ${
             aiSettings.fontSize === "small" ? "text-xs" : aiSettings.fontSize === "large" ? "text-base" : "text-sm"
           }`}>
-            <div className="max-w-3xl mx-auto flex flex-col gap-6">
+            <div className="max-w-3xl mx-auto flex flex-col gap-6 min-h-full">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
-              <div className="relative h-20 w-20 mb-8">
+            <div className="mt-auto flex flex-col items-center justify-center pt-8 pb-4 text-center animate-in fade-in slide-in-from-bottom-8 duration-1000">
+              <div className="relative h-20 w-20 mb-6">
                 <div className="absolute inset-0 bg-emerald-500 rounded-3xl rotate-6 animate-pulse opacity-20" />
                 <div className="absolute inset-0 bg-emerald-500 rounded-3xl -rotate-3 transition-transform hover:rotate-0 duration-500 shadow-xl shadow-emerald-500/20 flex items-center justify-center text-white">
                   <Sparkles className="h-10 w-10" />
@@ -3906,21 +3908,21 @@ export default function AIChatPage() {
               <h2 className="text-3xl font-black text-gray-900  mb-3 tracking-tight">
                 สวัสดี, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-500">{user.name.split(' ')[0]}</span>
               </h2>
-              <p className="text-base text-gray-500  max-w-sm mx-auto mb-12 font-medium">
+              <p className="text-base text-gray-500  max-w-sm mx-auto mb-6 font-medium">
                 ฉันคือผู้ช่วย AI ส่วนตัวของคุณ พร้อมตอบคำถามและวิเคราะห์ข้อมูลทุกรูปแบบ
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl px-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full max-w-2xl px-4">
                 {SUGGESTIONS.map((s, idx) => (
                   <button
                     key={s}
                     disabled={!!(quota && quota.usage >= quota.limit && isFreeModel(selectedModel))}
                     onClick={() => s.includes("📷") ? fileInputRef.current?.click() : sendMessage(s)}
-                    className="group text-left p-4 rounded-2xl border border-gray-200/60  bg-white  hover:bg-emerald-50  hover:border-emerald-200  transition-all shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="group text-left p-3 rounded-xl border border-gray-200/60  bg-white  hover:bg-emerald-50  hover:border-emerald-200  transition-all shadow-sm hover:shadow-md animate-in fade-in slide-in-from-bottom-4 duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ animationDelay: `${idx * 100}ms` }}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-xl bg-gray-50  group-hover:bg-white  text-gray-400 group-hover:text-emerald-500 transition-colors">
+                      <div className="p-1.5 rounded-lg bg-gray-50  group-hover:bg-white  text-gray-400 group-hover:text-emerald-500 transition-colors">
                         {s.includes("📝") ? <ClipboardList className="h-4 w-4" /> : 
                          s.includes("📚") ? <GraduationCap className="h-4 w-4" /> :
                          s.includes("📷") ? <Image className="h-4 w-4" /> :
@@ -4214,17 +4216,16 @@ export default function AIChatPage() {
                         setIsModelPickerOpen(!isModelPickerOpen);
                         if (!isModelPickerOpen) setIsToolsMenuOpen(false);
                       }}
-                      className={`h-10 w-10 rounded-xl flex items-center justify-center transition-all border ${
+                      className={`h-10 px-2.5 rounded-xl flex items-center gap-2 transition-all border ${
                         isModelPickerOpen 
                           ? "bg-emerald-500 text-white border-emerald-500 shadow-lg shadow-emerald-500/20" 
-                          : "bg-emerald-500/5  text-emerald-500 border-emerald-500/10 hover:bg-emerald-500/10 "
+                          : "bg-emerald-500/5  text-emerald-600 border-emerald-500/10 hover:bg-emerald-500/10 "
                       }`}
                       title="เลือกโมเดล AI"
                     >
-                      <div className="relative">
-                        {currentModel.icon}
-                        <ChevronDown className={`absolute -bottom-1 -right-2 h-2.5 w-2.5 transition-transform duration-300 ${isModelPickerOpen ? 'rotate-180' : ''}`} />
-                      </div>
+                      <span className="shrink-0">{currentModel.icon}</span>
+                      <span className="text-sm font-semibold max-w-[120px] truncate">{currentModel.label}</span>
+                      <ChevronDown className={`h-3.5 w-3.5 shrink-0 transition-transform duration-300 ${isModelPickerOpen ? 'rotate-180' : ''}`} />
                     </button>
 
                     {/* Model Picker Popover */}
@@ -4235,7 +4236,7 @@ export default function AIChatPage() {
                             <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Select AI Model</span>
                           </div>
                           {MODEL_CATEGORIES.map((category) => (
-                            <div key={category.name} className="mb-4">
+                            <div key={category.name} className="mb-2">
                               <div className="px-4 py-1.5">
                                 <span className="text-[10px] font-black text-emerald-500/70 uppercase tracking-widest">{category.name}</span>
                               </div>
@@ -4249,8 +4250,8 @@ export default function AIChatPage() {
                                       key={model.value}
                                       disabled={!available}
                                       onClick={() => { setSelectedModel(model.value); setIsModelPickerOpen(false); }}
-                                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-left transition-all ${
-                                        !available ? "opacity-30 grayscale cursor-not-allowed" :
+                                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left transition-all ${
+                                        !available ? "cursor-not-allowed text-gray-500" :
                                         selectedModel === model.value 
                                           ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20" 
                                           : isAuto 
@@ -4258,13 +4259,16 @@ export default function AIChatPage() {
                                             : "hover:bg-gray-100  text-gray-600 "
                                       }`}
                                     >
-                                      <div className={`p-2 rounded-lg ${selectedModel === model.value ? 'bg-white/20' : 'bg-white  shadow-sm'}`}>
+                                      <div className={`p-1.5 rounded-lg ${selectedModel === model.value ? 'bg-white/20' : 'bg-white  shadow-sm'}`}>
                                         {model.icon}
                                       </div>
                                       <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
                                           <span className="text-sm font-bold truncate">{model.label}</span>
-                                          {cost !== undefined && <span className="text-[9px] opacity-70 font-black tracking-tighter">{cost}CR</span>}
+                                          <div className="flex items-center gap-1.5 shrink-0">
+                                            {!available && <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-gray-100 text-gray-600">เร็วๆ นี้</span>}
+                                            {cost !== undefined && <span className="text-[9px] opacity-70 font-black tracking-tighter">{cost}CR</span>}
+                                          </div>
                                         </div>
                                         <p className={`text-[10px] truncate ${selectedModel === model.value ? 'text-white/70' : 'text-gray-400'}`}>{model.desc}</p>
                                       </div>
