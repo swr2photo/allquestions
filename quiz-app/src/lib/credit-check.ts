@@ -45,6 +45,15 @@ export const EMPTY_PREFS: CreditCheckPrefs = { overrides: {}, excluded: [], excl
 
 export type SkipReason = "repeat" | "audit" | "fail" | "excluded" | "term" | "none";
 
+export const SKIP_LABEL: Record<SkipReason, string> = {
+  repeat: "ลงซ้ำ — นับครั้งล่าสุด",
+  audit: "Audit ไม่นับหน่วยกิต",
+  fail: "ไม่ผ่าน / ถอน — ไม่นับหน่วยกิต",
+  excluded: "ไม่นับ (F / W)",
+  term: "ไม่นับภาคนี้",
+  none: "ไม่นับ",
+};
+
 /** เกรดในใบผลการเรียนที่ไม่ได้หน่วยกิต (ติด E/F, ไม่ผ่าน U, ถอน W, ไม่สมบูรณ์ I) */
 export const NON_EARNED_GRADES: ReadonlySet<string> = new Set(["E", "F", "W", "U", "I"]);
 
@@ -60,6 +69,10 @@ export interface CheckedCourse {
   bucket: BucketChoice;
   /** หมวดที่ระบบจัดให้ */
   auto: Bucket;
+  /** true = อยู่ในรายวิชาบังคับ/GE ที่แผนการศึกษาฉบับนี้ระบุไว้ */
+  inPlan: boolean;
+  /** true = อยู่ในรายการวิชาเลือกเฉพาะของฉบับนี้ */
+  inElectiveCatalog: boolean;
   /** true = ระบบเดาจากรหัสภาควิชา ควรตรวจเอง */
   guessed: boolean;
   overridden: boolean;
@@ -97,6 +110,14 @@ export interface CreditSummary {
   earned: number;
   remaining: number;
   buckets: Record<Bucket, BucketSummary>;
+  /** รายละเอียดเกณฑ์ย่อยและส่วนเกินที่ไหลไปเลือกเสรี */
+  breakdown: {
+    basicNeed: number;
+    majorRequiredNeed: number;
+    extraNeed: number;
+    geOverflow: number;
+    electiveOverflow: number;
+  };
   geAreas: {
     area: (typeof GE_AREAS)[number];
     earned: number;
@@ -316,11 +337,25 @@ export function summarizeCredits(
       }
       if (auto.guessed && !override) guessedCount++;
     }
-    courses.push({ key, record, base, bucket, auto: auto.bucket, guessed: auto.guessed && !override, overridden: !!override, ge: auto.ge, skip });
+    courses.push({
+      key,
+      record,
+      base,
+      bucket,
+      auto: auto.bucket,
+      inPlan: lookup.planCourses.has(base),
+      inElectiveCatalog: lookup.electiveCodes.has(base),
+      guessed: auto.guessed && !override,
+      overridden: !!override,
+      ge: auto.ge,
+      skip,
+    });
   }
 
   // ส่วนเกินของ GE และวิชาเลือกเฉพาะ นับเป็นเลือกเสรีได้
-  const overflow = Math.max(0, earned.ge - need.ge) + Math.max(0, earned.elective - need.elective);
+  const geOverflow = Math.max(0, earned.ge - need.ge);
+  const electiveOverflow = Math.max(0, earned.elective - need.elective);
+  const overflow = geOverflow + electiveOverflow;
   const buckets = {} as Record<Bucket, BucketSummary>;
   for (const b of BUCKETS) {
     const overflowIn = b === "free" ? overflow : 0;
@@ -378,6 +413,13 @@ export function summarizeCredits(
     earned: BUCKETS.reduce((a, b) => a + earned[b], 0),
     remaining: Math.max(0, total - counted),
     buckets,
+    breakdown: {
+      basicNeed: structure.basic,
+      majorRequiredNeed: plan.required,
+      extraNeed: extra,
+      geOverflow,
+      electiveOverflow,
+    },
     geAreas,
     courses,
     missing,
