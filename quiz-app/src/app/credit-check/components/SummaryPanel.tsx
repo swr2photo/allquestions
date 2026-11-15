@@ -119,7 +119,9 @@ export function SummaryPanel({ summary }: { summary: CreditSummary }) {
       {summary.geAreas.length > 0 && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
           <h3 className="text-sm font-semibold text-gray-900">ศึกษาทั่วไปรายสาระ</h3>
-          <p className="mt-0.5 text-xs text-gray-500">เกณฑ์ขั้นต่ำตามโครงสร้าง GE 2567 ของมหาวิทยาลัย (บังคับ GE1–GE7 รวม 18 นก. + GE8 เลือก 6 นก.) — วิชาที่ระบบไม่รู้สาระจะไม่ปรากฏที่นี่</p>
+          <p className="mt-0.5 text-xs text-gray-500">
+            เกณฑ์ขั้นต่ำตามโครงสร้าง GE 2567 ของมหาวิทยาลัย (บังคับ GE1–GE7 รวม 18 นก. + GE8 เลือก {summary.geAreas.find((a) => a.area === "GE8")?.need ?? 6} นก.) — วิชาที่ระบบไม่รู้สาระจะไม่ปรากฏที่นี่
+          </p>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             {summary.geAreas.map(({ area, earned, need, sub }) => {
               const ok = earned >= need && (!sub || sub.every((s) => s.earned >= s.need));
@@ -189,13 +191,16 @@ export function SummaryPanel({ summary }: { summary: CreditSummary }) {
                     <p className="mb-1 text-xs font-semibold text-gray-700">{g.title}</p>
                     <ul className="divide-y divide-gray-100 rounded-xl border border-gray-100">
                       {g.list.map((m) => (
-                        <li key={m.code} className="flex items-center gap-3 px-3 py-2 text-sm">
-                          <span className="min-w-[4.5rem] shrink-0 font-mono text-xs font-semibold text-gray-900">{m.code}</span>
-                          <span className="min-w-0 flex-1 text-gray-700">{m.name}</span>
-                          <span className="shrink-0 text-[11px] text-gray-500">
+                        <li key={m.code} className="flex items-start gap-3 px-3 py-2 text-sm">
+                          <span className="mt-0.5 min-w-[4.5rem] shrink-0 font-mono text-xs font-semibold text-gray-900">{m.code}</span>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-gray-700">{m.name}</p>
+                            {m.note && <p className="mt-0.5 text-[11px] text-amber-700">{m.note}</p>}
+                          </div>
+                          <span className="mt-0.5 shrink-0 text-[11px] text-gray-500">
                             ปี {m.year}/{m.term}
                           </span>
-                          <span className="w-10 shrink-0 text-right text-xs font-semibold text-gray-900 tabular-nums">{m.credits} นก.</span>
+                          <span className="mt-0.5 w-10 shrink-0 text-right text-xs font-semibold text-gray-900 tabular-nums">{m.credits} นก.</span>
                         </li>
                       ))}
                     </ul>

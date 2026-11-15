@@ -1,10 +1,13 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ClipboardPaste, FileUp, Loader2, Plus, Trash2 } from "lucide-react";
+import { ClipboardPaste, FileUp, Loader2, Plus, Search, Trash2, X } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { useConfirm } from "@/components/ui/confirm";
+import { normalizeQuery } from "@/lib/timetable";
+import { codeKey, type CatalogCourse } from "@/lib/credit-check";
+import type { FacultyCourse } from "@/app/api/faculties/route";
 import { cn } from "@/lib/utils";
 import {
   UNKNOWN_TERM,
@@ -16,6 +19,7 @@ import {
 
 interface Props {
   records: RegistrationRecord[];
+  catalogCourses?: CatalogCourse[];
   onChange: (records: RegistrationRecord[]) => void;
 }
 
@@ -24,7 +28,7 @@ const FIELD =
 const SECONDARY =
   "flex h-10 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50";
 
-export function ImportPanel({ records, onChange }: Props) {
+export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
   const confirm = useConfirm();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -33,6 +37,96 @@ export function ImportPanel({ records, onChange }: Props) {
   const [pasteText, setPasteText] = useState("");
   const [manualOpen, setManualOpen] = useState(false);
   const [manual, setManual] = useState({ code: "", name: "", credits: "3", term: "" });
+  const [catalogQuery, setCatalogQuery] = useState("");
+  const [sisCache, setSisCache] = useState<Record<string, CatalogCourse[]>>({});
+  const [loadingQuery, setLoadingQuery] = useState<string | null>(null);
+
+  const normalizedQuery = normalizeQuery(catalogQuery);
+
+  useEffect(() => {
+    if (!manualOpen || normalizedQuery.length < 2 || normalizedQuery in sisCache) return;
+    const ctrl = new AbortController();
+    const qKey = normalizedQuery;
+    const rawQ = catalogQuery.trim();
+    const timer = setTimeout(() => {
+      setLoadingQuery(qKey);
+      fetch(`/api/faculties?only=courses&q=${encodeURIComponent(rawQ)}`, { signal: ctrl.signal })
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
+        .then((json: { courses?: FacultyCourse[] }) => {
+          const mapped: CatalogCourse[] = (json.courses ?? []).map((c) => ({
+            code: c.code,
+            name: c.nameTh || c.nameEn || c.code,
+            nameSub: c.nameTh && c.nameEn && c.nameTh !== c.nameEn ? c.nameEn : undefined,
+            credits: c.creditNum || 2,
+            source: "sis",
+            tag: c.ge[0] ?? (c.faculty || undefined),
+          }));
+          setSisCache((prev) => ({ ...prev, [qKey]: mapped }));
+        })
+        .catch((err) => {
+          if (err?.name !== "AbortError") setSisCache((prev) => ({ ...prev, [qKey]: [] }));
+        })
+        .finally(() => setLoadingQuery((cur) => (cur === qKey ? null : cur)));
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+      ctrl.abort();
+    };
+  }, [manualOpen, catalogQuery, normalizedQuery, sisCache]);
+
+  const addedCodes = useMemo(() => new Set(records.map((r) => codeKey(r.code))), [records]);
+
+  const catalogMatches = useMemo(() => {
+    if (!normalizedQuery) {
+      const missingOrPlan = catalogCourses.filter(
+        (c) =>
+          (c.source === "missing" || c.source === "elective" || (c.tag?.startsWith("ในแผน") ?? false)) &&
+          !addedCodes.has(codeKey(c.code))
+      );
+      return (missingOrPlan.length ? missingOrPlan : catalogCourses).slice(0, 30);
+    }
+
+    const sisHits = sisCache[normalizedQuery] ?? [];
+    const byKey = new Map<string, CatalogCourse & { score: number }>();
+    const consider = (c: CatalogCourse) => {
+      const codeNorm = normalizeQuery(c.code);
+      const hayNorm = normalizeQuery(`${c.code} ${c.name} ${c.nameSub ?? ""} ${c.tag ?? ""}`);
+      let score = -1;
+      if (codeNorm === normalizedQuery) score = 0;
+      else if (codeNorm.startsWith(normalizedQuery)) score = 1;
+      else if (codeNorm.includes(normalizedQuery)) score = 2;
+      else if (hayNorm.includes(normalizedQuery)) score = 3;
+      if (score < 0) return;
+
+      const k = codeKey(c.code);
+      const prev = byKey.get(k);
+      if (!prev) {
+        byKey.set(k, { ...c, score });
+        return;
+      }
+      // Prefer SIS/curriculum exact credits over GE default 2, and preserve local plan/GE labels
+      byKey.set(k, {
+        ...prev,
+        credits: prev.creditsEstimated && !c.creditsEstimated ? c.credits : prev.credits,
+        creditsEstimated: prev.creditsEstimated && c.creditsEstimated,
+        nameSub: prev.nameSub ?? c.nameSub,
+        score: Math.min(prev.score, score),
+      });
+    };
+
+    catalogCourses.forEach(consider);
+    sisHits.forEach(consider);
+
+    return [...byKey.values()]
+      .sort((a, b) => a.score - b.score || a.code.localeCompare(b.code))
+      .slice(0, 40);
+  }, [catalogCourses, sisCache, normalizedQuery, addedCodes]);
+
+  const searchingSis = normalizedQuery.length >= 2 && loadingQuery === normalizedQuery;
+
+  const pickCourse = (c: CatalogCourse) => {
+    setManual((m) => ({ ...m, code: c.code, name: c.name, credits: String(c.credits) }));
+  };
 
   const termCount = new Set(records.map((r) => r.term)).size;
 
@@ -212,8 +306,9 @@ export function ImportPanel({ records, onChange }: Props) {
       <Dialog
         open={manualOpen}
         onClose={() => setManualOpen(false)}
+        size="lg"
         title="เพิ่มวิชาเอง"
-        description="สำหรับวิชาที่ไม่มีในใบลงทะเบียน เช่น วิชาเทียบโอน"
+        description="สำหรับวิชาที่ไม่มีในใบลงทะเบียน เช่น วิชาเทียบโอน — เลือกจากฐานข้อมูลหรือกรอกเองด้านล่าง"
         icon={<Plus className="h-5 w-5" />}
         iconClassName="bg-emerald-100 text-emerald-700"
         footer={
@@ -231,23 +326,134 @@ export function ImportPanel({ records, onChange }: Props) {
           </div>
         }
       >
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <label className="col-span-1 space-y-1">
-            <span className="text-xs font-medium text-gray-700">รหัสวิชา</span>
-            <input className={cn(FIELD, "font-mono")} placeholder="322-101" value={manual.code} onChange={(e) => setManual({ ...manual, code: e.target.value })} />
-          </label>
-          <label className="col-span-1 space-y-1">
-            <span className="text-xs font-medium text-gray-700">หน่วยกิต</span>
-            <input className={FIELD} inputMode="numeric" value={manual.credits} onChange={(e) => setManual({ ...manual, credits: e.target.value })} />
-          </label>
-          <label className="col-span-2 space-y-1">
-            <span className="text-xs font-medium text-gray-700">ชื่อวิชา</span>
-            <input className={FIELD} placeholder="CALCULUS I" value={manual.name} onChange={(e) => setManual({ ...manual, name: e.target.value })} />
-          </label>
-          <label className="col-span-2 space-y-1">
-            <span className="text-xs font-medium text-gray-700">ภาคการศึกษา (ไม่บังคับ)</span>
-            <input className={FIELD} placeholder="1/2568" value={manual.term} onChange={(e) => setManual({ ...manual, term: e.target.value })} />
-          </label>
+        <div className="space-y-4 text-sm">
+          {/* เลือกจากฐานข้อมูลรายวิชา */}
+          <div className="space-y-2 rounded-xl border border-gray-200 bg-gray-50/70 p-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-semibold text-gray-800">เลือกจากฐานข้อมูลรายวิชา (หลักสูตร · GE · SIS)</span>
+              {searchingSis && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700">
+                  <Loader2 className="h-3 w-3 animate-spin" /> กำลังค้นหารายวิชา ม.อ.…
+                </span>
+              )}
+            </div>
+            <div className="relative">
+              <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <input
+                type="text"
+                value={catalogQuery}
+                onChange={(e) => setCatalogQuery(e.target.value)}
+                placeholder="ค้นหารหัสหรือชื่อวิชา เช่น 322-101, Calculus, DII00G4005…"
+                aria-label="ค้นหารายวิชาจากฐานข้อมูล"
+                className={cn(FIELD, "pr-8 pl-9")}
+              />
+              {catalogQuery && (
+                <button
+                  type="button"
+                  onClick={() => setCatalogQuery("")}
+                  aria-label="ล้างคำค้นหา"
+                  className="absolute top-1/2 right-2.5 -translate-y-1/2 rounded p-0.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+
+            {catalogMatches.length > 0 ? (
+              <div className="max-h-52 divide-y divide-gray-100 overflow-y-auto rounded-xl border border-gray-200 bg-white">
+                {catalogMatches.map((c) => {
+                  const alreadyAdded = addedCodes.has(codeKey(c.code));
+                  const selected = normalizeQuery(manual.code) === normalizeQuery(c.code);
+                  return (
+                    <button
+                      key={`${c.source}:${c.code}`}
+                      type="button"
+                      onClick={() => pickCourse(c)}
+                      className={cn(
+                        "flex w-full items-start gap-2.5 px-3 py-2 text-left transition-colors hover:bg-emerald-50/60",
+                        selected && "bg-emerald-50/80"
+                      )}
+                    >
+                      <span className="mt-0.5 shrink-0 font-mono text-xs font-semibold text-gray-900">{c.code}</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-medium text-gray-800">{c.name}</p>
+                        {c.nameSub && <p className="truncate text-[11px] text-gray-500">{c.nameSub}</p>}
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        {c.tag && (
+                          <span
+                            className={cn(
+                              "hidden rounded px-1.5 py-0.5 text-[10px] font-medium sm:inline-block",
+                              c.source === "missing"
+                                ? "bg-amber-50 text-amber-800"
+                                : c.source === "gened"
+                                  ? "bg-sky-50 text-sky-800"
+                                  : "bg-gray-100 text-gray-600"
+                            )}
+                          >
+                            {c.tag}
+                          </span>
+                        )}
+                        {alreadyAdded && (
+                          <span className="rounded bg-emerald-100 px-1.5 py-0.5 text-[10px] font-medium text-emerald-800">
+                            มีแล้ว
+                          </span>
+                        )}
+                        <span className="text-xs font-semibold tabular-nums text-gray-700">{c.credits} นก.</span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="py-2 text-center text-xs text-gray-500">
+                {normalizedQuery
+                  ? searchingSis
+                    ? "กำลังค้นหารายวิชาในระบบ…"
+                    : `ไม่พบ “${catalogQuery.trim()}” ในฐานข้อมูล — กรอกรหัสและชื่อวิชาเองด้านล่างได้`
+                  : "พิมพ์รหัสหรือชื่อวิชา (อย่างน้อย 2 ตัวอักษรเพื่อค้นหารายวิชา ม.อ. ทั้งหมด) หรือเลือกสาขาในขั้นที่ 1 เพื่อดูวิชาในแผน"}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="col-span-1 space-y-1">
+              <span className="text-xs font-medium text-gray-700">รหัสวิชา</span>
+              <input
+                className={cn(FIELD, "font-mono")}
+                placeholder="322-101 หรือ DII00G4005"
+                value={manual.code}
+                onChange={(e) => setManual({ ...manual, code: e.target.value })}
+              />
+            </label>
+            <label className="col-span-1 space-y-1">
+              <span className="text-xs font-medium text-gray-700">หน่วยกิต</span>
+              <input
+                className={FIELD}
+                inputMode="numeric"
+                value={manual.credits}
+                onChange={(e) => setManual({ ...manual, credits: e.target.value })}
+              />
+            </label>
+            <label className="col-span-2 space-y-1">
+              <span className="text-xs font-medium text-gray-700">ชื่อวิชา</span>
+              <input
+                className={FIELD}
+                placeholder="CALCULUS I"
+                value={manual.name}
+                onChange={(e) => setManual({ ...manual, name: e.target.value })}
+              />
+            </label>
+            <label className="col-span-2 space-y-1">
+              <span className="text-xs font-medium text-gray-700">ภาคการศึกษา (ไม่บังคับ)</span>
+              <input
+                className={FIELD}
+                placeholder="1/2568 (เว้นว่างไว้ได้สำหรับวิชาเทียบโอน)"
+                value={manual.term}
+                onChange={(e) => setManual({ ...manual, term: e.target.value })}
+              />
+            </label>
+          </div>
         </div>
       </Dialog>
     </div>

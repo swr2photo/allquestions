@@ -4,6 +4,8 @@
 // ฉบับปรับปรุง พ.ศ. 2564 และ 2569 — ตรวจด้วยมือทีละฉบับให้ผลรวมรายหมวดเท่ากับหน่วยกิตรวมตลอดหลักสูตร
 // รายชื่อรายวิชาในแต่ละหมวดใช้จาก public/timetable/curricula/sci.json (แผนการศึกษา + รายวิชาเลือก)
 
+import type { GeKey } from "@/lib/ge";
+
 export interface CreditPlan {
   id: string;
   label: string;
@@ -113,5 +115,134 @@ export const LEGACY_GE_CODES: ReadonlySet<string> = new Set([
   "895-034", "895-035", "895-036", "895-037", "895-038", "895-039", "895-040", "895-041", "895-042", "895-043",
   "895-044", "895-045", "895-046", "895-047", "895-048", "895-049", "895-050", "895-051", "895-052", "895-053",
   "895-054", "895-055", "895-056", "895-057", "895-058", "895-059", "895-060", "895-061", "895-062", "895-063",
-  "895-070", "950-102",
+  "895-070", "895-100", "950-102",
 ]);
+
+export interface LegacyGeSpec {
+  /** สาระ GE 2567 ที่เทียบเท่าได้ */
+  ge: GeKey;
+  /** รหัสพื้นฐานใหม่ที่เปลี่ยนไป (กรณีเปลี่ยนรหัสวิชาโดยตรง) */
+  replacedBy?: readonly string[];
+  /** รหัส/ชื่อวิชานี้ไม่มีเปิดสอนตรงตามเดิมในวิทยาเขตหาดใหญ่แล้ว */
+  discontinued?: boolean;
+  /** ชื่อวิชาที่นำรหัสไปใช้ใหม่เป็นคนละวิชา (ไม่ให้ถือเป็น GE เดิม) */
+  excludeName?: RegExp;
+  /** คำแนะนำสั้น ๆ แสดงในรายการวิชาที่ยังขาด */
+  note: string;
+}
+
+/**
+ * แผนผังเทียบโอน/เปลี่ยนรหัสของรายวิชา GE บังคับในหลักสูตร 2564 กับโครงสร้าง GE 2567 และรหัสปัจจุบันบน SIS
+ * — ใช้สำหรับนักศึกษารหัส 67+ ที่เรียนหลักสูตรเฉพาะปี 2564 ควบคู่กับ GE 2567 รวมถึงกรณีที่วิชามีการเปลี่ยนรหัสหรือยกเลิก
+ */
+export const LEGACY_GE_INFO: Readonly<Record<string, LegacyGeSpec>> = {
+  "890-001": {
+    ge: "GE1",
+    replacedBy: ["890-101"],
+    discontinued: true,
+    note: "เปลี่ยนรหัสเป็น 890-101G1 สรรสาระภาษาอังกฤษ (หรือลงหมวด GE1 แทนได้)",
+  },
+  "322-100": {
+    ge: "GE2A",
+    replacedBy: ["315-100"],
+    discontinued: true,
+    excludeName: /แคลคูลัส|calculus/i,
+    note: "เปลี่ยนรหัสเป็น 315-100G2A คำนวณศิลป์ (หรือลงหมวด GE2A แทนได้)",
+  },
+  "315-100": {
+    ge: "GE2A",
+    note: "รหัสปัจจุบัน 315-100G2A คำนวณศิลป์ (หมวด GE2A)",
+  },
+  "315-202": {
+    ge: "GE2B",
+    note: "รหัสปัจจุบัน 315-202G2B การคิดกับการใช้เหตุผล (หรือลงหมวด GE2B แทนได้)",
+  },
+  "001-103": {
+    ge: "GE3",
+    discontinued: true,
+    note: "ไม่มีเปิดสอนที่หาดใหญ่แล้ว — ลงวิชาในหมวด GE3 แทนได้",
+  },
+  "345-104": {
+    ge: "GE4",
+    replacedBy: ["315-104"],
+    discontinued: true,
+    note: "เปลี่ยนรหัสเป็น 315-104G4 รู้ทันเทคโนโลยีดิจิทัล (หรือลงหมวด GE4 แทนได้)",
+  },
+  "950-102": {
+    ge: "GE5",
+    note: "รหัสปัจจุบัน 950-102G5 (หรือลงหมวด GE5 แทนได้)",
+  },
+  "388-100": {
+    ge: "GE5",
+    note: "รหัสปัจจุบัน 388-100G5 (หรือลงหมวด GE5 แทนได้)",
+  },
+  "001-131": {
+    ge: "GE5",
+    note: "รหัสปัจจุบัน 001-131G5 (หมวด GE5)",
+  },
+  "001-102": {
+    ge: "GE6",
+    replacedBy: ["001-102", "512-151"],
+    discontinued: true,
+    note: "ไม่มีวิชาศาสตร์พระราชาฯ แล้ว — ลงหมวด GE6 (เช่น 001-102G6) แทนได้",
+  },
+  "315-200": {
+    ge: "GE6",
+    replacedBy: ["142-025", "512-151"],
+    discontinued: true,
+    note: "ไม่มีเปิดสอนรหัสเดิมแล้ว — ลงหมวด GE6 (เช่น 142-025G6) แทนได้",
+  },
+  "895-001": {
+    ge: "GE6",
+    replacedBy: ["895-601"],
+    note: "รหัสเทียบเท่า 895-601G6 หรือลงหมวด GE6 แทนได้",
+  },
+  "895-100": {
+    ge: "GE6",
+    replacedBy: ["895-001", "895-601"],
+    discontinued: true,
+    note: "เปลี่ยนเป็น 895-001 / 895-601G6 (หรือลงหมวด GE6 แทนได้)",
+  },
+  "315-201": {
+    ge: "GE7",
+    note: "รหัสปัจจุบัน 315-201G7 (หรือลงหมวด GE7 แทนได้)",
+  },
+  "315-103": {
+    ge: "GE8",
+    note: "รหัสปัจจุบัน 315-103G8 (หมวด GE8)",
+  },
+  "001-101": {
+    ge: "GE8",
+    note: "รหัสปัจจุบัน 001-101G8 (หมวด GE8)",
+  },
+  "874-195": {
+    ge: "GE8",
+    note: "รหัสปัจจุบัน 874-195G8 (หมวด GE8)",
+  },
+};
+
+function normLegacyBase(code: string): string {
+  return code
+    .trim()
+    .toUpperCase()
+    .replace(/[‐–—−]/g, "-")
+    .replace(/G[1-8][AB]?$/i, "");
+}
+
+/** คืนข้อมูลเทียบโอนของวิชา GE รหัสเก่า (ไม่จับคู่กับรหัสที่มี G1–G8 แล้ว) */
+export function findLegacyGeSpec(code: string, name?: string): LegacyGeSpec | undefined {
+  if (/G[1-8]/i.test(code)) return undefined;
+  const spec = LEGACY_GE_INFO[normLegacyBase(code)];
+  if (!spec) return undefined;
+  if (spec.excludeName && name && spec.excludeName.test(name)) return undefined;
+  return spec;
+}
+
+/** ตรวจว่าวิชานี้เป็นรายวิชา GE ในหลักสูตร 2564 หรือไม่ */
+export function isLegacyGe(code: string, name?: string): boolean {
+  if (/G[1-8]/i.test(code)) return false;
+  const base = normLegacyBase(code);
+  const spec = LEGACY_GE_INFO[base];
+  if (spec) return !(spec.excludeName && name && spec.excludeName.test(name));
+  return LEGACY_GE_CODES.has(base);
+}

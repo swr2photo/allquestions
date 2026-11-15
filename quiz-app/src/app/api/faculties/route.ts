@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { loadCurriculaIndex, loadCurriculumFile, loadTermData } from "@/lib/term-data.server";
-import { classifyCourse, isCatalogTerm, type GeKey } from "@/lib/ge";
-import { normalizeQuery, type CurriculumProgram, type TermData } from "@/lib/timetable";
+import { loadCurriculaIndex, loadCurriculumFile, loadTermData, loadTermIndex } from "@/lib/term-data.server";
+import { baseCode, classifyCourse, isCatalogTerm, type GeKey } from "@/lib/ge";
+import { matchScore, normalizeQuery, type CurriculumProgram, type TermData } from "@/lib/timetable";
 
 export const dynamic = "force-dynamic";
 
@@ -118,6 +118,32 @@ export async function GET(request: NextRequest) {
     if (!term) return NextResponse.json({ error: "ไม่พบข้อมูลภาคการศึกษา" }, { status: 404 });
     const termInfo = { id: term.id, label: term.label, year: term.year, term: term.term };
     const headers = { "Cache-Control": "public, max-age=300, stale-while-revalidate=3600" };
+
+    if (sp.get("only") === "courses") {
+      const q = normalizeQuery(sp.get("q") ?? "");
+      if (!q) return NextResponse.json({ term: termInfo, courses: [] }, { headers });
+      const idx = await loadTermIndex(origin);
+      const terms = (await Promise.all(idx.terms.map((t) => loadTermData(origin, t.id)))).filter(
+        (t): t is TermData => !!t
+      );
+      const seen = new Set<string>();
+      const scored: { rank: number; course: TermData["courses"][number] }[] = [];
+      for (const t of terms) {
+        for (const c of t.courses) {
+          const key = baseCode(c.code) ?? c.code.trim().toUpperCase();
+          if (seen.has(key)) continue;
+          const rank = matchScore(c, normalizeQuery(`${c.code} ${c.nameTh} ${c.nameEn}`), q);
+          if (rank < 0) continue;
+          seen.add(key);
+          scored.push({ rank, course: c });
+        }
+      }
+      scored.sort((a, b) => a.rank - b.rank || a.course.code.localeCompare(b.course.code));
+      return NextResponse.json(
+        { term: termInfo, courses: scored.slice(0, 40).map((s) => toCourse(s.course)) },
+        { headers }
+      );
+    }
 
     const faculty = sp.get("faculty");
     if (faculty) {

@@ -1,10 +1,21 @@
 // ตรวจหน่วยกิตตามโครงสร้างหลักสูตร — จัดรายวิชาที่ลงทะเบียน (จากใบผลการลงทะเบียน SIS) ลงหมวด
 // แล้วเทียบกับหน่วยกิตที่หลักสูตรกำหนด. Pure helpers (no React, no storage side effects except the prefs I/O at the end).
 
-import { GE_AREA_MIN, GE2_SUB_MIN, LEGACY_GE_CODES, type CreditPlan, type CreditStructure } from "@/data/credit-structures";
-import { baseCode, classifyCourse, geArea, isCatalogTerm, GE_AREAS, type GeIndex, type GeKey } from "./ge";
+import { GE_AREA_MIN, GE2_SUB_MIN, findLegacyGeSpec, isLegacyGe, type CreditPlan, type CreditStructure, type LegacyGeSpec } from "@/data/credit-structures";
+import {
+  GE_AREAS,
+  baseCode,
+  classifyCourse,
+  geArea,
+  geFromCode,
+  genedLevels,
+  isCatalogTerm,
+  type GeIndex,
+  type GeKey,
+  type GenedLite,
+} from "./ge";
 import type { RegistrationRecord } from "./registration";
-import type { CurriculumEdition } from "./timetable";
+import type { CurriculumEdition, CurriculumFile } from "./timetable";
 
 export type Bucket = "ge" | "required" | "elective" | "free";
 export type BucketChoice = Bucket | "none";
@@ -67,6 +78,8 @@ export interface MissingCourse {
   year: number;
   term: number;
   bucket: "ge" | "required";
+  /** คำแนะนำกรณีวิชารหัสเก่าในแผน 2564 มีการเปลี่ยนรหัสหรือยกเลิกในโครงสร้าง GE 2567 */
+  note?: string;
 }
 
 export interface CreditSummary {
@@ -102,8 +115,8 @@ export function recordKey(r: RegistrationRecord): string {
   return `${r.term}|${r.code}`;
 }
 
-function codeKey(code: string): string {
-  return baseCode(code) ?? code;
+export function codeKey(code: string): string {
+  return baseCode(code) ?? code.replace(/\s+/g, "").toUpperCase();
 }
 
 // ------------------------------------------------------------------ curriculum lookups
@@ -164,6 +177,8 @@ interface AutoBucket {
   bucket: Bucket;
   guessed: boolean;
   ge: GeKey | null;
+  /** true เมื่อเป็นรหัส GE โครงสร้าง 2567 ที่มีส่วนท้าย G1–G8 */
+  fromG2567: boolean;
 }
 
 function classify(
@@ -177,21 +192,51 @@ function classify(
   const info = classifyCourse({ code: record.code, name: record.name }, index);
   const geKey = info?.levels[0] ?? null;
   // 1) รหัสมีส่วนท้าย G1–G8 = มหาวิทยาลัยกำหนดให้เป็น GE
-  if (info?.source === "sis-code") return { bucket: "ge", guessed: false, ge: geKey };
-  const legacyGe = structure.curriculumYear < 2567 && LEGACY_GE_CODES.has(key);
+  if (info?.source === "sis-code") return { bucket: "ge", guessed: false, ge: geKey, fromG2567: true };
+  const legacySpec = structure.curriculumYear < 2567 ? findLegacyGeSpec(record.code, record.name) : undefined;
+  const legacyGe = structure.curriculumYear < 2567 && isLegacyGe(record.code, record.name);
+  const resolvedGe = geKey ?? legacySpec?.ge ?? null;
   const scienceCode = key[0] === "3";
   // 2) วิชาในแผนการศึกษา: วิชา GE ที่แผนระบุรหัสไว้ยังเป็น GE, ที่เหลือเป็นวิชาบังคับ
   if (lookup.planCourses.has(key)) {
-    if (legacyGe || (info && !scienceCode)) return { bucket: "ge", guessed: false, ge: geKey };
-    return { bucket: "required", guessed: false, ge: null };
+    if (legacyGe || (info && !scienceCode)) return { bucket: "ge", guessed: false, ge: resolvedGe, fromG2567: false };
+    return { bucket: "required", guessed: false, ge: null, fromG2567: false };
   }
   // 3) วิชา GE ที่ไม่อยู่ในแผน
-  if (legacyGe || info) return { bucket: "ge", guessed: false, ge: geKey };
+  if (legacyGe || info) return { bucket: "ge", guessed: false, ge: resolvedGe, fromG2567: false };
   // 4) วิชาเลือกของหมวดวิชาเฉพาะ
-  if (lookup.electiveCodes.has(key)) return { bucket: "elective", guessed: false, ge: null };
+  if (lookup.electiveCodes.has(key)) return { bucket: "elective", guessed: false, ge: null, fromG2567: false };
   // 5) วิชาของภาควิชาเดียวกันที่ไม่พบในรายการ — เดา: ถ้าแผนที่นำเข้าไม่ครบ น่าจะเป็นวิชาบังคับปีท้าย ๆ
-  if (lookup.homePrefixes.has(key.slice(0, 3))) return { bucket: planIncomplete ? "required" : "elective", guessed: true, ge: null };
-  return { bucket: "free", guessed: false, ge: null };
+  if (lookup.homePrefixes.has(key.slice(0, 3))) return { bucket: planIncomplete ? "required" : "elective", guessed: true, ge: null, fromG2567: false };
+  return { bucket: "free", guessed: false, ge: null, fromG2567: false };
+}
+
+function isLegacyGeSatisfied(
+  spec: LegacyGeSpec | undefined,
+  autoGe: GeKey | null,
+  ctx: {
+    geEarned: number;
+    geNeed: number;
+    countedCodes: Set<string>;
+    hasGe2567: boolean;
+    areaEarned: Map<string, number>;
+    subEarned: Map<GeKey, number>;
+    ge2567AreaEarned: Map<string, number>;
+    ge2567SubEarned: Map<GeKey, number>;
+  }
+): boolean {
+  if (ctx.geEarned >= ctx.geNeed) return true;
+  if (spec?.replacedBy?.some((r) => ctx.countedCodes.has(r))) return true;
+  const targetGe = spec?.ge ?? autoGe;
+  if (!targetGe) return false;
+  if (targetGe === "GE2A" || targetGe === "GE2B") {
+    if ((ctx.ge2567SubEarned.get(targetGe) ?? 0) >= 2) return true;
+    return !!(spec?.discontinued && ctx.hasGe2567 && (ctx.subEarned.get(targetGe) ?? 0) >= 2);
+  }
+  const area = geArea(targetGe);
+  const minNeed = GE_AREA_MIN[area] ?? 2;
+  if ((ctx.ge2567AreaEarned.get(area) ?? 0) >= minNeed) return true;
+  return !!(spec?.discontinued && ctx.hasGe2567 && (ctx.areaEarned.get(area) ?? 0) >= minNeed);
 }
 
 // ------------------------------------------------------------------ summary
@@ -228,6 +273,9 @@ export function summarizeCredits(
   const earned: Record<Bucket, number> = { ge: 0, required: 0, elective: 0, free: 0 };
   const areaEarned = new Map<string, number>();
   const subEarned = new Map<GeKey, number>();
+  const ge2567AreaEarned = new Map<string, number>();
+  const ge2567SubEarned = new Map<GeKey, number>();
+  let hasGe2567 = false;
   let guessedCount = 0;
 
   for (const record of ordered) {
@@ -248,8 +296,13 @@ export function summarizeCredits(
       if (bucket === "ge" && auto.ge) {
         const area = geArea(auto.ge);
         areaEarned.set(area, (areaEarned.get(area) ?? 0) + record.credits);
+        if (auto.fromG2567) {
+          hasGe2567 = true;
+          ge2567AreaEarned.set(area, (ge2567AreaEarned.get(area) ?? 0) + record.credits);
+        }
         if (auto.ge === "GE2A" || auto.ge === "GE2B") {
           subEarned.set(auto.ge, (subEarned.get(auto.ge) ?? 0) + record.credits);
+          if (auto.fromG2567) ge2567SubEarned.set(auto.ge, (ge2567SubEarned.get(auto.ge) ?? 0) + record.credits);
         }
       }
       if (auto.guessed && !override) guessedCount++;
@@ -272,12 +325,29 @@ export function summarizeCredits(
     if (countedCodes.has(c.code)) continue;
     const auto = classify({ code: c.code, name: c.name }, structure, lookup, planIncomplete, index);
     if (auto.bucket !== "ge" && auto.bucket !== "required") continue;
-    missing.push({ ...c, bucket: auto.bucket });
+    const legacySpec = auto.bucket === "ge" && structure.curriculumYear < 2567 ? findLegacyGeSpec(c.code, c.name) : undefined;
+    if (
+      auto.bucket === "ge" &&
+      structure.curriculumYear < 2567 &&
+      isLegacyGeSatisfied(legacySpec, auto.ge, {
+        geEarned: earned.ge,
+        geNeed: need.ge,
+        countedCodes,
+        hasGe2567,
+        areaEarned,
+        subEarned,
+        ge2567AreaEarned,
+        ge2567SubEarned,
+      })
+    ) {
+      continue;
+    }
+    missing.push({ ...c, bucket: auto.bucket, ...(legacySpec?.note ? { note: legacySpec.note } : {}) });
   }
   missing.sort((a, b) => a.year - b.year || a.term - b.term || a.code.localeCompare(b.code));
 
   const geAreas =
-    structure.curriculumYear >= 2567
+    structure.curriculumYear >= 2567 || hasGe2567
       ? GE_AREAS.map((area) => ({
           area,
           earned: areaEarned.get(area) ?? 0,
@@ -334,4 +404,187 @@ export function writeCreditCheckPrefs(prefs: CreditCheckPrefs) {
   } catch {
     /* storage unavailable — choices just won't persist */
   }
+}
+
+// ------------------------------------------------------------------ course catalog for manual pick
+
+export interface CatalogCourse {
+  code: string;
+  name: string;
+  nameSub?: string;
+  credits: number;
+  creditsEstimated?: boolean;
+  source: "missing" | "curriculum" | "elective" | "gened" | "sis";
+  tag?: string;
+}
+
+function isRealCourseCode(code: string): boolean {
+  return !/xxx/i.test(code) && !!baseCode(code);
+}
+
+function genedDisplayCode(g: GenedLite): string | null {
+  const fromTitle = g.title.match(
+    /^([A-Z0-9]{3}\s*-\s*(?:\d{3}|[A-Z]\d{2})\s*G[1-8][AB]?|[A-Z]{3}\d{2}G[1-8][AB]?\d{2,3})(?![A-Z0-9])/i
+  );
+  if (fromTitle) return fromTitle[1].replace(/\s+/g, "").toUpperCase();
+  const fromSlug = g.slug.match(/^([A-Za-z0-9]{3}-(?:\d{3}|[A-Za-z]\d{2})g[1-8][ab]?)(?![A-Za-z0-9])/i);
+  if (fromSlug) return fromSlug[1].toUpperCase();
+  return g.code ?? baseCode(g.slug);
+}
+
+function cleanGenedTitle(title: string): string {
+  return (
+    title
+      .replace(/^(?:[A-Z0-9]{3}\s*-\s*[A-Z0-9]{3,6}|[A-Z]{3}\d{2}[A-Z0-9]{4,6})\s*[:\-–—]?\s*/i, "")
+      .replace(/^GE\d[AB]?\s*[:\-–—]\s*/i, "")
+      .trim() || title.trim()
+  );
+}
+
+function normCatalogCode(code: string): string {
+  return code.trim().toUpperCase().replace(/[‐–—−]/g, "-").replace(/\s+/g, "");
+}
+
+function titlesMatch(a: string, b: string): boolean {
+  // ใช้ NFKD แตกสระอำ (\u0E33 → \u0E4D+\u0E32) แล้วตัดช่องว่าง สระบน/ล่าง วรรณยุกต์ และ PUA glyph จาก PDF (เช่น คานวณศิลป์ ↔ คำนวณศิลป์)
+  const strip = (s: string) => s.normalize("NFKD").replace(/[\s\u0E31\u0E34-\u0E3A\u0E47-\u0E4E\uF700-\uF7FF]/g, "").toLowerCase();
+  const na = strip(a);
+  const nb = strip(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  const minLen = Math.min(na.length, nb.length);
+  return minLen >= 8 && (na.includes(nb) || nb.includes(na));
+}
+
+/** รวมฐานข้อมูลรายวิชาที่มีในฝั่ง client (วิชาในแผนที่ยังขาด, หลักสูตรคณะวิทย์ฯ, และหมวด GE) สำหรับหน้าเพิ่มวิชาเอง */
+export function buildCatalogCourses(params: {
+  curricula?: CurriculumFile | null;
+  edition?: CurriculumEdition;
+  plan?: CreditPlan;
+  missing?: MissingCourse[];
+  geCourses?: GenedLite[];
+}): CatalogCourse[] {
+  const byCode = new Map<string, CatalogCourse>();
+  const gCodesByBase = new Map<string, Set<string>>();
+
+  const upsert = (item: CatalogCourse) => {
+    if (!isRealCourseCode(item.code)) return;
+    const exact = normCatalogCode(item.code);
+    const base = codeKey(item.code);
+    const isG = !!geFromCode(item.code);
+
+    if (isG) {
+      let gSet = gCodesByBase.get(base);
+      if (!gSet) {
+        gSet = new Set();
+        gCodesByBase.set(base, gSet);
+      }
+      gSet.add(exact);
+
+      // ถ้ารายการเดิมเป็นรหัสไม่มี G ที่เป็นชื่อวิชาเดียวกัน (เช่น 315-100 คานวณศิลป์ → 315-100G2A คำนวณศิลป์)
+      // รวมเป็นรายการเดียวโดยใช้รหัส G และชื่อที่เป็นทางการกว่า แต่ห้ามปนกับคนละวิชา (เช่น 322-100 คำนวณศิลป์ ≠ 322-100G2A รวยด้วยคณิตศาสตร์)
+      const plain = byCode.get(base);
+      if (plain && titlesMatch(plain.name, item.name)) {
+        byCode.delete(base);
+        byCode.set(exact, {
+          ...item,
+          name: item.source === "gened" ? item.name : plain.name,
+          credits: !plain.creditsEstimated ? plain.credits : item.credits,
+          creditsEstimated: plain.creditsEstimated && item.creditsEstimated,
+          tag: plain.source === "missing" ? plain.tag : item.tag,
+        });
+        return;
+      }
+    } else {
+      for (const gKey of gCodesByBase.get(base) ?? []) {
+        const gItem = byCode.get(gKey);
+        if (gItem && titlesMatch(gItem.name, item.name)) {
+          if (gItem.creditsEstimated && !item.creditsEstimated) {
+            byCode.set(gKey, { ...gItem, credits: item.credits, creditsEstimated: false });
+          }
+          return;
+        }
+      }
+    }
+
+    const prev = byCode.get(exact);
+    if (!prev) {
+      byCode.set(exact, item);
+      return;
+    }
+    const betterName = item.source === "gened" && prev.source !== "gened" ? item.name : prev.name;
+    const betterCredits = prev.creditsEstimated && !item.creditsEstimated ? item.credits : prev.credits;
+    const stillEst = prev.creditsEstimated && item.creditsEstimated;
+    if (betterName !== prev.name || betterCredits !== prev.credits || stillEst !== prev.creditsEstimated) {
+      byCode.set(exact, { ...prev, name: betterName, credits: betterCredits, creditsEstimated: stillEst });
+    }
+  };
+
+  for (const m of params.missing ?? []) {
+    if (m.bucket === "ge" && findLegacyGeSpec(m.code, m.name)?.discontinued) continue;
+    upsert({
+      code: m.code,
+      name: m.name,
+      credits: m.credits,
+      source: "missing",
+      tag: m.year >= 90 ? "ขาดในแผน" : `ขาด · ปี ${m.year}/${m.term}`,
+    });
+  }
+
+  const addEdition = (ed: CurriculumEdition, p: CreditPlan | undefined, tagPrefix: string, skipDiscontinued = false) => {
+    const hasVariant = p ? ed.years.some((y) => y.plan && /สหกิจ/.test(y.plan) === !!p.coop) : false;
+    for (const y of ed.years) {
+      if (p && !planMatches(p, y.plan, hasVariant)) continue;
+      for (const t of y.terms) {
+        if (isCatalogTerm(t)) continue;
+        for (const c of t.courses) {
+          if (c.placeholder) continue;
+          const legacySpec = ed.curriculumYear < 2567 ? findLegacyGeSpec(c.code, c.name) : undefined;
+          if (skipDiscontinued && legacySpec?.discontinued) continue;
+          upsert({
+            code: c.code,
+            name: c.name,
+            credits: c.credits,
+            source: "curriculum",
+            tag: legacySpec?.discontinued ? `รหัสเก่า · ${legacySpec.ge}` : `${tagPrefix} ${y.year}/${t.term}`,
+          });
+        }
+      }
+    }
+    for (const area of ed.electives?.areas ?? []) {
+      for (const c of area.courses) {
+        upsert({
+          code: c.code,
+          name: c.name,
+          credits: c.credits,
+          source: "elective",
+          tag: area.label ?? area.name,
+        });
+      }
+    }
+  };
+
+  if (params.edition) addEdition(params.edition, params.plan, "ในแผน", true);
+
+  for (const g of params.geCourses ?? []) {
+    const code = genedDisplayCode(g);
+    if (!code) continue;
+    const levels = genedLevels(g);
+    upsert({
+      code,
+      name: cleanGenedTitle(g.title),
+      credits: 2,
+      creditsEstimated: true,
+      source: "gened",
+      tag: levels[0] ?? "GE",
+    });
+  }
+
+  for (const prog of params.curricula?.programs ?? []) {
+    for (const ed of [...prog.editions].sort((a, b) => b.curriculumYear - a.curriculumYear)) {
+      addEdition(ed, undefined, prog.name);
+    }
+  }
+
+  return [...byCode.values()];
 }

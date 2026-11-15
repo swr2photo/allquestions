@@ -9,6 +9,7 @@ import { useGenedIndex } from "@/hooks/use-gened-index";
 import { SCI_CREDIT_STRUCTURES, findCreditStructure, structureTotal } from "@/data/credit-structures";
 import {
   EMPTY_PREFS,
+  buildCatalogCourses,
   readCreditCheckPrefs,
   summarizeCredits,
   termOrder,
@@ -47,7 +48,7 @@ function StepCard({ step, title, hint, children }: { step: number; title: string
 }
 
 export default function CreditCheckPage() {
-  const { index: geIndex } = useGenedIndex();
+  const { courses: geCourses, index: geIndex } = useGenedIndex();
   const [curricula, setCurricula] = useState<CurriculumFile | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [history, setHistory] = useState<RegistrationHistory>({ records: [], regradeCodes: [] });
@@ -117,6 +118,18 @@ export default function CreditCheckPage() {
   const summary = useMemo(
     () => (structure && plan ? summarizeCredits(history.records, structure, plan, edition, prefs, geIndex) : null),
     [history.records, structure, plan, edition, prefs, geIndex]
+  );
+
+  const catalogCourses = useMemo(
+    () =>
+      buildCatalogCourses({
+        curricula,
+        edition,
+        plan,
+        missing: summary?.missing,
+        geCourses,
+      }),
+    [curricula, edition, plan, summary?.missing, geCourses]
   );
 
   const programOptions: SelectOption<string>[] = programs.map((p) => ({ value: p.id, label: p.name, group: p.division }));
@@ -235,7 +248,7 @@ export default function CreditCheckPage() {
             </>
           }
         >
-          {ready && <ImportPanel records={history.records} onChange={updateRecords} />}
+          {ready && <ImportPanel records={history.records} catalogCourses={catalogCourses} onChange={updateRecords} />}
         </StepCard>
 
         {summary && history.records.length > 0 && (
