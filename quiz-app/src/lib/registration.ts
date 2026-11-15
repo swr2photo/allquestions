@@ -48,7 +48,14 @@ const REG_TAIL =
 const TRANSCRIPT_TAIL =
   /^(?:(.*?)\s+)?(\d+(?:\.\d+)?)\s+([ABCDF][+-]?|[SUWIP]|AU)$/i;
 const NON_COURSE_LINE =
-  /^(?:(?:page|หน้า)\s*\d+|-\s*\d+\s*-|\d+\s*\/\s*\d+|(?:ลำดับ|รหัสวิชา|course\s*code|no\.?\s+code)\b|.*(?:ชื่อ(?:ราย)?วิชา.*หน่วยกิต|ตอนเรียน.*หน่วยกิต)|(?:รวม|รวมหน่วยกิต|จำนวนหน่วยกิต|คะแนนเฉลี่ย|เกรดเฉลี่ย|gp[ax]\b|total\b|remark|หมายเหตุ|พิมพ์เมื่อ|วันที่|printed\b|ลงชื่อ)|[\d\s.,:/\-*()]+)$/i;
+  /^(?:(?:page|หน้า)\s*\d+(?:\s*(?:of|\/|จาก)\s*\d+)?|-\s*\d+\s*-|\d+\s*(?:\/|of|จาก)\s*\d+|(?:ลำดับ|รหัสวิชา|course\s*code|no\.?\s+code)\b|.*(?:ชื่อ(?:ราย)?วิชา.*หน่วยกิต|ตอนเรียน.*หน่วยกิต)|(?:รวม|รวมหน่วยกิต|จำนวนหน่วยกิต|คะแนนเฉลี่ย|เกรดเฉลี่ย|gp[ax]\b|total\b|remark|หมายเหตุ|พิมพ์เมื่อ|วันที่|printed\b|ลงชื่อ)|(?:created\s+at|generated\s+(?:from|by)|(?:psu\s+)?student\s+information\s+system)\b|(?:ผลการลงทะเบียน|ผลการศึกษา|ใบรายงานผลการศึกษา|ตารางเรียนนักศึกษา|ข้อมูลการลงทะเบียน|รายละเอียดการลงทะเบียน)(?:\s|$)|มหาวิทยาลัยสงขลานครินทร์(?:\s+(?:วิทยาเขต|ระบบ|งานทะเบียน|ผล|ใบรายงาน)|$)|(?:รหัส(?:ประจำตัว)?นักศึกษา|student\s*(?:id|code)|ชื่อ[-\s]*สกุล|ชื่อนักศึกษา|คณะ|ภาควิชา|สาขา(?:วิชา)?|หลักสูตร|ระดับ(?:การศึกษา)?|สถานภาพ(?:นักศึกษา)?|อาจารย์ที่ปรึกษา)(?:\s*[:：]|\s+\d)|(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.)\s+\S+(?:\s+\S+){0,4}\s+\d{10}$|[\d\s.,:/\-*()]+)$/i;
+
+const SIS_FOOTER_INLINE =
+  /\s*(?:\bCreated\s+at\s+\d{1,2}[/-]\d{1,2}[/-]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?\b|\b(?:Generated\s+(?:from|by)\s+)?PSU\s+Student\s+Information\s+System\b|ผลการลงทะเบียน\s+(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.|รหัสนักศึกษา)|(?:(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.)\s+\S+.*?\s+)?รหัสนักศึกษา\s*[:：]?\s*\d{7,12}\b).*$/i;
+
+function stripRegistrationFooter(text: string): string {
+  return text.replace(SIS_FOOTER_INLINE, "").trim();
+}
 
 const LOOSE_COURSE = new RegExp(
   `^(?:\\d{1,2}\\.?\\s+)?(${CODE_BODY})\\s+(.+?)\\s+(\\d{1,2})(?:\\.\\d+)?(?:\\s*[A-DFWSPUI][+-]?)?(?:\\s*\\(.*)?$`,
@@ -56,12 +63,14 @@ const LOOSE_COURSE = new RegExp(
 );
 
 function cleanRegistrationLine(raw: string): string {
-  return raw
-    .replace(/[\u200B-\u200D\uFEFF]/g, "")
-    .replace(/[\t\u00A0]+/g, " ")
-    .replace(/([A-Z0-9]{3})\s*[‐‑‒–—-]\s*(\d{3}|[A-Z]\d{2})/gi, "$1-$2")
-    .replace(/\s+/g, " ")
-    .trim();
+  return stripRegistrationFooter(
+    raw
+      .replace(/[\u200B-\u200D\uFEFF]/g, "")
+      .replace(/[\t\u00A0]+/g, " ")
+      .replace(/([A-Z0-9]{3})\s*[‐‑‒–—-]\s*(\d{3}|[A-Z]\d{2})/gi, "$1-$2")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 function normalizeCourseCode(raw: string): string {
@@ -284,12 +293,18 @@ export function parseRegistrationText(text: string): RegistrationRecord[] {
   return records;
 }
 
+function sanitizeRecordName(record: RegistrationRecord): RegistrationRecord {
+  const clean = stripRegistrationFooter(record.name).replace(/\s+/g, " ").trim();
+  return clean === record.name ? record : { ...record, name: clean || record.code };
+}
+
 export function mergeRegistrationRecords(
   existing: RegistrationRecord[],
   incoming: RegistrationRecord[]
 ): RegistrationRecord[] {
   const byKey = new Map<string, RegistrationRecord>();
-  for (const record of [...existing, ...incoming]) {
+  for (const raw of [...existing, ...incoming]) {
+    const record = sanitizeRecordName(raw);
     byKey.set(`${record.term}|${record.code}|${record.sec}`, record);
   }
   return [...byKey.values()].sort(
@@ -312,7 +327,7 @@ export function readRegistrationHistory(): RegistrationHistory {
     const value = raw ? JSON.parse(raw) : null;
     if (!value || !Array.isArray(value.records)) return { records: [], regradeCodes: [] };
     return {
-      records: value.records,
+      records: value.records.map(sanitizeRecordName),
       regradeCodes: Array.isArray(value.regradeCodes) ? value.regradeCodes : [],
     };
   } catch {
@@ -415,7 +430,9 @@ export async function extractPdfLines(file: File): Promise<string[]> {
     const page = await doc.getPage(pageNo);
     const content = await page.getTextContent();
     const items = content.items.filter((item): item is typeof item & PdfTextItemLike => "str" in item);
-    lines.push(...buildPdfPageLines(items));
+    const pageLines = buildPdfPageLines(items);
+    if (lines.length && pageLines.length) lines.push("");
+    lines.push(...pageLines);
   }
   return lines;
 }
