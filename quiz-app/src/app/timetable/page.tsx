@@ -55,6 +55,7 @@ import {
   type TermIndexEntry,
 } from "@/lib/timetable";
 import {
+  REGISTRATION_AT_KEY,
   mergeRegistrationRecords,
   priorTermsFor,
   readRegistrationHistory,
@@ -85,7 +86,7 @@ import { SharedBanner } from "./components/SharedBanner";
 import { useSharedTimetable } from "@/hooks/use-timetable-share";
 import type { ShareSource, SharedTimetable } from "@/lib/timetable-share";
 
-const REG_AT_KEY = "psu-registration:v1:at";
+const REG_AT_KEY = REGISTRATION_AT_KEY;
 const EMPTY_ITEMS: PlanItem[] = [];
 
 function termTitle(t: { year: number; term: number }) {

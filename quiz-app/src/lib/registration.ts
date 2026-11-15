@@ -1,6 +1,8 @@
 // ประวัติการลงทะเบียนจากไฟล์ PDF "ผลการลงทะเบียน" ของ SIS (เก็บในเครื่องผู้ใช้เท่านั้น)
 
 export const REGISTRATION_STORAGE_KEY = "psu-registration:v1";
+/** เวลาที่แก้ไขสำเนาในเครื่องล่าสุด — ใช้เทียบกับสำเนาบนบัญชีในหน้าจัดตารางเรียน */
+export const REGISTRATION_AT_KEY = "psu-registration:v1:at";
 
 export interface RegistrationRecord {
   /** ภาคการศึกษา/ปี พ.ศ. เช่น "1/2567" */
@@ -52,6 +54,46 @@ export function parseRegistrationLines(lines: string[]): RegistrationRecord[] {
       continue;
     }
     pending = null;
+  }
+  return records;
+}
+
+const LOOSE_TERM = /(?:ภาค(?:การศึกษา|เรียน)?(?:ที่)?|term|semester)\s*(\d)\s*\/\s*(25\d{2})|^(\d)\s*\/\s*(25\d{2})$/i;
+const LOOSE_COURSE = /^([A-Z0-9]{3}-\d{3}[A-Z0-9]*)\s+(.+?)\s+(\d{1,2})(?:\.\d+)?(?:\s*\(.*)?$/;
+export const UNKNOWN_TERM = "ไม่ระบุภาค";
+
+/**
+ * ข้อความที่คัดลอกจากหน้า "ผลการลงทะเบียน" ของ SIS (หรือพิมพ์เอง) → รายการวิชา
+ * ลองรูปแบบเดียวกับ PDF ก่อน ถ้าไม่พบจึงใช้รูปแบบหลวม "รหัส ชื่อวิชา … หน่วยกิต" (ไม่ต้องมีตอน/ประเภท)
+ */
+export function parseRegistrationText(text: string): RegistrationRecord[] {
+  const lines = text.split(/\r?\n/).map((l) => l.replace(/[\t ]+/g, " "));
+  const strict = parseRegistrationLines(lines);
+  if (strict.length) return strict;
+  const records: RegistrationRecord[] = [];
+  let term = UNKNOWN_TERM;
+  for (const raw of lines) {
+    const line = raw.replace(/\s+/g, " ").trim();
+    if (!line) continue;
+    const termMatch = line.match(LOOSE_TERM);
+    if (termMatch) {
+      term = `${termMatch[1] ?? termMatch[3]}/${termMatch[2] ?? termMatch[4]}`;
+      continue;
+    }
+    const course = line.match(LOOSE_COURSE);
+    if (!course) continue;
+    const credits = Number(course[3]);
+    if (credits > 15) continue;
+    // "ชื่อวิชา 01 C" → ตัดตอน/ประเภทที่ติดท้ายชื่อออก
+    const tail = course[2].match(/^(.*?)\s+(\d{2})\s+([A-Z])$/);
+    records.push({
+      term,
+      code: course[1],
+      name: (tail ? tail[1] : course[2]).trim(),
+      sec: tail ? tail[2] : "",
+      type: tail ? tail[3] : "C",
+      credits,
+    });
   }
   return records;
 }
