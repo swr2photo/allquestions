@@ -158,7 +158,7 @@ export default function CreditCheckPage() {
         </div>
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">เช็กหน่วยกิต คณะวิทยาศาสตร์ ม.อ.</h1>
-          <p className="mt-0.5 text-sm text-gray-500">ใส่ใบลงทะเบียนจาก SIS แล้วดูว่าแต่ละหมวดของหลักสูตรครบหรือยัง ขาดอีกเท่าไร</p>
+          <p className="mt-0.5 text-sm text-gray-500">ใส่ใบผลการเรียน (ใบเกรด) หรือใบลงทะเบียนจาก SIS แล้วดูว่าแต่ละหมวดครบหรือยัง ขาดอีกเท่าไร</p>
         </div>
       </div>
 
@@ -237,10 +237,10 @@ export default function CreditCheckPage() {
 
         <StepCard
           step={2}
-          title="ใส่ใบลงทะเบียนจาก SIS"
+          title="ใส่ใบผลการเรียน / ใบลงทะเบียนจาก SIS"
           hint={
             <>
-              เข้า sis.psu.ac.th → เมนูผลการลงทะเบียน → เลือกภาคการศึกษา → พิมพ์/บันทึกเป็น PDF ทำซ้ำให้ครบทุกภาคที่เรียนมา
+              เข้า sis.psu.ac.th → เมนูผลการเรียน (PDF ใบเดียวครบทุกภาค) หรือ ผลการลงทะเบียน → พิมพ์/บันทึกเป็น PDF
               ข้อมูลเก็บในเครื่องนี้เท่านั้น และใช้ร่วมกับหน้า{" "}
               <Link href="/timetable" className="inline-flex items-center gap-0.5 font-medium text-emerald-700 hover:underline">
                 <CalendarRange className="h-3 w-3" /> จัดตารางเรียน
@@ -256,8 +256,9 @@ export default function CreditCheckPage() {
             <div className="flex items-start gap-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-xs leading-relaxed text-sky-900">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />
               <p>
-                ใบลงทะเบียนไม่มีเกรด ระบบจึงนับทุกวิชาที่ลงทะเบียนว่าได้หน่วยกิต — กดปุ่ม <span className="font-semibold">ไม่นับ</span> ที่วิชาที่ติด F หรือถอน (W)
-                และปิดสวิตช์ <span className="font-semibold">นับภาคนี้</span> ของภาคที่ยังเรียนไม่จบ ผลนี้ใช้ประกอบการวางแผนเท่านั้น
+                หากนำเข้า PDF <span className="font-semibold">ผลการเรียน</span> ระบบจะไม่นับวิชาที่ติด F/E, ถอน (W), ไม่ผ่าน (U) หรือ I ให้อัตโนมัติ
+                ส่วนใบลงทะเบียนที่ยังไม่มีเกรด กดปุ่ม <span className="font-semibold">ไม่นับ</span> ที่วิชาที่ติด F/W หรือปิดสวิตช์{" "}
+                <span className="font-semibold">นับภาคนี้</span> ของภาคที่กำลังเรียน ผลนี้ใช้ประกอบการวางแผนเท่านั้น
                 การตรวจสอบจบจริงให้ยืนยันกับอาจารย์ที่ปรึกษาหรืองานทะเบียน
               </p>
             </div>

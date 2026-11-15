@@ -43,7 +43,14 @@ export interface CreditCheckPrefs {
 
 export const EMPTY_PREFS: CreditCheckPrefs = { overrides: {}, excluded: [], excludedTerms: [] };
 
-export type SkipReason = "repeat" | "audit" | "excluded" | "term" | "none";
+export type SkipReason = "repeat" | "audit" | "fail" | "excluded" | "term" | "none";
+
+/** เกรดในใบผลการเรียนที่ไม่ได้หน่วยกิต (ติด E/F, ไม่ผ่าน U, ถอน W, ไม่สมบูรณ์ I) */
+export const NON_EARNED_GRADES: ReadonlySet<string> = new Set(["E", "F", "W", "U", "I"]);
+
+export function isNonEarnedGrade(grade?: string): boolean {
+  return !!grade && NON_EARNED_GRADES.has(grade.trim().toUpperCase());
+}
 
 export interface CheckedCourse {
   key: string;
@@ -266,8 +273,8 @@ export function summarizeCredits(
 
   const excluded = new Set(prefs.excluded);
   const excludedTerms = new Set(prefs.excludedTerms);
-  // ใหม่ → เก่า: วิชาที่ลงซ้ำนับครั้งล่าสุดที่ยังนับอยู่เพียงครั้งเดียว
-  const ordered = [...records].sort((a, b) => termOrder(b.term) - termOrder(a.term) || a.code.localeCompare(b.code));
+  // ใหม่ → เก่า: วิชาที่ลงซ้ำนับครั้งล่าสุดที่ยังนับอยู่เพียงครั้งเดียว (ถ้าภาคเดียวกันมีทั้งมีเกรดและไม่มีเกรด ให้ดูตัวที่มีเกรดก่อน)
+  const ordered = [...records].sort((a, b) => termOrder(b.term) - termOrder(a.term) || (b.grade ? 1 : 0) - (a.grade ? 1 : 0) || a.code.localeCompare(b.code));
   const countedCodes = new Set<string>();
   const courses: CheckedCourse[] = [];
   const earned: Record<Bucket, number> = { ge: 0, required: 0, elective: 0, free: 0 };
@@ -284,10 +291,12 @@ export function summarizeCredits(
     const auto = classify(record, structure, lookup, planIncomplete, index);
     const override = prefs.overrides[base];
     const bucket: BucketChoice = override ?? auto.bucket;
+    const grade = record.grade?.trim().toUpperCase();
     let skip: SkipReason | null = null;
     if (excludedTerms.has(record.term)) skip = "term";
     else if (excluded.has(key)) skip = "excluded";
-    else if (record.type.toUpperCase() === "A") skip = "audit";
+    else if (record.type.toUpperCase() === "A" || grade === "AU") skip = "audit";
+    else if (isNonEarnedGrade(grade)) skip = "fail";
     else if (bucket === "none") skip = "none";
     else if (countedCodes.has(base)) skip = "repeat";
     if (!skip && bucket !== "none") {

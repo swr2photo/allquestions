@@ -12,6 +12,8 @@ export interface RegistrationRecord {
   sec: string;
   type: string;
   credits: number;
+  /** ผลการเรียน เช่น "A", "B+", "G", "S", "F", "W" (มีเมื่อนำเข้าจากใบผลการเรียน) */
+  grade?: string;
 }
 
 export interface RegistrationHistory {
@@ -43,22 +45,26 @@ const CODE_PREFIX = new RegExp(
   `^(?:\\d{1,2}\\.?\\s+)?(${CODE_BODY})(?:\\s+(.*)|([\\u0E00-\\u0E7F].*))?$`,
   "i"
 );
+const GRADE_BODY = "[ABCDF][+-]?|[GSUWIPEOR]|AU";
+const GRADE_TOKEN = new RegExp(`^(?:${GRADE_BODY})$`);
 const REG_TAIL =
-  /^(?:(.*?)\s+)?(\d{1,3}[A-Z]?|-)\s+([A-Z])\*?\s+(\d+(?:\.\d+)?)(?:\s*\(\d+-\d+-\d+\))?(?:\s+(?:[ABCDF][+-]?|[SUWIPGR]|AU|-|ลงทะเบียน\S*|ปกติ|ถอน\S*|ผ่าน\S*|รอผล\S*|ไม่นับ\S*|\(\S+\)))*$/;
+  /^(?:(.*?)\s+)?(\d{1,3}[A-Z]?|-)\s+([A-Z])\*?\s+(\d+(?:\.\d+)?)(?:\s*\(\d+-\d+-\d+\))?((?:\s+(?:[ABCDF][+-]?|[GSUWIPEOR]|AU|-|ลงทะเบียน\S*|ปกติ|ถอน\S*|ผ่าน\S*|รอผล\S*|ไม่นับ\S*|\(\S+\)))*)$/;
+const TRANSCRIPT_TAIL_SEC =
+  /^(?:(.*?)\s+)?(\d{2,3}[A-Z]?|-)\s+(\d+(?:\.\d+)?)\s+([ABCDF][+-]?|[GSUWIPEOR]|AU|-)$/;
 const TRANSCRIPT_TAIL =
-  /^(?:(.*?)\s+)?(\d+(?:\.\d+)?)\s+([ABCDF][+-]?|[SUWIP]|AU)$/i;
+  /^(?:(.*?)\s+)?(\d+(?:\.\d+)?)\s+([ABCDF][+-]?|[GSUWIPEOR]|AU)$/;
 const NON_COURSE_LINE =
-  /^(?:(?:page|หน้า)\s*\d+(?:\s*(?:of|\/|จาก)\s*\d+)?|-\s*\d+\s*-|\d+\s*(?:\/|of|จาก)\s*\d+|(?:ลำดับ|รหัสวิชา|course\s*code|no\.?\s+code)\b|.*(?:ชื่อ(?:ราย)?วิชา.*หน่วยกิต|ตอนเรียน.*หน่วยกิต)|(?:รวม|รวมหน่วยกิต|จำนวนหน่วยกิต|คะแนนเฉลี่ย|เกรดเฉลี่ย|gp[ax]\b|total\b|remark|หมายเหตุ|พิมพ์เมื่อ|วันที่|printed\b|ลงชื่อ)|(?:created\s+at|generated\s+(?:from|by)|(?:psu\s+)?student\s+information\s+system)\b|(?:ผลการลงทะเบียน|ผลการศึกษา|ใบรายงานผลการศึกษา|ตารางเรียนนักศึกษา|ข้อมูลการลงทะเบียน|รายละเอียดการลงทะเบียน)(?:\s|$)|มหาวิทยาลัยสงขลานครินทร์(?:\s+(?:วิทยาเขต|ระบบ|งานทะเบียน|ผล|ใบรายงาน)|$)|(?:รหัส(?:ประจำตัว)?นักศึกษา|student\s*(?:id|code)|ชื่อ[-\s]*สกุล|ชื่อนักศึกษา|คณะ|ภาควิชา|สาขา(?:วิชา)?|หลักสูตร|ระดับ(?:การศึกษา)?|สถานภาพ(?:นักศึกษา)?|อาจารย์ที่ปรึกษา)(?:\s*[:：]|\s+\d)|(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.)\s+\S+(?:\s+\S+){0,4}\s+\d{10}$|[\d\s.,:/\-*()]+)$/i;
+  /^(?:(?:page|หน้า)\s*\d+(?:\s*(?:of|\/|จาก)\s*\d+)?|-\s*\d+\s*-|\d+\s*(?:\/|of|จาก)\s*\d+|(?:ลำดับ|รหัสวิชา)(?:\s|$)|(?:course\s*code|no\.?\s+code)\b|.*(?:ชื.?อ(?:ราย)?วิชา.*หน่วยกิต|ตอนเรียน.*หน่วยกิต|รหัสวิชา\s+ชื.?อวิชา)|(?:รวม|รวมหน่วยกิต|จ[\u0E33\u0E4D\u0E32]นวนหน่วย(?:กิต|จุด)|หน่วยกิต(?:ที.?|ที่)?ลงทะเบียน|หน่วยกิตที่ได้|สรุประดับภาคการศึกษา|สรุปสะสม|คะแนนเฉลี่ย|เกรดเฉลี่ย|gp[ax]\b|gps\b|total\b|semester\s+summary|cumulative\s+summary|grade\s*point|credits?\s+(?:registered|attempted|earned)|remark|หมายเหตุ|พิมพ์เมื่อ|วันที่|printed\b|ลงชื่อ)|(?:created\s+at|generated\s+(?:from|by)|(?:psu\s+)?student\s+information\s+system)\b|(?:ผลการลงทะเบียน|ผลการเรียน(?:เฉลี.?ย)?|ผลการศึกษา|ใบรายงานผลการศึกษา|ตารางเรียนนักศึกษา|ข้อมูลการลงทะเบียน|รายละเอียดการลงทะเบียน|grade\s*report|transcript)(?:\s|$)|(?:มหาวิทยาลัยสงขลานครินทร์|prince\s+of\s+songkla\s+university)(?:\s+(?:วิทยาเขต|ระบบ|งานทะเบียน|ผล|ใบรายงาน|campus)|$)|วิทยาเขต\S+(?:\s|$)|(?:รหัส(?:ประจำตัว)?นักศึกษา|student\s*(?:id|code)|ชื่อ[-\s]*สกุล|ชื่อนักศึกษา|คณะ|ภาควิชา|สาขา(?:วิชา)?|หลักสูตร|ระดับ(?:การศึกษา)?|สถานภาพ(?:นักศึกษา)?|อาจารย์ที่ปรึกษา)(?:\s*[:：]|\s+\d)|.*รหัส(?:ประจำตัว)?นักศึกษา\s*[:：]?\s*\d{6,12}(?:\s|$)|(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.)\s+\S+(?:\s+\S+){0,4}\s+\d{10}$|[\d\s.,:/\-*()]+)$/i;
 
 const SIS_FOOTER_INLINE =
-  /\s*(?:\bCreated\s+at\s+\d{1,2}[/-]\d{1,2}[/-]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?\b|\b(?:Generated\s+(?:from|by)\s+)?PSU\s+Student\s+Information\s+System\b|ผลการลงทะเบียน\s+(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.|รหัสนักศึกษา)|(?:(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.)\s+\S+.*?\s+)?รหัสนักศึกษา\s*[:：]?\s*\d{7,12}\b).*$/i;
+  /\s*(?:\bCreated\s+at\s+\d{1,2}[/-]\d{1,2}[/-]\d{2,4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?\b|\b(?:Generated\s+(?:from|by)\s+)?PSU\s+Student\s+Information\s+System\b|(?:ผลการลงทะเบียน|ผลการเรียน)\s+(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.|รหัสนักศึกษา)|(?:(?:นาย|นาง|นางสาว|น\.ส\.|Mr\.|Mrs\.|Ms\.)\s+\S+.*?\s+)?รหัสนักศึกษา\s*[:：]?\s*\d{7,12}\b|(?:สรุประดับภาคการศึกษา|สรุปสะสม|หน่วยกิต(?:ที.?|ที่)?ลงทะเบียน|จ[\u0E33\u0E4D\u0E32]นวนหน่วยจุด|ผลการเรียนเฉลี.?ย)(?:\s|$)).*$/i;
 
 function stripRegistrationFooter(text: string): string {
   return text.replace(SIS_FOOTER_INLINE, "").trim();
 }
 
 const LOOSE_COURSE = new RegExp(
-  `^(?:\\d{1,2}\\.?\\s+)?(${CODE_BODY})\\s+(.+?)\\s+(\\d{1,2})(?:\\.\\d+)?(?:\\s*[A-DFWSPUI][+-]?)?(?:\\s*\\(.*)?$`,
+  `^(?:\\d{1,2}\\.?\\s+)?(${CODE_BODY})\\s+(.+?)\\s+(\\d{1,2})(?:\\.\\d+)?(?:\\s+(${GRADE_BODY}))?(?:\\s*\\(.*)?$`,
   "i"
 );
 
@@ -94,6 +100,7 @@ interface ParsedTail {
   sec: string;
   type: string;
   credits: number;
+  grade?: string;
 }
 
 function parseCourseTail(text: string): ParsedTail | null {
@@ -101,11 +108,30 @@ function parseCourseTail(text: string): ParsedTail | null {
   if (reg) {
     const credits = Number(reg[4]);
     if (credits >= 0 && credits <= 15) {
+      const grade = (reg[5] ?? "")
+        .trim()
+        .split(/\s+/)
+        .find((tok) => GRADE_TOKEN.test(tok));
       return {
         namePart: (reg[1] ?? "").trim(),
         sec: reg[2],
         type: reg[3],
         credits,
+        ...(grade ? { grade } : {}),
+      };
+    }
+  }
+  const trSec = text.match(TRANSCRIPT_TAIL_SEC);
+  if (trSec) {
+    const credits = Number(trSec[3]);
+    if (credits >= 0 && credits <= 15) {
+      const grade = trSec[4] === "-" ? undefined : trSec[4];
+      return {
+        namePart: (trSec[1] ?? "").trim(),
+        sec: trSec[2],
+        type: grade === "AU" ? "A" : "C",
+        credits,
+        ...(grade ? { grade } : {}),
       };
     }
   }
@@ -116,8 +142,9 @@ function parseCourseTail(text: string): ParsedTail | null {
       return {
         namePart: (tr[1] ?? "").trim(),
         sec: "",
-        type: "C",
+        type: tr[3] === "AU" ? "A" : "C",
         credits,
+        grade: tr[3],
       };
     }
   }
@@ -195,6 +222,7 @@ export function inspectRegistrationLines(lines: string[]): RegistrationParseResu
           sec: tail.sec,
           type: tail.type,
           credits: tail.credits,
+          ...(tail.grade ? { grade: tail.grade } : {}),
         };
         records.push(pending);
       } else {
@@ -221,6 +249,7 @@ export function inspectRegistrationLines(lines: string[]): RegistrationParseResu
           sec: tail.sec,
           type: tail.type,
           credits: tail.credits,
+          ...(tail.grade ? { grade: tail.grade } : {}),
         };
         records.push(pending);
         openDraft = null;
@@ -279,15 +308,17 @@ export function parseRegistrationText(text: string): RegistrationRecord[] {
     if (!course) continue;
     const credits = Number(course[3]);
     if (credits > 15) continue;
-    // "ชื่อวิชา 01 C" → ตัดตอน/ประเภทที่ติดท้ายชื่อออก
-    const tail = course[2].match(/^(.*?)\s+(\d{1,3}[A-Z]?)\s+([A-Z])$/);
+    // "ชื่อวิชา 01 C" หรือ "ชื่อวิชา 01" → ตัดตอน/ประเภทที่ติดท้ายชื่อออก
+    const tail = course[2].match(/^(.*?)\s+(\d{1,3}[A-Z]?)(?:\s+([A-Z]))?$/);
+    const grade = course[4]?.toUpperCase();
     records.push({
       term,
       code: normalizeCourseCode(course[1]),
       name: (tail ? tail[1] : course[2]).trim(),
       sec: tail ? tail[2] : "",
-      type: tail ? tail[3] : "C",
+      type: tail?.[3] ?? (grade === "AU" ? "A" : "C"),
       credits,
+      ...(grade ? { grade } : {}),
     });
   }
   return records;
@@ -305,7 +336,9 @@ export function mergeRegistrationRecords(
   const byKey = new Map<string, RegistrationRecord>();
   for (const raw of [...existing, ...incoming]) {
     const record = sanitizeRecordName(raw);
-    byKey.set(`${record.term}|${record.code}|${record.sec}`, record);
+    const key = `${record.term}|${record.code}|${record.sec}`;
+    const prev = byKey.get(key);
+    byKey.set(key, prev && !record.grade && prev.grade ? { ...record, grade: prev.grade } : record);
   }
   return [...byKey.values()].sort(
     (a, b) => a.term.localeCompare(b.term) || a.code.localeCompare(b.code)

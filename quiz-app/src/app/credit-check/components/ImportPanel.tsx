@@ -140,7 +140,7 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
   const handleFiles = async (files: FileList | File[] | null | undefined) => {
     const list = [...(files ?? [])].filter((f) => f.type === "application/pdf" || /\.pdf$/i.test(f.name));
     if (!list.length) {
-      if (files?.length) toast.error("รองรับเฉพาะไฟล์ PDF ผลการลงทะเบียนจาก SIS");
+      if (files?.length) toast.error("รองรับเฉพาะไฟล์ PDF ผลการลงทะเบียนหรือผลการเรียน (ใบเกรด) จาก SIS");
       return;
     }
     setBusy(true);
@@ -166,11 +166,11 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
       if (parsed.length) addRecords(parsed, `ไฟล์ PDF ${list.length - failed.length} ไฟล์`);
       if (skipped.length) {
         toast.warning(
-          `พบรหัสวิชาที่อ่านไม่ครบ ${skipped.length} วิชา (${skipped.join(", ")}) — เพิ่มได้จากปุ่ม "+ เพิ่มรายวิชา"`,
+          `พบรหัสวิชาที่อ่านไม่ครบ ${skipped.length} วิชา (${skipped.join(", ")}) — เพิ่มได้จากปุ่ม "+ เพิ่มวิชาเอง"`,
           { duration: 6000 }
         );
       }
-      if (failed.length) toast.error(`ไม่พบรายวิชาใน ${failed.join(", ")} — ต้องเป็นไฟล์ "ผลการลงทะเบียน" จาก SIS`);
+      if (failed.length) toast.error(`ไม่พบรายวิชาใน ${failed.join(", ")} — ต้องเป็นไฟล์ "ผลการลงทะเบียน" หรือ "ผลการเรียน" จาก SIS`);
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = "";
@@ -233,8 +233,12 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
         <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
           {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileUp className="h-5 w-5" />}
         </span>
-        <span className="text-sm font-semibold text-gray-900">{busy ? "กำลังอ่านไฟล์…" : "เลือกหรือลากไฟล์ PDF ผลการลงทะเบียนมาวาง"}</span>
-        <span className="text-xs text-gray-500">เลือกได้หลายไฟล์พร้อมกัน (ภาคละไฟล์) · ไฟล์อ่านในเบราว์เซอร์ ไม่ถูกอัปโหลด</span>
+        <span className="text-sm font-semibold text-gray-900">
+          {busy ? "กำลังอ่านไฟล์…" : "เลือกหรือลากไฟล์ PDF ผลการเรียน (ใบเกรด) หรือผลการลงทะเบียนมาวาง"}
+        </span>
+        <span className="text-xs text-gray-500">
+          อัปโหลดใบผลการเรียนรวมทุกภาค หรือเลือกใบลงทะเบียนหลายไฟล์พร้อมกันก็ได้ · อ่านในเบราว์เซอร์ ไม่ส่งออกนอกเครื่อง
+        </span>
       </button>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -264,7 +268,9 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
       </div>
 
       <p className="text-xs text-gray-600" aria-live="polite">
-        {records.length ? `นำเข้าแล้ว ${records.length} รายการ จาก ${termCount} ภาคการศึกษา` : "ยังไม่มีรายวิชา — นำเข้าใบลงทะเบียนของทุกภาคที่เรียนมาแล้ว"}
+        {records.length
+          ? `นำเข้าแล้ว ${records.length} รายการ จาก ${termCount} ภาคการศึกษา`
+          : "ยังไม่มีรายวิชา — นำเข้า PDF ผลการเรียน (ใบเกรด) หรือใบลงทะเบียนจาก SIS"}
       </p>
 
       <Dialog
@@ -273,7 +279,7 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
         size="lg"
         persistent
         title="วางข้อความจาก SIS"
-        description="คัดลอกตารางรายวิชาจากหน้าผลการลงทะเบียนแล้ววางที่นี่ ใส่บรรทัด “ภาคการศึกษา 1/2568” คั่นแต่ละภาคได้"
+        description="คัดลอกตารางรายวิชาจากหน้าผลการเรียนหรือผลการลงทะเบียนแล้ววางที่นี่ ใส่บรรทัด “ภาคการศึกษา 1/2568” คั่นแต่ละภาคได้"
         icon={<ClipboardPaste className="h-5 w-5" />}
         iconClassName="bg-sky-100 text-sky-700"
         footer={
@@ -297,8 +303,8 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
           onChange={(e) => setPasteText(e.target.value)}
           rows={10}
           spellCheck={false}
-          aria-label="ข้อความผลการลงทะเบียน"
-          placeholder={"ภาคการศึกษา 1/2568\n322-101 CALCULUS I 01 C 3\n324-101 GENERAL CHEMISTRY I 02 C 3\n…"}
+          aria-label="ข้อความผลการเรียนหรือผลการลงทะเบียน"
+          placeholder={"ภาคการศึกษา 1/2568\n322-101 CALCULUS I 05 3 C+\n324-101 GENERAL CHEMISTRY I 02 C 3\n…"}
           className="w-full rounded-xl border border-gray-200 bg-white p-3 font-mono text-xs leading-relaxed text-gray-900 outline-none placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
         />
       </Dialog>
@@ -308,7 +314,7 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
         onClose={() => setManualOpen(false)}
         size="lg"
         title="เพิ่มวิชาเอง"
-        description="สำหรับวิชาที่ไม่มีในใบลงทะเบียน เช่น วิชาเทียบโอน — เลือกจากฐานข้อมูลหรือกรอกเองด้านล่าง"
+        description="สำหรับวิชาที่ไม่มีในใบผลการเรียนหรือใบลงทะเบียน เช่น วิชาเทียบโอน — เลือกจากฐานข้อมูลหรือกรอกเองด้านล่าง"
         icon={<Plus className="h-5 w-5" />}
         iconClassName="bg-emerald-100 text-emerald-700"
         footer={

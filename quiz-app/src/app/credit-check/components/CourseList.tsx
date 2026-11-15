@@ -4,7 +4,7 @@ import { Ban, RotateCcw, Trash2 } from "lucide-react";
 import { Select, type SelectOption } from "@/components/ui/select";
 import { Switch } from "@/components/ui/checkbox";
 import { GeBadge } from "@/components/ge-badge";
-import { BUCKET_META, termOrder, type BucketChoice, type CheckedCourse, type SkipReason } from "@/lib/credit-check";
+import { BUCKET_META, isNonEarnedGrade, termOrder, type BucketChoice, type CheckedCourse, type SkipReason } from "@/lib/credit-check";
 import { UNKNOWN_TERM } from "@/lib/registration";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +19,7 @@ const BUCKET_OPTIONS: SelectOption<BucketChoice>[] = [
 const SKIP_LABEL: Record<SkipReason, string> = {
   repeat: "ลงซ้ำ — นับครั้งล่าสุด",
   audit: "Audit ไม่นับหน่วยกิต",
+  fail: "ไม่ผ่าน / ถอน — ไม่นับหน่วยกิต",
   excluded: "ไม่นับ (F / W)",
   term: "ไม่นับภาคนี้",
   none: "ไม่นับ",
@@ -72,6 +73,18 @@ export function CourseList({ courses, excludedTerms, onBucket, onToggleExcluded,
                       <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                         <span className="font-mono text-xs font-semibold text-gray-900">{c.record.code}</span>
                         <span className="text-xs font-semibold text-gray-600 tabular-nums">{c.record.credits} นก.</span>
+                        {c.record.grade && (
+                          <span
+                            className={cn(
+                              "rounded-md px-1.5 py-px font-mono text-[10px] font-semibold ring-1 ring-inset",
+                              isNonEarnedGrade(c.record.grade) || c.record.grade.trim().toUpperCase() === "AU"
+                                ? "bg-red-50 text-red-700 ring-red-200"
+                                : "bg-emerald-50 text-emerald-800 ring-emerald-200"
+                            )}
+                          >
+                            {c.record.grade}
+                          </span>
+                        )}
                         {c.ge && c.bucket === "ge" && <GeBadge ge={c.ge} size="xs" />}
                         {c.skip && (
                           <span className="rounded-full bg-gray-100 px-1.5 py-px text-[10px] font-medium text-gray-700">{SKIP_LABEL[c.skip]}</span>
