@@ -8,9 +8,8 @@ import { useConfirm } from "@/components/ui/confirm";
 import { cn } from "@/lib/utils";
 import {
   UNKNOWN_TERM,
-  extractPdfLines,
+  extractRegistrationFromPdf,
   mergeRegistrationRecords,
-  parseRegistrationLines,
   parseRegistrationText,
   type RegistrationRecord,
 } from "@/lib/registration";
@@ -54,16 +53,29 @@ export function ImportPanel({ records, onChange }: Props) {
     try {
       const parsed: RegistrationRecord[] = [];
       const failed: string[] = [];
+      const skipped: string[] = [];
       for (const file of list) {
         try {
-          const found = parseRegistrationLines(await extractPdfLines(file));
-          if (found.length) parsed.push(...found);
-          else failed.push(file.name);
+          const { records: found, skippedCodes } = await extractRegistrationFromPdf(file);
+          if (found.length) {
+            parsed.push(...found);
+            for (const code of skippedCodes) {
+              if (!skipped.includes(code)) skipped.push(code);
+            }
+          } else {
+            failed.push(file.name);
+          }
         } catch {
           failed.push(file.name);
         }
       }
       if (parsed.length) addRecords(parsed, `ไฟล์ PDF ${list.length - failed.length} ไฟล์`);
+      if (skipped.length) {
+        toast.warning(
+          `พบรหัสวิชาที่อ่านไม่ครบ ${skipped.length} วิชา (${skipped.join(", ")}) — เพิ่มได้จากปุ่ม "+ เพิ่มรายวิชา"`,
+          { duration: 6000 }
+        );
+      }
       if (failed.length) toast.error(`ไม่พบรายวิชาใน ${failed.join(", ")} — ต้องเป็นไฟล์ "ผลการลงทะเบียน" จาก SIS`);
     } finally {
       setBusy(false);
@@ -83,10 +95,12 @@ export function ImportPanel({ records, onChange }: Props) {
   };
 
   const submitManual = () => {
-    const code = manual.code.trim().toUpperCase();
+    const code = manual.code.trim().replace(/\s+/g, "").toUpperCase();
     const credits = Number(manual.credits);
     const term = manual.term.trim();
-    if (!/^[A-Z0-9]{3}-\d{3}[A-Z0-9]*$/.test(code)) return toast.error("รหัสวิชาต้องอยู่ในรูป 322-101");
+    if (!/^(?:[A-Z0-9]{3}-(?:\d{3}|[A-Z]\d{2})[A-Z0-9]*|[A-Z]{3}\d{2}(?:G[1-8][AB]?\d{2,3}|[A-Z0-9]{2}\d{3}))$/.test(code)) {
+      return toast.error("รหัสวิชาต้องอยู่ในรูป 322-101, B03-001G4 หรือ DII00G4005");
+    }
     if (!(credits > 0 && credits <= 15)) return toast.error("หน่วยกิตไม่ถูกต้อง");
     if (term && !/^\d\/25\d{2}$/.test(term)) return toast.error("ภาคการศึกษาต้องอยู่ในรูป 1/2568");
     addRecords([{ term: term || UNKNOWN_TERM, code, name: manual.name.trim() || code, sec: "", type: "C", credits }], "รายการที่เพิ่มเอง");

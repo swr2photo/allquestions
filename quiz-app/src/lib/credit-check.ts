@@ -1,7 +1,7 @@
 // ตรวจหน่วยกิตตามโครงสร้างหลักสูตร — จัดรายวิชาที่ลงทะเบียน (จากใบผลการลงทะเบียน SIS) ลงหมวด
 // แล้วเทียบกับหน่วยกิตที่หลักสูตรกำหนด. Pure helpers (no React, no storage side effects except the prefs I/O at the end).
 
-import { GE_AREA_MIN, LEGACY_GE_CODES, type CreditPlan, type CreditStructure } from "@/data/credit-structures";
+import { GE_AREA_MIN, GE2_SUB_MIN, LEGACY_GE_CODES, type CreditPlan, type CreditStructure } from "@/data/credit-structures";
 import { baseCode, classifyCourse, geArea, isCatalogTerm, GE_AREAS, type GeIndex, type GeKey } from "./ge";
 import type { RegistrationRecord } from "./registration";
 import type { CurriculumEdition } from "./timetable";
@@ -77,7 +77,12 @@ export interface CreditSummary {
   earned: number;
   remaining: number;
   buckets: Record<Bucket, BucketSummary>;
-  geAreas: { area: (typeof GE_AREAS)[number]; earned: number; need: number }[];
+  geAreas: {
+    area: (typeof GE_AREAS)[number];
+    earned: number;
+    need: number;
+    sub?: { key: GeKey; short: string; earned: number; need: number }[];
+  }[];
   courses: CheckedCourse[];
   missing: MissingCourse[];
   /** แผนการศึกษาที่นำเข้ามีหน่วยกิตไม่ครบทั้งหลักสูตร (รายชื่อวิชาบังคับอาจขาดชั้นปีท้าย ๆ) */
@@ -222,6 +227,7 @@ export function summarizeCredits(
   const courses: CheckedCourse[] = [];
   const earned: Record<Bucket, number> = { ge: 0, required: 0, elective: 0, free: 0 };
   const areaEarned = new Map<string, number>();
+  const subEarned = new Map<GeKey, number>();
   let guessedCount = 0;
 
   for (const record of ordered) {
@@ -242,6 +248,9 @@ export function summarizeCredits(
       if (bucket === "ge" && auto.ge) {
         const area = geArea(auto.ge);
         areaEarned.set(area, (areaEarned.get(area) ?? 0) + record.credits);
+        if (auto.ge === "GE2A" || auto.ge === "GE2B") {
+          subEarned.set(auto.ge, (subEarned.get(auto.ge) ?? 0) + record.credits);
+        }
       }
       if (auto.guessed && !override) guessedCount++;
     }
@@ -269,7 +278,19 @@ export function summarizeCredits(
 
   const geAreas =
     structure.curriculumYear >= 2567
-      ? GE_AREAS.map((area) => ({ area, earned: areaEarned.get(area) ?? 0, need: GE_AREA_MIN[area] ?? Math.max(0, structure.ge - 18) }))
+      ? GE_AREAS.map((area) => ({
+          area,
+          earned: areaEarned.get(area) ?? 0,
+          need: GE_AREA_MIN[area] ?? Math.max(0, structure.ge - 18),
+          ...(area === "GE2"
+            ? {
+                sub: GE2_SUB_MIN.map((s) => ({
+                  ...s,
+                  earned: subEarned.get(s.key) ?? 0,
+                })),
+              }
+            : {}),
+        }))
       : [];
 
   return {

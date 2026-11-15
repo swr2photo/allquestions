@@ -101,16 +101,19 @@ function parseCourseCode(title: string): string | null {
   return m ? m[0].toUpperCase() : null;
 }
 
-/** WordPress de-duplicates slugs with "-2", so "941-275-2-2" → "941-275" */
-function codeFromSlug(slug: string): string | null {
+/** WordPress de-duplicates slugs with "-2", so "941-275-2-2" → "941-275" และรองรับรหัสใหม่ "dii00g4005" → "DII00G4005" */
+export function codeFromSlug(slug: string): string | null {
   let s = slug;
   try {
     s = decodeURIComponent(slug);
   } catch {
     /* keep raw slug */
   }
-  const m = s.match(/^(\d{3})-?(\d{3})(?![0-9])/);
-  return m ? `${m[1]}-${m[2]}` : null;
+  const mNew = s.match(/^([A-Za-z]{3}\d{2}(?:G[1-8][AB]?\d{2,3}|[A-Za-z0-9]{2}\d{3}))(?![A-Za-z0-9])/);
+  if (mNew) return mNew[1].toUpperCase();
+  const m = s.match(/^(?:([A-Za-z0-9]{3})-(\d{3}|[A-Za-z]\d{2})|(\d{3})(\d{3}))(?![0-9])/);
+  if (!m) return null;
+  return `${(m[1] ?? m[3]).toUpperCase()}-${(m[2] ?? m[4]).toUpperCase()}`;
 }
 
 function decodeHtmlEntities(s: string): string {

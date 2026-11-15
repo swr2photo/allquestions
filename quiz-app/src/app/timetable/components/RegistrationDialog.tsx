@@ -7,9 +7,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { useConfirm } from "@/components/ui/confirm";
 import { Checkbox, Switch } from "@/components/ui/checkbox";
 import {
-  extractPdfLines,
+  extractRegistrationFromPdf,
   mergeRegistrationRecords,
-  parseRegistrationLines,
   type RegistrationHistory,
 } from "@/lib/registration";
 
@@ -45,13 +44,16 @@ export function RegistrationDialog({ open, onClose, history, onChange, canSync, 
     if (!file) return;
     setBusy(true);
     try {
-      const parsed = parseRegistrationLines(await extractPdfLines(file));
+      const { records: parsed, skippedCodes } = await extractRegistrationFromPdf(file);
       if (!parsed.length) {
         toast.error("ไม่พบรายวิชาในไฟล์นี้ (ต้องเป็นไฟล์ผลการลงทะเบียนจาก SIS)");
         return;
       }
       onChange({ ...history, records: mergeRegistrationRecords(history.records, parsed) });
       toast.success(`นำเข้า ${parsed.length} รายการจากไฟล์`, { duration: 2000 });
+      if (skippedCodes.length) {
+        toast.warning(`พบรหัสวิชาที่อ่านไม่ครบ: ${skippedCodes.join(", ")}`, { duration: 5000 });
+      }
     } catch {
       toast.error("อ่านไฟล์ PDF ไม่สำเร็จ");
     } finally {

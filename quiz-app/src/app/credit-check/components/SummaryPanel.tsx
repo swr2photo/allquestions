@@ -119,10 +119,10 @@ export function SummaryPanel({ summary }: { summary: CreditSummary }) {
       {summary.geAreas.length > 0 && (
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
           <h3 className="text-sm font-semibold text-gray-900">ศึกษาทั่วไปรายสาระ</h3>
-          <p className="mt-0.5 text-xs text-gray-500">เกณฑ์ขั้นต่ำตามโครงสร้าง GE ของมหาวิทยาลัย — วิชาที่ระบบไม่รู้สาระ (ไม่มีส่วนท้าย G ในรหัส) จะไม่ปรากฏที่นี่</p>
+          <p className="mt-0.5 text-xs text-gray-500">เกณฑ์ขั้นต่ำตามโครงสร้าง GE 2567 ของมหาวิทยาลัย (บังคับ GE1–GE7 รวม 18 นก. + GE8 เลือก 6 นก.) — วิชาที่ระบบไม่รู้สาระจะไม่ปรากฏที่นี่</p>
           <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {summary.geAreas.map(({ area, earned, need }) => {
-              const ok = earned >= need;
+            {summary.geAreas.map(({ area, earned, need, sub }) => {
+              const ok = earned >= need && (!sub || sub.every((s) => s.earned >= s.need));
               return (
                 <div key={area} className={cn("rounded-xl border px-3 py-2", ok ? "border-emerald-200 bg-emerald-50/50" : "border-gray-200 bg-white")}>
                   <div className="flex items-center gap-1.5">
@@ -133,6 +133,25 @@ export function SummaryPanel({ summary }: { summary: CreditSummary }) {
                     </span>
                   </div>
                   <p className="mt-0.5 truncate text-[11px] text-gray-500">{GE_META[area].short}</p>
+                  {sub && (
+                    <div className="mt-1.5 flex flex-wrap gap-1">
+                      {sub.map((s) => {
+                        const subOk = s.earned >= s.need;
+                        return (
+                          <span
+                            key={s.key}
+                            className={cn(
+                              "inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium tabular-nums",
+                              subOk ? "bg-emerald-100/80 text-emerald-800" : "bg-amber-50 text-amber-800"
+                            )}
+                          >
+                            <span>{s.short}</span>
+                            <span>{s.earned}/{s.need}</span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -171,7 +190,7 @@ export function SummaryPanel({ summary }: { summary: CreditSummary }) {
                     <ul className="divide-y divide-gray-100 rounded-xl border border-gray-100">
                       {g.list.map((m) => (
                         <li key={m.code} className="flex items-center gap-3 px-3 py-2 text-sm">
-                          <span className="w-[4.5rem] shrink-0 font-mono text-xs font-semibold text-gray-900">{m.code}</span>
+                          <span className="min-w-[4.5rem] shrink-0 font-mono text-xs font-semibold text-gray-900">{m.code}</span>
                           <span className="min-w-0 flex-1 text-gray-700">{m.name}</span>
                           <span className="shrink-0 text-[11px] text-gray-500">
                             ปี {m.year}/{m.term}

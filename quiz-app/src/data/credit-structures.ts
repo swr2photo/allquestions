@@ -85,8 +85,14 @@ export function structureTotal(s: CreditStructure, plan: CreditPlan): number {
   return s.ge + s.basic + plan.required + plan.elective + s.free + (s.extra ?? []).reduce((a, e) => a + e.credits, 0);
 }
 
-/** เกณฑ์ขั้นต่ำรายสาระของ GE โครงสร้างใหม่ (หลักสูตร 2569): บังคับ GE1–GE7 รวม 18 หน่วยกิต ที่เหลือเป็น GE8 */
+/** เกณฑ์ขั้นต่ำรายสาระของ GE โครงสร้างใหม่ (ปรับปรุง 2567 / หลักสูตร 2569): บังคับ GE1–GE7 รวม 18 หน่วยกิต ที่เหลือเป็น GE8 */
 export const GE_AREA_MIN: Record<string, number> = { GE1: 4, GE2: 4, GE3: 2, GE4: 2, GE5: 2, GE6: 2, GE7: 2 };
+
+/** เกณฑ์ย่อยของ GE2 การพัฒนาความคิด (4 หน่วยกิต): ต้องเรียนทั้ง 2A และ 2B อย่างละ 2 หน่วยกิต */
+export const GE2_SUB_MIN = [
+  { key: "GE2A" as const, short: "2A ตรรกะ/ตัวเลข", need: 2 },
+  { key: "GE2B" as const, short: "2B คิดเชิงระบบ", need: 2 },
+];
 
 /**
  * รายวิชาหมวดศึกษาทั่วไปของหลักสูตร 2564 (สาระที่ 1–7 + วิชาเลือก) ที่ระบุในเล่มหลักสูตรคณะวิทยาศาสตร์

@@ -34,15 +34,15 @@ export interface GeMeta {
 }
 
 export const GE_META: Record<GeKey, GeMeta> = {
-  GE1: { key: "GE1", name: "ศิลปะการสื่อสารและภาษา", short: "สื่อสาร/ภาษา", chip: "bg-sky-50 text-sky-800 ring-sky-200", accent: "#0284c7" },
-  GE2: { key: "GE2", name: "การคิดเชิงตรรกะและเชิงระบบ", short: "ตรรกะ/ระบบ", chip: "bg-indigo-50 text-indigo-800 ring-indigo-200", accent: "#4f46e5" },
+  GE1: { key: "GE1", name: "ภาษาและการสื่อสาร", short: "ภาษาและสื่อสาร", chip: "bg-sky-50 text-sky-800 ring-sky-200", accent: "#0284c7" },
+  GE2: { key: "GE2", name: "การพัฒนาความคิด", short: "พัฒนาความคิด", chip: "bg-indigo-50 text-indigo-800 ring-indigo-200", accent: "#4f46e5" },
   GE2A: { key: "GE2A", name: "การคิดเชิงตรรกะและตัวเลข", short: "ตรรกะ/ตัวเลข", chip: "bg-indigo-50 text-indigo-800 ring-indigo-200", accent: "#4f46e5" },
   GE2B: { key: "GE2B", name: "การคิดเชิงระบบ", short: "คิดเชิงระบบ", chip: "bg-violet-50 text-violet-800 ring-violet-200", accent: "#7c3aed" },
-  GE3: { key: "GE3", name: "กรอบความคิดผู้ประกอบการ", short: "ผู้ประกอบการ", chip: "bg-amber-50 text-amber-800 ring-amber-200", accent: "#d97706" },
-  GE4: { key: "GE4", name: "เทคโนโลยีดิจิทัล", short: "ดิจิทัล", chip: "bg-cyan-50 text-cyan-800 ring-cyan-200", accent: "#0891b2" },
+  GE3: { key: "GE3", name: "การคิดแบบผู้ประกอบการ", short: "ผู้ประกอบการ", chip: "bg-amber-50 text-amber-800 ring-amber-200", accent: "#d97706" },
+  GE4: { key: "GE4", name: "การใช้เทคโนโลยีดิจิทัลและปัญญาประดิษฐ์", short: "ดิจิทัลและ AI", chip: "bg-cyan-50 text-cyan-800 ring-cyan-200", accent: "#0891b2" },
   GE5: { key: "GE5", name: "สุขภาวะองค์รวม", short: "สุขภาวะ", chip: "bg-rose-50 text-rose-800 ring-rose-200", accent: "#e11d48" },
   GE6: { key: "GE6", name: "จิตสาธารณะและการพัฒนาที่ยั่งยืน", short: "จิตสาธารณะ", chip: "bg-teal-50 text-teal-800 ring-teal-200", accent: "#0d9488" },
-  GE7: { key: "GE7", name: "มนุษยชาติกับสิ่งแวดล้อม", short: "สิ่งแวดล้อม", chip: "bg-green-50 text-green-800 ring-green-200", accent: "#16a34a" },
+  GE7: { key: "GE7", name: "การปรับตัวให้เข้ากับพลวัตของโลก", short: "พลวัตของโลก", chip: "bg-green-50 text-green-800 ring-green-200", accent: "#16a34a" },
   GE8: { key: "GE8", name: "รายวิชาเลือกในหมวดศึกษาทั่วไป", short: "เลือก GE8", chip: "bg-orange-50 text-orange-800 ring-orange-200", accent: "#ea580c" },
 };
 
@@ -57,15 +57,24 @@ export function geArea(k: GeKey): (typeof GE_AREAS)[number] {
 
 // ------------------------------------------------------------------ codes & names
 
-/** "001-102G6" / "001102" / "895-178g7" → "001-102" */
+/** "001-102G6" / "001102" / "B03-001G4" / "DII00G4005" → "001-102" / "B03-001" / "DII00G4005" */
 export function baseCode(code: string): string | null {
-  const m = code.match(/(\d{3})\s*-?\s*(\d{3})/);
-  return m ? `${m[1]}-${m[2]}` : null;
+  const s = code.replace(/[‐‑‒–—]/g, "-");
+  const mNew = s.match(/(?:^|[^A-Za-z0-9])([A-Za-z]{3}\d{2}(?:G[1-8][AB]?\d{2,3}|[A-Za-z0-9]{2}\d{3}))(?![A-Za-z0-9])/);
+  if (mNew) return mNew[1].toUpperCase();
+  const m = s.match(/(?:^|[^A-Za-z0-9])(?:([A-Za-z0-9]{3})\s*-\s*(\d{3}|[A-Za-z]\d{2})|(\d{3})\s*(\d{3}))(?![0-9])/);
+  if (!m) return null;
+  const head = (m[1] ?? m[3]).toUpperCase();
+  const tail = (m[2] ?? m[4]).toUpperCase();
+  return `${head}-${tail}`;
 }
 
-/** SIS code suffix → GE key ("117-201G2A" → "GE2A") */
+/** SIS code → GE key ("117-201G2A" → "GE2A", "B03-001G4" → "GE4", "DII00G4005" → "GE4") */
 export function geFromCode(code: string): GeKey | null {
-  const m = code.trim().match(/^\d{3}-\d{3}\s*G\s*(\d)([AB])?$/i);
+  const s = code.trim().replace(/[‐‑‒–—]/g, "-");
+  const m =
+    s.match(/^[A-Z0-9]{3}\s*-\s*(?:\d{3}|[A-Z]\d{2})\s*G\s*(\d)([AB])?$/i) ??
+    s.match(/^[A-Z]{3}\d{2}G(\d)([AB]?)\d{2,3}$/i);
   if (!m) return null;
   const key = `GE${m[1]}${(m[2] ?? "").toUpperCase()}`;
   return isGeKey(key) ? key : null;
@@ -159,7 +168,17 @@ export function classifyCourse(
   if (direct) {
     const extra = hit ?? byName;
     const info = extra ? fromGened(extra, "sis-code", c.campus) : null;
-    return { levels: [direct], ge8Groups: info?.ge8Groups ?? [], source: "sis-code", link: info?.link, sdgs: info?.sdgs };
+    const refined =
+      direct === "GE2" && info
+        ? info.levels.filter((l) => l === "GE2A" || l === "GE2B")
+        : [];
+    return {
+      levels: refined.length ? refined : [direct],
+      ge8Groups: info?.ge8Groups ?? [],
+      source: "sis-code",
+      link: info?.link,
+      sdgs: info?.sdgs,
+    };
   }
   if (hit?.length) return fromGened(hit, "gened-code", c.campus);
   // name-only matches are limited to undergraduate codes (x00–x4xx): graduate
