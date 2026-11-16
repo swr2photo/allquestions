@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { ClipboardPaste, FileUp, Loader2, Plus, Search, Trash2, X } from "lucide-react";
+import { ClipboardPaste, FileUp, Loader2, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { useConfirm } from "@/components/ui/confirm";
 import { normalizeQuery } from "@/lib/timetable";
@@ -19,16 +19,19 @@ import {
 
 interface Props {
   records: RegistrationRecord[];
-  catalogCourses?: CatalogCourse[];
+  /** สร้างฐานข้อมูลรายวิชาสำหรับหน้าเพิ่มวิชาเอง — เรียกเมื่อเปิดหน้าต่างเท่านั้น (รายการใหญ่ ไม่ควรสร้างทุกครั้งที่หน้าหลักเปลี่ยน) */
+  buildCatalog?: () => CatalogCourse[];
   onChange: (records: RegistrationRecord[]) => void;
 }
+
+const NO_CATALOG: CatalogCourse[] = [];
 
 const FIELD =
   "h-10 w-full rounded-xl border border-gray-200 bg-white px-3 text-sm text-gray-900 outline-none placeholder:text-gray-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20";
 const SECONDARY =
   "flex h-10 items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50";
 
-export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
+export function ImportPanel({ records, buildCatalog, onChange }: Props) {
   const confirm = useConfirm();
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -42,6 +45,7 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
   const [loadingQuery, setLoadingQuery] = useState<string | null>(null);
 
   const normalizedQuery = normalizeQuery(catalogQuery);
+  const catalogCourses = useMemo(() => (manualOpen && buildCatalog ? buildCatalog() : NO_CATALOG), [manualOpen, buildCatalog]);
 
   useEffect(() => {
     if (!manualOpen || normalizedQuery.length < 2 || normalizedQuery in sisCache) return;
@@ -226,18 +230,24 @@ export function ImportPanel({ records, catalogCourses = [], onChange }: Props) {
           void handleFiles(e.dataTransfer.files);
         }}
         className={cn(
-          "flex w-full flex-col items-center gap-1.5 rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 disabled:opacity-60",
-          dragging ? "border-emerald-500 bg-emerald-50" : "border-gray-300 bg-gray-50/60 hover:border-emerald-400 hover:bg-emerald-50/50"
+          "group flex w-full flex-col items-center gap-2 rounded-2xl border-2 border-dashed px-4 py-6 text-center transition-colors outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/40 disabled:opacity-60",
+          dragging ? "border-emerald-500 bg-emerald-50" : "border-emerald-200 bg-emerald-50/40 hover:border-emerald-400 hover:bg-emerald-50"
         )}
       >
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm">
-          {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <FileUp className="h-5 w-5" />}
+        <span className="relative flex h-14 w-14 items-center justify-center">
+          <span className="absolute inset-0 rotate-6 rounded-2xl bg-emerald-200/70 transition-transform group-hover:rotate-12 motion-reduce:transition-none" aria-hidden />
+          <span className="relative flex h-full w-full items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/25">
+            {busy ? <Loader2 className="h-6 w-6 animate-spin" /> : <FileUp className="h-6 w-6" />}
+          </span>
         </span>
         <span className="text-sm font-semibold text-gray-900">
-          {busy ? "กำลังอ่านไฟล์…" : "เลือกหรือลากไฟล์ PDF ผลการเรียน (ใบเกรด) หรือผลการลงทะเบียนมาวาง"}
+          {busy ? "กำลังอ่านไฟล์…" : dragging ? "ปล่อยไฟล์ที่นี่" : "เลือกหรือลากไฟล์ PDF จาก SIS มาวาง"}
         </span>
-        <span className="text-xs text-gray-500">
-          อัปโหลดใบผลการเรียนรวมทุกภาค หรือเลือกใบลงทะเบียนหลายไฟล์พร้อมกันก็ได้ · อ่านในเบราว์เซอร์ ไม่ส่งออกนอกเครื่อง
+        <span className="max-w-md text-xs leading-relaxed text-gray-600">
+          ใบผลการเรียน (ใบเกรด) รวมทุกภาค หรือใบผลการลงทะเบียนหลายไฟล์พร้อมกันก็ได้
+        </span>
+        <span className="inline-flex items-center gap-1 rounded-full bg-white px-2.5 py-1 text-[11px] font-medium text-emerald-800 ring-1 ring-emerald-200 ring-inset">
+          <ShieldCheck className="h-3.5 w-3.5" aria-hidden /> อ่านในเบราว์เซอร์ ไม่ส่งไฟล์ออกนอกเครื่อง
         </span>
       </button>
 
