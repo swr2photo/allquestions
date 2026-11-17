@@ -126,22 +126,21 @@ export async function updateCourseSettings(
   return updated;
 }
 
-export async function isCourseVisible(courseId: string): Promise<boolean> {
-  const settings = await getCourseSettings(courseId);
+export function isSettingsActive(
+  settings?: { isActive: boolean; scheduleStart: string | null; scheduleEnd: string | null }
+): boolean {
   if (!settings) return true;
   if (!settings.isActive) return false;
 
   const now = new Date();
-  if (settings.scheduleStart) {
-    const start = new Date(settings.scheduleStart);
-    if (now < start) return false;
-  }
-  if (settings.scheduleEnd) {
-    const end = new Date(settings.scheduleEnd);
-    if (now > end) return false;
-  }
+  if (settings.scheduleStart && now < new Date(settings.scheduleStart)) return false;
+  if (settings.scheduleEnd && now > new Date(settings.scheduleEnd)) return false;
 
   return true;
+}
+
+export async function isCourseVisible(courseId: string): Promise<boolean> {
+  return isSettingsActive(await getCourseSettings(courseId));
 }
 
 export async function getQuizSettings(quizId: string): Promise<QuizSettings | undefined> {
@@ -171,19 +170,5 @@ export async function updateQuizSettings(
 }
 
 export async function isQuizVisible(quizId: string): Promise<boolean> {
-  const settings = await getQuizSettings(quizId);
-  if (!settings) return true; // Default to visible if no settings configured
-  if (!settings.isActive) return false;
-
-  const now = new Date();
-  if (settings.scheduleStart) {
-    const start = new Date(settings.scheduleStart);
-    if (now < start) return false;
-  }
-  if (settings.scheduleEnd) {
-    const end = new Date(settings.scheduleEnd);
-    if (now > end) return false;
-  }
-
-  return true;
+  return isSettingsActive(await getQuizSettings(quizId));
 }

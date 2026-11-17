@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { loadCurriculaIndex, loadCurriculumFile, loadTermData, loadTermIndex } from "@/lib/term-data.server";
 import { baseCode, classifyCourse, isCatalogTerm, type GeKey } from "@/lib/ge";
 import { matchScore, normalizeQuery, type CurriculumProgram, type TermData } from "@/lib/timetable";
+import { sessionUser } from "@/lib/session.server";
 
 export const dynamic = "force-dynamic";
+
+const NO_STORE = { "Cache-Control": "no-store" };
 
 export interface FacultyProgram {
   id: string;
@@ -111,13 +114,16 @@ function toCourse(c: TermData["courses"][number]): FacultyCourse {
 // GET /api/faculties?faculty=…&campus=…    → that faculty's courses this term
 // GET /api/faculties?q=…                   → search faculties / departments / programs / courses
 export async function GET(request: NextRequest) {
+  if (!sessionUser(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_STORE });
+  }
   const sp = request.nextUrl.searchParams;
   const origin = request.nextUrl.origin;
   try {
     const term = await loadTermData(origin, sp.get("term"));
-    if (!term) return NextResponse.json({ error: "ไม่พบข้อมูลภาคการศึกษา" }, { status: 404 });
+    if (!term) return NextResponse.json({ error: "ไม่พบข้อมูลภาคการศึกษา" }, { status: 404, headers: NO_STORE });
     const termInfo = { id: term.id, label: term.label, year: term.year, term: term.term };
-    const headers = { "Cache-Control": "public, max-age=300, stale-while-revalidate=3600" };
+    const headers = NO_STORE;
 
     if (sp.get("only") === "courses") {
       const q = normalizeQuery(sp.get("q") ?? "");
@@ -175,9 +181,10 @@ export async function GET(request: NextRequest) {
       .map(toCourse);
     return NextResponse.json({ term: termInfo, faculties, depts: depts.slice(0, 60), programs, courses }, { headers });
   } catch (err) {
+    console.error("[api/faculties GET]", err);
     return NextResponse.json(
-      { error: "โหลดข้อมูลคณะไม่สำเร็จ", detail: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
+      { error: "โหลดข้อมูลคณะไม่สำเร็จ" },
+      { status: 500, headers: NO_STORE }
     );
   }
 }

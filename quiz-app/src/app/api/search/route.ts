@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isSettingsActive, loadAdminData } from "@/lib/admin-store";
 import { getAllCoursesWithCustom } from "@/lib/merged-courses";
+import { sessionUser } from "@/lib/session.server";
 
 export const dynamic = "force-dynamic";
+
+const NO_STORE = { "Cache-Control": "no-store" };
 
 interface SearchResult {
   courseId: string;
@@ -16,19 +20,29 @@ interface SearchResult {
 }
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("q")?.trim().toLowerCase();
-
-  if (!query || query.length < 2) {
-    return NextResponse.json({ results: [] });
+  if (!sessionUser(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_STORE });
   }
 
-  const courses = await getAllCoursesWithCustom();
+  const { searchParams } = new URL(request.url);
+  const query = (searchParams.get("q")?.trim() ?? "").slice(0, 200).toLowerCase();
+
+  if (query.length < 2) {
+    return NextResponse.json({ results: [] }, { headers: NO_STORE });
+  }
+
+  const [courses, adminData] = await Promise.all([
+    getAllCoursesWithCustom(),
+    loadAdminData(),
+  ]);
   const results: SearchResult[] = [];
 
   for (const course of courses) {
+    if (!isSettingsActive(adminData.courseSettings[course.id])) continue;
+
     for (const quiz of course.quizzes) {
       if (quiz.type === "pdf") continue;
+      if (!isSettingsActive(adminData.quizSettings?.[quiz.id])) continue;
 
       for (let i = 0; i < quiz.questions.length; i++) {
         const q = quiz.questions[i];
@@ -53,12 +67,15 @@ export async function GET(request: NextRequest) {
               isCorrect: c.isCorrect,
             })),
           });
+          if (results.length >= 50) break;
         }
       }
+
+      if (results.length >= 50) break;
     }
 
     if (results.length >= 50) break; // cap results
   }
 
-  return NextResponse.json({ results });
+  return NextResponse.json({ results }, { headers: NO_STORE });
 }

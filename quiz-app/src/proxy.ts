@@ -3,8 +3,10 @@ import { getSessionInfo, isValidAdminSession } from "@/lib/session-token";
 import { bucketFor, rateLimit } from "@/lib/rate-limit";
 
 // Admin-only API paths. The route handlers check this too; the proxy is a second lock.
-const ADMIN_API_PREFIXES = ["/api/admin/", "/api/sheets", "/api/sentry-example-api", "/api/ai/notebooklm/auth"];
+const ADMIN_API_PREFIXES = ["/api/admin/", "/api/courses/", "/api/sheets", "/api/sentry-example-api", "/api/ai/notebooklm/auth"];
 const PUBLIC_ADMIN_PATHS = new Set(["/api/admin/auth"]);
+// Course/question APIs that require any signed-in user session (the route handlers check this too).
+const SIGNED_IN_API_PREFIXES = ["/api/search/", "/api/faculties/", "/api/gened/offered/"];
 
 const UNSAFE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
@@ -34,9 +36,24 @@ function isCrossSite(req: NextRequest): boolean {
   return req.headers.get("sec-fetch-site") === "cross-site";
 }
 
+function matchesPrefix(pathname: string, prefixes: string[]): boolean {
+  return prefixes.some((p) => pathname === p.replace(/\/$/, "") || pathname.startsWith(p));
+}
+
 function isAdminApi(pathname: string): boolean {
   if (PUBLIC_ADMIN_PATHS.has(pathname)) return false;
-  return ADMIN_API_PREFIXES.some((p) => pathname === p.replace(/\/$/, "") || pathname.startsWith(p));
+  return matchesPrefix(pathname, ADMIN_API_PREFIXES);
+}
+
+function isSignedInApi(pathname: string): boolean {
+  return matchesPrefix(pathname, SIGNED_IN_API_PREFIXES);
+}
+
+function hasSignedInSession(req: NextRequest): boolean {
+  return Boolean(
+    getSessionInfo(req.cookies.get("user-session")?.value) ||
+    isValidAdminSession(req.cookies.get("admin-session")?.value)
+  );
 }
 
 export async function proxy(req: NextRequest) {
@@ -48,6 +65,10 @@ export async function proxy(req: NextRequest) {
   }
 
   if (isAdminApi(pathname) && !isValidAdminSession(req.cookies.get("admin-session")?.value)) {
+    return json(401, "Unauthorized");
+  }
+
+  if (isSignedInApi(pathname) && !hasSignedInSession(req)) {
     return json(401, "Unauthorized");
   }
 

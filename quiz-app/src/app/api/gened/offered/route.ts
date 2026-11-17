@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getGenedCourses } from "@/lib/gened";
 import { buildGeIndex, classifyCourse, type GeKey } from "@/lib/ge";
 import { loadTermData } from "@/lib/term-data.server";
+import { sessionUser } from "@/lib/session.server";
 
 export const dynamic = "force-dynamic";
+
+const NO_STORE = { "Cache-Control": "no-store" };
 
 export interface OfferedCourse {
   id: string;
@@ -25,8 +28,11 @@ export interface OfferedCourse {
   online: boolean;
 }
 
-// GET /api/gened/offered?term=2569-2 — GE courses that actually open in a SIS term
+// GET /api/gened/offered?term=2569-2 — GE courses that actually open in a SIS term (signed-in users only)
 export async function GET(request: NextRequest) {
+  if (!sessionUser(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: NO_STORE });
+  }
   const termId = request.nextUrl.searchParams.get("term");
   const origin = request.nextUrl.origin;
   try {
@@ -34,7 +40,7 @@ export async function GET(request: NextRequest) {
       loadTermData(origin, termId),
       getGenedCourses().catch(() => []),
     ]);
-    if (!term) return NextResponse.json({ error: "ไม่พบข้อมูลภาคการศึกษา" }, { status: 404 });
+    if (!term) return NextResponse.json({ error: "ไม่พบข้อมูลภาคการศึกษา" }, { status: 404, headers: NO_STORE });
     const index = buildGeIndex(gened);
 
     const courses: OfferedCourse[] = [];
@@ -69,12 +75,13 @@ export async function GET(request: NextRequest) {
         term: { id: term.id, label: term.label, year: term.year, term: term.term, fetchedAt: term.fetchedAt },
         courses,
       },
-      { headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=3600" } }
+      { headers: NO_STORE }
     );
   } catch (err) {
+    console.error("[api/gened/offered GET]", err);
     return NextResponse.json(
-      { error: "โหลดรายวิชาที่เปิดสอนไม่สำเร็จ", detail: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
+      { error: "โหลดรายวิชาที่เปิดสอนไม่สำเร็จ" },
+      { status: 500, headers: NO_STORE }
     );
   }
 }

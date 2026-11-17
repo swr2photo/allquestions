@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -20,6 +20,7 @@ import {
 import { Dialog } from "@/components/ui/dialog";
 import { Segmented } from "@/components/ui/checkbox";
 import { GeBadge } from "@/components/ge-badge";
+import { GoogleSignIn } from "@/components/google-sign-in";
 import { timetableStore } from "@/hooks/use-timetable-store";
 import { shortCampus } from "@/lib/timetable";
 import { cn } from "@/lib/utils";
@@ -49,6 +50,8 @@ export default function FacultiesPage() {
   const router = useRouter();
   const [data, setData] = useState<ListResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needsAuth, setNeedsAuth] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [campus, setCampus] = useState("all");
   const [query, setQuery] = useState("");
   const deferred = useDeferredValue(query.trim());
@@ -58,27 +61,48 @@ export default function FacultiesPage() {
   useEffect(() => {
     let cancelled = false;
     fetch("/api/faculties")
-      .then((r) => (r.ok ? (r.json() as Promise<ListResponse>) : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((d) => !cancelled && setData(d))
+      .then(async (r) => {
+        if (r.status === 401) {
+          if (!cancelled) {
+            setNeedsAuth(true);
+            setError(null);
+          }
+          return null;
+        }
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return (await r.json()) as ListResponse;
+      })
+      .then((d) => {
+        if (!cancelled && d) {
+          setNeedsAuth(false);
+          setData(d);
+        }
+      })
       .catch(() => !cancelled && setError("โหลดข้อมูลคณะไม่สำเร็จ"));
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [reloadKey]);
 
   useEffect(() => {
-    if (deferred.length < 2) return;
+    if (deferred.length < 2 || needsAuth) return;
     let cancelled = false;
     const t = setTimeout(() => {
       fetch(`/api/faculties?q=${encodeURIComponent(deferred)}`)
-        .then((r) => (r.ok ? (r.json() as Promise<SearchResponse>) : null))
+        .then((r) => {
+          if (r.status === 401) {
+            if (!cancelled) setNeedsAuth(true);
+            return null;
+          }
+          return r.ok ? (r.json() as Promise<SearchResponse>) : null;
+        })
         .then((res) => !cancelled && res && setSearch({ q: deferred, res }));
     }, 200);
     return () => {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [deferred]);
+  }, [deferred, needsAuth]);
 
   const campuses = useMemo(() => {
     const m = new Map<string, number>();
@@ -108,6 +132,11 @@ export default function FacultiesPage() {
       programs: f.reduce((n, x) => n + x.programs.length, 0),
     };
   }, [data]);
+
+  const handleUnauthorized = useCallback(() => {
+    setSelected(null);
+    setNeedsAuth(true);
+  }, []);
 
   const usePlan = (f: { campus: string; curriculumId?: string }, p: FacultyProgram) => {
     timetableStore.setCurriculum({
@@ -190,7 +219,21 @@ export default function FacultiesPage() {
 
       {error && <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
-      {showingSearch ? (
+      {needsAuth ? (
+        <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-4 rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+            <GraduationCap className="h-6 w-6" />
+          </div>
+          <h2 className="text-lg font-bold text-gray-900">เข้าสู่ระบบเพื่อดูข้อมูลคณะและรายวิชา</h2>
+          <p className="text-sm text-gray-600">กรุณาเข้าสู่ระบบด้วย Google เพื่อเข้าถึงรายวิชาและหลักสูตรจากระบบ SIS</p>
+          <GoogleSignIn
+            onSignedIn={() => {
+              setNeedsAuth(false);
+              setReloadKey((k) => k + 1);
+            }}
+          />
+        </div>
+      ) : showingSearch ? (
         <SearchResults res={search!.res} faculties={data?.faculties ?? []} onOpen={setSelected} onUsePlan={usePlan} />
       ) : !data ? (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -249,7 +292,13 @@ export default function FacultiesPage() {
         </div>
       )}
 
-      <FacultyDialog faculty={selected} termLabel={data?.term.label} onClose={() => setSelected(null)} onUsePlan={usePlan} />
+      <FacultyDialog
+        faculty={selected}
+        termLabel={data?.term.label}
+        onClose={() => setSelected(null)}
+        onUsePlan={usePlan}
+        onUnauthorized={handleUnauthorized}
+      />
     </div>
   );
 }
@@ -379,11 +428,13 @@ function FacultyDialog({
   termLabel,
   onClose,
   onUsePlan,
+  onUnauthorized,
 }: {
   faculty: FacultySummary | null;
   termLabel?: string;
   onClose: () => void;
   onUsePlan: (f: { campus: string; curriculumId?: string }, p: FacultyProgram) => void;
+  onUnauthorized: () => void;
 }) {
   const [faculty, setFaculty] = useState(incoming);
   if (incoming && incoming !== faculty) setFaculty(incoming);
@@ -403,12 +454,18 @@ function FacultyDialog({
     if (!incoming) return;
     let cancelled = false;
     fetch(`/api/faculties?faculty=${encodeURIComponent(incoming.name)}&campus=${encodeURIComponent(incoming.campus)}`)
-      .then((r) => (r.ok ? (r.json() as Promise<{ courses: FacultyCourse[] }>) : null))
+      .then((r) => {
+        if (r.status === 401) {
+          if (!cancelled) onUnauthorized();
+          return null;
+        }
+        return r.ok ? (r.json() as Promise<{ courses: FacultyCourse[] }>) : null;
+      })
       .then((d) => !cancelled && d && setCourses({ key: incoming.key, list: d.courses }));
     return () => {
       cancelled = true;
     };
-  }, [incoming]);
+  }, [incoming, onUnauthorized]);
 
   const list = courses && faculty && courses.key === faculty.key ? courses.list : null;
   const filtered = useMemo(() => {

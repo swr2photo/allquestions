@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -10,11 +10,13 @@ import {
   BookOpen,
   ArrowLeft,
   Loader2,
+  Lock,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { GoogleSignIn } from "@/components/google-sign-in";
 
 interface SearchResult {
   courseId: string;
@@ -29,11 +31,31 @@ interface SearchResult {
 }
 
 export default function SearchPage() {
+  const [authChecked, setAuthChecked] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/user", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : { authenticated: false }))
+      .then((d: { authenticated?: boolean }) => {
+        if (!cancelled) {
+          setSignedIn(Boolean(d.authenticated));
+          setAuthChecked(true);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setAuthChecked(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const doSearch = useCallback(async (q: string) => {
     if (q.trim().length < 2) {
@@ -46,6 +68,12 @@ export default function SearchPage() {
     setSearched(true);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      if (res.status === 401) {
+        setSignedIn(false);
+        setResults([]);
+        setSearched(false);
+        return;
+      }
       const data = await res.json();
       setResults(data.results || []);
     } catch {
@@ -60,6 +88,32 @@ export default function SearchPage() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => doSearch(value), 300);
   };
+
+  if (!authChecked) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-emerald-600" />
+      </div>
+    );
+  }
+
+  if (!signedIn) {
+    return (
+      <div className="mx-auto flex min-h-[60vh] max-w-md flex-col items-center justify-center gap-4 px-4 text-center">
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700 shadow-sm">
+          <Lock className="h-7 w-7" />
+        </div>
+        <h1 className="text-xl font-bold text-gray-900">เข้าสู่ระบบเพื่อค้นหาคำตอบ</h1>
+        <p className="text-sm text-gray-600">กรุณาเข้าสู่ระบบด้วย Google ก่อนเข้าถึงระบบค้นหาข้อสอบและคำตอบ</p>
+        <GoogleSignIn
+          onSignedIn={() => {
+            setSignedIn(true);
+            if (query.trim().length >= 2) void doSearch(query);
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50">

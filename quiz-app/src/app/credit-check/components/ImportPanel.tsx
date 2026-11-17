@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ClipboardPaste, FileUp, Loader2, Plus, Search, ShieldCheck, Trash2, X } from "lucide-react";
 import { Dialog } from "@/components/ui/dialog";
 import { useConfirm } from "@/components/ui/confirm";
+import { GoogleSignIn } from "@/components/google-sign-in";
 import { normalizeQuery } from "@/lib/timetable";
 import { codeKey, type CatalogCourse } from "@/lib/credit-check";
 import type { FacultyCourse } from "@/app/api/faculties/route";
@@ -43,20 +44,29 @@ export function ImportPanel({ records, buildCatalog, onChange }: Props) {
   const [catalogQuery, setCatalogQuery] = useState("");
   const [sisCache, setSisCache] = useState<Record<string, CatalogCourse[]>>({});
   const [loadingQuery, setLoadingQuery] = useState<string | null>(null);
+  const [sisNeedsAuth, setSisNeedsAuth] = useState(false);
 
   const normalizedQuery = normalizeQuery(catalogQuery);
   const catalogCourses = useMemo(() => (manualOpen && buildCatalog ? buildCatalog() : NO_CATALOG), [manualOpen, buildCatalog]);
 
   useEffect(() => {
-    if (!manualOpen || normalizedQuery.length < 2 || normalizedQuery in sisCache) return;
+    if (!manualOpen || sisNeedsAuth || normalizedQuery.length < 2 || normalizedQuery in sisCache) return;
     const ctrl = new AbortController();
     const qKey = normalizedQuery;
     const rawQ = catalogQuery.trim();
     const timer = setTimeout(() => {
       setLoadingQuery(qKey);
       fetch(`/api/faculties?only=courses&q=${encodeURIComponent(rawQ)}`, { signal: ctrl.signal })
-        .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-        .then((json: { courses?: FacultyCourse[] }) => {
+        .then(async (r) => {
+          if (r.status === 401) {
+            setSisNeedsAuth(true);
+            return null;
+          }
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return (await r.json()) as { courses?: FacultyCourse[] };
+        })
+        .then((json) => {
+          if (!json) return;
           const mapped: CatalogCourse[] = (json.courses ?? []).map((c) => ({
             code: c.code,
             name: c.nameTh || c.nameEn || c.code,
@@ -76,7 +86,7 @@ export function ImportPanel({ records, buildCatalog, onChange }: Props) {
       clearTimeout(timer);
       ctrl.abort();
     };
-  }, [manualOpen, catalogQuery, normalizedQuery, sisCache]);
+  }, [manualOpen, sisNeedsAuth, catalogQuery, normalizedQuery, sisCache]);
 
   const addedCodes = useMemo(() => new Set(records.map((r) => codeKey(r.code))), [records]);
 
@@ -429,6 +439,12 @@ export function ImportPanel({ records, buildCatalog, onChange }: Props) {
                     : `ไม่พบ “${catalogQuery.trim()}” ในฐานข้อมูล — กรอกรหัสและชื่อวิชาเองด้านล่างได้`
                   : "พิมพ์รหัสหรือชื่อวิชา (อย่างน้อย 2 ตัวอักษรเพื่อค้นหารายวิชา ม.อ. ทั้งหมด) หรือเลือกสาขาในขั้นที่ 1 เพื่อดูวิชาในแผน"}
               </p>
+            )}
+            {sisNeedsAuth && normalizedQuery.length >= 2 && (
+              <div className="flex flex-col items-center gap-2 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-center">
+                <p className="text-xs font-medium text-amber-900">เข้าสู่ระบบด้วย Google เพื่อค้นหารายวิชาจากฐานข้อมูล SIS</p>
+                <GoogleSignIn width={220} onSignedIn={() => setSisNeedsAuth(false)} />
+              </div>
             )}
           </div>
 

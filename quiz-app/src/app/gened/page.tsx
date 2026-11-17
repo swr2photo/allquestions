@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { Select } from "@/components/ui/select";
 import { Segmented } from "@/components/ui/checkbox";
 import { GeBadge, GeIcon } from "@/components/ge-badge";
+import { GoogleSignIn } from "@/components/google-sign-in";
 import { GE_AREAS, GE_META, baseCode, geArea, geProgress, genedLevels, type CreditItem, type GeKey } from "@/lib/ge";
 import { readRegistrationHistory, type RegistrationHistory } from "@/lib/registration";
 import { timetableStore, useTimetableStore } from "@/hooks/use-timetable-store";
@@ -86,6 +87,7 @@ export default function GenEdPage() {
   const { index: geIndex } = useGenedIndex();
   const [data, setData] = useState<CoursesResponse | null>(null);
   const [offered, setOffered] = useState<OfferedResponse | null>(null);
+  const [offeredNeedsAuth, setOfferedNeedsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,11 +106,17 @@ export default function GenEdPage() {
     try {
       const [a, b] = await Promise.all([
         fetch(`/api/gened/courses${force ? "?refresh=1" : ""}`, { cache: "no-store" }),
-        fetch("/api/gened/offered"),
+        fetch("/api/gened/offered", { cache: "no-store" }),
       ]);
       if (a.ok) setData((await a.json()) as CoursesResponse);
       else setError("ไม่สามารถโหลดข้อมูลจาก gened.psu.ac.th ได้ — แสดงเฉพาะวิชาที่เปิดสอนจาก SIS");
-      if (b.ok) setOffered((await b.json()) as OfferedResponse);
+      if (b.status === 401) {
+        setOffered(null);
+        setOfferedNeedsAuth(true);
+      } else if (b.ok) {
+        setOfferedNeedsAuth(false);
+        setOffered((await b.json()) as OfferedResponse);
+      }
       if (a.ok) setError(null);
       if (force && a.ok) {
         try {
@@ -130,12 +138,16 @@ export default function GenEdPage() {
     let cancelled = false;
     Promise.all([
       fetch("/api/gened/courses").then((r) => (r.ok ? (r.json() as Promise<CoursesResponse>) : null)),
-      fetch("/api/gened/offered").then((r) => (r.ok ? (r.json() as Promise<OfferedResponse>) : null)),
+      fetch("/api/gened/offered").then(async (r) => {
+        if (r.status === 401) return { unauth: true as const, data: null };
+        return { unauth: false as const, data: r.ok ? ((await r.json()) as OfferedResponse) : null };
+      }),
     ])
       .then(([a, b]) => {
         if (cancelled) return;
         setData(a);
-        setOffered(b);
+        setOfferedNeedsAuth(b.unauth);
+        setOffered(b.data);
         if (!a) setError("ไม่สามารถโหลดข้อมูลจาก gened.psu.ac.th ได้ — แสดงเฉพาะวิชาที่เปิดสอนจาก SIS");
         setRegistration(readRegistrationHistory());
       })
@@ -477,6 +489,13 @@ export default function GenEdPage() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-28 animate-pulse rounded-2xl bg-gray-100" />
           ))}
+        </div>
+      ) : tab === "offered" && offeredNeedsAuth ? (
+        <div className="mx-auto flex max-w-md flex-col items-center justify-center gap-3 rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+          <GraduationCap className="h-9 w-9 text-amber-600" />
+          <h2 className="text-base font-bold text-gray-900">เข้าสู่ระบบเพื่อดูรายวิชาที่เปิดสอนใน SIS</h2>
+          <p className="text-sm text-gray-600">ข้อมูลรายวิชาที่เปิดสอนและเวลาเรียนในภาคการศึกษาต้องเข้าสู่ระบบด้วย Google ก่อน</p>
+          <GoogleSignIn onSignedIn={() => void load()} />
         </div>
       ) : shown.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-gray-200 bg-white p-12 text-center">
