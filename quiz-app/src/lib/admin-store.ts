@@ -1,7 +1,10 @@
-import crypto from "crypto";
 import { kv } from "@/lib/kv";
 import type { AdminData, CourseSettings, QuizSettings } from "@/types";
 import { courses } from "@/data/courses";
+import { getAdminEmailsFromEnv } from "@/lib/session-token";
+
+// Session helpers live in session-token.ts (kept light so proxy.ts can import them).
+export * from "@/lib/session-token";
 
 function getDefaultData(): AdminData {
   const courseSettings: Record<string, CourseSettings> = {};
@@ -19,18 +22,6 @@ function getDefaultData(): AdminData {
     quizSettings: {},
     adminEmails: getAdminEmailsFromEnv(),
   };
-}
-
-// Get allowed admin emails from environment variable
-function getAdminEmailsFromEnv(): string[] {
-  const envEmails = process.env.ADMIN_EMAILS || "doralaikon.th@gmail.com";
-  return envEmails.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-}
-
-// Check if an email is allowed as admin
-export function isAllowedAdminEmail(email: string): boolean {
-  const allowed = getAdminEmailsFromEnv();
-  return allowed.includes(email.toLowerCase().trim());
 }
 
 export async function loadAdminData(): Promise<AdminData> {
@@ -81,16 +72,23 @@ export async function verifyGoogleToken(
   idToken: string
 ): Promise<{ email: string; name: string; picture: string } | null> {
   try {
+    if (typeof idToken !== "string" || idToken.length > 8192) return null;
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    // Without a client ID we can't check the audience, so a token minted for any other app would pass.
+    if (!clientId) return null;
+
     const res = await fetch(
-      `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`
+      `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`,
+      { cache: "no-store" }
     );
     if (!res.ok) return null;
 
     const payload = await res.json();
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
-    // Verify audience matches our client ID
-    if (clientId && payload.aud !== clientId) return null;
+    // Verify audience and issuer
+    if (payload.aud !== clientId) return null;
+    if (payload.iss !== "accounts.google.com" && payload.iss !== "https://accounts.google.com") return null;
+    if (typeof payload.email !== "string" || !payload.email) return null;
 
     // Verify email is verified
     if (payload.email_verified !== "true" && payload.email_verified !== true) return null;
@@ -189,103 +187,3 @@ export async function isQuizVisible(quizId: string): Promise<boolean> {
 
   return true;
 }
-
-// Stateless JWT-like Session Store
-//
-// Session lifetime policy:
-// - Admin: 7 days (slightly shorter because of higher privilege)
-// - User:  30 days
-// Both sessions support sliding refresh — every time the auth endpoint is
-// hit with a valid token we re-issue a fresh cookie, so actively-using
-// users never get kicked out mid-session.
-export const ADMIN_SESSION_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;   // 7 days
-export const USER_SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;   // 30 days
-export const ADMIN_SESSION_MAX_AGE_SEC = Math.floor(ADMIN_SESSION_MAX_AGE_MS / 1000);
-export const USER_SESSION_MAX_AGE_SEC = Math.floor(USER_SESSION_MAX_AGE_MS / 1000);
-
-// Legacy alias kept for back-compat with any external callers.
-// Defaults to the admin TTL — callers that care should pass maxAgeMs explicitly.
-const DEFAULT_SESSION_MAX_AGE_MS = ADMIN_SESSION_MAX_AGE_MS;
-
-const SECRET_KEY = process.env.SESSION_SECRET || "default-quiz-app-secret-key-please-change-it";
-
-interface SessionInfo {
-  email: string;
-  name: string;
-  picture: string;
-}
-
-interface StoredSession extends SessionInfo {
-  expiresAt: number;
-  issuedAt?: number;
-}
-
-function signSession(data: StoredSession): string {
-  const payload = Buffer.from(JSON.stringify(data)).toString("base64url");
-  const signature = crypto
-    .createHmac("sha256", SECRET_KEY)
-    .update(payload)
-    .digest("base64url");
-  return `${payload}.${signature}`;
-}
-
-// Generate a signed session token. Pass `maxAgeMs` to override the default TTL.
-export function createSessionToken(
-  info: SessionInfo,
-  maxAgeMs: number = DEFAULT_SESSION_MAX_AGE_MS
-): string {
-  const now = Date.now();
-  const sessionData: StoredSession = {
-    ...info,
-    issuedAt: now,
-    expiresAt: now + maxAgeMs,
-  };
-  return signSession(sessionData);
-}
-
-export function isValidSession(token: string | null | undefined): boolean {
-  return getSessionInfo(token) !== null;
-}
-
-export function getSessionInfo(token: string | null | undefined): SessionInfo | null {
-  if (!token) return null;
-
-  const parts = token.split(".");
-  if (parts.length !== 2) return null;
-  const [payload, signature] = parts;
-
-  const expectedSignature = crypto
-    .createHmac("sha256", SECRET_KEY)
-    .update(payload)
-    .digest("base64url");
-
-  if (signature !== expectedSignature) return null;
-
-  try {
-    const data: StoredSession = JSON.parse(Buffer.from(payload, "base64url").toString("utf-8"));
-    if (Date.now() > data.expiresAt) return null;
-    return {
-      email: data.email,
-      name: data.name,
-      picture: data.picture,
-    };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Sliding refresh — if the token is still valid, return a fresh token
- * with a full new TTL. Returns null if the existing token is invalid/expired.
- *
- * The caller is expected to re-set the cookie with the returned token.
- */
-export function refreshSessionToken(
-  token: string | null | undefined,
-  maxAgeMs: number
-): string | null {
-  const info = getSessionInfo(token);
-  if (!info) return null;
-  return createSessionToken(info, maxAgeMs);
-}
-

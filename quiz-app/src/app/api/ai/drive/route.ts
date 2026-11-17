@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { isValidSession } from "@/lib/admin-store";
 
+// Drive file/folder IDs are URL-safe; anything else could rewrite the Drive API path or query.
+const DRIVE_ID_RE = /^[A-Za-z0-9_-]{1,200}$/;
+
+function escapeDriveQuery(value: string): string {
+  return value.slice(0, 200).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+}
+
 // List files from Google Drive
 export async function GET(req: NextRequest) {
   const cookieStore = await cookies();
@@ -26,7 +33,10 @@ export async function GET(req: NextRequest) {
 
   // If browsing inside a folder, filter by parent
   if (folderId) {
-    driveQuery += ` and '${folderId.replace(/'/g, "\\'")}' in parents`;
+    if (!DRIVE_ID_RE.test(folderId)) {
+      return NextResponse.json({ error: "โฟลเดอร์ไม่ถูกต้อง" }, { status: 400 });
+    }
+    driveQuery += ` and '${folderId}' in parents`;
   }
 
   // Apply type filter
@@ -39,7 +49,7 @@ export async function GET(req: NextRequest) {
   }
   // "all" and "notebooklm" show everything including folders
   if (query) {
-    driveQuery += ` and name contains '${query.replace(/'/g, "\\'")}'`;
+    driveQuery += ` and name contains '${escapeDriveQuery(query)}'`;
   }
 
   try {
@@ -73,8 +83,8 @@ export async function GET(req: NextRequest) {
 // Download/export a file from Google Drive
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-  const userCookie = cookieStore.get("user-session") || cookieStore.get("admin-session");
-  if (!userCookie) {
+  const token = cookieStore.get("user-session")?.value || cookieStore.get("admin-session")?.value;
+  if (!token || !isValidSession(token)) {
     return NextResponse.json({ error: "กรุณาเข้าสู่ระบบ" }, { status: 401 });
   }
 
@@ -85,12 +95,12 @@ export async function POST(req: NextRequest) {
 
   try {
     const { fileId, mimeType } = await req.json();
-    if (!fileId) {
+    if (typeof fileId !== "string" || !DRIVE_ID_RE.test(fileId)) {
       return NextResponse.json({ error: "ไม่ระบุไฟล์" }, { status: 400 });
     }
 
     // Google Workspace files need export, others use direct download
-    const isGoogleDoc = mimeType?.startsWith("application/vnd.google-apps.");
+    const isGoogleDoc = typeof mimeType === "string" && mimeType.startsWith("application/vnd.google-apps.");
     let downloadUrl: string;
     let exportMime: string | undefined;
 

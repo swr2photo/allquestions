@@ -4,6 +4,7 @@ import { MessageSquare, Bot, User, Calendar, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import hljs from "highlight.js";
 import katex from "katex";
+import { escapeHtml, escapeMarkdownSource } from "@/lib/safe-html";
 import "highlight.js/styles/github-dark.css";
 import "katex/dist/katex.min.css";
 
@@ -39,42 +40,27 @@ function parseThinking(content: string): { thinking: string; answer: string } {
 function renderMarkdown(text: string): string {
   if (!text) return "";
   
+  // Math is rendered by KaTeX (which escapes its input) and kept aside as placeholders,
+  // so the escaping pass below doesn't touch it.
   const mathBlocks: string[] = [];
-  let processed = text.replace(/\$\$([\s\S]*?)\$\$/g, (_m, tex) => {
+  const addMath = (tex: string, displayMode: boolean) => {
     const idx = mathBlocks.length;
     try {
-      mathBlocks.push(katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false, output: "html" }));
+      mathBlocks.push(katex.renderToString(tex.trim(), { displayMode, throwOnError: false, output: "html" }));
     } catch {
-      mathBlocks.push(`<div class="text-red-500 text-sm font-mono">${tex}</div>`);
+      mathBlocks.push(displayMode
+        ? `<div class="text-red-500 text-sm font-mono">${escapeHtml(tex)}</div>`
+        : `<code class="text-red-500">${escapeHtml(tex)}</code>`);
     }
     return `\x00MATH${idx}\x00`;
-  });
+  };
 
-  processed = processed.replace(/(?<!\$)\$(?!\$)([^\n$]+?)\$(?!\$)/g, (_m, tex) => {
-    try {
-      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false, output: "html" });
-    } catch {
-      return `<code class="text-red-500">${tex}</code>`;
-    }
-  });
+  let processed = text.replace(/\$\$([\s\S]*?)\$\$/g, (_m, tex) => addMath(tex, true));
+  processed = processed.replace(/(?<!\$)\$(?!\$)([^\n$]+?)\$(?!\$)/g, (_m, tex) => addMath(tex, false));
 
   // Also handle \( ... \) and \[ ... \] LaTeX delimiters
-  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_m, tex) => {
-    const idx = mathBlocks.length;
-    try {
-      mathBlocks.push(katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false, output: "html" }));
-    } catch {
-      mathBlocks.push(`<div class="text-red-500 text-sm font-mono">${tex}</div>`);
-    }
-    return `\x00MATH${idx}\x00`;
-  });
-  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_m, tex) => {
-    try {
-      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false, output: "html" });
-    } catch {
-      return `<code class="text-red-500">${tex}</code>`;
-    }
-  });
+  processed = processed.replace(/\\\[([\s\S]*?)\\\]/g, (_m, tex) => addMath(tex, true));
+  processed = processed.replace(/\\\(([\s\S]*?)\\\)/g, (_m, tex) => addMath(tex, false));
 
   const codeBlocks: string[] = [];
   processed = processed.replace(/```(\w*)\n([\s\S]*?)(?:```|$)/g, (_m, lang: string, code: string) => {
@@ -102,6 +88,9 @@ function renderMarkdown(text: string): string {
     );
     return `\x00CODE${idx}\x00`;
   });
+
+  // Shared chats are written by anyone: escape the remaining text before building HTML.
+  processed = escapeMarkdownSource(processed);
 
   // Parse tables
   processed = processed.replace(

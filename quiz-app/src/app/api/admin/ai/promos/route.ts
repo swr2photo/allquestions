@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@/lib/kv";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 
 interface PromoCode {
   code: string;
@@ -12,7 +12,7 @@ interface PromoCode {
 
 function adminGuard(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!token || !isValidSession(token)) return false;
+  if (!token || !isValidAdminSession(token)) return false;
   return true;
 }
 

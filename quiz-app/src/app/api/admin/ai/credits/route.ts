@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@/lib/kv";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 import { creditsKey, addCreditLog } from "@/lib/credits";
 
 function adminGuard(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!token || !isValidSession(token)) return false;
+  if (!token || !isValidAdminSession(token)) return false;
   return true;
 }
 

@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 
 async function requireAdmin() {
   const token = (await cookies()).get("admin-session")?.value;
-  return isValidSession(token);
+  return isValidAdminSession(token);
 }
 
 export const dynamic = "force-dynamic";

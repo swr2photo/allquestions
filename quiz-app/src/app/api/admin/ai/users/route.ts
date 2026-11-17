@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 import { kv } from "@/lib/kv";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export interface UserQuotaInfo {
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

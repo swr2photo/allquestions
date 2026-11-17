@@ -3,7 +3,7 @@ import {
   verifyGoogleToken,
   isAllowedAdminEmail,
   createSessionToken,
-  isValidSession,
+  isValidAdminSession,
   getSessionInfo,
   refreshSessionToken,
   ADMIN_SESSION_MAX_AGE_MS,
@@ -52,7 +52,8 @@ export async function POST(request: NextRequest) {
         name: userInfo.name,
         picture: userInfo.picture,
       },
-      ADMIN_SESSION_MAX_AGE_MS
+      ADMIN_SESSION_MAX_AGE_MS,
+      "admin"
     );
 
     // Issue a user-session too, so admins don't need to log in a second time
@@ -116,7 +117,7 @@ export async function DELETE() {
 // expiration window slides forward with each request.
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  const valid = isValidSession(token);
+  const valid = isValidAdminSession(token);
   const user = valid ? getSessionInfo(token) : null;
 
   const response = NextResponse.json({

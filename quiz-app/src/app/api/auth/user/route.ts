@@ -10,6 +10,7 @@ import {
   ADMIN_SESSION_MAX_AGE_MS,
   ADMIN_SESSION_MAX_AGE_SEC,
   isAllowedAdminEmail,
+  isValidAdminSession,
 } from "@/lib/admin-store";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -91,7 +92,7 @@ export async function GET(request: NextRequest) {
   const adminToken = request.cookies.get("admin-session")?.value;
 
   const userValid = isValidSession(userToken);
-  const adminValid = isValidSession(adminToken);
+  const adminValid = isValidAdminSession(adminToken);
 
   const activeToken = userValid ? userToken : adminValid ? adminToken : undefined;
   const sessionInfo = userValid

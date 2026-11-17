@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 import { getProviderHealth, invalidateProviderHealthCache, type ProviderDetail } from "@/lib/ai-health";
 import { getProviderStats, getModelStats, resetAllStats, resetProviderStats, type ProviderStats } from "@/lib/ai-stats";
 import { kv } from "@/lib/kv";
@@ -22,7 +22,7 @@ async function getTotalUsage(): Promise<{ activeUsers: number; totalRequests: nu
 // GET — return full AI status snapshot for admin
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 // DELETE — reset provider call counters (?provider=xxx or all)
 export async function DELETE(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

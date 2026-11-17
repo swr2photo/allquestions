@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { kv } from "@/lib/kv";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 
 // GET /api/admin/ai/quotas - List all user quotas
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 // DELETE /api/admin/ai/quotas?email=xxx - Reset a user's quota
 export async function DELETE(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }
 

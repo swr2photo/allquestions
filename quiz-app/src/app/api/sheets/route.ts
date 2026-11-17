@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { fetchSheetData, groupByCourse } from "@/lib/sheets";
 import { cookies } from "next/headers";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 
 async function requireAdmin() {
   const token = (await cookies()).get("admin-session")?.value;
-  return isValidSession(token);
+  return isValidAdminSession(token);
 }
 
 

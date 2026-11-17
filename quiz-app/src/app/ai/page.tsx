@@ -30,6 +30,7 @@ import yaml from "highlight.js/lib/languages/yaml";
 import markdown from "highlight.js/lib/languages/markdown";
 import diff from "highlight.js/lib/languages/diff";
 import katex from "katex";
+import { escapeHtml, escapeMarkdownSource } from "@/lib/safe-html";
 import "katex/dist/katex.min.css";
 import {
   Sparkles,
@@ -182,7 +183,7 @@ const renderMarkdown = (text: string) => {
       const html = katex.renderToString(tex, { displayMode: true, throwOnError: false, output: "html" });
       return addBlock("MATH", `<div class="my-4 overflow-x-auto">${html}</div>`);
     } catch {
-      return addBlock("MATH", `<div class="text-red-500 text-sm font-mono my-2 border border-red-200 p-2 rounded bg-red-50">${tex}</div>`);
+      return addBlock("MATH", `<div class="text-red-500 text-sm font-mono my-2 border border-red-200 p-2 rounded bg-red-50">${escapeHtml(tex)}</div>`);
     }
   });
 
@@ -195,9 +196,12 @@ const renderMarkdown = (text: string) => {
       const html = katex.renderToString(tex, { displayMode: false, throwOnError: false, output: "html" });
       return addBlock("MATH", html);
     } catch {
-      return addBlock("MATH", `<code class="text-red-500">${tex}</code>`);
+      return addBlock("MATH", `<code class="text-red-500">${escapeHtml(tex)}</code>`);
     }
   });
+
+  // Everything left is untrusted text (model output, shared chats): escape it before building HTML.
+  processed = escapeMarkdownSource(processed);
 
   // Tables
   processed = processed.replace(/(?:^|\n)((?:\|[^\n]+\|\s*\n){2,})/g, (_m, tableBlock: string) => {

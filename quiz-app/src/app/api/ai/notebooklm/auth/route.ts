@@ -4,11 +4,11 @@ import os from "os";
 import fs from "fs";
 import { join } from "path";
 import { cookies } from "next/headers";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 
 async function requireAdmin() {
   const token = (await cookies()).get("admin-session")?.value;
-  return isValidSession(token);
+  return isValidAdminSession(token);
 }
 
 // POST: Run notebooklm-mcp-server auth (opens browser)

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 import { getGlobalChatHistory } from "@/lib/ai-stats";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  if (!isValidSession(token)) {
+  if (!isValidAdminSession(token)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

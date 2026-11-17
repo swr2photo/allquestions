@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isValidSession } from "@/lib/admin-store";
+import { isValidAdminSession } from "@/lib/admin-store";
 import {
   getCustomQuiz,
   updateCustomQuiz,
@@ -8,7 +8,7 @@ import {
 
 function checkAuth(request: NextRequest) {
   const token = request.cookies.get("admin-session")?.value;
-  return isValidSession(token);
+  return isValidAdminSession(token);
 }
 
 // GET /api/admin/quizzes/[quizId]

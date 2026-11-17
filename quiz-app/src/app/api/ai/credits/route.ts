@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getSessionInfo, isValidSession } from "@/lib/admin-store";
+import { getSessionInfo, isValidSession, isValidAdminSession } from "@/lib/admin-store";
 import { kv } from "@/lib/kv";
 import { MODEL_CREDITS, creditsKey, addCreditLog, type CreditLog } from "@/lib/credits";
 
@@ -99,8 +99,11 @@ export async function POST(req: NextRequest) {
     if (action === "admin_add" && targetEmail && amount) {
       // Check if current user is admin
       const adminToken = cookieStore.get("admin-session")?.value;
-      if (!adminToken || !isValidSession(adminToken)) {
+      if (!adminToken || !isValidAdminSession(adminToken)) {
         return NextResponse.json({ error: "Admin access required" }, { status: 403 });
+      }
+      if (typeof amount !== "number" || !Number.isFinite(amount) || !Number.isInteger(amount) || Math.abs(amount) > 1_000_000 || typeof targetEmail !== "string") {
+        return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
       }
 
       const currentBalance = await kv.get<number>(creditsKey(targetEmail)) ?? 0;
